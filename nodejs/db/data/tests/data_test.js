@@ -220,7 +220,7 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, metadata: true });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value(), [
-					[timestamp, 1, 60000, ""],
+					[timestamp, 1, 24000, ""],
 					[expiredTimestamp, 10],
 				]);
 			}

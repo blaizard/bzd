@@ -173,7 +173,7 @@ export default class Plugin extends PluginBase {
 			this.setStorage(await StorageBzd.make(this.nodes));
 
 			const output = await this.records.init(provider, async (record) => {
-				await this.nodes.insertRecord(Nodes.recordFromDisk(record));
+				this.nodes.insertFromRecord(Nodes.recordFromDisk(record));
 			});
 
 			return output;
@@ -516,7 +516,7 @@ export default class Plugin extends PluginBase {
 	}
 
 	get version() {
-		return 3;
+		return 4;
 	}
 
 	/// Read records from the given tick.
@@ -556,10 +556,9 @@ export default class Plugin extends PluginBase {
 	/// - Use the handlers mechanism.
 	///
 	/// \param uid The identifier of the node.
-	/// \param key The key where to store the value.
-	/// \param value The value to be stored.
+	/// \param data The data to be written.
 	/// \param timestamp The timestamp in Ms of this value.
-	async write(uid, key, value, timestamp) {
-		await this.nodes.insertRecord(Nodes.recordFromSingleEntry(uid, key, value, timestamp));
+	write(uid, data, timestamp) {
+		this.nodes.insertFromRecord(Nodes.recordFromSingleEntry(uid, data, timestamp));
 	}
 }

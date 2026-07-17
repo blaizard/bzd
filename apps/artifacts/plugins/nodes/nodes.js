@@ -56,7 +56,17 @@ export class Nodes {
 		timestamp = this.data.insert(uid, fragments, timestamp);
 
 		// Generate records.
-		return fragments.map(([key, value, _]) => [uid, key, value, timestamp, isFixedTimestamp]);
+		return fragments.map(([key, value, options]) => {
+			// Keep only the unit and expires in the options.
+			let updatedOptions = {};
+			if (options.unit !== undefined) {
+				updatedOptions.unit = options.unit;
+			}
+			if (options.expires !== undefined) {
+				updatedOptions.expires = options.expires;
+			}
+			return [uid, [key, value, updatedOptions], timestamp, isFixedTimestamp];
+		});
 	}
 
 	/// Get the tree with single values.
@@ -99,12 +109,10 @@ export class Nodes {
 	}
 
 	// Insert a record entry to the data.
-	async insertRecord(records) {
-		await Promise.all(
-			records.map(([uid, key, value, timestamp, _isFixedTimestamp]) =>
-				this.data.insert(uid, [[key, value]], timestamp),
-			),
-		);
+	insertFromRecord(records) {
+		for (const [uid, data, timestamp, _isFixedTimestamp] of records) {
+			this.data.insert(uid, [data], timestamp);
+		}
 	}
 
 	/// Write a record to the disk.
@@ -116,7 +124,7 @@ export class Nodes {
 	/// \return The disk optimized record.
 	static recordToDisk(record) {
 		let clusters = {};
-		for (const [uid, key, value, timestamp, isFixedTimestamp] of record) {
+		for (const [uid, data, timestamp, isFixedTimestamp] of record) {
 			const keyCluster = uid + "@" + timestamp + "@" + isFixedTimestamp;
 			clusters[keyCluster] ??= {
 				uid: uid,
@@ -124,20 +132,20 @@ export class Nodes {
 				isFixedTimestamp: isFixedTimestamp,
 				data: [],
 			};
-			clusters[keyCluster].data.push([key, value]);
+			clusters[keyCluster].data.push(data);
 		}
 		let onDiskRecord = [];
 		for (const [_, cluster] of Object.entries(clusters)) {
-			let valueCluster = {};
-			for (const [key, value] of cluster.data) {
-				let current = valueCluster;
+			let dataCluster = {};
+			for (const [key, ...data] of cluster.data) {
+				let current = dataCluster;
 				for (const part of key) {
 					current[part] ??= {};
 					current = current[part];
 				}
-				current["_"] = value;
+				current["_"] = data;
 			}
-			onDiskRecord.push([cluster.uid, valueCluster, cluster.timestamp, Boolean(cluster.isFixedTimestamp) ? 1 : 0]);
+			onDiskRecord.push([cluster.uid, dataCluster, cluster.timestamp, Boolean(cluster.isFixedTimestamp) ? 1 : 0]);
 		}
 		return onDiskRecord;
 	}
@@ -154,16 +162,16 @@ export class Nodes {
 			let paths = [];
 			for (const [part, data] of Object.entries(fragment)) {
 				if (part == "_") {
-					paths.push([key, data]);
+					paths.push([key, ...data]);
 				} else {
 					paths = paths.concat(traverse(data, [...key, part], depth + 1));
 				}
 			}
 			return paths;
 		};
-		for (const [uid, valueCluster, timestamp, isFixedTimestamp] of record) {
-			for (const [key, value] of traverse(valueCluster)) {
-				fromDiskRecord.push([uid, key, value, timestamp, Boolean(isFixedTimestamp)]);
+		for (const [uid, dataCluster, timestamp, isFixedTimestamp] of record) {
+			for (const data of traverse(dataCluster)) {
+				fromDiskRecord.push([uid, data, timestamp, Boolean(isFixedTimestamp)]);
 			}
 		}
 		return fromDiskRecord;
@@ -172,13 +180,12 @@ export class Nodes {
 	/// Create a record from a single entry.
 	///
 	/// \param uid The identifier of the node.
-	/// \param key The key where to store the value.
-	/// \param value The value to be stored.
+	/// \param data The data to be inserted in the record (typically: [key, value, metadata])
 	/// \param timestamp The timestamp in Ms of this value.
 	/// \param isFixedTimestamp If the timestamp is considered fixed or not.
 	///
 	/// \return A record containing this information.
-	static recordFromSingleEntry(uid, key, value, timestamp, isFixedTimestamp = false) {
-		return [[uid, key, value, timestamp, isFixedTimestamp]];
+	static recordFromSingleEntry(uid, data, timestamp, isFixedTimestamp = false) {
+		return [[uid, data, timestamp, isFixedTimestamp]];
 	}
 }

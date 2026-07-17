@@ -31,7 +31,7 @@ export default class RecordsReader {
 	/// The current version of the records, any records with a different version
 	/// will be discarded.
 	static get version() {
-		return 2;
+		return 3;
 	}
 
 	/// Get the tick from a path.

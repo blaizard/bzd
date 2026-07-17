@@ -17,62 +17,462 @@ const waitUntil = async (callback) => {
 };
 
 const recordTest1 = [
-	["udm", ["data", "disk", "/dev/loop0"], [741081088, 741081088], 1742396372419, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/overlay"], [1492955136, 9898135552], 1742396372419, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/log"], [227487744, 1020702720], 1742396372419, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/persistent"], [445366272, 2040373248], 1742396372419, false],
-	["udm", ["data", "disk", "/dev/sda5"], [1062014976, 116971257856], 1742396372419, false],
-	["udm", ["data", "uptime"], 11829212.253938198, 1742396372419, false],
-	["accounts", ["data", "cpu", "main"], [0.01], 1742396377036, false],
-	["accounts", ["data", "memory", "ram"], [624484352, 1003941888], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/vda1"], [14162665472, 25821052928], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop2"], [109051904, 109051904], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop0"], [4456448, 4456448], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/vda15"], [6333952, 109422592], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop8"], [109314048, 109314048], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop9"], [91357184, 91357184], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop10"], [4718592, 4718592], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop3"], [66846720, 66846720], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop13"], [93847552, 93847552], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop5"], [77463552, 77463552], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop4"], [46661632, 46661632], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop6"], [77594624, 77594624], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop11"], [66846720, 66846720], 1742396377036, false],
-	["accounts", ["data", "disk", "/dev/loop7"], [46661632, 46661632], 1742396377036, false],
-	["accounts", ["data", "uptime"], 23262548.98503518, 1742396377036, false],
-	["udm", ["data", "cpu", "main"], [0.052000000000000005, 0.031, 0.04, 0.10800000000000001], 1742396378612, false],
-	["udm", ["data", "temperature", "adt7475"], [52.25, 50.75, 52.25], 1742396378612, false],
-	["udm", ["data", "memory", "ram"], [2608898048, 4137803776], 1742396378612, false],
-	["udm", ["data", "memory", "swap"], [575930368, 7516188672], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/root"], [1475219456, 2040373248], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/loop0"], [741081088, 741081088], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/overlay"], [1492955136, 9898135552], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/log"], [227487744, 1020702720], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/persistent"], [445366272, 2040373248], 1742396378612, false],
-	["udm", ["data", "disk", "/dev/sda5"], [1062014976, 116971257856], 1742396378612, false],
-	["udm", ["data", "uptime"], 11829218.455123663, 1742396378612, false],
-	["accounts", ["data", "cpu", "main"], [0.01], 1742396383089, false],
-	["accounts", ["data", "memory", "ram"], [635863040, 1003941888], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/vda1"], [14162665472, 25821052928], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop2"], [109051904, 109051904], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop0"], [4456448, 4456448], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/vda15"], [6333952, 109422592], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop8"], [109314048, 109314048], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop9"], [91357184, 91357184], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop10"], [4718592, 4718592], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop3"], [66846720, 66846720], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop13"], [93847552, 93847552], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop5"], [77463552, 77463552], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop4"], [46661632, 46661632], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop6"], [77594624, 77594624], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop11"], [66846720, 66846720], 1742396383089, false],
-	["accounts", ["data", "disk", "/dev/loop7"], [46661632, 46661632], 1742396383089, false],
-	["accounts", ["data", "uptime"], 23262555.03905797, 1742396383089, false],
-	["udm", ["data", "cpu", "main"], [0.14, 0.156, 0.05, 0.214], 1742396384824, false],
-	["udm", ["data", "temperature", "adt7475"], [52.25, 50.75, 52.5], 1742396384824, false],
-	["udm", ["data", "memory", "ram"], [2609442816, 4137803776], 1742396384824, false],
-	["udm", ["data", "memory", "swap"], [575930368, 7516188672], 1742396384824, false],
-	["udm", ["data", "disk", "/dev/disk/by-partlabel/root"], [1475219456, 2040373248], 1742396384824, false],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/loop0"],
+			[741081088, 741081088],
+		],
+		1742396372419,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/overlay"],
+			[1492955136, 9898135552],
+		],
+		1742396372419,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/log"],
+			[227487744, 1020702720],
+		],
+		1742396372419,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/persistent"],
+			[445366272, 2040373248],
+		],
+		1742396372419,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/sda5"],
+			[1062014976, 116971257856],
+		],
+		1742396372419,
+		false,
+	],
+	["udm", [["data", "uptime"], 11829212.253938198], 1742396372419, false],
+	["accounts", [["data", "cpu", "main"], [0.01]], 1742396377036, false],
+	[
+		"accounts",
+		[
+			["data", "memory", "ram"],
+			[624484352, 1003941888],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/vda1"],
+			[14162665472, 25821052928],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop2"],
+			[109051904, 109051904],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop0"],
+			[4456448, 4456448],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/vda15"],
+			[6333952, 109422592],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop8"],
+			[109314048, 109314048],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop9"],
+			[91357184, 91357184],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop10"],
+			[4718592, 4718592],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop3"],
+			[66846720, 66846720],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop13"],
+			[93847552, 93847552],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop5"],
+			[77463552, 77463552],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop4"],
+			[46661632, 46661632],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop6"],
+			[77594624, 77594624],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop11"],
+			[66846720, 66846720],
+		],
+		1742396377036,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop7"],
+			[46661632, 46661632],
+		],
+		1742396377036,
+		false,
+	],
+	["accounts", [["data", "uptime"], 23262548.98503518], 1742396377036, false],
+	[
+		"udm",
+		[
+			["data", "cpu", "main"],
+			[0.052000000000000005, 0.031, 0.04, 0.10800000000000001],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "temperature", "adt7475"],
+			[52.25, 50.75, 52.25],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "memory", "ram"],
+			[2608898048, 4137803776],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "memory", "swap"],
+			[575930368, 7516188672],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/root"],
+			[1475219456, 2040373248],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/loop0"],
+			[741081088, 741081088],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/overlay"],
+			[1492955136, 9898135552],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/log"],
+			[227487744, 1020702720],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/persistent"],
+			[445366272, 2040373248],
+		],
+		1742396378612,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/sda5"],
+			[1062014976, 116971257856],
+		],
+		1742396378612,
+		false,
+	],
+	["udm", [["data", "uptime"], 11829218.455123663], 1742396378612, false],
+	["accounts", [["data", "cpu", "main"], [0.01]], 1742396383089, false],
+	[
+		"accounts",
+		[
+			["data", "memory", "ram"],
+			[635863040, 1003941888],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/vda1"],
+			[14162665472, 25821052928],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop2"],
+			[109051904, 109051904],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop0"],
+			[4456448, 4456448],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/vda15"],
+			[6333952, 109422592],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop8"],
+			[109314048, 109314048],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop9"],
+			[91357184, 91357184],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop10"],
+			[4718592, 4718592],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop3"],
+			[66846720, 66846720],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop13"],
+			[93847552, 93847552],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop5"],
+			[77463552, 77463552],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop4"],
+			[46661632, 46661632],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop6"],
+			[77594624, 77594624],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop11"],
+			[66846720, 66846720],
+		],
+		1742396383089,
+		false,
+	],
+	[
+		"accounts",
+		[
+			["data", "disk", "/dev/loop7"],
+			[46661632, 46661632],
+		],
+		1742396383089,
+		false,
+	],
+	["accounts", [["data", "uptime"], 23262555.03905797], 1742396383089, false],
+	[
+		"udm",
+		[
+			["data", "cpu", "main"],
+			[0.14, 0.156, 0.05, 0.214],
+		],
+		1742396384824,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "temperature", "adt7475"],
+			[52.25, 50.75, 52.5],
+		],
+		1742396384824,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "memory", "ram"],
+			[2609442816, 4137803776],
+		],
+		1742396384824,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "memory", "swap"],
+			[575930368, 7516188672],
+		],
+		1742396384824,
+		false,
+	],
+	[
+		"udm",
+		[
+			["data", "disk", "/dev/disk/by-partlabel/root"],
+			[1475219456, 2040373248],
+		],
+		1742396384824,
+		false,
+	],
 ];
 
 const recordOnDiskTest1 = [
@@ -81,13 +481,13 @@ const recordOnDiskTest1 = [
 		{
 			data: {
 				disk: {
-					"/dev/loop0": { _: [741081088, 741081088] },
-					"/dev/disk/by-partlabel/overlay": { _: [1492955136, 9898135552] },
-					"/dev/disk/by-partlabel/log": { _: [227487744, 1020702720] },
-					"/dev/disk/by-partlabel/persistent": { _: [445366272, 2040373248] },
-					"/dev/sda5": { _: [1062014976, 116971257856] },
+					"/dev/loop0": { _: [[741081088, 741081088]] },
+					"/dev/disk/by-partlabel/overlay": { _: [[1492955136, 9898135552]] },
+					"/dev/disk/by-partlabel/log": { _: [[227487744, 1020702720]] },
+					"/dev/disk/by-partlabel/persistent": { _: [[445366272, 2040373248]] },
+					"/dev/sda5": { _: [[1062014976, 116971257856]] },
 				},
-				uptime: { _: 11829212.253938198 },
+				uptime: { _: [11829212.253938198] },
 			},
 		},
 		1742396372419,
@@ -97,25 +497,25 @@ const recordOnDiskTest1 = [
 		"accounts",
 		{
 			data: {
-				cpu: { main: { _: [0.01] } },
-				memory: { ram: { _: [624484352, 1003941888] } },
+				cpu: { main: { _: [[0.01]] } },
+				memory: { ram: { _: [[624484352, 1003941888]] } },
 				disk: {
-					"/dev/vda1": { _: [14162665472, 25821052928] },
-					"/dev/loop2": { _: [109051904, 109051904] },
-					"/dev/loop0": { _: [4456448, 4456448] },
-					"/dev/vda15": { _: [6333952, 109422592] },
-					"/dev/loop8": { _: [109314048, 109314048] },
-					"/dev/loop9": { _: [91357184, 91357184] },
-					"/dev/loop10": { _: [4718592, 4718592] },
-					"/dev/loop3": { _: [66846720, 66846720] },
-					"/dev/loop13": { _: [93847552, 93847552] },
-					"/dev/loop5": { _: [77463552, 77463552] },
-					"/dev/loop4": { _: [46661632, 46661632] },
-					"/dev/loop6": { _: [77594624, 77594624] },
-					"/dev/loop11": { _: [66846720, 66846720] },
-					"/dev/loop7": { _: [46661632, 46661632] },
+					"/dev/vda1": { _: [[14162665472, 25821052928]] },
+					"/dev/loop2": { _: [[109051904, 109051904]] },
+					"/dev/loop0": { _: [[4456448, 4456448]] },
+					"/dev/vda15": { _: [[6333952, 109422592]] },
+					"/dev/loop8": { _: [[109314048, 109314048]] },
+					"/dev/loop9": { _: [[91357184, 91357184]] },
+					"/dev/loop10": { _: [[4718592, 4718592]] },
+					"/dev/loop3": { _: [[66846720, 66846720]] },
+					"/dev/loop13": { _: [[93847552, 93847552]] },
+					"/dev/loop5": { _: [[77463552, 77463552]] },
+					"/dev/loop4": { _: [[46661632, 46661632]] },
+					"/dev/loop6": { _: [[77594624, 77594624]] },
+					"/dev/loop11": { _: [[66846720, 66846720]] },
+					"/dev/loop7": { _: [[46661632, 46661632]] },
 				},
-				uptime: { _: 23262548.98503518 },
+				uptime: { _: [23262548.98503518] },
 			},
 		},
 		1742396377036,
@@ -125,18 +525,18 @@ const recordOnDiskTest1 = [
 		"udm",
 		{
 			data: {
-				cpu: { main: { _: [0.052000000000000005, 0.031, 0.04, 0.10800000000000001] } },
-				temperature: { adt7475: { _: [52.25, 50.75, 52.25] } },
-				memory: { ram: { _: [2608898048, 4137803776] }, swap: { _: [575930368, 7516188672] } },
+				cpu: { main: { _: [[0.052000000000000005, 0.031, 0.04, 0.10800000000000001]] } },
+				temperature: { adt7475: { _: [[52.25, 50.75, 52.25]] } },
+				memory: { ram: { _: [[2608898048, 4137803776]] }, swap: { _: [[575930368, 7516188672]] } },
 				disk: {
-					"/dev/disk/by-partlabel/root": { _: [1475219456, 2040373248] },
-					"/dev/loop0": { _: [741081088, 741081088] },
-					"/dev/disk/by-partlabel/overlay": { _: [1492955136, 9898135552] },
-					"/dev/disk/by-partlabel/log": { _: [227487744, 1020702720] },
-					"/dev/disk/by-partlabel/persistent": { _: [445366272, 2040373248] },
-					"/dev/sda5": { _: [1062014976, 116971257856] },
+					"/dev/disk/by-partlabel/root": { _: [[1475219456, 2040373248]] },
+					"/dev/loop0": { _: [[741081088, 741081088]] },
+					"/dev/disk/by-partlabel/overlay": { _: [[1492955136, 9898135552]] },
+					"/dev/disk/by-partlabel/log": { _: [[227487744, 1020702720]] },
+					"/dev/disk/by-partlabel/persistent": { _: [[445366272, 2040373248]] },
+					"/dev/sda5": { _: [[1062014976, 116971257856]] },
 				},
-				uptime: { _: 11829218.455123663 },
+				uptime: { _: [11829218.455123663] },
 			},
 		},
 		1742396378612,
@@ -146,25 +546,25 @@ const recordOnDiskTest1 = [
 		"accounts",
 		{
 			data: {
-				cpu: { main: { _: [0.01] } },
-				memory: { ram: { _: [635863040, 1003941888] } },
+				cpu: { main: { _: [[0.01]] } },
+				memory: { ram: { _: [[635863040, 1003941888]] } },
 				disk: {
-					"/dev/vda1": { _: [14162665472, 25821052928] },
-					"/dev/loop2": { _: [109051904, 109051904] },
-					"/dev/loop0": { _: [4456448, 4456448] },
-					"/dev/vda15": { _: [6333952, 109422592] },
-					"/dev/loop8": { _: [109314048, 109314048] },
-					"/dev/loop9": { _: [91357184, 91357184] },
-					"/dev/loop10": { _: [4718592, 4718592] },
-					"/dev/loop3": { _: [66846720, 66846720] },
-					"/dev/loop13": { _: [93847552, 93847552] },
-					"/dev/loop5": { _: [77463552, 77463552] },
-					"/dev/loop4": { _: [46661632, 46661632] },
-					"/dev/loop6": { _: [77594624, 77594624] },
-					"/dev/loop11": { _: [66846720, 66846720] },
-					"/dev/loop7": { _: [46661632, 46661632] },
+					"/dev/vda1": { _: [[14162665472, 25821052928]] },
+					"/dev/loop2": { _: [[109051904, 109051904]] },
+					"/dev/loop0": { _: [[4456448, 4456448]] },
+					"/dev/vda15": { _: [[6333952, 109422592]] },
+					"/dev/loop8": { _: [[109314048, 109314048]] },
+					"/dev/loop9": { _: [[91357184, 91357184]] },
+					"/dev/loop10": { _: [[4718592, 4718592]] },
+					"/dev/loop3": { _: [[66846720, 66846720]] },
+					"/dev/loop13": { _: [[93847552, 93847552]] },
+					"/dev/loop5": { _: [[77463552, 77463552]] },
+					"/dev/loop4": { _: [[46661632, 46661632]] },
+					"/dev/loop6": { _: [[77594624, 77594624]] },
+					"/dev/loop11": { _: [[66846720, 66846720]] },
+					"/dev/loop7": { _: [[46661632, 46661632]] },
 				},
-				uptime: { _: 23262555.03905797 },
+				uptime: { _: [23262555.03905797] },
 			},
 		},
 		1742396383089,
@@ -174,10 +574,10 @@ const recordOnDiskTest1 = [
 		"udm",
 		{
 			data: {
-				cpu: { main: { _: [0.14, 0.156, 0.05, 0.214] } },
-				temperature: { adt7475: { _: [52.25, 50.75, 52.5] } },
-				memory: { ram: { _: [2609442816, 4137803776] }, swap: { _: [575930368, 7516188672] } },
-				disk: { "/dev/disk/by-partlabel/root": { _: [1475219456, 2040373248] } },
+				cpu: { main: { _: [[0.14, 0.156, 0.05, 0.214]] } },
+				temperature: { adt7475: { _: [[52.25, 50.75, 52.5]] } },
+				memory: { ram: { _: [[2609442816, 4137803776]] }, swap: { _: [[575930368, 7516188672]] } },
+				disk: { "/dev/disk/by-partlabel/root": { _: [[1475219456, 2040373248]] } },
 			},
 		},
 		1742396384824,
@@ -186,12 +586,12 @@ const recordOnDiskTest1 = [
 ];
 
 const recordOnDiskTestVersion1 = [
-	["accounts", ["data", "cpu", "main"], [0.01], 1742552298029],
-	["accounts", ["data", "memory", "ram"], [432209920, 1003941888], 1742552298029],
-	["accounts", ["data", "disk", "/dev/vda1"], [14132637696, 25821052928], 1742552298029],
-	["accounts", ["data", "disk", "/dev/loop2"], [109051904, 109051904], 1742552298029],
-	["accounts", ["data", "disk", "/dev/loop0"], [4456448, 4456448], 1742552298029],
-	["accounts", ["data", "disk", "/dev/vda15"], [6333952, 109422592], 1742552298029],
+	["accounts", ["data", "cpu", "main"], [[0.01]], 1742552298029],
+	["accounts", ["data", "memory", "ram"], [[432209920, 1003941888]], 1742552298029],
+	["accounts", ["data", "disk", "/dev/vda1"], [[14132637696, 25821052928]], 1742552298029],
+	["accounts", ["data", "disk", "/dev/loop2"], [[109051904, 109051904]], 1742552298029],
+	["accounts", ["data", "disk", "/dev/loop0"], [[4456448, 4456448]], 1742552298029],
+	["accounts", ["data", "disk", "/dev/vda15"], [[6333952, 109422592]], 1742552298029],
 ];
 
 describe("Plugin", () => {
@@ -338,7 +738,7 @@ describe("Plugin", () => {
 			Exception.assertEqual(response.data.records.length, 2);
 			Exception.assertEqual(response.data.end, true);
 			Exception.assertEqual(response.data.next, 3);
-			Exception.assertEqual(response.data.version, 3);
+			Exception.assertEqual(response.data.version, 4);
 		}).timeout(10000);
 
 		it("stop", async () => {
@@ -373,8 +773,8 @@ describe("Plugin", () => {
 		it("RecordToDisk", async () => {
 			const result = Nodes.recordToDisk(recordTest1);
 			Exception.assertEqual(result, recordOnDiskTest1);
-			Exception.assertEqual(JSON.stringify(recordTest1).length, 4626);
-			Exception.assertEqual(JSON.stringify(result).length, 2672);
+			Exception.assertEqual(JSON.stringify(recordTest1).length, 4738);
+			Exception.assertEqual(JSON.stringify(result).length, 2784);
 		});
 
 		it("RecordFromDisk", async () => {
@@ -432,7 +832,7 @@ describe("Plugin", () => {
 		it("empty", async () => {
 			await makeSourceTest(
 				() => ({
-					version: 3,
+					version: 4,
 					timestamp: 121231,
 					records: [],
 					next: 1,
@@ -446,7 +846,7 @@ describe("Plugin", () => {
 		it("malformed", async () => {
 			await Exception.assertThrowsWithMatch(async () => {
 				await makeSourceTest(() => ({
-					version: 3,
+					version: 4,
 					timestamp: "string!>",
 					records: { "this is not as expected": "no no no" },
 					next: 10000,
@@ -457,7 +857,7 @@ describe("Plugin", () => {
 		it("valid records", async () => {
 			await makeSourceTest(
 				() => ({
-					version: 3,
+					version: 4,
 					timestamp: 121231,
 					records: [recordOnDiskTest1],
 					next: 1,

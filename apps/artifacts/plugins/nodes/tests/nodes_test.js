@@ -52,22 +52,21 @@ describe("Nodes", () => {
 		it("insert no timestamp", async () => {
 			const fragment = await nodes.insert("hello", ["mykey"], "world");
 			Exception.assertEqual(fragment.length, 1);
-			Exception.assertEqual(fragment[0].length, 5);
+			Exception.assertEqual(fragment[0].length, 4);
 			Exception.assertEqual(fragment[0][0], "hello");
-			Exception.assertEqual(fragment[0][1], ["mykey"]);
-			Exception.assertEqual(fragment[0][2], "world");
-			Exception.assert(fragment[0][3] <= timestampMs());
-			Exception.assertEqual(fragment[0][4], false);
+			Exception.assertEqual(fragment[0][1], [["mykey"], "world", {}]);
+			Exception.assert(fragment[0][2] <= timestampMs());
+			Exception.assertEqual(fragment[0][3], false);
 		});
 
 		it("insert w/timestamp (fixed)", async () => {
 			const fragment = await nodes.insert("hello", ["mykey"], "world", 123456, /*isFixedTimestamp*/ true);
-			Exception.assertEqual(fragment, [["hello", ["mykey"], "world", 123456, true]]);
+			Exception.assertEqual(fragment, [["hello", [["mykey"], "world", {}], 123456, true]]);
 		});
 
 		it("insert w/fixed timestamp (non fixed)", async () => {
 			const fragment = await nodes.insert("hello", ["mykey"], "world", 123456);
-			Exception.assertEqual(fragment, [["hello", ["mykey"], "world", 123456, false]]);
+			Exception.assertEqual(fragment, [["hello", [["mykey"], "world", {}], 123456, false]]);
 		});
 	});
 });

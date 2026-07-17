@@ -40,15 +40,16 @@ describe("Records", () => {
 	});
 
 	describe("Existing", () => {
+		const version = Records.version;
 		const fs = new Filesystem({
-			"records/main/2.rec": '{"version":2,"records":[[2,"abc",5,null],',
-			"records/main/1.rec": '{"version":2,"records":[[1,"a",3,null],',
-			"records/main/4.rec": '{"version":2,"records":[[4,"abcde",7,null],',
+			"records/main/2.rec": '{"version":' + version + ',"records":[[2,"abc",5,null],',
+			"records/main/1.rec": '{"version":' + version + ',"records":[[1,"a",3,null],',
+			"records/main/4.rec": '{"version":' + version + ',"records":[[4,"abcde",7,null],',
 			"records/main/6.rec": '{"version":1,"records":[[4,"abcde",7],',
-			"records/main/5.rec.gz": zlib.gzipSync('{"version":2,"records":[[5,"abcdef",8,null],'),
-			"records/main/invalid.rec": '{"version":2,"records":[[3,"abcdejsjs",10,null],',
-			"records/main/8.rec": '{"version":2,"records":[[8,"abcdefg",9,12],',
-			"records/main/3.rec": '{"version":2,"records":[[3,"abcd",6,null],',
+			"records/main/5.rec.gz": zlib.gzipSync('{"version":' + version + ',"records":[[5,"abcdef",8,null],'),
+			"records/main/invalid.rec": '{"version":' + version + ',"records":[[3,"abcdejsjs",10,null],',
+			"records/main/8.rec": '{"version":' + version + ',"records":[[8,"abcdefg",9,12],',
+			"records/main/3.rec": '{"version":' + version + ',"records":[[3,"abcd",6,null],',
 		});
 		const records = new Records({ path: "records", fs: fs });
 

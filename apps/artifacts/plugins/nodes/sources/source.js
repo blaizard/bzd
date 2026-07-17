@@ -34,7 +34,7 @@ export default class Source extends Process {
 
 			// Apply the records from remote.
 			for (const record of records) {
-				await this.plugin.nodes.insertRecord(record);
+				this.plugin.nodes.insertFromRecord(record);
 				if (this.options.persistent) {
 					await this.plugin.records.write(Nodes.recordToDisk(record), this.storageName, this.nextTickRemote);
 				}

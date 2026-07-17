@@ -225,7 +225,7 @@ export default class DatabaseInfluxDB extends Database {
 				const [values, remainingFields] = await gatherViaChunks(uid, useFields, 100);
 				nbValues += values.length;
 				for (const [key, value, timestamp] of values) {
-					await this.plugin.write(uid, key, DatabaseInfluxDB.fromDBValueToValue(value), timestamp);
+					this.plugin.write(uid, [key, DatabaseInfluxDB.fromDBValueToValue(value)], timestamp);
 				}
 				useFields = remainingFields;
 			}
@@ -241,7 +241,8 @@ export default class DatabaseInfluxDB extends Database {
 		let content = [];
 		let skipped = 0;
 		const timestampMin = this.retentionS ? timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
-		for (const [uid, key, value, timestamp] of records) {
+		for (const [uid, data, timestamp] of records) {
+			const [key, value] = data;
 			// InfluxDB doesn't support numbers with comma.
 			const timestampNanoseconds = Math.round(timestamp * 1000000);
 			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {

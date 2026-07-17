@@ -400,7 +400,7 @@ export default class Data {
 					history: 10,
 					// The duration in ms until which an entry is considered expired.
 					expires: undefined,
-					// The unit associated with this entry, the unti is expected to be in UCUM format.
+					// The unit associated with this entry, the unit is expected to be in UCUM format.
 					unit: undefined,
 				},
 				options,
@@ -408,24 +408,12 @@ export default class Data {
 
 			const data = this.getDataInternal_(uid, KeyMapping.keyToInternal(key));
 
-			if (config.unit) {
-				data.unit = config.unit;
-			}
-
 			let index = 0;
-			if (data.values.length) {
-				// If the timestamp of the last entry added is newer than the current one.
-				if (data.values[0][0] > timestamp) {
-					index = data.values.findIndex((d) => d[0] <= timestamp);
-					if (index == -1) {
-						index = data.values.length;
-					}
-				}
-				// The new samples is newer than the last one and it exists.
-				else if (data.expiresType == "auto") {
-					// Estimate the rate and estimate the expiration rate.
-					const expiresEstimate = (timestamp - data.values[0][0]) * 3;
-					data.expires = 0.4 * data.expires + 0.6 * expiresEstimate;
+			// If the timestamp of the last entry added is newer than the current one.
+			if (data.values.length && data.values[0][0] > timestamp) {
+				index = data.values.findIndex((d) => d[0] <= timestamp);
+				if (index == -1) {
+					index = data.values.length;
 				}
 			}
 
@@ -437,10 +425,26 @@ export default class Data {
 				data.values.pop();
 			}
 
-			// If a manual expires time is set.
+			// Set the unit if requested.
+			if (config.unit !== undefined) {
+				data.unit = config.unit;
+			}
+
+			// Set the expiry if requested.
 			if (config.expires !== undefined) {
-				data.expiresType = "manual";
-				data.expires = config.expires;
+				if (typeof config.expires == "number") {
+					data.expiresType = "manual";
+					data.expires = config.expires;
+				} else {
+					data.expiresType = "auto";
+				}
+			}
+
+			// Update the expiration if auto and it is the last entry.
+			if (data.expiresType == "auto" && index == 0) {
+				// Estimate the rate and estimate the expiration rate.
+				const expiresEstimate = (timestamp - data.values[0][0]) * 3;
+				data.expires = 0.4 * data.expires + 0.6 * expiresEstimate;
 			}
 		}
 
