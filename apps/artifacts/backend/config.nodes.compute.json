@@ -132,7 +132,7 @@
     ],
     "nodes.handlers": {
         "/data/leases": {
-            "expires": 30000
+            "expires": 30
         },
         "/data/log": {
             "history": 100,

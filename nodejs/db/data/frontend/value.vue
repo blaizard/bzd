@@ -144,7 +144,7 @@
 				let entries = [...this.valueFormatted(value, this.metadata.unit)];
 				if (isNewest) {
 					if (this.metadata.expires) {
-						entries.push("expires: " + timeToString(this.metadata.expires / 1000));
+						entries.push("expires: " + timeToString(this.metadata.expires));
 					}
 				}
 				return entries.join(", ");
