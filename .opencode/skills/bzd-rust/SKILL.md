@@ -1,5 +1,5 @@
 ---
-name: rust
+name: bzd-rust
 description: How to write, build, test, format, and contribute Rust code in the bzd monorepo
 compatibility: opencode
 ---

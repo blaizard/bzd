@@ -1,5 +1,5 @@
 ---
-name: sanitizer
+name: bzd-sanitizer
 description: How to run the sanitizer to format and lint code in the bzd monorepo
 compatibility: opencode
 ---

@@ -1,5 +1,5 @@
 ---
-name: nodejs
+name: bzd-nodejs
 description: How to write, build, test, and contribute Node.js/JavaScript/Vue code in the bzd monorepo
 compatibility: opencode
 ---

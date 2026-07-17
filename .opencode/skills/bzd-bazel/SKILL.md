@@ -1,5 +1,5 @@
 ---
-name: bazel
+name: bzd-bazel
 description: How to build, test, run, and maintain Bazel targets in the bzd monorepo — always load this before invoking any ./tools/bazel command
 compatibility: opencode
 ---

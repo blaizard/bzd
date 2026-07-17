@@ -1,5 +1,5 @@
 ---
-name: bdl
+name: bzd-bdl
 description: How to read, write, and wire BDL (Bzd Description Language) files and their Bazel rules in the bzd monorepo — load this before touching any .bdl file or bdl_* Bazel rule
 compatibility: opencode
 ---

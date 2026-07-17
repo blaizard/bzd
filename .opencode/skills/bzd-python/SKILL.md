@@ -1,5 +1,5 @@
 ---
-name: python
+name: bzd-python
 description: How to run, test, build, type-check, format, and manage Python dependencies in the bzd monorepo
 compatibility: opencode
 ---

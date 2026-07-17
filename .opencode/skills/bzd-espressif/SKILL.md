@@ -1,6 +1,6 @@
 ---
-name: esp32
-description: A technical reference tool providing links to essential ESP32 documentation.
+name: bzd-espressif
+description: How to build/test esp32/esp32s3/etc targets in the bzd monorepo.
 compatibility: opencode
 ---
 

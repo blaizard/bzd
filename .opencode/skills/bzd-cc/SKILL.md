@@ -1,5 +1,5 @@
 ---
-name: cc
+name: bzd-cc
 description: How to write, build, test, and contribute C++ code in the bzd monorepo
 compatibility: opencode
 ---
