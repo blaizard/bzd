@@ -329,5 +329,72 @@ describe("Validation", () => {
 				});
 			});
 		});
+		it("default keyword accepts any value type", () => {
+			// Boolean default.
+			new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: "string",
+						default: false,
+					},
+				},
+			});
+			// Number default.
+			new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: "string",
+						default: 42,
+					},
+				},
+			});
+			// Null default.
+			new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: "string",
+						default: null,
+					},
+				},
+			});
+			// Object default.
+			new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: "string",
+						default: { a: 1 },
+					},
+				},
+			});
+		});
+		it("default keyword does not affect validation behavior", () => {
+			const validation = new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: "string",
+						default: "hello",
+					},
+				},
+				required: ["id"],
+			});
+			// Validation still runs against the actual input, ignoring `default`.
+			validation.validate({
+				id: "world",
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: 12,
+				});
+			});
+			// Missing the property still fails (no default injection happens).
+			Exception.assertThrows(() => {
+				validation.validate({});
+			});
+		});
 	});
 });

@@ -25,6 +25,7 @@ export default class ValidationSchema {
 				description: {
 					type: "string",
 				},
+				default: {},
 				properties: {
 					type: "object",
 					additionalProperties: {

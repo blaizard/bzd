@@ -471,7 +471,7 @@ export default class Plugin extends PluginBase {
 							description: "Get a list of all available nodes.",
 						},
 						get: {
-							description: "Get data attached to a node.",
+							description: "Get data attached to a node. Returns {data: null} if the node does not exist.",
 							parameters: {
 								type: "object",
 								properties: {
@@ -479,8 +479,53 @@ export default class Plugin extends PluginBase {
 										description: "The exact name of the node as provided by 'list_nodes' to get the data for.",
 										type: "string",
 									},
+									metadata: {
+										description:
+											"If true, return [timestamp, value] tuples for each entry along with a server-reference timestamp, returning {timestamp: <ms>, data: <value>} instead of {data: <value>}.",
+										type: "boolean",
+										default: false,
+									},
+									children: {
+										description: "Number of nested levels to include as children. Use 99 to return the full subtree.",
+										type: "integer",
+										minimum: 0,
+										default: 99,
+									},
+									count: {
+										description: "Maximum number of values to return per entry.",
+										type: "integer",
+										minimum: 0,
+									},
+									after: {
+										description: "Only return values whose timestamp is strictly after this value.",
+										type: "integer",
+									},
+									before: {
+										description: "Only return values whose timestamp is strictly before this value.",
+										type: "integer",
+									},
+									include: {
+										description:
+											"List of key paths (each path being a list of segments) to restrict the output to, e.g. [['a','b']].",
+										type: "array",
+										items: {
+											type: "array",
+											items: { type: "string" },
+										},
+									},
+									sampling: {
+										description: "Sampling method to apply when aggregating returned values.",
+										type: "string",
+									},
+									keys: {
+										description:
+											"Return the list of child keys as objects of the form {key: [...], leaf: boolean}. Returns {data: null} if the node does not exist. Mutually exclusive with metadata, count, after, before, include and sampling.",
+										type: "boolean",
+										default: false,
+									},
 								},
 								required: ["name"],
+								additionalProperties: false,
 							},
 						},
 						schema: {
@@ -500,10 +545,47 @@ export default class Plugin extends PluginBase {
 								uids.push(uid);
 							}
 							return uids;
-						case "get":
+						case "get": {
+							let output = {};
+							if (args.metadata) {
+								output = Object.assign(output, {
+									timestamp: timestampMs(),
+								});
+							}
 							const uid = args.name.trim();
-							const maybeData = await this.nodes.get({ uid, key: [], children: 99 });
-							return maybeData.isEmpty() ? [] : maybeData.value();
+							if (args.keys) {
+								Exception.assertPrecondition(args.metadata === undefined, "'metadata' cannot be set with 'keys'");
+								Exception.assertPrecondition(args.count === undefined, "'count' cannot be set with 'keys'");
+								Exception.assertPrecondition(args.after === undefined, "'after' cannot be set with 'keys'");
+								Exception.assertPrecondition(args.before === undefined, "'before' cannot be set with 'keys'");
+								Exception.assertPrecondition(args.include === undefined, "'include' cannot be set with 'keys'");
+								Exception.assertPrecondition(args.sampling === undefined, "'sampling' cannot be set with 'keys'");
+
+								const maybeChildren = await this.nodes.getChildren({
+									uid,
+									key: [],
+									children: args.children ?? 99,
+									includeInner: true,
+								});
+
+								return Object.assign(output, maybeChildren ? { data: maybeChildren } : { data: null });
+							}
+
+							const include = args.include ? args.include.map((path) => path.filter(Boolean)) : null;
+
+							const maybeData = await this.nodes.get({
+								uid,
+								key: [],
+								metadata: args.metadata ?? false,
+								children: args.children ?? 99,
+								count: args.count ?? null,
+								after: args.after ?? null,
+								before: args.before ?? null,
+								include: include,
+								sampling: args.sampling ?? null,
+							});
+							return Object.assign(output, maybeData.isEmpty() ? { data: null } : { data: maybeData.value() });
+						}
 						case "schema":
 							return optionsSchema;
 						default:
