@@ -1,0 +1,14 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "node",
+    srcs = [
+        "node_test.js",
+        "//apps/artifacts/api:config.json",
+    ],
+    main = "node_test.js",
+    deps = [
+        "//apps/artifacts/api/nodejs/node",
+        "//nodejs/core:exception",
+    ],
+)
