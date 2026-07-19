@@ -312,7 +312,7 @@ bzd_python_oci(
 - **Private members**: append underscore (e.g., `myHelper_()`, `value_`)
 - **No `print()`**: use `bzd.logging` (`from bzd.logging import Logger`)
 - **No dynamic imports or `importlib`**: declare all deps in `BUILD.bazel`
-- **No `#bzd/` import prefix**: that pattern applies only to Node.js (`.mjs`) files
+- **No `#bzd/` import prefix**: that pattern applies only to Node.js files
 
 ---
 

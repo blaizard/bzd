@@ -6,7 +6,7 @@ compatibility: opencode
 
 ## Overview
 
-- **Language**: JavaScript (ES Modules, `.mjs`) — no TypeScript, no `.js`, no `.cjs` for new code
+- **Language**: JavaScript (`.js`) — no `.mjs`, no `.cjs` for new code
 - **Build system**: Bazel via `./tools/bazel` — use `@bzd_rules_nodejs//nodejs:defs.bzl` custom macros, never raw `nodejs_binary`
 - **Node.js toolchain**: Hermetic (managed by `bzd_rules_nodejs`) — never invoke system `node` or `npm` directly
 - **Package manager**: pnpm (managed automatically by Bazel install rules — never run `pnpm install` or `npm install` manually)
@@ -23,14 +23,14 @@ compatibility: opencode
 | Path                       | Purpose                                                                                    |
 | -------------------------- | ------------------------------------------------------------------------------------------ |
 | `nodejs/core/`             | Core runtime libraries: exception, log, format, cache, router, http, rest, websocket, etc. |
-| `nodejs/core/tests/`       | Unit tests for core libraries (`*_test.mjs`)                                               |
+| `nodejs/core/tests/`       | Unit tests for core libraries (`*_test.js`)                                                |
 | `nodejs/db/`               | Database abstractions: key-value store, storage, timeseries                                |
 | `nodejs/email/`            | Email integration (SendGrid, etc.)                                                         |
 | `nodejs/payment/`          | Payment integration (Stripe)                                                               |
 | `nodejs/styles/`           | SCSS design tokens and themes                                                              |
 | `nodejs/utils/`            | Utility functions: array, pathlib, regexpr, object, query, etc.                            |
 | `nodejs/vue/`              | Vue 3 layer: apps, components, directives, router, plugins                                 |
-| `nodejs/vue/apps/`         | Base frontend/backend app scaffolding (`frontend.mjs`, `backend.mjs`)                      |
+| `nodejs/vue/apps/`         | Base frontend/backend app scaffolding (`frontend.js`, `backend.js`)                        |
 | `nodejs/vue/apps/example/` | Minimal reference app (start here for a new app)                                           |
 | `nodejs/vue/components/`   | Reusable Vue components: graph, layout, logger, menu, modal, terminal, etc.                |
 | `nodejs/vue/directives/`   | Custom Vue directives: loading, resize, tooltip                                            |
@@ -127,7 +127,7 @@ import { Command } from "commander/esm.mjs";
 
 ## Code Style
 
-- **File extension**: `.mjs` (ES Modules) for all new code
+- **File extension**: `.js` (ES Modules) for all new code
 - **Indentation**: tabs (not spaces) — enforced by Prettier
 - **Column limit**: 120 characters
 - **Quotes**: double quotes (`"`) — no single quotes
@@ -203,7 +203,7 @@ Log.debug("Processing item {}", item);
 
 ## Writing a New Library
 
-1. Create `nodejs/<module>/my_feature.mjs`:
+1. Create `nodejs/<module>/my_feature.js`:
 
 ```javascript
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
@@ -247,7 +247,7 @@ bzd_nodejs_library(
 
 ## Writing Tests
 
-Tests use Mocha and are named `<name>_test.mjs`. Mocha globals (`describe`, `it`) are available automatically — no import needed.
+Tests use Mocha and are named `<name>_test.js`. Mocha globals (`describe`, `it`) are available automatically — no import needed.
 
 ### Test file structure
 
@@ -297,7 +297,7 @@ bzd_nodejs_test(
 )
 ```
 
-### Bulk-generate tests from all `*_test.mjs` files (preferred pattern)
+### Bulk-generate tests from all `*_test.js` files (preferred pattern)
 
 ```python
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
@@ -337,10 +337,10 @@ bzd_nodejs_test(
 apps/my_app/
 ├── BUILD.bazel
 ├── api.json              # REST/WebSocket API schema
-├── backend.mjs           # Node.js HTTP server entry point
+├── backend.js           # Node.js HTTP server entry point
 └── frontend/
     ├── BUILD.bazel
-    ├── app.mjs           # Frontend entry point
+    ├── app.js           # Frontend entry point
     └── app.vue           # Root Vue component
 ```
 
@@ -376,7 +376,7 @@ bzd_nodejs_web_binary(
 )
 ```
 
-### `backend.mjs` skeleton
+### `backend.js` skeleton
 
 ```javascript
 import APIv1 from "#bzd/api.json" with { type: "json" };

@@ -86,7 +86,7 @@ The project manages its own toolchains via Bazel. Do NOT install global compiler
 
 ### Node.js Specifics
 
-- **Extension:** `.mjs` (ES Modules are preferred).
+- **Extension:** `.js` (ES Modules are preferred).
 - **Naming:** Follows the general `camelCase` for functions and variables.
 - **Imports:** Use the `#bzd/` prefix for internal project imports to resolve against the monorepo root.
   - Example: `import ExceptionFactory from "#bzd/nodejs/core/exception.js";`
