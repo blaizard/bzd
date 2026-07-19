@@ -1,4 +1,4 @@
-// Copy of nodejs/utils/run.mjs with some addition.
+// Copy of nodejs/utils/run.js with some addition.
 const StatusJobExecutor = Object.freeze({
 	idle: "idle",
 	running: "running",

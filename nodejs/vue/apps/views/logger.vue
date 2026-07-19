@@ -12,9 +12,6 @@
 		components: {
 			Logger,
 		},
-		data: function () {
-			return {};
-		},
 	};
 </script>
 
