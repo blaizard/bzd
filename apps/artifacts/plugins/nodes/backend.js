@@ -507,7 +507,7 @@ export default class Plugin extends PluginBase {
 										description: "Number of nested levels to include as children.",
 										type: "integer",
 										minimum: 0,
-										default: 99,
+										default: 0,
 									},
 									count: {
 										description: "Maximum number of values to return per entry.",

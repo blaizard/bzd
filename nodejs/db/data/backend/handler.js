@@ -73,12 +73,25 @@ export async function handleDataGet(
 
 	key = key ?? [];
 	metadata = metadata ?? false;
-	children = children ?? 99;
+	children = children ?? 0;
 	count = count ?? null;
 	after = after ?? null;
 	before = before ?? null;
 	include = include ?? null;
 	sampling = sampling ?? null;
+
+	Log.trace(
+		"Handle data get with key={}, metadata={}, children={}, count={}, after={}, before={}, include={}, sampling={}, keys={}",
+		key,
+		metadata,
+		children,
+		count,
+		after,
+		before,
+		include,
+		sampling,
+		keys,
+	);
 
 	let output = {};
 	if (metadata) {
