@@ -48,7 +48,7 @@ class Path {
 				Exception.assert(
 					result !== undefined,
 					"Path cannot be normalized '{}', the '..' expands beyond the root.",
-					this.path.asPosix(),
+					this.asPosix(),
 				);
 			} else if (segment != ".") {
 				normalizedPath.push(segment);

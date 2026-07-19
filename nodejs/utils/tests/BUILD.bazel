@@ -19,3 +19,13 @@ bzd_nodejs_test(
         "//nodejs/utils:to_string",
     ],
 )
+
+bzd_nodejs_test(
+    name = "pathlib",
+    srcs = ["pathlib_test.js"],
+    main = "pathlib_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:pathlib",
+    ],
+)
