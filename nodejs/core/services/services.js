@@ -165,10 +165,9 @@ export default class Services {
 	/// \param uid The uid corresponding to the service.
 	/// \param name The name of the process.
 	async runProcessWithPolicy(uid, name) {
-		const service = this.services[uid];
-		const object = service.provider.processes[name];
-
 		if (!(await this.runProcess(uid, name))) {
+			const service = this.services[uid];
+			const object = service.provider.processes[name];
 			switch (object.options.policy) {
 				case Services.Policy.ignore:
 					break;
@@ -177,8 +176,12 @@ export default class Services {
 				case Services.Policy.throw:
 					service.lastFatalError = this.getLastError(uid, name);
 					break;
+				default:
+					Exception.unreachable("Unsupported policy: {}", object.options.policy);
 			}
+			return false;
 		}
+		return true;
 	}
 
 	/// Run a time triggered process.
@@ -278,24 +281,10 @@ export default class Services {
 		// Start the start processes if any.
 		for (const [name, _] of service.provider.getStartProcesses()) {
 			Log.info("Running start process '{}.{}'.", uid, name);
-			if (!(await this.runProcess(uid, name))) {
+			if (!(await this.runProcessWithPolicy(uid, name))) {
+				Log.error("Start process '{}.{}' failed.", uid, name);
 				service.state.timestampStop = Services._getTimestamp();
 				service.state.status = Services.Status.error;
-
-				// Handle the error based on the policy.
-				const object = service.provider.processes[name];
-				switch (object.options.policy) {
-					case Services.Policy.ignore:
-						break;
-					case Services.Policy.restart:
-						break;
-					case Services.Policy.throw:
-						service.lastFatalError = this.getLastError(uid, name);
-						break;
-					default:
-						Exception.unreachable("Unsupported policy: {}", object.options.policy);
-				}
-
 				return false;
 			}
 		}
@@ -344,21 +333,7 @@ export default class Services {
 		// Start the stop processes if any.
 		for (const [name, _] of service.provider.getStopProcesses()) {
 			Log.info("Running stop process '{}.{}'.", uid, name);
-			if (!(await this.runProcess(uid, name))) {
-				// Handle the error based on the policy.
-				const object = service.provider.processes[name];
-				switch (object.options.policy) {
-					case Services.Policy.ignore:
-						break;
-					case Services.Policy.restart:
-						break;
-					case Services.Policy.throw:
-						service.lastFatalError = this.getLastError(uid, name);
-						break;
-					default:
-						Exception.unreachable("Unsupported policy: {}", object.options.policy);
-				}
-			}
+			await this.runProcessWithPolicy(uid, name);
 		}
 
 		service.state.timestampStop = Services._getTimestamp();

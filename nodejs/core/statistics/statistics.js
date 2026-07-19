@@ -75,7 +75,7 @@ export default class Statistics {
 				lastTimestamp = timestampMs();
 			},
 			{
-				policy: Services.Policy.throw,
+				policy: Services.Policy.ignore,
 				periodS: 5,
 			},
 		);
