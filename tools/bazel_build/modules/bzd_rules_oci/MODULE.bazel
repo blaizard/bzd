@@ -20,7 +20,8 @@ use_repo(load_dependencies, "podman")
 images = use_extension("//:extensions.bzl", "images")
 images.pull(
     name = "oci_minimal",
-    digest = "sha256:00a24d7c50ebe46934e31f6154c0434e2ab51259a65e028be42413c636385f7f",
+    # stable-slim
+    digest = "sha256:328d16499860ae6cb9b345e2e4cebca08c2a36e4f7278482c7bd1f39d71e5bfd",
     image = "index.docker.io/library/debian",
     platforms = [
         "linux/amd64",
