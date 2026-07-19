@@ -4,7 +4,7 @@ import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 const Exception = ExceptionFactory("test", "artifacts", "node");
 
 /// Build a Node instance with a mocked HTTP client, isolating tests from network and env.
-function makeNode({ get = null, post = null } = {}) {
+function makeNode({ get = null, post = null, path = null } = {}) {
 	const httpClient = {
 		get: get ?? (async () => ({})),
 		post: post ?? (async () => ({})),
@@ -14,6 +14,7 @@ function makeNode({ get = null, post = null } = {}) {
 		volume: "nodes",
 		token: null,
 		httpClient,
+		path,
 	});
 }
 
@@ -106,6 +107,66 @@ describe("Node", () => {
 			});
 			const nodes = await node.list({ remote: "http://test" });
 			Exception.assertEqual(nodes, ["n1", "n2"]);
+		});
+	});
+
+	describe("publish", () => {
+		it("Posts data with a client timestamp to the data endpoint", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async (url, options) => {
+					calls.push({ url, json: options.json });
+					return {};
+				},
+			});
+			await node.publish({ data: "hello", uid: "testuid" });
+
+			Exception.assertEqual(calls.length, 1);
+			Exception.assertEqual(calls[0].url, "http://test/x/nodes/testuid/data/");
+
+			const body = calls[0].json;
+			Exception.assert(Array.isArray(body.data));
+			Exception.assertEqual(body.data.length, 1);
+			const [ts, value] = body.data[0];
+			Exception.assertEqual(value, "hello");
+			Exception.assert(typeof ts === "number");
+			Exception.assert(typeof body.timestamp === "number");
+		});
+
+		it("Builds a nested URI from the publish path option", async () => {
+			const urls = [];
+			const node = makeNode({
+				post: async (url) => {
+					urls.push(url);
+					return {};
+				},
+			});
+			await node.publish({ data: 1, uid: "u", path: ["foo", "bar"] });
+			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/foo/bar/");
+		});
+
+		it("Prepends the constructor path to the publish path", async () => {
+			const urls = [];
+			const node = makeNode({
+				path: ["root"],
+				post: async (url) => {
+					urls.push(url);
+					return {};
+				},
+			});
+			await node.publish({ data: 1, uid: "u", path: ["foo"] });
+			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/root/foo/");
+		});
+
+		it("Throws when posting to all remotes fails", async () => {
+			const node = makeNode({
+				post: async () => {
+					throw new Error("Unreachable");
+				},
+			});
+			await Exception.assertThrows(async () => {
+				await node.publish({ data: 1, uid: "testuid" });
+			});
 		});
 	});
 });

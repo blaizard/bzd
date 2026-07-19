@@ -11,11 +11,16 @@ const Exception = ExceptionFactory("artifacts", "api");
 const Log = LogFactory("artifacts", "api");
 
 export class Node extends ArtifactsBase {
+	constructor({ path = null, ...rest } = {}) {
+		super(rest);
+		this.path = [...(path ?? [])];
+	}
+
 	/// Generate the URI from the parameters.
 	_makeURI(uid = null, volume = null, path = null) {
 		const actualUid = uid ?? this.uid;
 		Exception.assert(actualUid, "No UID were specified.");
-		const subPath = ["data", ...(path ?? [])].map((s) => encodeURIComponent(s)).join("/");
+		const subPath = ["data", ...this.path, ...(path ?? [])].map((s) => encodeURIComponent(s)).join("/");
 		return (
 			"/x/" + encodeURIComponent(volume ?? this.volume) + "/" + encodeURIComponent(actualUid) + "/" + subPath + "/"
 		);
@@ -27,8 +32,38 @@ export class Node extends ArtifactsBase {
 	/// \param uid The unique identifier of the node.
 	/// \param volume The volume to which the data should be sent.
 	/// \param path The path to publish to.
-	async publish({ data, uid, remote = null, token = null, volume = null, path = null }) {
+	async publish({ data, uid = null, volume = null, path = null }) {
 		const uri = this._makeURI(uid, volume, path);
+		await this._publish({
+			uri: uri,
+			data: [[timestampMs(), data]],
+			isClientTimestamp: true,
+		});
+	}
+
+	async _publish(entry) {
+		const headers = {};
+		if (this.token) {
+			headers.authorization = "basic " + this.token;
+		}
+		for (const [remote, retry, nbRetries] of this.remotes()) {
+			try {
+				const content = { data: entry.data };
+				if (entry.isClientTimestamp) {
+					content.timestamp = timestampMs();
+				}
+				const url = remote + entry.uri;
+				await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
+				return;
+			} catch (e) {
+				if (retry === nbRetries) {
+					this.logger.warning(
+						"Exception while publishing " + remote + entry.uri + " after " + nbRetries + " retry: " + e,
+					);
+				}
+			}
+		}
+		throw Exception.error("Unable to publish to any of the remotes.");
 	}
 
 	/// List all nodes from a remote.
