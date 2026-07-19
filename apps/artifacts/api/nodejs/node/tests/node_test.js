@@ -169,4 +169,98 @@ describe("Node", () => {
 			});
 		});
 	});
+
+	describe("publishBulk", () => {
+		it("Posts accumulated entries from the callback to the bulk data endpoint", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async (url, options) => {
+					calls.push({ url, json: options.json });
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "testuid" }, (publish) => {
+				publish(100, "a");
+				publish(200, "b");
+			});
+
+			Exception.assertEqual(calls.length, 1);
+			Exception.assertEqual(calls[0].url, "http://test/x/nodes/testuid/data/");
+			Exception.assertEqual(calls[0].json.data, [
+				[100, "a"],
+				[200, "b"],
+			]);
+		});
+
+		it("Builds a nested URI from the publishBulk path option", async () => {
+			const urls = [];
+			const node = makeNode({
+				post: async (url) => {
+					urls.push(url);
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "u", path: ["foo", "bar"] }, () => {});
+			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/foo/bar/");
+		});
+
+		it("Prepends the constructor path to the publishBulk path", async () => {
+			const urls = [];
+			const node = makeNode({
+				path: ["root"],
+				post: async (url) => {
+					urls.push(url);
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "u", path: ["foo"] }, () => {});
+			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/root/foo/");
+		});
+
+		it("Throws and does not publish when the callback throws", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async () => {
+					calls.push(1);
+					return {};
+				},
+			});
+			await Exception.assertThrows(async () => {
+				await node.publishBulk({ uid: "u" }, () => {
+					throw new Error("boom");
+				});
+			});
+			Exception.assertEqual(calls.length, 0);
+		});
+
+		it("Forwards isClientTimestamp false to the underlying _publish call", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async (url, options) => {
+					calls.push({ url, json: options.json });
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "u", isClientTimestamp: false }, (publish) => {
+				publish(100, "x");
+			});
+
+			Exception.assertEqual(calls[0].json.timestamp, undefined);
+		});
+
+		it("Forwards default isClientTimestamp true to the underlying _publish call", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async (url, options) => {
+					calls.push({ url, json: options.json });
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "u" }, (publish) => {
+				publish(100, "x");
+			});
+
+			Exception.assert(typeof calls[0].json.timestamp === "number");
+		});
+	});
 });

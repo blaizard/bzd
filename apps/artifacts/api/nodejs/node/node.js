@@ -41,6 +41,27 @@ export class Node extends ArtifactsBase {
 		});
 	}
 
+	/// Publish a bulk of data to a remote.
+	///
+	/// \param uid The unique identifier of the node.
+	/// \param volume The volume to which the data should be sent.
+	/// \param path The path to publish to.
+	/// \param isClientTimestamp If true, the timestamps given for each entry are the client timestamp
+	///                          in milliseconds.
+	/// \param callback Function invoked with a `publish(timestampMs, data)` helper.
+	async publishBulk({ uid = null, volume = null, path = null, isClientTimestamp = true } = {}, callback) {
+		const bulk = [];
+		await callback((timestampMs, data) => {
+			bulk.push([timestampMs, data]);
+		});
+		const uri = this._makeURI(uid, volume, path);
+		await this._publish({
+			uri: uri,
+			data: bulk,
+			isClientTimestamp: isClientTimestamp,
+		});
+	}
+
 	async _publish(entry) {
 		const headers = {};
 		if (this.token) {
