@@ -20,8 +20,7 @@
 		},
 		methods: {
 			async apiGet(query) {
-				const data = await this.$rest.request("get", "/admin/statistics", query);
-				return JSON.parse(data);
+				return await this.$rest.request("get", "/admin/statistics", query);
 			},
 		},
 	};

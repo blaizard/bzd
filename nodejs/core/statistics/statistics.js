@@ -2,10 +2,10 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import Provider from "#bzd/nodejs/core/statistics/provider.js";
 import Data from "#bzd/nodejs/db/data/data.js";
-import { handleDataGet } from "#bzd/nodejs/db/data/backend/handler.js";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
 
 const Exception = ExceptionFactory("statistics");
 const Log = LogFactory("statistics");
@@ -40,7 +40,22 @@ export default class Statistics {
 
 		const data = this.data;
 		api.handle("get", "/admin/statistics", async function (context) {
-			await handleDataGet(this, data, "statistics", []);
+			const inputs = getDataGetInputsFromQuery(this);
+			const maybeOutput = await handleDataGet(
+				data,
+				Object.assign(
+					{
+						uid: "statistics",
+						key: [],
+					},
+					inputs,
+				),
+			);
+
+			if (maybeOutput === null) {
+				throw this.httpError(404, "Not found");
+			}
+			return maybeOutput;
 		});
 	}
 

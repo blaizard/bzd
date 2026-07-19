@@ -8,6 +8,9 @@
                 "documentation": "Get the statistics data",
                 "request": {
                     "type": "query"
+                },
+                "response": {
+                    "type": "json"
                 }
             }
         }

@@ -53,20 +53,32 @@ function pathToKey(path) {
 ///   ]
 /// }```
 ///
-export async function handleDataGet(context, data, uid, key) {
-	const metadata = context.getQuery("metadata", false, Boolean);
-	const children = context.getQuery("children", 0, parseInt);
-	const count = context.getQuery("count", null, parseInt);
-	const after = context.getQuery("after", null, parseInt);
-	const before = context.getQuery("before", null, parseInt);
-	const include = context.getQuery("include", null, (value) =>
-		value
-			.split(",")
-			.filter(Boolean)
-			.map((path) => pathToKey(path)),
-	);
-	const sampling = context.getQuery("sampling", null, String);
-	const keys = context.getQuery("keys", false, Boolean);
+export async function handleDataGet(
+	data,
+	{ uid, key, metadata, children, count, after, before, include, sampling, keys },
+) {
+	Exception.assertPrecondition(uid !== undefined, "'uid' must be set");
+
+	keys = keys ?? false;
+
+	// Sanitiy checks.
+	if (keys) {
+		Exception.assertPrecondition(metadata === undefined, "'metadata' cannot be set with 'keys'");
+		Exception.assertPrecondition(count === undefined, "'count' cannot be set with 'keys'");
+		Exception.assertPrecondition(after === undefined, "'after' cannot be set with 'keys'");
+		Exception.assertPrecondition(before === undefined, "'before' cannot be set with 'keys'");
+		Exception.assertPrecondition(include === undefined, "'include' cannot be set with 'keys'");
+		Exception.assertPrecondition(sampling === undefined, "'sampling' cannot be set with 'keys'");
+	}
+
+	key = key ?? [];
+	metadata = metadata ?? false;
+	children = children ?? 99;
+	count = count ?? null;
+	after = after ?? null;
+	before = before ?? null;
+	include = include ?? null;
+	sampling = sampling ?? null;
 
 	let output = {};
 	if (metadata) {
@@ -76,17 +88,9 @@ export async function handleDataGet(context, data, uid, key) {
 	}
 
 	if (keys) {
-		Exception.assertPrecondition(context.getQuery("metadata", null) === null, "'metadata' cannot be set with 'keys'");
-		Exception.assertPrecondition(context.getQuery("count", null) === null, "'count' cannot be set with 'keys'");
-		Exception.assertPrecondition(context.getQuery("after", null) === null, "'after' cannot be set with 'keys'");
-		Exception.assertPrecondition(context.getQuery("before", null) === null, "'before' cannot be set with 'keys'");
-		Exception.assertPrecondition(context.getQuery("include", null) === null, "'include' cannot be set with 'keys'");
-		Exception.assertPrecondition(context.getQuery("sampling", null) === null, "'sampling' cannot be set with 'keys'");
-
 		const maybeData = await data.getChildren({ uid, key, children, includeInner: true });
 		if (!maybeData) {
-			context.sendStatus(404);
-			return;
+			return null;
 		}
 		output = Object.assign(output, {
 			data: maybeData,
@@ -104,14 +108,39 @@ export async function handleDataGet(context, data, uid, key) {
 			sampling,
 		});
 		if (maybeData.isEmpty()) {
-			context.sendStatus(404);
-			return;
+			return null;
 		}
 		output = Object.assign(output, {
 			data: maybeData.value(),
 		});
 	}
 
-	context.setStatus(200);
-	context.sendJson(output);
+	return output;
+}
+
+export function getDataGetInputsFromQuery(context) {
+	const metadata = context.getQuery("metadata", undefined, Boolean);
+	const children = context.getQuery("children", undefined, parseInt);
+	const count = context.getQuery("count", undefined, parseInt);
+	const after = context.getQuery("after", undefined, parseInt);
+	const before = context.getQuery("before", undefined, parseInt);
+	const include = context.getQuery("include", undefined, (value) =>
+		value
+			.split(",")
+			.filter(Boolean)
+			.map((path) => pathToKey(path)),
+	);
+	const sampling = context.getQuery("sampling", undefined, String);
+	const keys = context.getQuery("keys", undefined, Boolean);
+
+	return {
+		metadata,
+		children,
+		count,
+		after,
+		before,
+		include,
+		sampling,
+		keys,
+	};
 }

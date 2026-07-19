@@ -16,7 +16,7 @@ import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import { Readable } from "stream";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
-import { handleDataGet } from "#bzd/nodejs/db/data/backend/handler.js";
+import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
 
 const databaseTypes = {
 	influxdb: DatabaseInfluxDB,
@@ -384,7 +384,16 @@ export default class Plugin extends PluginBase {
 		endpoints.register("get", "/{uid}/{path:*}", async (context) => {
 			const uid = context.getParam("uid");
 			const key = Utils.pathToKey(context.getParam("path"));
-			await handleDataGet(context, this.nodes, uid, key);
+
+			const inputs = getDataGetInputsFromQuery(context);
+			const maybeOuput = await handleDataGet(this.nodes, Object.assign({ uid, key }, inputs));
+
+			if (maybeOuput === null) {
+				context.sendStatus(404);
+			} else {
+				context.setStatus(200);
+				context.sendJson(maybeOuput);
+			}
 		});
 
 		/// Insert one or multiple entries.
@@ -479,14 +488,23 @@ export default class Plugin extends PluginBase {
 										description: "The exact name of the node as provided by 'list_nodes' to get the data for.",
 										type: "string",
 									},
+									key: {
+										description:
+											"The key to target, to be use if we do not want to access the full tree for a specific node.",
+										type: "array",
+										items: {
+											type: "string",
+										},
+										default: [],
+									},
 									metadata: {
 										description:
-											"If true, return [timestamp, value] tuples for each entry along with a server-reference timestamp, returning {timestamp: <ms>, data: <value>} instead of {data: <value>}.",
+											"If true, return [timestamp, value, (expiry time in seconds), (unit)] tuples for each entry along with a server-reference timestamp.",
 										type: "boolean",
 										default: false,
 									},
 									children: {
-										description: "Number of nested levels to include as children. Use 99 to return the full subtree.",
+										description: "Number of nested levels to include as children.",
 										type: "integer",
 										minimum: 0,
 										default: 99,
@@ -518,8 +536,7 @@ export default class Plugin extends PluginBase {
 										type: "string",
 									},
 									keys: {
-										description:
-											"Return the list of child keys as objects of the form {key: [...], leaf: boolean}. Returns {data: null} if the node does not exist. Mutually exclusive with metadata, count, after, before, include and sampling.",
+										description: "Return the list of child keys as objects of the form {key: [...], leaf: boolean}.",
 										type: "boolean",
 										default: false,
 									},
@@ -546,45 +563,21 @@ export default class Plugin extends PluginBase {
 							}
 							return uids;
 						case "get": {
-							let output = {};
-							if (args.metadata) {
-								output = Object.assign(output, {
-									timestamp: timestampMs(),
-								});
-							}
-							const uid = args.name.trim();
-							if (args.keys) {
-								Exception.assertPrecondition(args.metadata === undefined, "'metadata' cannot be set with 'keys'");
-								Exception.assertPrecondition(args.count === undefined, "'count' cannot be set with 'keys'");
-								Exception.assertPrecondition(args.after === undefined, "'after' cannot be set with 'keys'");
-								Exception.assertPrecondition(args.before === undefined, "'before' cannot be set with 'keys'");
-								Exception.assertPrecondition(args.include === undefined, "'include' cannot be set with 'keys'");
-								Exception.assertPrecondition(args.sampling === undefined, "'sampling' cannot be set with 'keys'");
-
-								const maybeChildren = await this.nodes.getChildren({
-									uid,
-									key: [],
-									children: args.children ?? 99,
-									includeInner: true,
-								});
-
-								return Object.assign(output, maybeChildren ? { data: maybeChildren } : { data: null });
-							}
-
-							const include = args.include ? args.include.map((path) => path.filter(Boolean)) : null;
-
-							const maybeData = await this.nodes.get({
-								uid,
-								key: [],
-								metadata: args.metadata ?? false,
-								children: args.children ?? 99,
-								count: args.count ?? null,
-								after: args.after ?? null,
-								before: args.before ?? null,
-								include: include,
-								sampling: args.sampling ?? null,
+							const maybeOutput = await handleDataGet(this.nodes, {
+								uid: args.name.trim(),
+								key: args.key,
+								metadata: args.metadata,
+								children: args.children,
+								count: args.count,
+								after: args.after,
+								before: args.before,
+								include: args.include,
+								sampling: args.sampling,
 							});
-							return Object.assign(output, maybeData.isEmpty() ? { data: null } : { data: maybeData.value() });
+							if (maybeOutput === null) {
+								return { data: null };
+							}
+							return maybeOutput;
 						}
 						case "schema":
 							return optionsSchema;
