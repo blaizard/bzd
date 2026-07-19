@@ -66,4 +66,35 @@ describe("Filesystem", () => {
 			Exception.assertThrows(async () => await fs.appendFile("hello", "a directory"));
 		});
 	});
+
+	describe("binary", () => {
+		it("round-trip preserves binary data", async () => {
+			const fs = new Filesystem();
+			const original = Buffer.from([0x00, 0xff, 0x80, 0x7f, 0x00]);
+			await fs.writeBinary("data.bin", original);
+			const result = await fs.readBinary("data.bin");
+			Exception.assertEqual(result, original);
+		});
+
+		it("round-trip with empty Buffer", async () => {
+			const fs = new Filesystem();
+			const original = Buffer.from([]);
+			await fs.writeBinary("empty.bin", original);
+			const result = await fs.readBinary("empty.bin");
+			Exception.assertEqual(result, original);
+		});
+
+		it("readBinary on non-existent path throws", async () => {
+			const fs = new Filesystem();
+			Exception.assertThrows(async () => await fs.readBinary("nonexistent.bin"));
+		});
+
+		it("readBinary from constructor init string", async () => {
+			const fs = new Filesystem({
+				"file.txt": "hello",
+			});
+			const result = await fs.readBinary("file.txt");
+			Exception.assertEqual(result, Buffer.from("hello"));
+		});
+	});
 });

@@ -366,7 +366,7 @@ export default class FileSystem {
 	async readBinary(path) {
 		await this.options.wait();
 		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
-		return new Buffer(file.content);
+		return Buffer.from(file.content);
 	}
 
 	/// Write the content of a file
