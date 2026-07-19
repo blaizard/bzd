@@ -574,9 +574,7 @@ export default class Plugin extends PluginBase {
 								include: args.include,
 								sampling: args.sampling,
 							});
-							if (maybeOutput === null) {
-								return { data: null };
-							}
+							Exception.assert(maybeOutput !== null, "Not found");
 							return maybeOutput;
 						}
 						case "schema":
