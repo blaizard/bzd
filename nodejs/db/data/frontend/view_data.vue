@@ -178,10 +178,6 @@
 	.data {
 		display: flex;
 		flex-direction: column;
-		.keys {
-			border: 1px solid #eee;
-			padding: 10px;
-		}
 		.search {
 			margin-bottom: 16px;
 		}
