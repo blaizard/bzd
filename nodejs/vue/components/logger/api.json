@@ -9,8 +9,7 @@
                 "response": {
                     "type": "json",
                     "validation": {
-                        "errors": "",
-                        "logs": ""
+                        "logs": "mandatory"
                     }
                 }
             }

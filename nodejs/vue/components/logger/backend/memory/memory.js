@@ -1,50 +1,48 @@
-import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 
-const Exception = ExceptionFactory("logger", "memory");
 const Log = LogFactory("logger", "memory");
 
 export default class LoggerMemory {
 	constructor(options = {}) {
 		this.options = Object.assign(
 			{
-				/// Keep maximum 100 entries.
-				maxEntries: 100,
-				/// Store the entries for the last x errors.
-				maxErrors: 3,
+				/// Per-level capacity overrides.
+				/// Any level not listed here uses `defaultCapacity`.
+				capacities: {
+					debug: 1000,
+				},
+				/// Capacity used for any level not present in `capacities`.
+				defaultCapacity: 100,
 			},
 			options,
 		);
 
-		this.buffer = [];
-		this.errors = [];
-		Log.addBackend("memory", (...args) => this.processor(...args), "debug");
+		/// Dictionary of level -> ring buffer (Array).
+		/// Buffers are created lazily on first encounter of each level.
+		this.buffers = {};
+
+		/// Register as a log backend at 'trace' level: receives all log entries (all levels including trace).
+		Log.addBackend("memory", (...args) => this.processor(...args), "trace");
 	}
 
 	processor(date, level, topics, message) {
-		// Keep all new entries.
-		while (this.buffer.length >= this.options.maxEntries) {
-			this.buffer.shift();
+		if (!(level in this.buffers)) {
+			this.buffers[level] = [];
 		}
-		this.buffer.push({ date, level, topics, message });
-
-		// If this is an error.
-		if (level == "error") {
-			while (this.errors.length >= this.options.maxErrors) {
-				this.errors.shift();
-			}
-			this.errors.push(this.buffer.at(1));
+		const buffer = this.buffers[level];
+		const capacity = this.options.capacities[level] ?? this.options.defaultCapacity;
+		if (buffer.length >= capacity) {
+			buffer.shift();
 		}
+		buffer.push({ date, level, topics, message });
 	}
 
 	installRest(api) {
 		Log.info("Installing 'Logger' REST");
 
 		api.handle("get", "/admin/logger", async (inputs, user) => {
-			return {
-				logs: this.buffer,
-				errors: this.errors,
-			};
+			/// Return the raw per-level buffers. The frontend handles merge and sort.
+			return { logs: this.buffers };
 		});
 	}
 }

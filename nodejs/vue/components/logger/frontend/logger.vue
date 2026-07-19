@@ -32,7 +32,6 @@
 		},
 		data: function () {
 			return {
-				errors: [],
 				logs: [],
 				form: {
 					minLevel: "info",
@@ -61,6 +60,8 @@
 						return new Set(["warning", "error"]);
 					case "error":
 						return new Set(["error"]);
+					default:
+						return new Set();
 				}
 			},
 		},
@@ -79,8 +80,14 @@
 			async handleFetch() {
 				await this.handleSubmit(async () => {
 					const result = await this.$rest.request("get", "/admin/logger");
-					this.errors = result.errors;
-					this.logs = result.logs;
+					const merged = [];
+					for (const entries of Object.values(result.logs)) {
+						for (const entry of entries) {
+							merged.push(entry);
+						}
+					}
+					merged.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+					this.logs = merged;
 				});
 			},
 		},
