@@ -126,10 +126,7 @@ describe("Node", () => {
 
 			const body = calls[0].json;
 			Exception.assert(Array.isArray(body.data));
-			Exception.assertEqual(body.data.length, 1);
-			const [ts, value] = body.data[0];
-			Exception.assertEqual(value, "hello");
-			Exception.assert(typeof ts === "number");
+			Exception.assertEqual(body.data[0][1][0][1], "hello");
 			Exception.assert(typeof body.timestamp === "number");
 		});
 
@@ -180,15 +177,15 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "testuid" }, (publish) => {
-				publish(100, "a");
-				publish(200, "b");
+				publish({ timestampMs: 100, data: "a" });
+				publish({ timestampMs: 200, data: "b" });
 			});
 
 			Exception.assertEqual(calls.length, 1);
 			Exception.assertEqual(calls[0].url, "http://test/x/nodes/testuid/data/");
 			Exception.assertEqual(calls[0].json.data, [
-				[100, "a"],
-				[200, "b"],
+				[[], [[100, "a"]]],
+				[[], [[200, "b"]]],
 			]);
 		});
 
@@ -200,7 +197,9 @@ describe("Node", () => {
 					return {};
 				},
 			});
-			await node.publishBulk({ uid: "u", path: ["foo", "bar"] }, () => {});
+			await node.publishBulk({ uid: "u", path: ["foo", "bar"] }, (publish) => {
+				publish({ timestampMs: 1, data: "x" });
+			});
 			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/foo/bar/");
 		});
 
@@ -213,7 +212,9 @@ describe("Node", () => {
 					return {};
 				},
 			});
-			await node.publishBulk({ uid: "u", path: ["foo"] }, () => {});
+			await node.publishBulk({ uid: "u", path: ["foo"] }, (publish) => {
+				publish({ timestampMs: 1, data: "x" });
+			});
 			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/root/foo/");
 		});
 
@@ -242,7 +243,7 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u", isClientTimestamp: false }, (publish) => {
-				publish(100, "x");
+				publish({ timestampMs: 100, data: "x" });
 			});
 
 			Exception.assertEqual(calls[0].json.timestamp, undefined);
@@ -257,10 +258,22 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u" }, (publish) => {
-				publish(100, "x");
+				publish({ timestampMs: 100, data: "x" });
 			});
 
 			Exception.assert(typeof calls[0].json.timestamp === "number");
+		});
+
+		it("Skips the POST when the bulk callback publishes nothing", async () => {
+			const calls = [];
+			const node = makeNode({
+				post: async () => {
+					calls.push(1);
+					return {};
+				},
+			});
+			await node.publishBulk({ uid: "testuid" }, () => {});
+			Exception.assertEqual(calls.length, 0);
 		});
 	});
 });

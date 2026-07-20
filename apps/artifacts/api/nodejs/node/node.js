@@ -36,7 +36,7 @@ export class Node extends ArtifactsBase {
 		const uri = this._makeURI(uid, volume, path);
 		await this._publish({
 			uri: uri,
-			data: [[timestampMs(), data]],
+			data: [[[], [[timestampMs(), data]]]],
 			isClientTimestamp: true,
 		});
 	}
@@ -51,9 +51,12 @@ export class Node extends ArtifactsBase {
 	/// \param callback Function invoked with a `publish(timestampMs, data)` helper.
 	async publishBulk({ uid = null, volume = null, path = null, isClientTimestamp = true } = {}, callback) {
 		const bulk = [];
-		await callback((timestampMs, data) => {
-			bulk.push([timestampMs, data]);
+		await callback(({ timestampMs, data, key = null }) => {
+			bulk.push([key ?? [], [[timestampMs, data]]]);
 		});
+		if (bulk.length === 0) {
+			return;
+		}
 		const uri = this._makeURI(uid, volume, path);
 		await this._publish({
 			uri: uri,
