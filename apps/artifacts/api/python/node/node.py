@@ -9,13 +9,22 @@ from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
 from apps.artifacts.api.python.common import ArtifactsBase
 
+# The bulk payload.
+BulkData = typing.List[typing.Any]
+# One entry of the bulk list: [subKey, [[ts, value], ...]].
+BulkEntry = typing.List[typing.Union[typing.List[str], typing.List[BulkData]]]
+# The bulk list shipped to the server for a single node.
+BulkEntries = typing.List[BulkEntry]
+# The bulk payload for a multi-node request: {uid: BulkEntries}.
+BulkMulti = typing.Dict[str, BulkEntries]
+
 
 class NodePublishNoRemote(RuntimeError):
 	pass
 
 
 class PublisherProtocol(typing.Protocol):
-	def __call__(self, timestampMs: float, data: typing.Dict[str, typing.Any]) -> None: ...
+	def __call__(self, timestampMs: float, data: typing.Any, key: typing.Optional[typing.List[str]] = ...) -> None: ...
 
 
 @dataclass
@@ -25,7 +34,9 @@ class BufferEntryBulk:
 	# The path to publish to.
 	uri: str
 	# The data to be published and their associated timestamp.
-	data: typing.List[typing.Tuple[float, typing.Any]]
+	# - For a single-node bulk: a BulkEntries list of [subKey, [[ts, value], ...]] entries.
+	# - For a multi-node bulk: a BulkMulti mapping of node uid to a BulkEntries list.
+	data: typing.Union[BulkEntries, BulkMulti]
 	# If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
 	# They might be adjusted to match the exact time at which they will be sent.
 	# If false, they will not be modified.
@@ -160,16 +171,14 @@ class Node(ArtifactsBase):
 		        volume: The volume to which the data should be sent.
 		"""
 
+		if not data:
+			return
+
 		timestampMs = time.time() * 1000
 		self._publish(
 			BufferEntryBulk(
 				uri=f"/x/{volume or self.volume}/",
-				data=[
-					(
-						timestampMs,
-						data,
-					)
-				],
+				data={uid: [[[], [[timestampMs, value]]]] for uid, value in data.items()},
 				isClientTimestamp=True,
 			)
 		)
@@ -198,10 +207,12 @@ class Node(ArtifactsBase):
 			BufferEntryBulk(
 				uri=uri,
 				data=[
-					(
-						time.time() * 1000,
-						data,
-					)
+					[
+						[],
+						[
+							[time.time() * 1000, data],
+						],
+					]
 				],
 				isClientTimestamp=True,
 			)
@@ -226,17 +237,16 @@ class Node(ArtifactsBase):
 		                                           If false, they will not be modified.
 		"""
 
-		bulk: typing.List[typing.Tuple[float, typing.Any]] = []
+		bulk: BulkEntries = []
 
-		def publisher(timestampMs: float, data: typing.Dict[str, typing.Any]) -> None:
-			bulk.append(
-				(
-					timestampMs,
-					data,
-				)
-			)
+		def publisher(timestampMs: float, data: typing.Any, key: typing.Optional[typing.List[str]] = None) -> None:
+			bulk.append([key or [], [[timestampMs, data]]])
 
 		yield publisher
+
+		# Skip the POST entirely if the bulk is empty.
+		if not bulk:
+			return
 
 		uri = self._makeURI(uid=uid, volume=volume, path=path)
 		self._publish(BufferEntryBulk(uri=uri, data=bulk, isClientTimestamp=isClientTimestamp))
@@ -285,7 +295,7 @@ class Node(ArtifactsBase):
 		for remote, retry, nbRetries in self.remotes:
 			url = remote + uri
 			response = self.httpClient.get(url, headers=headers, query=query)
-			return response.content  #  type: ignore
+			return response.content  # type: ignore
 
 		raise NodePublishNoRemote("Unable to export from any of the remotes.")
 
