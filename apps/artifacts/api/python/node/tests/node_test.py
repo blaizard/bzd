@@ -13,6 +13,7 @@ class TestRun(unittest.TestCase):
 		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
 			self.assertEqual(method, "POST")
+			assert body is not None
 			data = json.loads(body.decode())
 			# Navigate: data["data"][0] = [subKey, pairs]; pairs[0] = [ts, value]; value is [1]
 			self.assertEqual(data["data"][0][1][0][1], "hello")
@@ -27,6 +28,7 @@ class TestRun(unittest.TestCase):
 
 		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
+			assert body is not None
 			data = json.loads(body.decode())
 			self.assertEqual(
 				data["data"],
@@ -45,6 +47,7 @@ class TestRun(unittest.TestCase):
 
 		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
+			assert body is not None
 			data = json.loads(body.decode())
 			self.assertEqual(
 				data,
@@ -65,6 +68,7 @@ class TestRun(unittest.TestCase):
 			self.calledCounter += 1
 			self.assertEqual(method, "POST")
 			self.assertEqual(url, "http://localhost:8081/x/nodes/?bulk=1")
+			assert body is not None
 			data = json.loads(body.decode())
 			self.assertEqual(data["data"]["hello"][0][1][0][1], "1")
 			self.assertEqual(data["data"]["world"][0][1][0][1], "2")
@@ -91,6 +95,7 @@ class TestRun(unittest.TestCase):
 			if self.callbackRaise:
 				raise Exception("Unreachable")
 			self.calledCounter += 1
+			assert body is not None
 			data = json.loads(body.decode())
 			values.append(data["data"][0][1][0][1])
 

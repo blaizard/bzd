@@ -92,8 +92,8 @@ export default class Statistics {
 						return "empty";
 					}
 					await node.publishBulk({}, (publish) => {
-						for (const [key, [timestampMs, data, expires, unit]] of maybeData.value()) {
-							publish({ key: key, timestampMs: timestampMs, data: data });
+						for (const [key, [timestampMs, value, expires, unit]] of maybeData.value()) {
+							publish({ key: key, timestampMs: timestampMs, value: value, unit: unit });
 						}
 					});
 				},

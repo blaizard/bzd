@@ -177,8 +177,8 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "testuid" }, (publish) => {
-				publish({ timestampMs: 100, data: "a" });
-				publish({ timestampMs: 200, data: "b" });
+				publish({ timestampMs: 100, value: "a" });
+				publish({ timestampMs: 200, value: "b" });
 			});
 
 			Exception.assertEqual(calls.length, 1);
