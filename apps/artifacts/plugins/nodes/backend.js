@@ -464,7 +464,7 @@ export default class Plugin extends PluginBase {
 				for (const [nodeUid, bulk] of Object.entries(bulkDictionary)) {
 					for (const [subKey, data] of bulk) {
 						const dataKey = [...key, ...subKey];
-						for (const [timestamp, value] of data) {
+						for (const [timestamp, value, expires, unit] of data) {
 							Exception.assertPrecondition(
 								typeof timestamp == "number",
 								"The timestamp given for value '{:?}' is not a number {}.",
@@ -472,17 +472,19 @@ export default class Plugin extends PluginBase {
 								timestamp,
 							);
 							const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
-							await processValue(nodeUid, dataKey, value, actualTimestamp, isFixedTimestamp);
+							await processValue(nodeUid, dataKey, value, expires, unit, actualTimestamp, isFixedTimestamp);
 						}
 					}
 				}
 			};
 
-			const processValue = async (nodeUid, dataKey, value, timestamp, isFixedTimestamp) => {
+			const processValue = async (nodeUid, dataKey, value, expires, unit, timestamp, isFixedTimestamp) => {
 				const newRecords = await this.nodes.insert({
 					uid: nodeUid,
 					key: dataKey,
 					value: value,
+					expires: expires,
+					unit: unit,
 					timestamp: timestamp,
 					isFixedTimestamp: isFixedTimestamp,
 				});
@@ -511,10 +513,26 @@ export default class Plugin extends PluginBase {
 					inputs.data,
 				);
 				for (const [nodeUid, value] of Object.entries(inputs.data)) {
-					await processValue(nodeUid, [], value, timestampMs(), /*isFixedTimestamp*/ false);
+					await processValue(
+						nodeUid,
+						[],
+						value,
+						/*expires*/ null,
+						/*unit*/ null,
+						timestampMs(),
+						/*isFixedTimestamp*/ false,
+					);
 				}
 			} else {
-				await processValue(uid, key, inputs.data, timestampMs(), /*isFixedTimestamp*/ false);
+				await processValue(
+					uid,
+					key,
+					inputs.data,
+					/*expires*/ null,
+					/*unit*/ null,
+					timestampMs(),
+					/*isFixedTimestamp*/ false,
+				);
 			}
 
 			// Save the data written on disk.

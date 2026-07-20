@@ -144,7 +144,11 @@ export default class Handlers {
 
 	process(fragments) {
 		// Sort and initialize the fragments with an empty options.
-		fragments = Handlers.sort(fragments).map(([key, value]) => [key, value, Object.assign({}, this.defaultOptions)]);
+		fragments = Handlers.sort(fragments).map(([key, value, options = {}]) => [
+			key,
+			value,
+			Object.assign(options, this.defaultOptions),
+		]);
 
 		for (let index = 0; index < fragments.length; ++index) {
 			const keys = [...fragments[index][0]];

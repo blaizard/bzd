@@ -399,9 +399,9 @@ export default class Data {
 					// The number of values to be kept as history.
 					history: 10,
 					// The duration in seconds until which an entry is considered expired.
-					expires: undefined,
+					expires: null,
 					// The unit associated with this entry, the unit is expected to be in UCUM format.
-					unit: undefined,
+					unit: null,
 				},
 				options,
 			);
@@ -437,12 +437,12 @@ export default class Data {
 			}
 
 			// Set the unit if requested.
-			if (config.unit !== undefined) {
+			if (config.unit) {
 				data.unit = config.unit;
 			}
 
 			// Set the expiry if requested.
-			if (config.expires !== undefined) {
+			if (config.expires) {
 				if (typeof config.expires == "number") {
 					data.expiresType = "manual";
 					data.expires = config.expires;

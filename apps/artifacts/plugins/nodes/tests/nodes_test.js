@@ -15,29 +15,26 @@ describe("Nodes", () => {
 				},
 			});
 			Exception.assertEqual(result, [
-				[["a", "b", "c"], 12],
-				[["a", "b", "e"], []],
-				[["a", "b", "f"], null],
-				[
-					["a", "d"],
-					[12, 3],
-				],
+				[["a", "b", "c"], 12, {}],
+				[["a", "b", "e"], [], {}],
+				[["a", "b", "f"], null, {}],
+				[["a", "d"], [12, 3], {}],
 			]);
 		});
 
 		it("string", async () => {
 			const result = Nodes.getAllPathAndValues("hello");
-			Exception.assertEqual(result, [[[], "hello"]]);
+			Exception.assertEqual(result, [[[], "hello", {}]]);
 		});
 
 		it("array", async () => {
 			const result = Nodes.getAllPathAndValues(["a", "b", { c: 1 }]);
-			Exception.assertEqual(result, [[[], ["a", "b", { c: 1 }]]]);
+			Exception.assertEqual(result, [[[], ["a", "b", { c: 1 }], {}]]);
 		});
 
 		it("null", async () => {
 			const result = Nodes.getAllPathAndValues(null);
-			Exception.assertEqual(result, [[[], null]]);
+			Exception.assertEqual(result, [[[], null, {}]]);
 		});
 	});
 

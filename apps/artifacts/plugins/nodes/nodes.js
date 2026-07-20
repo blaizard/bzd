@@ -27,17 +27,17 @@ export class Nodes {
 	/// A path is determined by the full path up to a value or a list.
 	///
 	/// \return A list of paths and values.
-	static getAllPathAndValues(fragment, rootKey = []) {
+	static getAllPathAndValues(fragment, rootKey = [], options = {}) {
 		if (fragment && fragment.constructor == Object) {
 			let paths = [];
 			for (const [key, value] of Object.entries(fragment)) {
 				for (const [subKey, subValue] of Nodes.getAllPathAndValues(value)) {
-					paths.push([[...rootKey, key, ...subKey], subValue]);
+					paths.push([[...rootKey, key, ...subKey], subValue, options]);
 				}
 			}
 			return paths;
 		}
-		return [[[...rootKey], fragment]];
+		return [[[...rootKey], fragment, options]];
 	}
 
 	/// Insert new data at a given path.
@@ -45,12 +45,21 @@ export class Nodes {
 	/// \param uid The identifier of the node.
 	/// \param key The key at which the entry shall be inserted.
 	/// \param value The value to be inserted.
+	/// \param expires The expiry time in seconds.
+	/// \param unit The unit of the value.
 	/// \param timestamp The timestamp to use.
 	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
 	///
 	/// \return A list of records corresponding to this change.
-	async insert({ uid, key, value, timestamp = null, isFixedTimestamp = false }) {
-		let fragments = Nodes.getAllPathAndValues(value, key);
+	async insert({ uid, key, value, expires = null, unit = null, timestamp = null, isFixedTimestamp = false }) {
+		let options = {};
+		if (expires) {
+			options.expires = expires;
+		}
+		if (unit) {
+			options.unit = unit;
+		}
+		let fragments = Nodes.getAllPathAndValues(value, key, options);
 		fragments = this.handlers.process(fragments);
 
 		timestamp = this.data.insert(uid, fragments, timestamp);
