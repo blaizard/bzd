@@ -401,17 +401,42 @@ export default class Plugin extends PluginBase {
 		/// \note If <path:*> is not empty the first item is the uid, while the rest corresponds to the key.
 		/// If <path:*> is empty, value is expected to be a dictionary which keys are the uid and value the actual value.
 		///
-		/// POST <endpoint>/<path:*>
+		/// POST <endpoint>/<uid>/<path:*>
 		/// ```<value>``` -> stores a new value to the path at the server timestamp.
 		///
-		/// POST <endpoint>/<path:*>?bulk=1
+		/// or multi node.
+		///
+		/// POST <endpoint>
 		/// ```{
-		///    timestamp: xxx,             # Node current timestamp for reference.
-		///                                # If unset, the timestamp will be treated as "fixed timestamps".
-		///    data: [
-		///      [<timestamp1>, <value1>], # Store a new value with timestamp1.
-		///      [<timestamp2>, <value2>]  # Store another value with timestamp2.
-		///    ]
+		///    <uid for node1>: value1,
+		///    <uid for node2>: value2,
+		/// }```
+		///
+		/// or including metadata, multiple entries.
+		///
+		/// POST <endpoint>/<uid>/<path:*>?bulk=1
+		/// ```{
+		///    timestamp: xxx,  # Node current timestamp for reference.
+		///
+		///    data: [[
+		///      [ 'backend', 'process' ], # The sub key, that will be amended to the path.
+		///      [
+		///        [<timestamp1>, <value1>, (<expire1>), (<unit1>)],  # Store a value with timestamp.
+		///        [<timestamp2>, <value2>, (<expire2>), (<unit2>)]   # Store another value with timestamp.
+		///      ]
+		///    ]]
+		/// }```
+		///
+		/// or multi node, including metadata, multiple entries.
+		///
+		/// POST <endpoint>?bulk=1
+		/// ```{
+		///    timestamp: xxx,
+		///
+		///    data: {
+		///       <uid for node1>: <same as bulk data>,
+		///       <uid for node2>: <same as bulk data>,
+		///    }
 		/// }```
 		endpoints.register("post", "/{path:*}", async (context) => {
 			let inputs = {};
@@ -424,46 +449,66 @@ export default class Plugin extends PluginBase {
 			}
 
 			const now = timestampMs();
+			const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
+			let records = [];
+
 			// Normalize the data to bulk data format.
-			// bulk = List[Tuple[<timestamp>, <values>]]
 			// timestampClient = The timestamp on the client side, if unset, use the current timestamp.
 			// isFixedTimestamp = If this timestamp is intended to be modified or not.
-			const [bulk, timestampClient, isFixedTimestamp] = ((data) => {
-				if (inputs.bulk) {
-					const isFixedTimestamp = !("timestamp" in data);
-					Exception.assertPrecondition(isObject(data), "The data must be an object: {:?}", data);
-					Exception.assertPrecondition(
-						isFixedTimestamp || typeof data.timestamp == "number",
-						"The timestamp given is not a number {}.",
-						data.timestamp,
-					);
-					return [data.data, data.timestamp ?? now, isFixedTimestamp];
-				} else {
-					return [[[now, inputs.data]], now, false];
-				}
-			})(inputs.data);
-
-			let records = [];
-			const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
-
-			for (const [timestamp, value] of bulk) {
+			const processBulk = async (bulkDictionary, timestampClient, isFixedTimestamp) => {
 				Exception.assertPrecondition(
-					typeof timestamp == "number",
-					"The timestamp given for value '{:?}' is not a number {}.",
-					value,
-					timestamp,
+					isObject(bulkDictionary),
+					"A multi node request must be made with a dictionary: {:?}",
+					bulkDictionary,
 				);
-				const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
-
-				// If there is no 'uid' set for this request, it must be embedded in the value.
-				if (!uid) {
-					Exception.assertPrecondition(isObject(value), "Expected an object, containing uid to values: {:?}", value);
-					for (const [uid, subValue] of Object.entries(value)) {
-						records = records.concat(await this.nodes.insert(uid, key, subValue, actualTimestamp, isFixedTimestamp));
+				for (const [nodeUid, bulk] of Object.entries(bulkDictionary)) {
+					for (const [subKey, data] of bulk) {
+						const dataKey = [...key, ...subKey];
+						for (const [timestamp, value] of data) {
+							Exception.assertPrecondition(
+								typeof timestamp == "number",
+								"The timestamp given for value '{:?}' is not a number {}.",
+								value,
+								timestamp,
+							);
+							const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
+							await processValue(nodeUid, dataKey, value, actualTimestamp, isFixedTimestamp);
+						}
 					}
-				} else {
-					records = records.concat(await this.nodes.insert(uid, key, value, actualTimestamp, isFixedTimestamp));
 				}
+			};
+
+			const processValue = async (nodeUid, dataKey, value, timestamp, isFixedTimestamp) => {
+				const newRecords = await this.nodes.insert(nodeUid, dataKey, value, timestamp, isFixedTimestamp);
+				records = records.concat(newRecords);
+			};
+
+			const data = inputs.data;
+			const isMultiNode = uid ? false : true;
+
+			if (inputs.bulk) {
+				Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:?}", inputs.data);
+				const isFixedTimestamp = !("timestamp" in inputs.data);
+				Exception.assertPrecondition(
+					isFixedTimestamp || typeof inputs.data.timestamp == "number",
+					"The timestamp given is not a number {}.",
+					inputs.data.timestamp,
+				);
+				const data = inputs.data.data;
+				const timestamp = inputs.data.timestamp ?? now;
+
+				await processBulk(isMultiNode ? data : { [uid]: data }, timestamp, isFixedTimestamp);
+			} else if (isMultiNode) {
+				Exception.assertPrecondition(
+					isObject(inputs.data),
+					"A multi node request must be made with a dictionary: {:?}",
+					inputs.data,
+				);
+				for (const [nodeUid, value] of Object.entries(inputs.data)) {
+					await processValue(nodeUid, [], value, timestampMs(), /*isFixedTimestamp*/ false);
+				}
+			} else {
+				await processValue(uid, key, inputs.data, timestampMs(), /*isFixedTimestamp*/ false);
 			}
 
 			// Save the data written on disk.

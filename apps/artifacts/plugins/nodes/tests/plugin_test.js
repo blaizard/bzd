@@ -949,7 +949,7 @@ describe("Plugin", () => {
 						tester.send(nodeName, "post", "/hello/value", {
 							query: { bulk: 1 },
 							headers: { "Content-Type": "application/json" },
-							data: JSON.stringify({ data: [[value, value]] }),
+							data: JSON.stringify({ data: [[[], [[value, value]]]] }),
 						}),
 					);
 					if (promises.length === 50) {
@@ -1023,7 +1023,7 @@ describe("Plugin", () => {
 			await tester.send("nodes", "post", "/uid01/hello/fixed", {
 				query: { bulk: 1 },
 				headers: { "Content-Type": "application/json" },
-				data: JSON.stringify({ data: [[1234, { c: 3 }]] }),
+				data: JSON.stringify({ data: [[[], [[1234, { c: 3 }]]]] }),
 			});
 			await tester.serviceRun("nodes.nodes", "database.database1.write");
 			await waitUntil(() => fetched);
