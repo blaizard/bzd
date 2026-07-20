@@ -167,7 +167,7 @@ export default class Plugin extends PluginBase {
 
 			this.nodes = new Nodes(optionsHandlers, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
-				await this.nodes.insert(uid, ["data"], data);
+				await this.nodes.insert({ uid: uid, key: ["data"], value: data });
 			}
 
 			this.setStorage(await StorageBzd.make(this.nodes));
@@ -479,7 +479,13 @@ export default class Plugin extends PluginBase {
 			};
 
 			const processValue = async (nodeUid, dataKey, value, timestamp, isFixedTimestamp) => {
-				const newRecords = await this.nodes.insert(nodeUid, dataKey, value, timestamp, isFixedTimestamp);
+				const newRecords = await this.nodes.insert({
+					uid: nodeUid,
+					key: dataKey,
+					value: value,
+					timestamp: timestamp,
+					isFixedTimestamp: isFixedTimestamp,
+				});
 				records = records.concat(newRecords);
 			};
 

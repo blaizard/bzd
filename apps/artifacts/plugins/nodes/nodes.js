@@ -44,13 +44,13 @@ export class Nodes {
 	///
 	/// \param uid The identifier of the node.
 	/// \param key The key at which the entry shall be inserted.
-	/// \param fragment The data to be inserted.
+	/// \param value The value to be inserted.
 	/// \param timestamp The timestamp to use.
 	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
 	///
 	/// \return A list of records corresponding to this change.
-	async insert(uid, key, fragment, timestamp = null, isFixedTimestamp = false) {
-		let fragments = Nodes.getAllPathAndValues(fragment, key);
+	async insert({ uid, key, value, timestamp = null, isFixedTimestamp = false }) {
+		let fragments = Nodes.getAllPathAndValues(value, key);
 		fragments = this.handlers.process(fragments);
 
 		timestamp = this.data.insert(uid, fragments, timestamp);

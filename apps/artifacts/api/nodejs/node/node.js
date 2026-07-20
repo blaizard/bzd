@@ -51,8 +51,12 @@ export class Node extends ArtifactsBase {
 	/// \param callback Function invoked with a `publish(timestampMs, data)` helper.
 	async publishBulk({ uid = null, volume = null, path = null, isClientTimestamp = true } = {}, callback) {
 		const bulk = [];
-		await callback(({ timestampMs, data, key = null }) => {
-			bulk.push([key ?? [], [[timestampMs, data]]]);
+		await callback(({ timestampMs, value, key = null, unit = null }) => {
+			let data = [timestampMs, value];
+			if (unit) {
+				data = [...data, null, unit];
+			}
+			bulk.push([key ?? [], [data]]);
 		});
 		if (bulk.length === 0) {
 			return;
