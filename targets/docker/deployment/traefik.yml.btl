@@ -53,6 +53,8 @@ services:
         restart: always
         volumes:
             - "./data/{{ hostToName(docker.host) }}:/bzd/data"
+        environment:
+            - BZD_NODE_UID={{ docker.host }}
         labels:
             traefik.enable: "true"
             {% if needsWWWRedirect(docker.host) %}
