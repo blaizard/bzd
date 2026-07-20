@@ -463,6 +463,8 @@ export default class Plugin extends PluginBase {
 				);
 				for (const [nodeUid, bulk] of Object.entries(bulkDictionary)) {
 					for (const [subKey, data] of bulk) {
+						Exception.assertPrecondition(Array.isArray(subKey), "The key should be an array, not: {:?}", subKey);
+						Exception.assertPrecondition(Array.isArray(data), "The data should be an array, not: {:?}", data);
 						const dataKey = [...key, ...subKey];
 						for (const [timestamp, value, expires, unit] of data) {
 							Exception.assertPrecondition(
