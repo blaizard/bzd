@@ -7,6 +7,7 @@ bzd_dashboard_oci, _oci = make_bzd_config_apply(
     configs = [
         Label("//apps/dashboard/backend:config"),
         Label("//apps/dashboard/frontend:config"),
+        Label("//apps/artifacts/api:config"),
     ],
 )
 
@@ -15,6 +16,7 @@ bzd_dashboard_binary, _binary = make_bzd_config_apply(
     configs = [
         Label("//apps/dashboard/backend:config"),
         Label("//apps/dashboard/frontend:config"),
+        Label("//apps/artifacts/api:config"),
     ],
     executable = True,
 )

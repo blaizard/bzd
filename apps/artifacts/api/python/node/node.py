@@ -119,9 +119,8 @@ class Node(ArtifactsBase):
 							self.buffer.pop(0)
 						return
 
-					except Exception as e:
-						if retry == nbRetries:
-							self.logger.warning(f"Exception while publishing {url} after {nbRetries} retry: {str(e)}")
+					except Exception:
+						# ignore.
 						pass
 
 				# The buffer can contain maxBufferSize + 1 element.

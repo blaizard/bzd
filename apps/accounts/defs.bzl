@@ -7,5 +7,6 @@ bzd_accounts_oci, _ = make_bzd_config_apply(
     configs = [
         Label("//apps/accounts:config"),
         Label("//apps/accounts/backend:config"),
+        Label("//apps/artifacts/api:config"),
     ],
 )

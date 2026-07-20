@@ -38,6 +38,8 @@ bzd_nodejs_binary(
     args = [
         "--static",
         "apps/job_executor/frontend/frontend.bundle",
+        "--uid",
+        "local-job-executor",
     ],
     data = [
         ":config",

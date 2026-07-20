@@ -7,6 +7,7 @@ bzd_artifacts_oci, _ = make_bzd_config_apply(
     configs = [
         Label("//nodejs/vue/apps:config"),
         Label("//apps/artifacts/backend:config"),
+        Label("//apps/artifacts/api:config"),
     ],
 )
 
@@ -15,6 +16,7 @@ bzd_artifacts_binary, _binary = make_bzd_config_apply(
     configs = [
         Label("//nodejs/vue/apps:config"),
         Label("//apps/artifacts/backend:config"),
+        Label("//apps/artifacts/api:config"),
     ],
     executable = True,
 )

@@ -6,13 +6,23 @@ import ServiceProvider from "#bzd/nodejs/core/services/provider.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
+import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
 const Exception = ExceptionFactory("statistics");
 const Log = LogFactory("statistics");
 
 /// This class is a statistics manager.
 export default class Statistics {
-	constructor() {
+	constructor(options) {
+		this.options = Object.assign(
+			{
+				// The uid for this node, this will be used to send statistics data with this uid name.
+				// If unset, no data will be sent.
+				uid: null,
+			},
+			options,
+		);
+
 		this.data = new Data();
 		this.processors = {};
 		// Used to run processors.
@@ -61,24 +71,38 @@ export default class Statistics {
 
 	serviceSync(...namespaces) {
 		const provider = new ServiceProvider(...namespaces);
-		let lastTimestamp = 0;
-		provider.addTimeTriggeredProcess(
-			"statistics.sync",
-			async (options) => {
-				const result = await this.data.get({
-					uid: "statistics",
-					key: [],
-					metadata: true,
-					children: 99,
-					after: lastTimestamp,
-				});
-				lastTimestamp = timestampMs();
-			},
-			{
-				policy: Services.Policy.ignore,
-				periodS: 5,
-			},
-		);
+
+		if (this.options.uid) {
+			Log.info("Installing 'Statistics' services with uid={}.", this.options.uid);
+
+			let lastTimestamp = 0;
+			const node = new Node({ uid: this.options.uid });
+			provider.addTimeTriggeredProcess(
+				"statistics.sync",
+				async (options) => {
+					const maybeData = await this.data.get({
+						uid: "statistics",
+						key: [],
+						metadata: true,
+						children: 99,
+						after: lastTimestamp,
+					});
+					lastTimestamp = timestampMs();
+					if (maybeData.isEmpty()) {
+						return "empty";
+					}
+					await node.publishBulk({}, (publish) => {
+						for (const [key, [timestampMs, data, expires, unit]] of maybeData.value()) {
+							publish({ key: key, timestampMs: timestampMs, data: data });
+						}
+					});
+				},
+				{
+					policy: Services.Policy.ignore,
+					periodS: 5,
+				},
+			);
+		}
 		return provider;
 	}
 

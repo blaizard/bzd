@@ -22,6 +22,8 @@ bzd_nodejs_binary(
     args = [
         "--static",
         "apps/dashboard/frontend/frontend.bundle",
+        "--uid",
+        "local-dashboard",
     ],
     data = [
         "//apps/dashboard/frontend:frontend.bundle",

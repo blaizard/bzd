@@ -45,6 +45,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":provider",
+        "//apps/artifacts/api/nodejs/node",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/services",

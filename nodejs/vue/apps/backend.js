@@ -20,7 +20,7 @@ const Log = LogFactory("backend");
 
 /// Backend server object to be used in the application.
 export default class Backend {
-	constructor(port, test) {
+	constructor(port, test, uid) {
 		this.instances = {
 			authentication: null,
 			rest: null,
@@ -41,12 +41,13 @@ export default class Backend {
 		};
 		this.isSetup = false;
 		this.test = test;
+		this.uid = uid;
 		this.signalDestructor = null;
 	}
 
 	// Set-up the backend object.
-	static make(port, test) {
-		return new Backend(port, test);
+	static make(port, test, uid) {
+		return new Backend(port, test, uid);
 	}
 
 	/// Set-up the backend object from cli.
@@ -65,10 +66,12 @@ export default class Backend {
 			)
 			.option("-s, --static <path>", "Directory to static serve.", ".")
 			.option("--test", "Set the application in test mode.")
+			.option("--uid <uid>", "Unique ID of the node.", null)
 			.parse(argv);
 
 		const port = parseInt(process.env.BZD_PORT || program.opts().port);
-		const backend = new Backend(port, program.opts().test);
+		const uid = process.env.BZD_NODE_UID || program.opts().uid;
+		const backend = new Backend(port, program.opts().test, uid);
 		backend.useStaticContent(program.opts().static);
 		return backend;
 	}
@@ -189,10 +192,17 @@ export default class Backend {
 	}
 
 	/// Set-up the statistics object.
-	useStatistics() {
+	useStatistics(options) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.statistics, "Statistics already set-up.");
-		this.instances.statistics = new Statistics();
+		this.instances.statistics = new Statistics(
+			Object.assign(
+				{
+					uid: this.uid,
+				},
+				options,
+			),
+		);
 		this.instances.statisticsProviderProcess = new ProviderProcess();
 		this.instances.statistics.register(this.instances.statisticsProviderProcess, "backend");
 		return this;

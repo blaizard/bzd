@@ -23,13 +23,15 @@ export default class Services {
 	/// Type of policies, what action is triggered in case of error.
 	/// Emulation of an enum type.
 	static Policy = Object.freeze({
-		/// No operation.
+		/// Ignore the exception.
+		/// The error is recorded in the logs of the service, not on the application log.
 		ignore: "ignore",
 		/// Restart the whole
 		restart: "restart",
 		/// Raise an exception when an error occurs. Note that the exception will not be thrown
 		/// immediately but only upon calling start() or stop(). This ensures that we can catch it and it is
 		/// not thrown within a setTimeout context.
+		/// The error will be logged immediately via the logger.
 		throw: "throw",
 	});
 
@@ -122,7 +124,6 @@ export default class Services {
 			record.status = Services.Status.idle;
 			Log.debug("Completed '{}.{}'.", uid, name);
 		} catch (e) {
-			Log.error("Error '{}.{}': {}: {}\n{}", uid, name, e.constructor.name, e.message, e.stack);
 			++record.errors;
 			record.status = Services.Status.error;
 			log.error = e;
@@ -168,13 +169,16 @@ export default class Services {
 		if (!(await this.runProcess(uid, name))) {
 			const service = this.services[uid];
 			const object = service.provider.processes[name];
+
 			switch (object.options.policy) {
 				case Services.Policy.ignore:
 					break;
 				case Services.Policy.restart:
 					break;
 				case Services.Policy.throw:
-					service.lastFatalError = this.getLastError(uid, name);
+					const e = this.getLastError(uid, name);
+					service.lastFatalError = e;
+					Log.error("Error '{}.{}': {}: {}\n{}", uid, name, e.constructor.name, e.message, e.stack);
 					break;
 				default:
 					Exception.unreachable("Unsupported policy: {}", object.options.policy);

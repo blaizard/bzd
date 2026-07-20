@@ -80,11 +80,7 @@ export class Node extends ArtifactsBase {
 				await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
 				return;
 			} catch (e) {
-				if (retry === nbRetries) {
-					this.logger.warning(
-						"Exception while publishing " + remote + entry.uri + " after " + nbRetries + " retry: " + e,
-					);
-				}
+				// ignore.
 			}
 		}
 		throw Exception.error("Unable to publish to any of the remotes.");
