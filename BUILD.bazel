@@ -61,6 +61,7 @@ bzd_executable_test(
         "--preset",
         "agent1",
         "--dry",
+        "--verbose",
     ],
     executable = ":sandbox",
     expected_output = "no-new-privileges:true",
