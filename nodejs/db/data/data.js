@@ -23,8 +23,10 @@ export default class Data {
 				external: (uid, key, count, after, before) => {
 					return null;
 				},
-				/// Callback when creatinga new uid or a new key.
-				newBranch: (uid, key) => {},
+				/// Callback when creating a new uid.
+				onCreateUid: (uid, metadata) => {},
+				/// Callback when creating a new key.
+				onCreateKey: (uid, key, metadata) => {},
 			},
 			options,
 		);
@@ -64,10 +66,12 @@ export default class Data {
 	getDataInternal_(uid, key, internal) {
 		if (!(uid in this.storage)) {
 			this.storage[uid] = {
-				metadata: {},
+				metadata: {
+					tags: new Set(),
+				},
 				data: {},
 			};
-			this.options.newBranch(uid, []);
+			this.options.onCreateUid(uid, this.storage[uid].metadata);
 		}
 		if (!(internal in this.storage[uid].data)) {
 			this.storage[uid].data[internal] = {
@@ -76,7 +80,7 @@ export default class Data {
 				unit: "",
 				values: [],
 			};
-			this.options.newBranch(uid, key);
+			this.options.onCreateKey(uid, key, this.storage[uid].metadata);
 			this.tree.setDirty(uid);
 		}
 		return this.storage[uid].data[internal];
