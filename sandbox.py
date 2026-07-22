@@ -331,19 +331,23 @@ class SandboxContainer:
 		names += [pathHash, re.sub(r"[^a-zA-Z0-9]+", "-", directory).strip("-")]
 		return "-".join(names)
 
-	def initialize(self, dry: bool) -> None:
+	def initialize(self, dry: bool, verbose: bool) -> None:
 
 		# Initialize features.
 		for feature in self.features:
 			feature.process(context=self)
 
-		if dry:
+		if verbose:
 			print("==== Hash ====")
 			print("\n".join(self.toHash))
 			print("==== DockerFile ====")
 			print(self.dockerFile)
 			print("==== DockerCompose ====")
 			print(self.dockerCompose)
+
+		if dry:
+			_ = self.dockerFile
+			_ = self.dockerCompose
 
 		else:
 			# Write the docker files.
@@ -743,7 +747,13 @@ services:
 		parser.add_argument(
 			"--dry",
 			action="store_true",
-			help="Only show the DockerFile and docker-compose.yaml that it would use.",
+			help="Runs up to the initialization but without creating any files.",
+		)
+		parser.add_argument(
+			"-v",
+			"--verbose",
+			action="store_true",
+			help="Print the content of the DockerFile and docker-compose.yaml.",
 		)
 		parser.add_argument(
 			"--no-tty",
@@ -801,7 +811,7 @@ services:
 		features = [allFeatures[name](args) for name in featureNames] + [feature(args) for feature in additionalFeatures]
 
 		sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
-		sandbox.initialize(dry=args.dry)
+		sandbox.initialize(dry=args.dry, verbose=args.verbose)
 		if not args.dry:
 			if args.build_force:
 				sandbox.build(force=True)
