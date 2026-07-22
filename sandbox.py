@@ -394,10 +394,12 @@ class SandboxContainer:
 			]
 		else:
 			user_groups = {gid: grp.getgrgid(gid).gr_name for gid in os.getgrouplist(self.user, self.gid)}
-			groups = (
-				[str(gid) for gid in user_groups.keys()]
-				+ ["sudo"]
-				+ [group for feature in self.features for group in feature.groups]
+			groups = sorted(
+				set(
+					[str(gid) for gid in user_groups.keys()]
+					+ ["sudo"]
+					+ [group for feature in self.features for group in feature.groups]
+				)
 			)
 			# Create all user groups if not existing.
 			instructions += [f"RUN getent group {gid} || groupadd -g {gid} '{name}'" for gid, name in user_groups.items()]
@@ -485,8 +487,8 @@ services:
     labels:
       com.bzd.sandbox.root: "{self.root}"
       com.bzd.sandbox.interactive: "{1 if self.isInteractive else 0}"
-      com.bzd.sandbox.user: "{getpass.getuser()}"
-      com.bzd.sandbox.command: "{" ".join(sys.argv[1:])}"
+      com.bzd.sandbox.user: "{self.user}"
+      com.bzd.sandbox.command: ""
     init: true
     tty: {"true" if self.isInteractive else "false"}
     stdin_open: {"true" if self.isInteractive else "false"}
@@ -676,7 +678,7 @@ services:
 	@staticmethod
 	def fromCLI(
 		argv: typing.Sequence[typing.Union[str, pathlib.Path]], additionalFeatures: typing.List[typing.Type[Feature]] = []
-	) -> None:
+	) -> "SandboxContainer":
 
 		allFeatures = {
 			"docker": FeatureDocker,
@@ -806,7 +808,9 @@ services:
 
 		# Select only the features asked.
 		featureNames = set(args.enable if len(args.enable) else defaultFeatures) - set(args.disable)
-		features = [allFeatures[name](args) for name in featureNames] + [feature(args) for feature in additionalFeatures]
+		features = [allFeatures[name](args) for name in sorted(featureNames)] + [
+			feature(args) for feature in additionalFeatures
+		]
 
 		sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
 		sandbox.initialize(dry=args.dry, verbose=args.verbose)
@@ -816,6 +820,8 @@ services:
 			if args.build:
 				sandbox.build(force=False)
 			sandbox.run(args=args.rest, env=args.env, recreate=args.build or args.build_force)
+
+		return sandbox
 
 
 if __name__ == "__main__":
