@@ -42,8 +42,8 @@ describe("Nodes", () => {
 		const nodes = new Nodes(/*handlers*/ {}, /*options*/ {});
 
 		it("initial conditions", async () => {
-			const result = await nodes.getNodes();
-			Exception.assertEqual(result, []);
+			const result = nodes.getNodes();
+			Exception.assertEqual(result, {});
 		});
 
 		it("insert no timestamp", async () => {

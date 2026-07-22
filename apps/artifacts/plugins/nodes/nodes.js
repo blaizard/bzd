@@ -15,11 +15,8 @@ export class Nodes {
 		this.data = new Data(options);
 	}
 
-	async *getNodes() {
-		const all = await this.data.list();
-		for await (const name of all) {
-			yield name;
-		}
+	getNodes() {
+		return this.data.getEntries();
 	}
 
 	/// Identify the path of the fragments that are being set.

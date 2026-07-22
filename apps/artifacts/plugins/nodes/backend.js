@@ -548,7 +548,8 @@ export default class Plugin extends PluginBase {
 				{
 					tools: {
 						list_nodes: {
-							description: "Get a list of all available nodes.",
+							description:
+								"Get a dictionary of all available nodes, with the key being the 'name' and the value their associated metadata.",
 						},
 						get: {
 							description: "Get data attached to a node. Returns {data: null} if the node does not exist.",
@@ -628,11 +629,7 @@ export default class Plugin extends PluginBase {
 				async (tool, args) => {
 					switch (tool) {
 						case "list_nodes":
-							let uids = [];
-							for await (const uid of this.nodes.getNodes()) {
-								uids.push(uid);
-							}
-							return uids;
+							return this.nodes.getNodes();
 						case "get": {
 							const maybeOutput = await handleDataGet(this.nodes, {
 								uid: args.name.trim(),

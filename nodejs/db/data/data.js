@@ -23,6 +23,8 @@ export default class Data {
 				external: (uid, key, count, after, before) => {
 					return null;
 				},
+				/// Callback when creatinga new uid or a new key.
+				newBranch: (uid, key) => {},
 			},
 			options,
 		);
@@ -37,39 +39,47 @@ export default class Data {
 			// }
 			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys form leaf nodes.
 			//
-			const data = this.storage[uid] || {};
 			let tree = {};
-			for (const [internal, _] of Object.entries(data)) {
-				const paths = KeyMapping.internalToKey(internal);
-				const object = paths.reduce((r, segment) => {
-					r[segment] ??= {};
-					return r[segment];
-				}, tree);
-				object[SPECIAL_KEY_FOR_VALUE] = { internal: internal, key: paths };
+			if (uid in this.storage) {
+				for (const [internal, _] of Object.entries(this.storage[uid].data)) {
+					const paths = KeyMapping.internalToKey(internal);
+					const object = paths.reduce((r, segment) => {
+						r[segment] ??= {};
+						return r[segment];
+					}, tree);
+					object[SPECIAL_KEY_FOR_VALUE] = { internal: internal, key: paths };
+				}
 			}
 			return tree;
 		});
 		this.tree = this.options.cache.getAccessor("tree");
 	}
 
-	/// List all available keys
-	async list() {
-		return Object.keys(this.storage);
+	/// List all available uids and their metadata.
+	getEntries() {
+		return Object.fromEntries(Object.entries(this.storage).map(([uid, storage]) => [uid, storage.metadata]));
 	}
 
 	/// Helper to access an internal value.
-	getDataInternal_(uid, internal) {
-		this.storage[uid] ??= {};
-		if (!(internal in this.storage[uid])) {
-			this.storage[uid][internal] = {
+	getDataInternal_(uid, key, internal) {
+		if (!(uid in this.storage)) {
+			this.storage[uid] = {
+				metadata: {},
+				data: {},
+			};
+			this.options.newBranch(uid, []);
+		}
+		if (!(internal in this.storage[uid].data)) {
+			this.storage[uid].data[internal] = {
 				expiresType: "auto",
 				expires: 60, // seconds
 				unit: "",
 				values: [],
 			};
+			this.options.newBranch(uid, key);
 			this.tree.setDirty(uid);
 		}
-		return this.storage[uid][internal];
+		return this.storage[uid].data[internal];
 	}
 
 	/// Get the tree at a given key.
@@ -284,10 +294,10 @@ export default class Data {
 		include = null,
 		sampling = null,
 	}) {
-		const data = this.storage[uid] || {};
+		const data = uid in this.storage ? this.storage[uid].data : {};
 
 		const valuesToResult = (key, internal, values) => {
-			const dataInternal = this.getDataInternal_(uid, internal);
+			const dataInternal = this.getDataInternal_(uid, key, internal);
 			if (metadata) {
 				let result = values.map(([t, v]) => [t, v]);
 				if (result.length > 0) {
@@ -406,7 +416,7 @@ export default class Data {
 				options,
 			);
 
-			const data = this.getDataInternal_(uid, KeyMapping.keyToInternal(key));
+			const data = this.getDataInternal_(uid, key, KeyMapping.keyToInternal(key));
 
 			let index = 0;
 
