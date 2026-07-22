@@ -88,7 +88,7 @@ class FeatureSession(Feature):
 
 	def process(self, context: "SandboxContainer") -> None:
 		self.dockerFile += [
-			"RUN sudo apt update && sudo apt install -y dtach",
+			"RUN sudo apt install -y dtach",
 			"""RUN sudo tee /usr/local/bin/session <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
@@ -140,7 +140,7 @@ class FeatureDevcontainerCLI(Feature):
 
 	def process(self, context: "SandboxContainer") -> None:
 		self.dockerFile += [
-			"RUN sudo apt update && sudo apt install -y nodejs npm",
+			"RUN sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g @devcontainers/cli",
 		]
 
@@ -170,7 +170,7 @@ class FeatureOpenCode(Feature):
 			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
 			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
 			f"ENV OPENCODE_CONFIG_DIR={context.home}/.opencode_config",
-			"RUN sudo apt update && sudo apt install -y nodejs npm",
+			"RUN sudo apt install -y nodejs npm",
 			"RUN sudo npm install -g opencode-ai@latest",
 			f"RUN echo '{
 				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
