@@ -92,9 +92,16 @@ class FeatureSession(Feature):
 			"""RUN sudo tee /usr/local/bin/session <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-mkdir -p ~/.dtach
-export BZD_SESSION="\\${1:-main}"
-exec dtach -A ~/.dtach/"\\${1:-main}" bash
+mkdir -p "\\$HOME/.dtach"
+name="\\${1:-main}"
+sock="\\$HOME/.dtach/\\$name"
+export BZD_SESSION="\\$name"
+# Create the master detached.
+if [ ! -S "\\$sock" ]; then
+	dtach -n "\\$sock" bash
+fi
+# Attach to it.
+exec dtach -a "\\$sock"
 EOF""",
 			"RUN sudo chmod +x /usr/local/bin/session",
 		]
