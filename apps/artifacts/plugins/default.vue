@@ -111,6 +111,8 @@
 				switch (key) {
 					case "size":
 						return bytesToString(value);
+					case "tags":
+						return value.join(", ");
 					default:
 						return value;
 				}

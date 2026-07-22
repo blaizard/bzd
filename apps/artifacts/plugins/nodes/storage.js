@@ -15,11 +15,12 @@ export default class StorageBzd extends Storage {
 	async _initialize() {}
 
 	async _listNodes(maxOrPaging) {
-		const uids = Object.keys(this.nodes.getNodes());
-		return await CollectionPaging.makeFromList(uids, maxOrPaging, (uid) => {
+		const nodes = Object.entries(this.nodes.getNodes());
+		return await CollectionPaging.makeFromList(nodes, maxOrPaging, ([uid, metadata]) => {
 			return Permissions.makeEntry(
 				{
 					name: uid,
+					tags: [...metadata.tags],
 				},
 				{ read: true, list: true },
 			);
