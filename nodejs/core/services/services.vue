@@ -50,12 +50,6 @@
 								</button>
 							</td>
 						</tr>
-						<tr v-if="lastError(process)" class="process-error-row">
-							<td colspan="9">
-								<span class="error-label">Last error:</span>
-								<span class="error-message">{{ lastError(process) }}</span>
-							</td>
-						</tr>
 					</template>
 				</tbody>
 			</table>
@@ -284,9 +278,6 @@
 						return "status-idle";
 				}
 			},
-			lastError(process) {
-				return process.errorLogs && process.errorLogs.length ? String(process.errorLogs[0].error) : null;
-			},
 			logStatusClass(log) {
 				if (log.timestampStop === 0) return "log-running";
 				if (log.error) return "log-error";
@@ -411,23 +402,6 @@
 
 	.process-row .status-text {
 		font-weight: normal;
-	}
-
-	.process-error-row {
-		td {
-			background: color.adjust(config.$bzdGraphColorRed, $lightness: 45%);
-			padding: 8px 10px;
-		}
-		.error-label {
-			color: config.$bzdGraphColorRed;
-			font-weight: 600;
-			margin-right: 6px;
-		}
-		.error-message {
-			font-family: monospace;
-			white-space: pre-wrap;
-			word-break: break-all;
-		}
 	}
 
 	.error-count.has-errors {

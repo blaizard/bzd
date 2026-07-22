@@ -473,9 +473,15 @@ export default class Services {
 			for (const [uid, info] of this.getServices()) {
 				let processes = {};
 				for (const [name, record] of this.getProcesses(uid)) {
-					processes[name] = Object.assign({}, record, {
-						logs: null,
-					});
+					processes[name] = {
+						executions: record.executions,
+						errors: record.errors,
+						durationMin: record.durationMin,
+						durationMax: record.durationMax,
+						durationAvg: record.durationAvg,
+						estimatedInterval: record.estimatedInterval,
+						status: record.status,
+					};
 				}
 				services[uid] = {
 					state: info.state,
