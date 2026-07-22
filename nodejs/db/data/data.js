@@ -58,8 +58,18 @@ export default class Data {
 	}
 
 	/// List all available uids and their metadata.
-	getEntries() {
-		return Object.fromEntries(Object.entries(this.storage).map(([uid, storage]) => [uid, storage.metadata]));
+	getEntries({ tags } = {}) {
+		const tagsAsArray = tags ? Array.from(tags) : [];
+		return Object.fromEntries(
+			Object.entries(this.storage)
+				.filter(([_, storage]) => {
+					if (tagsAsArray.length > 0) {
+						return tagsAsArray.some((tag) => storage.metadata.tags.has(tag));
+					}
+					return true;
+				})
+				.map(([uid, storage]) => [uid, storage.metadata]),
+		);
 	}
 
 	/// Helper to access an internal value.
