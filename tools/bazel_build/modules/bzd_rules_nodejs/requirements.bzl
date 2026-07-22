@@ -48,8 +48,7 @@ def _requirement_repository_impl(repository_ctx):
         url,
         output = "srcs",
         integrity = repository_ctx.attr.integrity,
-        # TODO: add this when supported (not as of 9.1.0).
-        # strip_comoinents = 1,
+        strip_components = 1,
     )
 
     # Create the dependency list.

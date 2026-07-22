@@ -54,8 +54,7 @@ if __name__ == "__main__":
 
 	with tempfile.TemporaryDirectory() as tempDir:
 		tempDirPath = pathlib.Path(tempDir)
-		# Copy and strip the first directory.
-		shutil.copytree(next(args.srcs.iterdir()), tempDirPath / args.root)
+		shutil.copytree(args.srcs, tempDirPath / args.root)
 		for moduleName, relativePath in args.symlink:
 			createSymlink(linkPath=tempDirPath / args.root / "node_modules" / moduleName, relativePath=relativePath)
 		createTar(source=tempDirPath, destination=args.output)
