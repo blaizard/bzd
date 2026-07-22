@@ -440,8 +440,6 @@ RUN apt update && apt upgrade -y && apt install -y \
 RUN locale-gen en_US.UTF-8
 ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
-COPY --from=bzd --chown={self.uid}:{self.gid} /tmp/bzd/tools/bazel /usr/local/bin/bazel
-
 # Entry point script that will run once upon container start.
 RUN mkdir /bzd && echo "#!/usr/bin/env bash" > /bzd/startup.sh && chmod +x /bzd/startup.sh
 
