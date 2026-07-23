@@ -107,6 +107,33 @@ function buildRouterForDashboards(optionsDashboards) {
 	return router;
 }
 
+/// Build a dictionary of routers to match with a key.
+///
+/// Create a router per tag, to ensure we can have multiple tags per key.
+function buildRoutersForTagsFromKey(optionsTags) {
+	const routers = {};
+	for (const [tag, options] of Object.entries(optionsTags)) {
+		const router = new Router();
+		for (const match of options.fromKey ?? []) {
+			router.add(match, () => {});
+		}
+		routers[tag] = router;
+	}
+	return routers;
+}
+
+/// Build a dictionary of regex to match with a uid.
+///
+/// Create a regex per tag, to ensure we can have multiple tags per uid.
+function buildRegexForTagsFromUid(optionsTags) {
+	const regexes = {};
+	for (const [tag, options] of Object.entries(optionsTags)) {
+		const regexList = options.fromUid ?? [];
+		regexes[tag] = new RegExp("^(" + regexList.join("|") + ")$");
+	}
+	return regexes;
+}
+
 export default class Plugin extends PluginBase {
 	constructor(volume, options, provider, endpoints, components = {}) {
 		// Components that can be mocked for testing.
@@ -133,6 +160,8 @@ export default class Plugin extends PluginBase {
 		const optionsDatabases = options["nodes.databases"] || {};
 		const optionsSchema = options["nodes.schema"] || {};
 		const optionsHandlers = options["nodes.handlers"] || {};
+		const optionsTags = options["nodes.tags"] || {};
+		const optionsDashboards = options["nodes.dashboards"] || [];
 
 		// Add the validation to the handlers options.
 		for (const [path, validation] of Object.entries(optionsSchema)) {
@@ -150,14 +179,31 @@ export default class Plugin extends PluginBase {
 			},
 			options["nodes.records"] || {},
 		);
-		const optionsDashboards = options["nodes.dashboards"] || [];
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
+		const routersTagsFromKey = buildRoutersForTagsFromKey(optionsTags);
+		const regexTagsFromUid = buildRegexForTagsFromUid(optionsTags);
 
 		this.records = new RecordsDistributed(optionsRecords);
 		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
 				statistics: this.statistics.makeNested("data"),
+				onCreateUid: (uid, metadata) => {
+					for (const [tag, regex] of Object.entries(regexTagsFromUid)) {
+						if (regex.exec(uid)) {
+							metadata.tags.add(tag);
+						}
+					}
+				},
+				onCreateKey: (uid, key, metadata) => {
+					const path = Utils.keyToPath(key);
+					for (const [tag, router] of Object.entries(routersTagsFromKey)) {
+						const match = router.match(path);
+						if (match) {
+							metadata.tags.add(tag);
+						}
+					}
+				},
 			};
 			if (dbReadExternal !== null) {
 				optionsNodes["external"] = async (...args) => {
@@ -547,7 +593,7 @@ export default class Plugin extends PluginBase {
 			const schema = MCPServer.updateSchema(
 				{
 					tools: {
-						list_nodes: {
+						nodes: {
 							description:
 								"Get a dictionary of all available nodes, with the key being the 'name' and the value their associated metadata.",
 						},
@@ -557,7 +603,7 @@ export default class Plugin extends PluginBase {
 								type: "object",
 								properties: {
 									name: {
-										description: "The exact name of the node as provided by 'list_nodes' to get the data for.",
+										description: "The exact name of the node as provided by 'nodes' to get the data for.",
 										type: "string",
 									},
 									key: {
@@ -622,14 +668,15 @@ export default class Plugin extends PluginBase {
 						},
 					},
 				},
-				mcpOptions || {},
+				mcpOptions?.override || {},
 			);
+			const tags = mcpOptions?.tags || [];
 			endpoints.registerMCP(
 				endpoint,
 				async (tool, args) => {
 					switch (tool) {
-						case "list_nodes":
-							return this.nodes.getNodes();
+						case "nodes":
+							return this.nodes.getNodes({ tags });
 						case "get": {
 							const maybeOutput = await handleDataGet(this.nodes, {
 								uid: args.name.trim(),

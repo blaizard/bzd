@@ -15,8 +15,8 @@ export class Nodes {
 		this.data = new Data(options);
 	}
 
-	getNodes() {
-		return this.data.getEntries();
+	getNodes(filters) {
+		return this.data.getEntries(filters);
 	}
 
 	/// Identify the path of the fragments that are being set.

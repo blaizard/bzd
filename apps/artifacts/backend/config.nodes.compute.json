@@ -141,14 +141,19 @@
     },
     "nodes.mcp": {
         "/@mcp/compute": {
-            "tools": {
-                "get": {
-                    "description": "Get current CPU, memory, network, etc. statistics for a specific node."
-                },
-                "list_nodes": {
-                    "description": "Get a list of all available compute nodes."
+            "override": {
+                "tools": {
+                    "get": {
+                        "description": "Get current CPU, memory, network, etc. statistics for a specific node."
+                    },
+                    "nodes": {
+                        "description": "Get all available compute nodes and their associated metadata."
+                    }
                 }
-            }
+            },
+            "tags": [
+                "compute"
+            ]
         }
     },
     "nodes.schema": {
@@ -301,6 +306,14 @@
             "minimum": 0,
             "type": "number",
             "unit": "s"
+        }
+    },
+    "nodes.tags": {
+        "compute": {
+            "fromKey": [
+                "/data/cpu/{name}",
+                "/data/gpu/{name}"
+            ]
         }
     }
 }
