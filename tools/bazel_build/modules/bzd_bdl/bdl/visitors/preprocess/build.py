@@ -3,6 +3,7 @@ import typing
 
 from bdl.visitor import Visitor, Group
 from bdl.entities.all import (
+	Preset,
 	Expression,
 	Nested,
 	Method,
@@ -78,6 +79,10 @@ class Build(Visitor[None]):
 		self.registerEntity(entity=entity)
 
 	def visitExpression(self, entity: Expression, result: None) -> None:
+		self.registerEntity(entity=entity)
+
+	def visitPreset(self, entity: Preset, result: None) -> None:
+		"""Register preset entities in the symbol map."""
 		self.registerEntity(entity=entity)
 
 	def visitMethod(self, entity: Method, result: None) -> None:

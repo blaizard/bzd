@@ -13,6 +13,7 @@ from bdl.entities.impl.using import Using as _Using
 from bdl.entities.impl.expression import Expression as _Expression
 from bdl.entities.impl.extern import Extern as _Extern
 from bdl.entities.impl.reference import Reference as _Reference
+from bdl.entities.impl.preset import Preset as _Preset
 
 # Implicitly export all types
 Builtin = _Builtin
@@ -26,6 +27,7 @@ Using = _Using
 Expression = _Expression
 Extern = _Extern
 Reference = _Reference
+Preset = _Preset
 
 EntityType = typing.Union[
 	Expression,
@@ -39,6 +41,7 @@ EntityType = typing.Union[
 	Use,
 	Builtin,
 	Reference,
+	Preset,
 ]
 SymbolType = typing.Union[Expression, Nested, Method, Using, Enum, Extern]
 
@@ -57,6 +60,7 @@ CATEGORY_TO_ENTITY: typing.Dict[str, typing.Type[EntityType]] = {
 	"use": Use,
 	"reference": Reference,
 	"extern": Extern,
+	"preset": Preset,
 }
 
 

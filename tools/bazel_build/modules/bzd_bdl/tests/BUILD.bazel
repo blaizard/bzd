@@ -5,6 +5,10 @@ bdl_library(
     srcs = [
         "a.bdl",
     ],
-    # TODO: fix
-    tags = ["manual"],
+)
+
+bdl_library(
+    name = "preset",
+    srcs = ["preset.bdl"],
+    presets = ["fixture/config.json"],
 )

@@ -7,6 +7,9 @@
 {%- macro declareUsing(data) %}
 {{ data.comment | normalComment }}using {{ data.name }} = {{ data.symbol | symbolToStr }}{{ declareContract(data.contracts) }};{% end -%}
 
+{%- macro declarePreset(data) %}
+{{ data.comment | normalComment }}preset {{ data.name }} from "{{ data.path }}";{% end -%}
+
 {%- macro declareMethod(data) %}
 {{ data.comment | normalComment }}method {{ data.name }}({{ printParameters(data.parameters) }}){{ declareContract(data.contracts) }}{% if data.isSymbol %} -> {{ data.symbol | symbolToStr }}{% end %};{% end -%}
 
@@ -73,6 +76,8 @@ composition:
 		{% if not entity.isExtern %}
 			{% if entity.category == Category.using %}
 {{ declareUsing(entity) }}
+			{% elif entity.category == Category.preset %}
+{{ declarePreset(entity) }}
 			{% elif entity.category == Category.enum %}
 {{ declareEnum(entity) }}
 			{% elif entity.category == Category.method %}

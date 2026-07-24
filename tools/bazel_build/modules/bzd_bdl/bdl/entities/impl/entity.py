@@ -434,6 +434,23 @@ class Entity:
 			# Note, config entities are resolved only later, when used.
 			# This allow symbol discovery at a later stage, only when the element is actually instantiated.
 
+	def _resolveTrailingFQN(
+		self,
+		resolver: "Resolver",
+		remaining: typing.List[str],
+	) -> typing.Optional[str]:
+		"""Handle unresolved trailing FQN segments after the base symbol resolves.
+
+		Override in subclasses to implement custom resolution for trailing path segments
+		(e.g., navigating into a JSON structure). Returns a JSON-encoded literal string
+		if handled, or None to fall through to the normal resolution path.
+
+		Args:
+			- resolver: The resolver context.
+			- remaining: The trailing FQN segments that could not be resolved in the symbol map.
+		"""
+		return None
+
 	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(
 			element=self.element if element is None else element,

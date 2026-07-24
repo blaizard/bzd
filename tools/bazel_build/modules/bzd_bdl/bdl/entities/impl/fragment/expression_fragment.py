@@ -170,9 +170,12 @@ class SymbolFragment(ExpressionFragment):
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def resolve(self, resolver: "Resolver") -> None:
+		# Normal resolution path.
 		entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
 		if entity.isRoleMeta:
 			self._setMeta()
+			if self.isLiteral:
+				return
 
 		# The type refers to a value.
 		if entity.isRoleValue:

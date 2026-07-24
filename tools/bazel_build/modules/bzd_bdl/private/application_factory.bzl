@@ -10,7 +10,7 @@ def bdl_application_factory(implementation):
         namespace = ".".join(ctx.label.package.split("/") + [ctx.label.name])
         providers = implementation(ctx, ctx.attr.target, bdl, namespace)
 
-        bdl_provider, _ = precompile_bdl(ctx, srcs = [bdl], deps = [])
+        bdl_provider, _ = precompile_bdl(ctx, srcs = [bdl], deps = [], presets = [])
 
         return [bdl_provider] + providers
 

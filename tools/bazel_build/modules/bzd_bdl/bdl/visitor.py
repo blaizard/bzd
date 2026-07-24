@@ -7,6 +7,7 @@ from bzd.parser.element import Element
 
 from bdl.entities.impl.types import Category
 from bdl.entities.all import (
+	Preset,
 	Expression,
 	Nested,
 	Method,
@@ -221,6 +222,10 @@ class Visitor(VisitorBase[T, T]):
 			elif isinstance(entity, Use):
 				self.visitUse(entity, result)
 
+			# Handle config
+			elif isinstance(entity, Preset):
+				self.visitPreset(entity, result)
+
 			# Should never go here
 			else:
 				Error.handleFromElement(
@@ -281,5 +286,11 @@ class Visitor(VisitorBase[T, T]):
 	def visitUse(self, entity: Use, result: T) -> None:
 		"""
 		Called when discovering an use statement.
+		"""
+		pass
+
+	def visitPreset(self, entity: Preset, result: T) -> None:
+		"""
+		Called when discovering a preset.
 		"""
 		pass

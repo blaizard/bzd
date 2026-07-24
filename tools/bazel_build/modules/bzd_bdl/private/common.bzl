@@ -114,7 +114,7 @@ def make_bdl_arguments(ctx, stage, search_formats = None, format = None, output 
         arguments += args
     return arguments
 
-def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
+def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets = []):
     """Precompile a set of bdls.
 
     Args:
@@ -124,6 +124,7 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
         output_dir: The output directory where the precompiled objects should be stored,
                     if not specified, it will be stored in the same directory as the source file.
         namespace: The namespace in which the bdls files should be compiled.
+        presets: JSON preset files referenced by `preset NAME from "PATH";` statements.
 
     Returns:
         A tuple including a BdlInfo provider and its associated metadata
@@ -132,6 +133,7 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
     # Input files and bdls
     input_sources = depset(transitive = [dep[BdlInfo].sources for dep in deps])
     input_files = depset(srcs, transitive = [dep[BdlInfo].files for dep in deps])
+    preset_files = depset(presets)
     search_formats = sets.make([d for dep in deps for d in dep[BdlInfo].search_formats])
 
     # Output files
@@ -142,7 +144,7 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
         if output_dir == None:
             # Build the relative path of the input file from the BUILD file
             build_root_path = ctx.build_file_path.rsplit("/", 1)[0] + "/"
-            relative_name = input_file.short_path.replace(build_root_path, "").replace(".bdl", "")
+            relative_name = input_file.path.replace(build_root_path, "").replace(".bdl", "")
         else:
             relative_name = "{}/{}/{}".format(output_dir, input_file.dirname, input_file.basename.replace(".bdl", ""))
 
@@ -163,7 +165,7 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None):
 
     # Preprocess all input files at once, this stage is language agnostic.
     ctx.actions.run(
-        inputs = input_files,
+        inputs = depset(transitive = [input_files, preset_files]),
         outputs = [bdl["output"] for bdl in metadata],
         progress_message = "Preprocessing BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
         arguments = make_bdl_arguments(

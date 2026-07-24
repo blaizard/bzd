@@ -9,6 +9,17 @@ load("@rules_python//python:defs.bzl", "py_test")
         "//bdl:generators",
         "//bdl:grammar",
     ],
-) for path in glob([
-    "*.py",
-])]
+) for path in glob(
+    ["*.py"],
+    exclude = ["preset.py"],
+)]
+
+py_test(
+    name = "preset",
+    srcs = ["preset.py"],
+    data = ["fixtures/test_preset.json"],
+    deps = [
+        "//bdl:generators",
+        "//bdl:grammar",
+    ],
+)

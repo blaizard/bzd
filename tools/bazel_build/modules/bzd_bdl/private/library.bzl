@@ -11,6 +11,7 @@ def _bdl_library_impl(ctx):
         ctx = ctx,
         srcs = ctx.files.srcs,
         deps = ctx.attr.deps,
+        presets = ctx.files.presets,
     )
 
     # Generate the data for the data file for the bdl constructor.
@@ -70,6 +71,10 @@ bdl_library = rule(
             providers = [BdlInfo],
             aspects = [aspect_bdl_providers],
             doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
+        ),
+        "presets": attr.label_list(
+            allow_files = [".json"],
+            doc = "JSON preset files referenced by `preset NAME from \"PATH\";` statements.",
         ),
         "srcs": attr.label_list(
             mandatory = True,

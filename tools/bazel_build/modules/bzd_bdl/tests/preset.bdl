@@ -1,0 +1,17 @@
+
+namespace bzd;
+
+
+preset cfg from "tools/bazel_build/modules/bzd_bdl/tests/fixture/config.json";
+struct Server {
+	host = String;
+	port = Integer;
+	
+}
+
+composition MyService {
+	server = Server(host = cfg.host, port = cfg.port);
+	
+}
+
+

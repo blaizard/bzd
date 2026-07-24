@@ -1,7 +1,7 @@
 import typing
 
 from bdl.visitor import Visitor as VisitorBase
-from bdl.entities.all import Use
+from bdl.entities.all import Preset, Use
 
 
 class ProcessInclusions(VisitorBase[None]):
@@ -25,3 +25,13 @@ class ProcessInclusions(VisitorBase[None]):
 		except Exception as e:
 			entity.error(message=str(e))
 			raise
+
+	def visitPreset(self, entity: Preset, result: None) -> None:
+		"""Load preset JSON files at preprocess time."""
+		# Workspace/execroot-relative path (same as `use`); read directly.
+		try:
+			content = entity.path.read_text(encoding="utf-8")
+		except (FileNotFoundError, OSError) as e:
+			entity.error(message=f"Cannot read preset file '{entity.path}' for '{entity.name}': {e}")
+			return
+		entity.setContent(content)  # JSONDecodeError + top-level-array rejection handled inside.

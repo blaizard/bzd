@@ -56,6 +56,27 @@ class Symbol:
 		        - maybeValue: Set to true if the type might represent a value.
 		"""
 
+		# Try shallow resolution first — if the base entity handles trailing segments
+		# (e.g., preset JSON navigation), delegate to its hook.
+		maybeResult = resolver.resolveShallowFQN(name=self.fqn)
+		if maybeResult:
+			baseFQN, remaining = maybeResult.value
+			maybeEntity = resolver.getEntityResolved(fqn=baseFQN)
+			if maybeEntity:
+				entity = maybeEntity.value
+				leaf = entity._resolveTrailingFQN(resolver=resolver, remaining=remaining)
+				if leaf is not None:
+					self.assertTrue(
+						condition=entity.isFQN,
+						message="A value referenced must have a valid FQN.",
+					)
+					ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_resolved", baseFQN)
+					ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_category", entity.category.value)
+					ElementBuilder.cast(self.element, ElementBuilder).setAttr("literal", leaf)
+					ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_value", self.fqn)
+					entity.resolveMemoized(resolver=resolver)
+					return entity
+
 		# Make the fully qualified kind name.
 		fqns = resolver.resolveFQN(name=self.fqn).assertValue(element=self.element, attr=self.kindAttr)
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr(f"{self.kindAttr}_resolved", ";".join(fqns))

@@ -18,3 +18,4 @@ class Category(enum.Enum):
 	use = "use"
 	extern = "extern"
 	expression = "expression"
+	preset = "preset"

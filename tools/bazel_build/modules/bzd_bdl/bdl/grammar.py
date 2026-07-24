@@ -12,7 +12,7 @@ from bzd.parser.fragments import (
 	FragmentComment,
 )
 
-_regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|[0-9])[0-9a-zA-Z_]+"
+_regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|preset\b|[0-9])[0-9a-zA-Z_]+"
 # Match name: abc
 _regexprName = r"(?P<name>" + _regexprBaseName + r")"
 # Match name or varargs: abc or abc...
@@ -493,6 +493,26 @@ def makeGrammarUse() -> Grammar:
 	]
 
 
+def makeGrammarPreset() -> Grammar:
+	"""preset name from "path";  -- loads a JSON preset file (top-level only)."""
+	return [
+		GrammarItem(
+			r"preset",
+			{"category": "preset"},
+			[
+				GrammarItem(
+					_regexprName + r"\s+from",
+					Fragment,
+					[
+						# _regexprString captures the path under the `value` attr (same as `use`).
+						GrammarItem(_regexprString, Fragment, [GrammarItem(r";", FragmentNewElement)]),
+					],
+				),
+			],
+		),
+	]
+
+
 # Comments allowed by the grammar
 _grammarComments = [
 	GrammarItem(r"/\*(?P<comment>([\s\S]*?))\*/", FragmentBlockComment),
@@ -508,6 +528,7 @@ class Parser(ParserBase):
 			content,
 			grammar=makeGrammarNamespace()
 			+ makeGrammarUse()
+			+ makeGrammarPreset()
 			+ makeGrammarExtern()
 			+ withinNested
 			+ makeGrammarNested(
