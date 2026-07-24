@@ -59,11 +59,11 @@ def _bzd_nodejs_package_impl(ctx):
         executable = ctx.executable._repackage,
     )
 
-    return BzdNodeJsPackageInfo(
+    return [DefaultInfo(files = depset([store])), BzdNodeJsPackageInfo(
         canonical_name = ctx.attr.canonical_name,
         module_name = ctx.attr.module_name,
         transitive_stores = depset([store], transitive = [dep[BzdNodeJsPackageInfo].transitive_stores for dep in ctx.attr.deps.values()]),
-    )
+    )]
 
 bzd_nodejs_package = rule(
     doc = "Package implementation.",

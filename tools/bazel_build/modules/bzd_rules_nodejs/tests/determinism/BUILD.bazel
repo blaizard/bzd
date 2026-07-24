@@ -1,0 +1,38 @@
+load("@bazel_skylib//rules/directory:directory.bzl", "directory")
+load("@bazel_skylib//rules/directory:subdirectory.bzl", "subdirectory")
+load("@bzd_lib//:defs.bzl", "bzd_diff_test")
+load("//nodejs:defs.bzl", "bzd_nodejs_package")
+
+directory(
+    name = "root",
+    srcs = glob(["package_test/**"]),
+)
+
+subdirectory(
+    name = "package_test_root",
+    parent = ":root",
+    path = "package_test",
+)
+
+bzd_nodejs_package(
+    name = "package_test",
+    srcs = ":package_test_root",
+    canonical_name = "test@6.0.2",
+    module_name = "test",
+)
+
+filegroup(
+    name = "package_test.tar",
+    srcs = [
+        ":package_test",
+    ],
+)
+
+bzd_diff_test(
+    name = "determinism_package_test",
+    file1 = ":package_test.tar",
+    # expected_package_test.tar is created as follow:
+    # bazel build @bzd_rules_nodejs//tests/determinism:package_test.tar
+    # cp bazel-bin/external/bzd_rules_nodejs+/tests/determinism/store.tar tools/bazel_build/modules/bzd_rules_nodejs/tests/determinism/expected_package_test.tar
+    file2 = ":expected_package_test.tar",
+)

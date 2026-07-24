@@ -6,12 +6,27 @@ import tempfile
 import shutil
 
 
+def resetTarInfo(info: tarfile.TarInfo) -> tarfile.TarInfo:
+	"""Zero out non-deterministic metadata."""
+
+	info.mtime = 0
+	info.uid = 0
+	info.gid = 0
+	info.uname = ""
+	info.gname = ""
+
+	return info
+
+
 def createTar(source: pathlib.Path, destination: pathlib.Path) -> None:
 	"""Create a package tar archive."""
 
 	destination.parent.mkdir(parents=True, exist_ok=True)
-	with tarfile.open(destination, "w") as tar:
-		tar.add(source, arcname=".", recursive=True)
+	with tarfile.open(destination, "w", format=tarfile.GNU_FORMAT) as tar:
+		# Sorted walk make it deterministic.
+		for path in sorted(source.rglob("*"), key=lambda p: p.as_posix()):
+			arcname = "./" + path.relative_to(source).as_posix()
+			tar.add(path, arcname=arcname, recursive=False, filter=resetTarInfo)
 
 
 def createSymlink(linkPath: pathlib.Path, relativePath: str) -> None:
