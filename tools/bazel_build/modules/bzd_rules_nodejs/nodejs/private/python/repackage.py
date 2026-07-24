@@ -4,7 +4,6 @@ import pathlib
 import tarfile
 import tempfile
 import shutil
-import stat
 
 
 def resetTarInfo(info: tarfile.TarInfo) -> tarfile.TarInfo:
@@ -23,12 +22,7 @@ def resetTarInfo(info: tarfile.TarInfo) -> tarfile.TarInfo:
 	elif info.issym() or info.islnk():
 		info.mode = 0o777
 	else:
-		# Mask against owner execute bit only (0o100)
-		# Bazel tracks only this bit the rest of the executable bits are OS dependent/noise.
-		if info.mode & stat.S_IXUSR:
-			info.mode = 0o755
-		else:
-			info.mode = 0o644
+		info.mode = 0o644
 
 	return info
 
