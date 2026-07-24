@@ -82,7 +82,7 @@ class TestRun(unittest.TestCase):
 		element.setAttr("value", "path.json")
 		preset = Preset(element)
 		with self.assertRaisesRegex(Exception, r"was not loaded"):
-			preset.resolve(None)
+			preset.resolve(None)  # type: ignore
 
 	@staticmethod
 	def _makeFixtureFile(content: typing.Any) -> str:
@@ -169,8 +169,7 @@ class TestRun(unittest.TestCase):
 				objectContext=ObjectContext(resolve=True, composition=True),
 			)
 			server = bdl.entity("bzd.MyService.server")
-			self.assertIsInstance(server, Expression)
-
+			assert isinstance(server, Expression)
 			self.assertEqual(len(server.parametersResolved), 2)
 
 			self.assertEqual(server.parametersResolved[0].param.literal, '"10.10.0.10"')
