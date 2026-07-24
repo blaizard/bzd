@@ -14,6 +14,19 @@ def resetTarInfo(info: tarfile.TarInfo) -> tarfile.TarInfo:
 	info.gid = 0
 	info.uname = ""
 	info.gname = ""
+	info.pax_headers = {}
+
+	# Normalize permissions
+	if info.isdir():
+		info.mode = 0o755
+	elif info.issym() or info.islnk():
+		info.mode = 0o777
+	else:
+		# Preserve the executable bit
+		if info.mode & 0o111:
+			info.mode = 0o755
+		else:
+			info.mode = 0o644
 
 	return info
 
