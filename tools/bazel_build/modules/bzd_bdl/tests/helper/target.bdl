@@ -1,0 +1,13 @@
+use "external/bzd_bdl+/tests/helper/executor.bdl"
+
+
+
+component Executor : bzd.Executor {
+}
+
+composition {
+	executor = Executor() [executor];
+	
+}
+
+

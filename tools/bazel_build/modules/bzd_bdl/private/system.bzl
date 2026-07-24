@@ -109,7 +109,7 @@ def _bdl_binary_impl(ctx):
                 ),
             )
             providers = [
-                DefaultInfo(executable = binary_file, runfiles = runfiles),
+                DefaultInfo(executable = binary_file, runfiles = runfiles, files = depset(provider.get("files", {}).values())),
             ]
             metadata = []
         elif "binary" in library_extensions[fmt]:

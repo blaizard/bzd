@@ -1,0 +1,24 @@
+{
+    "contexts": [
+        {
+            "registry": {
+                "default.executor": {
+                    "deps": [],
+                    "expression": {
+                        "category": "component",
+                        "fqn": "default.executor",
+                        "name": "executor",
+                        "symbol": "default.Executor"
+                    },
+                    "init": [],
+                    "intra": [],
+                    "shutdown": []
+                }
+            },
+            "services": [],
+            "workloads": []
+        }
+    ],
+    "ios": {},
+    "target": "default"
+}

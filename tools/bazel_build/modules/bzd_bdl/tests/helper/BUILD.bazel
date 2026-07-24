@@ -1,0 +1,30 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+load("//:defs.bzl", "bdl_library", "bdl_target")
+
+bdl_library(
+    name = "executor",
+    srcs = [
+        "executor.bdl",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "print_json",
+    srcs = [
+        "print_json.py",
+    ],
+)
+
+bdl_target(
+    name = "target",
+    binary = ":print_json",
+    composition = [
+        ":target.bdl",
+    ],
+    language = "json",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":executor",
+    ],
+)

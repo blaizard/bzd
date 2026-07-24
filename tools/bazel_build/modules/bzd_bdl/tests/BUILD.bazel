@@ -1,4 +1,5 @@
 load("//:defs.bzl", "bdl_library")
+load("//tests/helper:defs.bzl", "bzl_system_test")
 
 bdl_library(
     name = "a",
@@ -11,4 +12,20 @@ bdl_library(
     name = "preset",
     srcs = ["preset.bdl"],
     presets = ["fixture/config.json"],
+)
+
+bzl_system_test(
+    name = "a_test",
+    expected_json = ":exoected_a.json",
+    deps = [
+        ":a",
+    ],
+)
+
+bzl_system_test(
+    name = "preset_test",
+    expected_json = ":exoected_preset.json",
+    deps = [
+        ":preset",
+    ],
 )
