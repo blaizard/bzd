@@ -37,7 +37,8 @@ def createTar(source: pathlib.Path, destination: pathlib.Path) -> None:
 	destination.parent.mkdir(parents=True, exist_ok=True)
 	with tarfile.open(destination, "w", format=tarfile.GNU_FORMAT) as tar:
 		# Sorted walk make it deterministic.
-		for path in sorted(source.rglob("*"), key=lambda p: p.as_posix()):
+		allPaths = set(source.rglob("*")) | set(source.rglob(".*"))
+		for path in sorted(allPaths, key=lambda p: p.as_posix()):
 			arcname = "./" + path.relative_to(source).as_posix()
 			tar.add(path, arcname=arcname, recursive=False, filter=resetTarInfo)
 
