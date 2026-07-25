@@ -1,9 +1,8 @@
 """Comparator for text files using unified diff output."""
 
-import difflib
 import pathlib
 
-from private.diff_test.common import getShortestDistinctPaths, maybeColorizeLine
+from private.diff_test.common import printUnifiedDiff
 
 
 def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
@@ -14,24 +13,6 @@ def compare(file1: pathlib.Path, file2: pathlib.Path, color: bool) -> bool:
 	if content1 == content2:
 		return True
 
-	shortest1, shortest2 = getShortestDistinctPaths(file1, file2)
-
-	diff = difflib.unified_diff(
-		content1.splitlines(keepends=True),
-		content2.splitlines(keepends=True),
-		fromfile=str(shortest1),
-		tofile=str(shortest2),
-	)
-
-	colors = {
-		"-": "\033[0;31m",
-		"+": "\033[0;32m",
-		"@": "\033[0;34m",
-	}
-
-	for line in diff:
-		prefix = line[0] if line else ""
-		maybeColorStr = colors.get(prefix, None) if color else None
-		print(maybeColorizeLine(line.rstrip("\n"), maybeColorStr))
+	printUnifiedDiff(content1.splitlines(keepends=True), content2.splitlines(keepends=True), file1, file2, color)
 
 	return False
