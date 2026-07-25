@@ -23,18 +23,12 @@ if __name__ == "__main__":
 		help="Namespace to be injected in the preprocessed files.",
 	)
 	parser.add_argument(
-		"--preprocess-format",
-		dest="preprocessFormat",
-		default=None,
-		type=str,
-		help="This is how is named a preprocessed file, used for auto-discovering preprocessed files instead of re-generating them.",
-	)
-	parser.add_argument(
-		"--search-formats",
-		dest="searchFormats",
+		"--search-path",
+		dest="searchPaths",
 		action="append",
 		default=[],
-		help="List of search format string to find preprocessed object files.",
+		type=str,
+		help="Search directory for preprocessed `.bdl.o` files from upstream rules and raw preset files.",
 	)
 	parser.add_argument(
 		"--stage",
@@ -59,8 +53,7 @@ if __name__ == "__main__":
 	config = parser.parse_args()
 
 	objectContext = ObjectContext(
-		preprocessFormat=config.preprocessFormat,
-		searchFormats=config.searchFormats,
+		searchPaths=config.searchPaths,
 		resolve=True,
 	)
 

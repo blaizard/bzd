@@ -40,9 +40,8 @@ def _bdl_library_impl(ctx):
                     outputs = outputs,
                     progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
                     arguments = make_bdl_arguments(
-                        ctx = ctx,
                         stage = "generate",
-                        search_formats = bdl_provider.search_formats,
+                        search_paths = bdl_provider.search_paths,
                         format = fmt,
                         output = outputs[0].path,
                         data = data_file,

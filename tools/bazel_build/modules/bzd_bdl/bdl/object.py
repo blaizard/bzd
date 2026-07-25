@@ -17,19 +17,18 @@ from bdl.entities.all import EntityType
 class ObjectContext:
 	def __init__(
 		self,
-		preprocessFormat: typing.Optional[str] = None,
-		searchFormats: typing.Optional[typing.List[str]] = None,
+		searchPaths: typing.Optional[typing.List[str]] = None,
 		resolve: bool = False,
 		composition: bool = False,
 	) -> None:
 		"""
 		Args:
+		        searchPaths: Directories to look up preprocessed `.bdl.o` files and preset files from upstream rules.
 		        resolve: Resolve all symbols.
 		        composition: Include composition stage (for testing purpose only).
 		"""
 
-		self.preprocessFormat = "{}.o" if preprocessFormat is None else preprocessFormat
-		self.searchFormats = searchFormats if searchFormats else []
+		self.searchPaths = [Path(p) for p in (searchPaths or [])]
 		self.sources: typing.List[Path] = []
 		self.resolve = resolve
 		self.composition = composition
@@ -61,25 +60,41 @@ class ObjectContext:
 		return Path(split[0])
 
 	def getPreprocessedPathFromSource(self, source: str) -> Path:
-		"""Extract the preprocess path name from the source."""
+		"""Extract the preprocessed path from a source, using `@<output>` if present, or falling back to `"{}.o".format(source)`."""
 
 		split = source.split("@")
 		assert len(split) <= 2, f"The source '{source}' is malformed."
-		return Path(split[1]) if len(split) > 1 else Path(self.preprocessFormat.format(source))
+		return Path(split[1]) if len(split) > 1 else Path("{}.o".format(source))
+
+	def _findInSearchPaths(self, rel: Path) -> typing.Optional[Path]:
+		"""Iterate search paths in order, returning the first match for the given relative path."""
+		for sp in self.searchPaths:
+			candidate = sp / rel
+			if candidate.is_file():
+				return candidate
+		return None
 
 	def findPreprocess(self, source: str) -> typing.Optional[Path]:
-		"""Search for the preprocessed object file if any."""
-
-		def getPreprocessedPath(source: str, path: Path) -> typing.Iterator[Path]:
-			yield self.getPreprocessedPathFromSource(source=source)
-			for fmt in self.searchFormats:
-				yield Path(fmt.format(path))
+		"""Search for a preprocessed object file, checking explicit `@<output>` first, then `searchPaths` with the `.bdl.o` suffix."""
 
 		path = self.getPathFromSource(source=source)
-		for preprocessed in getPreprocessedPath(source=source, path=path):
-			if preprocessed.is_file():
-				return preprocessed
-		return None
+		# Candidate 1: explicit @<output> form, if present.
+		if "@" in source:
+			candidate = self.getPreprocessedPathFromSource(source=source)
+			if candidate.is_file():
+				return candidate
+		# Candidate 2: any search path's preprocessed object file.
+		return self._findInSearchPaths(path.with_suffix(".bdl.o"))
+
+	def findFile(self, source: str) -> typing.Optional[Path]:
+		"""Search for a raw file (e.g. preset JSON), checking the direct path first, then `searchPaths`."""
+
+		path = self.getPathFromSource(source=source)
+		# Candidate 1: the path as-written, resolved against execroot/cwd.
+		if path.is_file():
+			return path
+		# Candidate 2: relative to each upstream search root (preserving any extension on `path`).
+		return self._findInSearchPaths(path)
 
 	def isPreprocessed(self, source: str) -> bool:
 		"""Check if a BDL file has a preprocessed counter-part."""
@@ -134,7 +149,13 @@ class ObjectContext:
 		# Save the preprocessed payload to a file.
 		# Do not save when ignoring dependencies, as this creates incomplete views.
 		if self.resolve:
-			self.savePreprocess(source=source, object=bdl)
+			# When no explicit @<output> is given (e.g. from a recursive `use`), derive
+			# an output path relative to the first search path so it can be found later.
+			saveSource = source
+			if "@" not in source and self.searchPaths:
+				output = self.searchPaths[0] / path.with_suffix(".bdl.o")
+				saveSource = "{}@{}".format(source, output)
+			self.savePreprocess(source=saveSource, object=bdl)
 
 		# Pop dependency
 		self.popSource()

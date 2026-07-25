@@ -1,0 +1,18 @@
+
+
+
+preset cfg from "external/bzd_bdl+/tests/preset/generated/config.json";
+struct Server {
+	host = String;
+	port = Integer;
+	
+}
+
+method check(server = Server());
+composition MyService {
+	server = Server(host = cfg.host, port = cfg.port);
+	check(server = server);
+	
+}
+
+

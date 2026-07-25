@@ -1,0 +1,22 @@
+load("//:defs.bzl", "bdl_library")
+load("//tests/helper:defs.bzl", "bzl_system_test")
+
+genrule(
+    name = "generate_config",
+    outs = ["config.json"],
+    cmd = "echo '{\"host\": \"10.10.0.10\", \"port\": 8080}' >  \"$@\"",
+)
+
+bdl_library(
+    name = "preset",
+    srcs = ["preset.bdl"],
+    presets = ["config.json"],
+)
+
+bzl_system_test(
+    name = "preset_test",
+    expected_json = ":expected_output.json",
+    deps = [
+        ":preset",
+    ],
+)

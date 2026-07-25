@@ -28,10 +28,13 @@ class ProcessInclusions(VisitorBase[None]):
 
 	def visitPreset(self, entity: Preset, result: None) -> None:
 		"""Load preset JSON files at preprocess time."""
-		# Workspace/execroot-relative path (same as `use`); read directly.
-		try:
-			content = entity.path.read_text(encoding="utf-8")
-		except (FileNotFoundError, OSError) as e:
-			entity.error(message=f"Cannot read preset file '{entity.path}' for '{entity.name}': {e}")
+		maybeFile = self.objectContext.findFile(source=entity.path.as_posix())
+		if maybeFile is None:
+			entity.error(message=f"Cannot find preset file for '{entity.path}' (name '{entity.name}').")
 			return
-		entity.setContent(content)  # JSONDecodeError + top-level-array rejection handled inside.
+		try:
+			content = maybeFile.read_text(encoding="utf-8")
+		except (FileNotFoundError, OSError) as e:
+			entity.error(message=f"Cannot read preset file '{maybeFile}' for '{entity.name}': {e}")
+			return
+		entity.setContent(content)

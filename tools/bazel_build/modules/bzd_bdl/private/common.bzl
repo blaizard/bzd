@@ -43,7 +43,7 @@ def _aspect_bdl_providers_impl(target, ctx):
             BdlInfo(
                 sources = depset(transitive = [dep[BdlInfo].sources for dep in ctx.rule.attr.deps if BdlInfo in dep]),
                 files = depset(transitive = [dep[BdlInfo].files for dep in ctx.rule.attr.deps if BdlInfo in dep]),
-                search_formats = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if BdlInfo in dep for d in dep[BdlInfo].search_formats])),
+                search_paths = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if BdlInfo in dep for d in dep[BdlInfo].search_paths])),
             ),
             _BdlCompositionInfo(data = provider_data),
         ]
@@ -76,16 +76,12 @@ transition_platform = transition(
 
 # ---- Helpers functions ----
 
-def _get_preprocessed_format(ctx):
-    return "{}/{{}}.o".format(ctx.bin_dir.path)
-
-def make_bdl_arguments(ctx, stage, search_formats = None, format = None, output = None, namespace = None, data = None, targets = None, args = None):
+def make_bdl_arguments(stage, search_paths = None, format = None, output = None, namespace = None, data = None, targets = None, args = None):
     """Create the argument list for the `bdl` tool.
 
     Args:
-        ctx: The context of the rule.
         stage: The stage of the bdl processing.
-        search_formats: The formatting of the search.
+        search_paths: List of directory paths to search for preprocessed object files (and preset files) from upstream rules.
         format: The format of the output.
         output: The output path.
         namespace: The namespace to set.
@@ -97,9 +93,9 @@ def make_bdl_arguments(ctx, stage, search_formats = None, format = None, output 
         The argument list to be passed to the bdl tool.
     """
 
-    arguments = ["--stage", stage, "--preprocess-format", _get_preprocessed_format(ctx)]
-    if search_formats:
-        arguments += [i for fmt in search_formats for i in ("--search-format", fmt)]
+    arguments = ["--stage", stage]
+    if search_paths:
+        arguments += [i for path in search_paths for i in ("--search-path", path)]
     if format:
         arguments += ["--format", format]
     if output:
@@ -134,7 +130,11 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets
     input_sources = depset(transitive = [dep[BdlInfo].sources for dep in deps])
     input_files = depset(srcs, transitive = [dep[BdlInfo].files for dep in deps])
     preset_files = depset(presets)
-    search_formats = sets.make([d for dep in deps for d in dep[BdlInfo].search_formats])
+
+    # Collect search paths from all dependencies.
+    search_paths = sets.make([d for dep in deps for d in dep[BdlInfo].search_paths])
+    sets.insert(search_paths, ctx.bin_dir.path)
+    search_paths = sets.to_list(search_paths)
 
     # Output files
     metadata = []
@@ -158,21 +158,15 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets
             "relative_name": relative_name,
         })
 
-    # Add the new path to the list, it must be done before preprocessing the files,
-    # as some might refer to others.
-    sets.insert(search_formats, _get_preprocessed_format(ctx))
-    search_formats = sets.to_list(search_formats)
-
     # Preprocess all input files at once, this stage is language agnostic.
     ctx.actions.run(
         inputs = depset(transitive = [input_files, preset_files]),
         outputs = [bdl["output"] for bdl in metadata],
         progress_message = "Preprocessing BDL manifest(s) {}".format(", ".join([bdl["input"].short_path for bdl in metadata])),
         arguments = make_bdl_arguments(
-            ctx = ctx,
             stage = "preprocess",
             namespace = namespace,
-            search_formats = search_formats,
+            search_paths = search_paths,
             args = ["{}@{}".format(bdl["input"].path, bdl["output"].path) for bdl in metadata],
         ),
         executable = ctx.attr._bdl.files_to_run,
@@ -181,7 +175,7 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets
     sources = depset([(bdl["input"], bdl["output"]) for bdl in metadata], transitive = [input_sources])
     files = depset([bdl["output"] for bdl in metadata], transitive = [input_files])
 
-    return BdlInfo(sources = sources, files = files, search_formats = search_formats), metadata
+    return BdlInfo(sources = sources, files = files, search_paths = search_paths), metadata
 
 def make_composition_language_providers(ctx, name, deps, target_deps = None, target_bdl_providers = None):
     """Compose the system.
@@ -227,8 +221,7 @@ def make_composition_language_providers(ctx, name, deps, target_deps = None, tar
     # Contains all bdl files, this is used for debugging purpose.
     files = depset(transitive = [provider.files for provider, target in bdl_providers])
 
-    # Contains all search format strings.
-    search_formats = sets.to_list(sets.make([fmt for provider, target in bdl_providers for fmt in provider.search_formats]))
+    search_paths = sets.to_list(sets.make([sp for provider, target in bdl_providers for sp in provider.search_paths]))
 
     # Contains all deps grouped by target.
     combined_deps = dict({"all": deps}, **target_deps)
@@ -268,10 +261,9 @@ def make_composition_language_providers(ctx, name, deps, target_deps = None, tar
                 outputs = outputs.values(),
                 progress_message = "Generating {} composition for {}".format(data["display"], ctx.label),
                 arguments = make_bdl_arguments(
-                    ctx = ctx,
                     stage = "compose",
                     format = fmt,
-                    search_formats = search_formats,
+                    search_paths = search_paths,
                     targets = targets,
                     output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
                     data = data_file,

@@ -1,7 +1,7 @@
 
 
 
-preset cfg from "external/bzd_bdl+/tests/fixture/config.json";
+preset cfg from "external/bzd_bdl+/tests/preset/simple/config.json";
 struct Server {
 	host = String;
 	port = Integer;

@@ -1,0 +1,72 @@
+{
+    "contexts": [
+        {
+            "registry": {
+                "MyService.server": {
+                    "deps": [],
+                    "expression": {
+                        "category": "struct",
+                        "fqn": "MyService.server",
+                        "name": "server",
+                        "parameters": [
+                            {
+                                "category": "preset",
+                                "fqn": "Server.host",
+                                "name": "host",
+                                "symbol": "cfg",
+                                "value": "10.10.0.10"
+                            },
+                            {
+                                "category": "preset",
+                                "fqn": "Server.port",
+                                "name": "port",
+                                "symbol": "cfg",
+                                "value": 8080
+                            }
+                        ],
+                        "symbol": "Server"
+                    },
+                    "init": [],
+                    "intra": [],
+                    "shutdown": []
+                },
+                "default.executor": {
+                    "deps": [],
+                    "expression": {
+                        "category": "component",
+                        "fqn": "default.executor",
+                        "name": "executor",
+                        "symbol": "default.Executor"
+                    },
+                    "init": [],
+                    "intra": [],
+                    "shutdown": []
+                }
+            },
+            "services": [],
+            "workloads": [
+                {
+                    "deps": [
+                        "MyService.server"
+                    ],
+                    "expression": {
+                        "category": "method",
+                        "parameters": [
+                            {
+                                "category": "expression",
+                                "name": "server",
+                                "symbol": "MyService.server"
+                            }
+                        ],
+                        "symbol": "check"
+                    },
+                    "init": [],
+                    "intra": [],
+                    "shutdown": []
+                }
+            ]
+        }
+    ],
+    "ios": {},
+    "target": "default"
+}

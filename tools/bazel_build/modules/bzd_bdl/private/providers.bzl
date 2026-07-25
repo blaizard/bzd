@@ -11,7 +11,7 @@ BdlInfo = provider(
     doc = "Provider for bdl files.",
     fields = {
         "files": "All files, contains the same set of files as in `sources`, but uses a different format for convenience.",
-        "search_formats": "Set of search formats string to locate the preprocessed object files.",
+        "search_paths": "Ordered list of directory paths to search for preprocessed object files.",
         "sources": "Pair of input and preprocessed bdl files.",
     },
 )
