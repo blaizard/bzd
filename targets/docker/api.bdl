@@ -10,7 +10,7 @@ interface:
 	// \param image The docker image to be used.
 	// \param host The hostname to be used for this service.
 	// \param port The port exposed by this image to be served.
-	method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory]);
+	method add(image = String [mandatory], host = String [mandatory], port = Integer [mandatory], node_token = String);
 	
 }
 

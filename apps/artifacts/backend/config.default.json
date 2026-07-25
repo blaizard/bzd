@@ -98,17 +98,19 @@
         }
     ],
     "tokens": {
-        "aGVsbG86YWJjMTIz": {
+        "test": {
             "doc": "base64 user:password token for hello:abc123",
             "scopes": [
                 "/volume/memory_private"
-            ]
+            ],
+            "token": "aGVsbG86YWJjMTIz"
         },
         "tokenscope1": {
             "doc": "Some useful documentation",
             "scopes": [
                 "/volume/scope1"
-            ]
+            ],
+            "token": "tokenscope1"
         }
     },
     "volumes": {

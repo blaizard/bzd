@@ -236,6 +236,9 @@ if __name__ == "__main__":
 	dockerCompose = traefikDockerCompose | composeDockerCompose
 	images = traefikImages | composeImages
 
+	print(dockerCompose)
+	sys.exit(1)
+
 	registry = Template.fromPath(pathlib.Path(__file__).parent / "registry.yml.btl").render(common)
 	applicationsDirectory = args.directory / "apps"
 

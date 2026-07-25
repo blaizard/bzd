@@ -55,6 +55,9 @@ services:
             - "./data/{{ hostToName(docker.host) }}:/bzd/data"
         environment:
             - BZD_NODE_UID={{ docker.host }}
+            {% if docker.node_token %}
+            - BZD_NODE_TOKEN={{ docker.node_token }}
+            {% end %}
         labels:
             traefik.enable: "true"
             {% if needsWWWRedirect(docker.host) %}
