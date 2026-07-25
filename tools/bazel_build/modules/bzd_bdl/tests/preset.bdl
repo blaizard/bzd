@@ -1,5 +1,4 @@
 
-namespace bzd;
 
 
 preset cfg from "external/bzd_bdl+/tests/fixture/config.json";
@@ -9,8 +8,10 @@ struct Server {
 	
 }
 
+method check(server = Server());
 composition MyService {
 	server = Server(host = cfg.host, port = cfg.port);
+	check(server = server);
 	
 }
 
