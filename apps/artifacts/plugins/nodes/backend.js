@@ -303,7 +303,7 @@ export default class Plugin extends PluginBase {
 			// taken from a previous version/iteration, therefore we consider the tick passed invalid
 			// and reset it to 0. This is to handle updates on the remote side.
 			let tick = context.getQuery("tick", 0, parseInt);
-			if (tick > this.records.tick + 1) {
+			if (tick > this.records.records.tick + 1) {
 				tick = 0;
 			}
 			let maxSize = context.getQuery("size", 1024 * 1024, parseInt);
