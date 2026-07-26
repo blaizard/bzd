@@ -50,6 +50,7 @@ frontend.app.use(CachePlugin, {
 				);
 			} while (next);
 
+			list.sort((a, b) => a.name.localeCompare(b.name));
 			return list;
 		},
 		default: [],
