@@ -21,6 +21,9 @@ export default class CommandBase {
 		this.timestampStart = null;
 		this.timestampStop = null;
 
+		/// Callback to be called once the command terminates.
+		this.onTerminate = null;
+
 		this.event = new Event();
 		this.event.on("output", (data) => {
 			this.output.push(data);
@@ -62,6 +65,9 @@ export default class CommandBase {
 			case Status.failed:
 			case Status.cancelled:
 				this.timestampStop = Date.now();
+				if (this.onTerminate) {
+					this.onTerminate(status);
+				}
 				break;
 			default:
 				Exception.assertUnreachable(`Unsupported status value: ${status}`);

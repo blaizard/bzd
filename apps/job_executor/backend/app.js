@@ -27,28 +27,52 @@ const Log = LogFactory("backend");
 	});
 	await commands.initialize();
 
-	backend.rest.handle("post", "/job/send", async function () {
+	async function schedule(getInputs, scheduler) {
 		const contextJob = await commands.allocate();
 		const uid = contextJob.getUid();
 
 		try {
-			const inputs = await this.processForm(async (key, file, info) => {
-				const path = ["inputs", info.name];
-				await contextJob.write(path, file);
-				return path.join("/");
-			});
+			const inputs = await getInputs(contextJob);
 			Exception.assertPrecondition(inputs.type in Jobs, "Job type is not known: {}", inputs.type);
 
 			// Build the input data.
 			await commands.makeFromSchema(contextJob, Jobs[inputs.type], inputs);
-			await commands.schedule(uid, { type: "queue" });
+			await commands.schedule(uid, scheduler);
 
-			Log.info("Executing job {}", uid);
+			Log.info("Executing job {} with scheduler type '{}'.", uid, scheduler.type);
 		} catch (error) {
 			Log.error("Executing job {}", uid);
 			await commands.remove(uid);
 			throw error;
 		}
+
+		return uid;
+	}
+
+	// Run preset instances.
+	for (const instance of config.instances) {
+		const scheduler = instance.scheduler ?? { type: "queue" };
+		await schedule(() => {
+			return Object.assign(
+				{
+					type: instance.type,
+				},
+				instance.args,
+			);
+		}, scheduler);
+	}
+
+	backend.rest.handle("post", "/job/send", async function () {
+		const uid = await schedule(async (contextJob) => {
+			return await this.processForm(
+				async (key, file, info) => {
+					const path = ["inputs", info.name];
+					await contextJob.write(path, file);
+					return path.join("/");
+				},
+				/*scheduler*/ { type: "queue" },
+			);
+		});
 
 		return {
 			job: uid,

@@ -126,9 +126,9 @@ export default class Executor {
 		this.event.trigger("input", JSON.stringify({ type: "stream", value: data }));
 	}
 
-	async execute(args) {
+	async execute(args, onTerminate) {
 		await this.lock.acquire(async () => {
-			await this.executor.execute(args);
+			await this.executor.execute(args, onTerminate);
 		});
 	}
 

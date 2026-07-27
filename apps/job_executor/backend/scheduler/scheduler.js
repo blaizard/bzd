@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import Status from "#bzd/apps/job_executor/backend/status.js";
 import ServicesProvider from "#bzd/nodejs/core/services/provider.js";
+import Services from "#bzd/nodejs/core/services/services.js";
 
 const Exception = ExceptionFactory("scheduler");
 const Log = LogFactory("scheduler");
@@ -27,7 +28,8 @@ export default class Scheduler {
 
 				// Loop through the executors ready to be scheduled.
 				for (const [uid, status] of Object.entries(this.statuses)) {
-					if (status == Status.idle && infos[uid].scheduler && this.isReadyToBeExecuted(uid, infos[uid].scheduler)) {
+					const scheduler = infos[uid].scheduler;
+					if (status == Status.idle && scheduler && this.isReadyToBeExecuted(uid, scheduler)) {
 						await this._execute(uid);
 						this.statuses[uid] = Status.running;
 					}
@@ -36,7 +38,8 @@ export default class Scheduler {
 				return this.statuses;
 			},
 			{
-				periodS: 5,
+				periodS: 1,
+				policy: Services.Policy.throw,
 			},
 		);
 	}
@@ -49,6 +52,7 @@ export default class Scheduler {
 	/// - periodically <time>
 	async schedule(uid, scheduler) {
 		const executor = this._getExecutor(uid);
+		await executor.reset();
 		return await executor.updateInfo({
 			scheduler: scheduler,
 		});
@@ -66,6 +70,16 @@ export default class Scheduler {
 			// Run regardless of any conditions.
 			case "immediately":
 				return true;
+
+			case "periodically":
+				Exception.assertPrecondition(
+					typeof scheduler.period == "number",
+					"Periodic scheduler is missing its period argument (should be a number in seconds).",
+				);
+				return true;
+
+			default:
+				Exception.unreachable("Unsupported scheduler type '{}'.", type);
 		}
 
 		return true;
@@ -81,7 +95,17 @@ export default class Scheduler {
 		const info = await executor.getInfo();
 		Exception.assertPrecondition(info.status == Status.idle, "The job '{uid}' has already started", uid);
 		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:?}", uid, info);
-		await executor.execute(info.args);
+
+		await executor.execute(info.args, (status) => {
+			// TODO: handle re-scheduling based on the status.
+			if (info.scheduler?.type == "periodically") {
+				setTimeout(() => {
+					executor.reset().catch((e) => {
+						Log.error("Executor '{}' failed to reset.", uid);
+					});
+				}, info.scheduler.period * 1000);
+			}
+		});
 
 		if (info.data && info.data.stdin) {
 			executor.writeToStdin(info.data.stdin + "\n");

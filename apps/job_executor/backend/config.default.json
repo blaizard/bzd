@@ -1,1 +1,14 @@
-{}
+{
+    "instances": [
+        {
+            "args": {
+                "time": "5"
+            },
+            "scheduler": {
+                "period": 10,
+                "type": "periodically"
+            },
+            "type": "sleep"
+        }
+    ]
+}

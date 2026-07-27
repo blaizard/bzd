@@ -46,7 +46,8 @@ export default class ExecutorDocker {
 		await this.command.attach();
 	}
 
-	async execute(args) {
+	async execute(args, onTerminate) {
+		this.command.onTerminate = onTerminate;
 		await this.command.detach([
 			"-v",
 			this.contextJob.getRootPath().absolute().asPosix() + ":/sandbox",

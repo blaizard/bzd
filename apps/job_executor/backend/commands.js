@@ -92,7 +92,6 @@ export default class Commands {
 	/// Send a workload to be scheduled.
 	async schedule(uid, type) {
 		const executor = this.getExecutor(uid);
-		await executor.reset();
 		return await this.scheduler.schedule(uid, type);
 	}
 

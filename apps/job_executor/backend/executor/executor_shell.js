@@ -19,7 +19,8 @@ export default class ExecutorShell {
 		return {};
 	}
 
-	async execute(args) {
+	async execute(args, onTerminate) {
+		this.command.onTerminate = onTerminate;
 		await this.command.detach(["--cwd", this.contextJob.getRootPath().asPosix(), "--", ...args]);
 	}
 
