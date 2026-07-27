@@ -45,12 +45,17 @@ public:
 
 		co_await !logger.info("Watering for {}s..."_csv, context_.config.wateringTimeS);
 		co_await !context_.io.pump.set(1);
-		co_await !context_.config.timer.delay(bzd::units::Second{context_.config.wateringTimeS});
-		co_await !context_.io.pump.set(0);
+		// co_await !context_.config.timer.delay(bzd::units::Second{context_.config.wateringTimeS});
+		// co_await !context_.io.pump.set(0);
 
-		co_await !logger.info("Going to sleep, will wake up in {}s..."_csv, context_.config.wakeUpPeriodS);
-		esp_sleep_enable_timer_wakeup(/*time us*/ context_.config.wakeUpPeriodS * 1000000ull);
-		esp_deep_sleep_start();
+		// co_await !logger.info("Going to sleep, will wake up in {}s..."_csv, context_.config.wakeUpPeriodS);
+		// esp_sleep_enable_timer_wakeup(/*time us*/ context_.config.wakeUpPeriodS * 1000000ull);
+		// esp_deep_sleep_start();
+
+		while (true)
+		{
+			co_await !context_.config.timer.delay(bzd::units::Second{1});
+		}
 
 		co_return {};
 	}
@@ -79,19 +84,13 @@ public:
 			while (current >= 0 && current <= max)
 			{
 				co_await !context_.io.pwmDuty0.set(current);
-				co_await !context_.io.pwmDuty1.set(current);
 				current += inc;
 				co_await !context_.config.timer.delay(bzd::units::Millisecond{1});
 			}
-			if (inc > 0)
+
+			while (true)
 			{
-				current = max;
-				inc = -2;
-			}
-			else
-			{
-				current = 0;
-				inc = 2;
+				co_await !context_.config.timer.delay(bzd::units::Second{1});
 			}
 		}
 
