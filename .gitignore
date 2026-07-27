@@ -39,6 +39,7 @@ temp/
 \#*\#
 _*
 *.bak
+.history
 
 # OpenSCAD
 *.stl
