@@ -55,6 +55,7 @@ def _bzd_nodejs_executable_impl(ctx):
     runfiles = ctx.runfiles(
         transitive_files = install.files,
     )
+    runfiles = runfiles.merge_all([target.default_runfiles for target in ctx.attr.data])
 
     # Look for the entry point.
     paths = {
@@ -100,6 +101,7 @@ cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
         ctx = ctx,
         locations = locations,
         paths = paths,
+        data = ctx.files.data,
         output = ctx.outputs.executable,
         command = command,
         extra_runfiles = [runfiles],
