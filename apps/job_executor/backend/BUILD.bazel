@@ -12,6 +12,10 @@ bzd_config_default(
     visibility = [
         "//deployment:__subpackages__",
     ],
+    # TODO: use this way once jobs is integrated into the config.
+    #values = {
+    #    "jobs.sleep.target": "$(location //apps/job_executor/tests:sleep)",
+    #},
 )
 
 bzd_nodejs_library(

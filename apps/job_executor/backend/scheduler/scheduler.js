@@ -3,6 +3,7 @@ import LogFactory from "#bzd/nodejs/core/log.js";
 import Status from "#bzd/apps/job_executor/backend/status.js";
 import ServicesProvider from "#bzd/nodejs/core/services/provider.js";
 import Services from "#bzd/nodejs/core/services/services.js";
+import { timestampS } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("scheduler");
 const Log = LogFactory("scheduler");
@@ -97,13 +98,44 @@ export default class Scheduler {
 		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:?}", uid, info);
 
 		await executor.execute(info.args, (status) => {
-			// TODO: handle re-scheduling based on the status.
-			if (info.scheduler?.type == "periodically") {
-				setTimeout(() => {
-					executor.reset().catch((e) => {
-						Log.error("Executor '{}' failed to reset.", uid);
+			const reschedule = () => {
+				executor
+					.reset()
+					.then(() => {
+						return executor.updateInfo({
+							restart: {
+								count: (info?.restart?.count ?? 0) + 1,
+								lastTimestamp: timestampS(),
+								lastStatus: status,
+							},
+						});
+					})
+					.catch((e) => {
+						Log.error("Executor for ID '{}' failed to reschedule.", uid);
 					});
+			};
+
+			if (info.scheduler?.type == "periodically") {
+				Exception.assert(!info.scheduler?.restart, "Periodic scheduler cannot have a restart policy.");
+				setTimeout(() => {
+					reschedule();
 				}, info.scheduler.period * 1000);
+			} else {
+				switch (info.scheduler?.restart) {
+					case "on-failure":
+						if (status == Status.failed) {
+							reschedule();
+							return;
+						}
+						break;
+					case "always":
+						reschedule();
+						return;
+					case undefined:
+						break;
+					default:
+						Exception.unreachable("Unsupported restart policy '{}'.", info.scheduler?.restart);
+				}
 			}
 		});
 

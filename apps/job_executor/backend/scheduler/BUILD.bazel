@@ -14,5 +14,6 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core/services",
         "//nodejs/utils:run",
+        "//nodejs/utils:timestamp",
     ],
 )
