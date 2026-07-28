@@ -6,6 +6,9 @@ bzd_config_default(
     srcs = [
         "config.default.json",
     ],
+    data = [
+        "//apps/job_executor/tests:sleep",
+    ],
     visibility = [
         "//deployment:__subpackages__",
     ],

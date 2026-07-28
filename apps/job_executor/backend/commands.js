@@ -102,9 +102,11 @@ export default class Commands {
 
 	/// Remove a specific job.
 	async remove(uid) {
-		await this.terminate(uid, { force: true });
-		await this.executors[uid].remove();
-		delete this.executors[uid];
+		if (uid in this.executors) {
+			await this.terminate(uid, { force: true });
+			await this.executors[uid].remove();
+			delete this.executors[uid];
+		}
 	}
 
 	getContext(uid) {

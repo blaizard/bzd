@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "executor",
     srcs = [
         "executor.js",
+        "executor_bazel.js",
         "executor_docker.js",
         "executor_readonly.js",
         "executor_shell.js",

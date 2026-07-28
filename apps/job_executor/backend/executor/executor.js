@@ -6,6 +6,7 @@ import Status from "#bzd/apps/job_executor/backend/status.js";
 
 import ExecutorReadonly from "#bzd/apps/job_executor/backend/executor/executor_readonly.js";
 import ExecutorShell from "#bzd/apps/job_executor/backend/executor/executor_shell.js";
+import ExecutorBazel from "#bzd/apps/job_executor/backend/executor/executor_bazel.js";
 import ExecutorDocker from "#bzd/apps/job_executor/backend/executor/executor_docker.js";
 
 const Exception = ExceptionFactory("backend", "executor");
@@ -18,6 +19,7 @@ export default class Executor {
 	static ExecutorClasses = {
 		readonly: ExecutorReadonly,
 		shell: ExecutorShell,
+		bazel: ExecutorBazel,
 		docker: ExecutorDocker,
 	};
 

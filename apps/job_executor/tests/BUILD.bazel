@@ -6,6 +6,7 @@ py_binary(
     srcs = [
         "sleep.py",
     ],
+    visibility = ["//apps/job_executor/backend:__pkg__"],
 )
 
 bzd_python_oci(

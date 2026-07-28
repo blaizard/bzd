@@ -78,6 +78,21 @@
         "args": [
             "{time}"
         ],
+        "inputs": [
+            {
+                "caption": "Time (in seconds)",
+                "name": "time",
+                "type": "Input",
+                "validation": "mandatory"
+            }
+        ],
+        "target": "apps/job_executor/tests/sleep",
+        "type": "bazel"
+    },
+    "sleep_docker": {
+        "args": [
+            "{time}"
+        ],
         "image": "local/image_sleep:latest",
         "inputs": [
             {
