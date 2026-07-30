@@ -283,21 +283,9 @@ const Log = LogFactory("backend");
 
 	// ---- REST ----
 
-	backend
-		.useRest(APIv1.rest, {
-			authentication: authentication,
-		})
-		.useLoggerMemory()
-		.setup();
+	backend.useAuthentication(authentication).useRest(APIv1.rest).useLoggerMemory().setup();
 
-	backend.rest.installPlugins(
-		authentication,
-		authenticationGoogle,
-		authenticationFacebook,
-		users,
-		applications,
-		payment,
-	);
+	backend.rest.installPlugins(authenticationGoogle, authenticationFacebook, users, applications, payment);
 
 	backend.rest.handle("get", "/sso", async function (inputs, session) {
 		// Get that the application exists.
@@ -305,7 +293,11 @@ const Log = LogFactory("backend");
 		Exception.assertPrecondition(application, "Application '{}' does not exists.", inputs.application);
 
 		// Get the SSO token.
-		const token = await authentication.makeSSOToken(inputs.application, session, application.getScopes().toList());
+		const token = await backend.authentication.makeSSOToken(
+			inputs.application,
+			session,
+			application.getScopes().toList(),
+		);
 
 		return {
 			token: token,
@@ -340,10 +332,10 @@ const Log = LogFactory("backend");
 	backend.rest.handle("post", "/password-change", async function (inputs) {
 		const maybeUser = await users.get(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
-			throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
+			throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
 		}
 		if (!inputs.token || maybeUser.getPassword() !== inputs.token) {
-			throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
+			throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
 		}
 		await users.update(maybeUser.getUid(), async (user) => {
 			await user.setPassword(inputs.password);

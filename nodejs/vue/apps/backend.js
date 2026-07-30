@@ -6,6 +6,7 @@ import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import HttpServer from "#bzd/nodejs/core/http/server.js";
 import MockHttpServer from "#bzd/nodejs/core/http/mock/server.js";
 import Authentication from "#bzd/apps/accounts/authentication/server.js";
+import AuthenticationBase from "#bzd/nodejs/core/authentication/server.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import Cache2 from "#bzd/nodejs/core/cache2.js";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
@@ -141,10 +142,14 @@ export default class Backend {
 	}
 
 	/// Set-up the authentication object.
-	useAuthentication(options = config.authentication) {
+	useAuthentication(optionsOrAuthentication = config.authentication) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
-		this.instances.authentication = Authentication.make(options);
+		if (optionsOrAuthentication instanceof AuthenticationBase) {
+			this.instances.authentication = optionsOrAuthentication;
+		} else {
+			this.instances.authentication = Authentication.make(optionsOrAuthentication);
+		}
 		return this;
 	}
 
