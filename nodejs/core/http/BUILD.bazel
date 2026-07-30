@@ -81,6 +81,7 @@ bzd_nodejs_library(
         "//nodejs/core:filesystem",
         "//nodejs/core:log",
         "//nodejs/core:router",
+        "//nodejs/core:validation_schema",
         "//nodejs/core/statistics:provider",
     ],
 )

@@ -25,7 +25,7 @@ export default class Backend {
 			authentication: null,
 			rest: null,
 			websocket: null,
-			web: test ? new MockHttpServer() : new HttpServer(port),
+			web: null,
 			cache: null,
 			statistics: null,
 			statisticsProviderProcess: null,
@@ -40,6 +40,7 @@ export default class Backend {
 			mcpOptions: null,
 		};
 		this.isSetup = false;
+		this.port = port;
 		this.test = test;
 		this.uid = uid;
 		this.signalDestructor = null;
@@ -239,6 +240,13 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		this.isSetup = true;
 
+		const httpServerOptions = {
+			authentication: this.instances.authentication || null,
+		};
+		this.instances.web = this.test
+			? new MockHttpServer(httpServerOptions)
+			: new HttpServer(this.port, httpServerOptions);
+
 		if (this.instances.services) {
 			Log.info("Setting up services");
 			if (this.instances.cache) {
@@ -288,6 +296,7 @@ export default class Backend {
 			Log.info("Setting up websocket server");
 			const websocketOptions = Object.assign(
 				{
+					authentication: this.instances.authentication || null,
 					channel: this.instances.web,
 				},
 				this.instances.websocketOptions || {},
@@ -299,6 +308,7 @@ export default class Backend {
 			Log.info("Setting up MCP server");
 			const mcpOptions = Object.assign(
 				{
+					authentication: this.instances.authentication || null,
 					channel: this.instances.web,
 				},
 				this.instances.mcpOptions,

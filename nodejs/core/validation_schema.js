@@ -10,8 +10,12 @@ export default class ValidationSchema {
 			type: "object",
 			properties: {
 				type: {
-					type: "string",
+					type: ["string", "array"],
 					enum: ["string", "number", "integer", "boolean", "null", "object", "array"],
+					items: {
+						type: "string",
+						enum: ["string", "number", "integer", "boolean", "null", "object", "array"],
+					},
 				},
 				minimum: {
 					type: "number",
@@ -112,15 +116,10 @@ export default class ValidationSchema {
 
 	static validateSchema(values, schema, options = {}) {
 		const validate = (valuesToValidate, schemaToValidate, nested) => {
-			// Validate a single property, excluding anyOf, oneOf, allOf.
-			const validateProperty = (value, property, key) => {
+			// Validate for a specific type and return an error message if any, or null otherwise.
+			const validateType = (type, value, property, key) => {
 				try {
-					if ("$ref" in property) {
-						const propertyRef = ValidationSchema.getRefFromSchema(property["$ref"], schema);
-						property = deepMerge({}, property, propertyRef);
-					}
-
-					switch (property.type) {
+					switch (type) {
 						case "string":
 							Exception.assert(typeof value === "string", "[key={}] expected type string, not {:?}", key, value);
 							if ("enum" in property) {
@@ -188,17 +187,41 @@ export default class ValidationSchema {
 							}
 							break;
 					}
-
-					// Call the visitor.
-					options.visitor && options.visitor(value, property, key);
-
-					return null;
 				} catch (e) {
 					if (e instanceof Exception) {
 						return e.message;
 					}
 					throw e;
 				}
+				return null;
+			};
+
+			// Validate a single property, excluding anyOf, oneOf, allOf.
+			const validateProperty = (value, property, key) => {
+				if ("$ref" in property) {
+					const propertyRef = ValidationSchema.getRefFromSchema(property["$ref"], schema);
+					property = deepMerge({}, property, propertyRef);
+				}
+
+				if (Array.isArray(property.type) && property.type.length > 0) {
+					const results = property.type.map((type) => validateType(type, value, property, key));
+					for (const type of property.type) {
+						const maybeError = validateType(property.type, value, property, key);
+						if (!results.some((result) => result === null)) {
+							return "None of the types [" + property.type + "] validated:\n" + results.join("\n");
+						}
+					}
+				} else {
+					const maybeError = validateType(property.type, value, property, key);
+					if (maybeError) {
+						return maybeError;
+					}
+				}
+
+				// Call the visitor.
+				options.visitor && options.visitor(value, property, key);
+
+				return null;
 			};
 
 			let maybeError = null;

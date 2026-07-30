@@ -16,7 +16,7 @@
         },
         "/contact-authenticated": {
             "post": {
-                "authentication": true,
+                "authentication": [],
                 "documentation": "Send a message to the support channel.",
                 "request": {
                     "type": "json",
@@ -55,7 +55,7 @@
         },
         "/sso": {
             "get": {
-                "authentication": true,
+                "authentication": [],
                 "documentation": "Get SSO for a specific application.",
                 "request": {
                     "type": "query",

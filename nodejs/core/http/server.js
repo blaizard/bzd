@@ -16,6 +16,7 @@ import FileSystem from "../filesystem.js";
 import LogFactory from "../log.js";
 import { HttpServerContext, HttpError, WebsocketServerContext } from "#bzd/nodejs/core/http/server_context.js";
 import HttpEndpoint from "#bzd/nodejs/core/http/endpoint.js";
+import ValidationSchema from "#bzd/nodejs/core/validation_schema.js";
 
 const Log = LogFactory("http", "server");
 const Exception = ExceptionFactory("http", "server");
@@ -37,6 +38,8 @@ export default class HttpServer {
 				ca: null,
 				/// \brief Use data compression and minfy certain file types.
 				useCompression: false,
+				/// Authentication object.
+				authentication: null,
 			},
 			config,
 		);
@@ -334,9 +337,44 @@ export default class HttpServer {
 				timeoutS: this.config.timeoutS,
 				/// Add guards to unhandled exceptions. This adds a callstack layer.
 				exceptionGuard: false,
+				/// Authentication constraints/scopes.
+				authentication: null,
 			},
 			options,
 		);
+		new ValidationSchema({
+			type: "object",
+			properties: {
+				type: {},
+				limit: {},
+				path: {},
+				timeoutS: {},
+				exceptionGuard: {},
+				authentication: {
+					type: ["array", "null"],
+					items: {
+						type: "string",
+					},
+				},
+			},
+			additionalProperties: false,
+		}).validate(options);
+
+		if (options.authentication !== null) {
+			Exception.assert(
+				this.config.authentication,
+				"The route {}::{} has authentication requirement but no authentication object was specified.",
+				type,
+				uri,
+			);
+		}
+		Log.info(
+			"Installing HTTP handler for {}::{}{}",
+			type,
+			uri,
+			options.authentication === null ? "" : " with authentication: " + options.authentication,
+		);
+
 		this.maxTimeoutS = Math.max(this.maxTimeoutS, options.timeoutS);
 
 		const endpoint = new HttpEndpoint(uri);
@@ -347,10 +385,20 @@ export default class HttpServer {
 			this.statistics.rate("rate-" + statisticsName);
 			await this.statistics.timeit("time-" + statisticsName, callback);
 		};
+		const httpServer = this;
 		callbackList.unshift(async function (request, response) {
 			await measureStatistics(async () => {
 				// Create the context.
 				const context = new HttpServerContext(request, response);
+
+				// Check if this request needs authentication.
+				if (options.authentication) {
+					context.session = await httpServer.config.authentication.verify(context, options.authentication);
+					if (!context.session) {
+						return context.sendStatus(401, "Unauthorized");
+					}
+				}
+
 				// Override the params.
 				// This is needed because Express apply a urldecode operation to the params which is not
 				// wanted with variable arguments. Because we need to differentiate between / and %2F.

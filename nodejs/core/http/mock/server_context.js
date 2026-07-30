@@ -24,6 +24,7 @@ export default class MockServerContext {
 			end: false,
 			headers: {},
 		};
+		this.session = null;
 	}
 
 	static make(request = {}) {

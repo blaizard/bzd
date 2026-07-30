@@ -2,7 +2,6 @@
     "rest": {
         "/file": {
             "get": {
-                "authentication": "optional",
                 "documentation": "Retrieve the content of a specific file.",
                 "request": {
                     "type": "query",
@@ -17,7 +16,6 @@
         },
         "/list": {
             "post": {
-                "authentication": "optional",
                 "documentation": "Get the file/directory list from a specific path.",
                 "request": {
                     "type": "json",

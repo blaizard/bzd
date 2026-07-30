@@ -9,6 +9,12 @@ const Log = LogFactory("mcp", "server");
 const mcpSchemaDescriptor = {
 	type: "object",
 	properties: {
+		authentication: {
+			type: ["array", "null"],
+			items: {
+				type: "string",
+			},
+		},
 		tools: {
 			type: "object",
 			additionalProperties: {
@@ -26,6 +32,7 @@ const mcpSchemaDescriptor = {
 			},
 		},
 	},
+	additionalProperties: false,
 };
 
 export default class MCPServer {
@@ -94,16 +101,25 @@ export default class MCPServer {
 			}),
 		);
 
+		const routeOptions = {
+			authentication: schema.authentication ?? null,
+		};
+
 		// Enable CORS Headers so that it can be reached from browsers.
-		this.options.channel.addRoute("OPTIONS", endpoint, (context) => {
-			context.setHeader("Access-Control-Allow-Origin", "*");
-			context.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-			context.setHeader(
-				"Access-Control-Allow-Headers",
-				"Origin, Content-Type, Accept, Authorization, mcp-protocol-version",
-			);
-			context.sendStatus(200, "OK");
-		});
+		this.options.channel.addRoute(
+			"OPTIONS",
+			endpoint,
+			(context) => {
+				context.setHeader("Access-Control-Allow-Origin", "*");
+				context.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+				context.setHeader(
+					"Access-Control-Allow-Headers",
+					"Origin, Content-Type, Accept, Authorization, mcp-protocol-version",
+				);
+				context.sendStatus(200, "OK");
+			},
+			routeOptions,
+		);
 
 		this.options.channel.addRoute(
 			"POST",
@@ -187,9 +203,12 @@ export default class MCPServer {
 				context.setHeader("Content-Type", "application/json");
 				context.sendStatus(200, JSON.stringify(response));
 			},
-			{
-				type: "json",
-			},
+			Object.assign(
+				{
+					type: "json",
+				},
+				routeOptions,
+			),
 		);
 	}
 }

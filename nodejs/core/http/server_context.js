@@ -28,6 +28,7 @@ export class HttpServerContext {
 	constructor(request, response) {
 		this.request = request;
 		this.response = response;
+		this.session = null;
 	}
 
 	getHost() {

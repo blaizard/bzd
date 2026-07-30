@@ -109,11 +109,15 @@ const Exception = ExceptionFactory("backend");
 		return { volume: key[0], pathList: key.slice(1) };
 	}
 
-	async function isAuthorizedVolume(context, volume) {
+	function isVolumePrivate(volume) {
 		if (!(volume in volumes)) {
 			return false;
 		}
-		if ("private" in volumes[volume].options) {
+		return "private" in volumes[volume].options;
+	}
+
+	async function isAuthorizedVolume(context, volume) {
+		if (isVolumePrivate(volume)) {
 			const maybeSession = await backend.authentication.verify(context, /*scopes*/ ["/volume/" + volume]);
 			if (!maybeSession) {
 				return false;
@@ -219,15 +223,23 @@ const Exception = ExceptionFactory("backend");
 		// so it will not shadow potential rest endpoints while the opposite is probable.
 		for (const [path, endpoint] of Object.entries(data.endpoints.mcp)) {
 			const route = "/x/" + volume + path;
-			Log.info("Adding MCP route {}", route);
-			backend.mcp.addRoute(route, endpoint.handler, endpoint.schema, endpoint.options);
+			backend.mcp.addRoute(
+				route,
+				endpoint.handler,
+				Object.assign(
+					{
+						authentication: isVolumePrivate(volume) ? ["/volume/" + volume] : null,
+					},
+					endpoint.schema,
+				),
+				endpoint.options,
+			);
 		}
 
 		// Handle REST endpoints.
 		for (const [method, endpoints] of Object.entries(data.endpoints.rest)) {
 			for (const endpoint of endpoints) {
 				const route = "/x/" + volume + endpoint.path;
-				Log.info("Adding REST route {}::{}", method, route);
 				backend.web.addRoute(
 					method,
 					route,
@@ -236,7 +248,14 @@ const Exception = ExceptionFactory("backend");
 						await assertAuthorizedVolume(context, volume);
 						return await endpoint.handler(context);
 					},
-					Object.assign({ exceptionGuard: true, type: ["raw"] }, endpoint.options),
+					Object.assign(
+						{
+							exceptionGuard: true,
+							type: ["raw"],
+							authentication: isVolumePrivate(volume) ? ["/volume/" + volume] : null,
+						},
+						endpoint.options,
+					),
 				);
 			}
 		}

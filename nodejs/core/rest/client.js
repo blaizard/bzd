@@ -123,13 +123,11 @@ export default class RestClient extends Base {
 				await maybeAuthentication.updateAuthenticationFetch(fetchOptions);
 			}
 			// Check if this is a request that needs authentication
-			if (authenticationSchema != "optional") {
-				Exception.assert(
-					maybeAuthentication,
-					"This route has authentication requirement but no authentication object was specified.",
-				);
-				Exception.assert(await maybeAuthentication.isAuthenticated(), "A user must be authenticated for this route.");
-			}
+			Exception.assert(
+				maybeAuthentication,
+				"This route has authentication requirement but no authentication object was specified.",
+			);
+			Exception.assert(await maybeAuthentication.isAuthenticated(), "A user must be authenticated for this route.");
 		}
 
 		const channel = this.options.channel ? this.options.channel : HttpClient;

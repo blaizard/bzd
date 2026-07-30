@@ -73,32 +73,18 @@ export default class RestServer extends Base {
 		const requestOptions = endpointOptions.request || {};
 		const responseOptions = endpointOptions.response || {};
 
-		let authentication = null;
-		if (endpointOptions.authentication) {
-			Exception.assert(
-				this.options.authentication,
-				"This route '{}' with method '{}' has authentication requirement but no authentication object was specified.",
-				endpoint,
-				method,
-			);
-			authentication = this.options.authentication;
-		}
-
-		Log.debug(
-			"Installing handler for {} {}{}",
-			method,
-			endpoint,
-			authentication === null ? "" : " with authentication",
-		);
-
-		// Build the web options
+		// Build the web options.
 		let webOptions = {};
 		if ("type" in requestOptions) {
 			webOptions.type = [requestOptions.type];
 		}
-		// Set the upload limit
+		// Set the upload limit.
 		if ("limit" in options || "limit" in requestOptions) {
 			webOptions.limit = options.limit ?? requestOptions.limit;
+		}
+		// Set authentication.
+		if (endpointOptions.authentication) {
+			webOptions.authentication = endpointOptions.authentication;
 		}
 
 		// Create a wrapper to the callback
@@ -113,27 +99,6 @@ export default class RestServer extends Base {
 					context.setHeader("Access-Control-Allow-Origin", "*");
 					context.setHeader("Access-Control-Allow-Methods", method + ", options");
 					context.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
-				}
-
-				// Check if this is a request that needs authentication
-				let authenticationData = { session: null };
-				if (authentication) {
-					// Check if session is authorized
-					const authenticationSchema = endpointOptions.authentication;
-					authenticationData.session = await authentication.verify(
-						context,
-						Array.isArray(authenticationSchema) ? authenticationSchema : null,
-					);
-					if (typeof authenticationSchema == "string") {
-						Exception.assert(
-							authenticationSchema == "optional",
-							"Only 'optional' is a valid option, not '{}'.",
-							authenticationSchema,
-						);
-						// Ignore validation.
-					} else if (!authenticationData.session) {
-						return context.sendStatus(401, "Unauthorized");
-					}
 				}
 
 				let data = {};
@@ -153,7 +118,7 @@ export default class RestServer extends Base {
 
 				// Add debug information
 				context.addDebug("data", data);
-				context.addDebug("session", authenticationData.session);
+				context.addDebug("session", context.session);
 
 				if ("validation" in requestOptions) {
 					Exception.assert(
@@ -170,11 +135,11 @@ export default class RestServer extends Base {
 				}
 
 				if ("scopes" in requestOptions) {
-					Exception.assert(authentication, "'scopes' can only be set with authentication.");
-					Exception.assertResult(authenticationData.session.getScopes().checkDictionary(data, requestOptions.scopes));
+					Exception.assert(context.session, "'scopes' can only be set with authentication.");
+					Exception.assertResult(context.session.getScopes().checkDictionary(data, requestOptions.scopes));
 				}
 
-				let result = await callback.call(context, data, authenticationData.session);
+				let result = await callback.call(context, data, context.session);
 
 				// Add debug information
 				context.addDebug("result", result);
@@ -199,8 +164,8 @@ export default class RestServer extends Base {
 				}
 
 				if ("scopes" in responseOptions) {
-					Exception.assert(authentication, "'scopes' can only be set with authentication.");
-					result = authenticationData.session.getScopes().filterDictionary(result, responseOptions.scopes);
+					Exception.assert(context.session, "'scopes' can only be set with authentication.");
+					result = context.session.getScopes().filterDictionary(result, responseOptions.scopes);
 				}
 
 				if (!context.manualResponse) {

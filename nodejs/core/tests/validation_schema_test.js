@@ -329,6 +329,27 @@ describe("Validation", () => {
 				});
 			});
 		});
+		it("type array validation", () => {
+			const validation = new ValidationSchema({
+				type: "object",
+				properties: {
+					id: {
+						type: ["boolean", "integer"],
+					},
+				},
+			});
+			validation.validate({
+				id: true,
+			});
+			validation.validate({
+				id: 12,
+			});
+			Exception.assertThrows(() => {
+				validation.validate({
+					id: "hello",
+				});
+			});
+		});
 		it("default keyword accepts any value type", () => {
 			// Boolean default.
 			new ValidationSchema({
