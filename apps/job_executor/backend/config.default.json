@@ -12,6 +12,9 @@
         }
     ],
     "jobs": {
+        "$refs": [
+            "apps/job_executor/backend/config.ebook.json"
+        ],
         "bash": {
             "args": [],
             "command": "/bin/bash",
@@ -24,67 +27,6 @@
             "image": "docker.io/blaizard/build:x86_64",
             "inputs": [],
             "stdin": true,
-            "type": "docker"
-        },
-        "ebook": {
-            "args": [
-                [
-                    "--key",
-                    "{key}"
-                ],
-                [
-                    "--max-dpi",
-                    "{dpi}"
-                ],
-                [
-                    "--zoom",
-                    "{zoom}"
-                ],
-                [
-                    "{action}"
-                ],
-                "{ebook}"
-            ],
-            "default": {
-                "action": "pdf",
-                "dpi": "200"
-            },
-            "image": "local/image:latest",
-            "inputs": [
-                {
-                    "caption": "Action",
-                    "list": [
-                        "pdf",
-                        "cover"
-                    ],
-                    "name": "action",
-                    "type": "Dropdown",
-                    "validation": "mandatory"
-                },
-                {
-                    "caption": "Ebook",
-                    "max": 1,
-                    "name": "ebook",
-                    "type": "File",
-                    "validation": "mandatory"
-                },
-                {
-                    "caption": "Key file",
-                    "max": 1,
-                    "name": "key",
-                    "type": "File"
-                },
-                {
-                    "caption": "Max DPI",
-                    "name": "dpi",
-                    "type": "Input"
-                },
-                {
-                    "caption": "Zoom (default 1.0)",
-                    "name": "zoom",
-                    "type": "Input"
-                }
-            ],
             "type": "docker"
         },
         "sleep": {

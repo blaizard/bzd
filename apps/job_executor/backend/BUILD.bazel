@@ -1,6 +1,10 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
+exports_files([
+    "config.ebook.json",
+])
+
 bzd_config_default(
     name = "config",
     srcs = [
@@ -14,6 +18,9 @@ bzd_config_default(
     },
     visibility = [
         "//deployment:__subpackages__",
+    ],
+    deps = [
+        "config.ebook.json",
     ],
 )
 
@@ -53,6 +60,7 @@ bzd_nodejs_binary(
     main = "app.js",
     visibility = [
         "//apps/job_executor:__pkg__",
+        "//deployment:__subpackages__",
     ],
     deps = [
         ":status",
