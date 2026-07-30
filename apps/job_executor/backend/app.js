@@ -1,7 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
-import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 import Args from "#bzd/apps/job_executor/backend/args.js";
 import Backend from "#bzd/nodejs/vue/apps/backend.js";
 import Commands from "#bzd/apps/job_executor/backend/commands.js";
@@ -33,10 +32,10 @@ const Log = LogFactory("backend");
 
 		try {
 			const inputs = await getInputs(contextJob);
-			Exception.assertPrecondition(inputs.type in Jobs, "Job type is not known: {}", inputs.type);
+			Exception.assertPrecondition(inputs.type in config.jobs, "Job type is not known: {}", inputs.type);
 
 			// Build the input data.
-			await commands.makeFromSchema(contextJob, Jobs[inputs.type], inputs);
+			await commands.makeFromSchema(contextJob, config.jobs[inputs.type], inputs);
 			await commands.schedule(uid, scheduler);
 
 			Log.info("Executing job {} with scheduler type '{}'.", uid, scheduler.type);
@@ -84,6 +83,10 @@ const Log = LogFactory("backend");
 			jobs: await commands.getAllInfo(),
 			timestamp: Date.now(),
 		};
+	});
+
+	backend.rest.handle("get", "/jobs-schema", async (inputs) => {
+		return config.jobs;
 	});
 
 	backend.rest.handle("post", "/job/{id}/start", async (inputs) => {

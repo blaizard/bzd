@@ -9,13 +9,12 @@ bzd_config_default(
     data = [
         "//apps/job_executor/tests:sleep",
     ],
+    values = {
+        "jobs.sleep.executable": "$(rootpath //apps/job_executor/tests:sleep)",
+    },
     visibility = [
         "//deployment:__subpackages__",
     ],
-    # TODO: use this way once jobs is integrated into the config.
-    #values = {
-    #    "jobs.sleep.target": "$(location //apps/job_executor/tests:sleep)",
-    #},
 )
 
 bzd_nodejs_library(
@@ -39,7 +38,6 @@ bzd_nodejs_binary(
         "commands.js",
         "context.js",
         ":config.json",
-        "//apps/job_executor:jobs.json",
     ],
     apis = ["//apps/job_executor:api.v1.json"],
     args = [

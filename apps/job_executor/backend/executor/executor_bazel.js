@@ -19,7 +19,7 @@ export default class ExecutorBazel extends ExecutorShell {
 			case "File":
 				return args.map((arg) => "/sandbox/" + arg.file);
 			case "post":
-				return [schema["target"], ...args];
+				return [schema["executable"], ...args];
 		}
 		return args;
 	}

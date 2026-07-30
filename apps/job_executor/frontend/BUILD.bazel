@@ -6,9 +6,7 @@ bzd_nodejs_web_binary(
         "**/*.vue",
         "**/*.svg",
         "**/*.js",
-    ]) + [
-        "//apps/job_executor:jobs.json",
-    ],
+    ]),
     apis = ["//apps/job_executor:api.v1.json"],
     config_scss = "//nodejs/styles:default.scss",
     main = "app.js",

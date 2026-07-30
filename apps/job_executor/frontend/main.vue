@@ -49,7 +49,6 @@
 
 <script>
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
-	import Jobs from "#bzd/apps/job_executor/jobs.json" with { type: "json" };
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 	import LogFactory from "#bzd/nodejs/core/log.js";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
@@ -71,13 +70,14 @@
 			tooltip: DirectiveTooltip,
 		},
 		mounted() {
-			this.fetchJobs();
+			this.fetchJobsSchema().then(() => this.fetchJobs());
 		},
 		beforeUnmount() {
 			clearTimeout(this.instanceTimeout);
 		},
 		data: function () {
 			return {
+				schema: {},
 				value: {},
 				jobs: {},
 				timestampServer: null,
@@ -89,14 +89,14 @@
 				return this.value["jobId"] ?? null;
 			},
 			jobDescription() {
-				const jobList = Object.keys(Jobs);
+				const jobList = Object.keys(this.schema);
 				return {
 					type: "Dropdown",
 					list: jobList,
 					name: "jobId",
 					caption: "Type",
 					onchange: (value) => {
-						this.value = Object.assign({}, Jobs[this.jobId].default, this.value);
+						this.value = Object.assign({}, this.schema[this.jobId].default, this.value);
 					},
 				};
 			},
@@ -105,8 +105,8 @@
 				if (!this.jobId) {
 					return description;
 				}
-				Exception.assert(this.jobId in Jobs, `Job ${this.jobId} not found`);
-				const schema = Jobs[this.jobId];
+				Exception.assert(this.jobId in this.schema, `Job ${this.jobId} not found`);
+				const schema = this.schema[this.jobId];
 				let extra = [];
 				if (schema.stdin) {
 					extra.push({ type: "Textarea", name: "stdin", caption: "Commands to send to the standard input" });
@@ -119,6 +119,11 @@
 			},
 		},
 		methods: {
+			async fetchJobsSchema() {
+				await this.handleSubmit(async () => {
+					this.schema = await this.$rest.request("get", "/jobs-schema");
+				});
+			},
 			async fetchJobs() {
 				try {
 					const data = await this.$rest.request("get", "/jobs");

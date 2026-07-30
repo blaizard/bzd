@@ -87,6 +87,14 @@
                     }
                 }
             }
+        },
+        "/jobs-schema": {
+            "get": {
+                "documentation": "Get the list of jobs schema available.",
+                "response": {
+                    "type": "json"
+                }
+            }
         }
     },
     "websocket": {
