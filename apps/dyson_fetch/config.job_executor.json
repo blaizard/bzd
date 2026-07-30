@@ -1,0 +1,60 @@
+{
+    "dyson_fetch": {
+        "args": [
+            [
+                "--serial",
+                "{serial}"
+            ],
+            [
+                "--password",
+                "{password}"
+            ],
+            [
+                "--ip",
+                "{ip}"
+            ],
+            [
+                "--type",
+                "{device_type}"
+            ],
+            "--interval",
+            "{interval}"
+        ],
+        "default": {
+            "interval": "30"
+        },
+        "executable": "apps/dyson_fetch/dyson_fetch",
+        "inputs": [
+            {
+                "caption": "Serial Number",
+                "name": "serial",
+                "type": "Input",
+                "validation": "mandatory"
+            },
+            {
+                "caption": "MQTT Password",
+                "name": "password",
+                "type": "Password",
+                "validation": "mandatory"
+            },
+            {
+                "caption": "Device IP address",
+                "name": "ip",
+                "type": "Input",
+                "validation": "mandatory"
+            },
+            {
+                "caption": "Device type",
+                "name": "device_type",
+                "type": "Input",
+                "validation": "mandatory"
+            },
+            {
+                "caption": "Polling Interval (seconds)",
+                "name": "interval",
+                "type": "Input"
+            }
+        ],
+        "type": "bazel"
+    }
+}

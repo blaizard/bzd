@@ -13,7 +13,8 @@
     ],
     "jobs": {
         "$refs": [
-            "apps/job_executor/backend/config.ebook.json"
+            "apps/ebook/config.job_executor.json",
+            "apps/dyson_fetch/config.job_executor.json"
         ],
         "bash": {
             "args": [],
@@ -74,5 +75,6 @@
             "stdin": true,
             "type": "docker"
         }
-    }
+    },
+    "sandbox": "./sandbox"
 }

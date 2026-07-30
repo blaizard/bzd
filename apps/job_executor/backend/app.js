@@ -21,7 +21,7 @@ const Log = LogFactory("backend");
 		.useLoggerMemory()
 		.setup();
 
-	let commands = new Commands(pathlib.path("sandbox"), {
+	let commands = new Commands(pathlib.path(config.sandbox), {
 		services: backend.services.makeProvider("commands"),
 	});
 	await commands.initialize();
@@ -62,16 +62,16 @@ const Log = LogFactory("backend");
 	}
 
 	backend.rest.handle("post", "/job/send", async function () {
-		const uid = await schedule(async (contextJob) => {
-			return await this.processForm(
-				async (key, file, info) => {
+		const uid = await schedule(
+			async (contextJob) => {
+				return await this.processForm(async (key, file, info) => {
 					const path = ["inputs", info.name];
 					await contextJob.write(path, file);
 					return path.join("/");
-				},
-				/*scheduler*/ { type: "queue" },
-			);
-		});
+				});
+			},
+			/*scheduler*/ { type: "immediately" },
+		);
 
 		return {
 			job: uid,
