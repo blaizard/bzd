@@ -209,7 +209,7 @@ class Node(ArtifactsBase):
 					[
 						[],
 						[
-							[time.time() * 1000, data],
+							[round(time.time() * 1000), data],
 						],
 					]
 				],
@@ -238,8 +238,21 @@ class Node(ArtifactsBase):
 
 		bulk: BulkEntries = []
 
-		def publisher(timestampMs: float, data: typing.Any, key: typing.Optional[typing.List[str]] = None) -> None:
-			bulk.append([key or [], [[timestampMs, data]]])
+		def publisher(
+			value: typing.Any,
+			timestampMs: typing.Optional[float] = None,
+			key: typing.Optional[typing.List[str]] = None,
+			expires: typing.Optional[float] = None,
+			unit: typing.Optional[str] = None,
+		) -> None:
+			if timestampMs is None:
+				timestampMs = round(time.time() * 1000)
+			data = [timestampMs, value]
+			if expires is not None or unit is not None:
+				data.append(expires)
+				if unit is not None:
+					data.append(unit)
+			bulk.append([key or [], [data]])
 
 		yield publisher
 
@@ -354,8 +367,8 @@ class LoggerHandlerNode(LoggerHandler):
 			with self.node.publishBulk(path=["log"]) as publisher:
 				for log in data:
 					publisher(
-						log.timestamp,
-						{
+						timestampMs=log.timestamp,
+						value={
 							self.name: {
 								"name": log.name,
 								"level": log.level,
