@@ -24,7 +24,14 @@ class NodePublishNoRemote(RuntimeError):
 
 
 class PublisherProtocol(typing.Protocol):
-	def __call__(self, timestampMs: float, data: typing.Any, key: typing.Optional[typing.List[str]] = ...) -> None: ...
+	def __call__(
+		self,
+		value: typing.Any,
+		timestampMs: typing.Optional[float] = None,
+		key: typing.Optional[typing.List[str]] = None,
+		expires: typing.Optional[float] = None,
+		unit: typing.Optional[str] = None,
+	) -> None: ...
 
 
 @dataclass
