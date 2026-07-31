@@ -1,19 +1,25 @@
 import argparse
 import json
+import os
 import time
 import threading
 import typing
 import paho.mqtt.client as mqtt
 from paho.mqtt.enums import CallbackAPIVersion
 
+from apps.artifacts.api.python.node.node import Node
+
 
 class Dyson:
-	def __init__(self, serial: str, password: str, ip: str, type: str, intervalS: int) -> None:
+	def __init__(
+		self, serial: str, password: str, ip: str, type: str, intervalS: int, maybeNode: typing.Optional[Node]
+	) -> None:
 		self.serial = serial
 		self.password = password
 		self.ip = ip
 		self.type = type
 		self.intervalS = intervalS
+		self.maybeNode = maybeNode
 		self.client: typing.Optional[mqtt.Client] = None
 
 	def kelvin_to_celsius(self, kelvin_x10: int) -> typing.Optional[float]:
@@ -90,6 +96,8 @@ class Dyson:
 
 			if msg_type == "ENVIRONMENTAL-CURRENT-SENSOR-DATA":
 				data = payload.get("data", {})
+				bulk = []
+				name = f"dyson-{self.type.lower()}"
 
 				temp_k = self.safe_int(data.get("tact"))
 				humidity = self.safe_int(data.get("hact"))
@@ -101,17 +109,37 @@ class Dyson:
 				timestamp = time.strftime("%H:%M:%S")
 				print(f"\n[{timestamp}] --- Sensor Readings ---")
 				if temp_k is not None:
-					print(f"Temperature : {self.kelvin_to_celsius(temp_k)} °C")
+					temperature = self.kelvin_to_celsius(temp_k)
+					bulk.append({"key": ["temperature", name], "value": [temperature], "unit": "Cel"})
 				if humidity is not None:
-					print(f"Humidity    : {humidity}%")
+					bulk.append({"key": ["humidity", name], "value": [humidity / 100.0], "unit": "%"})
 				if pm25 is not None:
-					print(f"PM 2.5      : {pm25} µg/m³")
+					bulk.append({"key": ["pm25", name], "value": [pm25], "unit": "ug/m3"})
 				if pm10 is not None:
-					print(f"PM 10       : {pm10} µg/m³")
+					bulk.append({"key": ["pm10", name], "value": [pm10], "unit": "ug/m3"})
 				if voc is not None:
-					print(f"VOC Index   : {voc}")
+					bulk.append(
+						{
+							"key": ["voc", name],
+							"value": [voc],
+						}
+					)
 				if no2 is not None:
-					print(f"NO2 Index   : {no2}")
+					bulk.append(
+						{
+							"key": ["no2", name],
+							"value": [no2],
+						}
+					)
+
+				for entry in bulk:
+					path = "/".join(entry["key"])
+					print(f"{path}: {entry['value']} {entry.get('unit', '')}")
+
+				if self.maybeNode is not None:
+					with self.maybeNode.publishBulk() as publish:
+						for entry in bulk:
+							publish(**entry)
 
 		except Exception as e:
 			print(f"Error parsing message: {e}")
@@ -141,13 +169,21 @@ if __name__ == "__main__":
 		type=int,
 		help="The polling interval in seconds.",
 	)
+	parser.add_argument(
+		"--uid",
+		default=os.environ.get("BZD_NODE_UID"),
+		help="The UID of this node. If no UID is provided, the application will not report the monitoring.",
+	)
+	parser.add_argument(
+		"--token",
+		default=os.environ.get("BZD_NODE_TOKEN"),
+		help="A token to be used to access the node server.",
+	)
 	args = parser.parse_args()
 
+	maybeNode = Node(uid=args.uid, token=args.token) if args.uid else None
+
 	dyson = Dyson(
-		serial=args.serial,
-		password=args.password,
-		ip=args.ip,
-		type=args.type,
-		intervalS=args.interval,
+		serial=args.serial, password=args.password, ip=args.ip, type=args.type, intervalS=args.interval, maybeNode=maybeNode
 	)
 	dyson.start()

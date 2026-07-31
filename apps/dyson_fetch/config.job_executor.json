@@ -17,13 +17,21 @@
                 "--type",
                 "{device_type}"
             ],
+            [
+                "--uid",
+                "{uid}"
+            ],
+            [
+                "--token",
+                "{token}"
+            ],
             "--interval",
             "{interval}"
         ],
         "default": {
             "interval": "30"
         },
-        "executable": "apps/dyson_fetch/dyson_fetch",
+        "executable": "apps/dyson_fetch/hermetic",
         "inputs": [
             {
                 "caption": "Serial Number",
@@ -48,6 +56,16 @@
                 "name": "device_type",
                 "type": "Input",
                 "validation": "mandatory"
+            },
+            {
+                "caption": "Node UID",
+                "name": "uid",
+                "type": "Input"
+            },
+            {
+                "caption": "Node Token",
+                "name": "token",
+                "type": "Input"
             },
             {
                 "caption": "Polling Interval (seconds)",
