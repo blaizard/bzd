@@ -169,13 +169,16 @@ export default class Handlers {
 				current = current[key];
 				if (SPECIAL_KEY_FOR_HANDLERS in current) {
 					const { handlers, root } = current[SPECIAL_KEY_FOR_HANDLERS];
+					// Fueled by the sort, fragments sharing a root are contiguous, so a range fired at the block start covers them all.
+					if (index > 0 && KeyMapping.keyStartsWith(fragments[index - 1][0], root)) {
+						continue;
+					}
+					const range = new FragmentRange(fragments, index, root);
 					for (const handler of handlers) {
-						const range = new FragmentRange(fragments, index, root);
 						handler.process(range);
 					}
 				}
 			}
-			// TODO: move the index forward to the size of the max FragmentRange as all these element have been processed.
 		}
 
 		return fragments;

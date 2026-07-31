@@ -54,6 +54,27 @@ describe("Handlers", () => {
 		]);
 	});
 
+	it("history deep override fires after shallow block skip", () => {
+		const handlers = new Handlers({
+			"/a": {
+				history: 2,
+			},
+			"/a/c": {
+				history: 3,
+			},
+		});
+		const result = handlers.process([
+			[["a"], "valueA"],
+			[["a", "c", "d"], "valueACD"],
+			[["a", "d"], "valueAD"],
+		]);
+		Exception.assertEqual(result, [
+			[["a"], "valueA", { history: 2 }],
+			[["a", "c", "d"], "valueACD", { history: 3 }],
+			[["a", "d"], "valueAD", { history: 2 }],
+		]);
+	});
+
 	it("toString", () => {
 		const handlers = new Handlers({
 			"/a": {
@@ -104,6 +125,26 @@ describe("Handlers", () => {
 			[["a", "name"], "value1 != value6", { history: 2 }],
 			[["b", "l"], "value5", {}],
 			[["c"], "value4", { history: 7 }],
+		]);
+	});
+
+	it("toString multi-group", () => {
+		const handlers = new Handlers({
+			"/a": { toString: "{b} != {d}" },
+		});
+		const result = handlers.process([
+			[["a", "x", "b"], 1],
+			[["a", "x", "d"], 2],
+			[["a", "y", "b"], 3],
+			[["a", "y", "d"], 4],
+			[["b", "l"], 5],
+			[["c"], 6],
+		]);
+		Exception.assertEqual(result, [
+			[["a", "x"], "1 != 2", {}],
+			[["a", "y"], "3 != 4", {}],
+			[["b", "l"], 5, {}],
+			[["c"], 6, {}],
 		]);
 	});
 
