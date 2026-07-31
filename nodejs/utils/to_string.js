@@ -193,7 +193,7 @@ export function UCUMToString(value, unit, defaultValue = undefined, decimalPoint
 	}
 
 	const [baseUnitWithPrefix, ...rest] = unit.split("/");
-	const postfix = (rest.length ? "/" : "") + rest.join("/");
+	const postfix = rest.length ? "/" + rest.join("/") : "";
 
 	// Determine which unit it is.
 	for (let nbChars = 1; nbChars <= Math.min(maxUCUMToPresetsLength, baseUnitWithPrefix.length); ++nbChars) {
@@ -202,12 +202,14 @@ export function UCUMToString(value, unit, defaultValue = undefined, decimalPoint
 			const potentialPrefix = baseUnitWithPrefix.slice(0, -nbChars);
 			const preset = UCUMToPresets[potentialUnit];
 			if (potentialPrefix in preset.prefixes) {
-				return UnitToStringFactory.makeFromPreset(
-					value,
-					potentialPrefix,
-					preset.unit ?? potentialUnit,
-					preset,
-					decimalPoints,
+				return (
+					UnitToStringFactory.makeFromPreset(
+						value,
+						potentialPrefix,
+						preset.unit ?? potentialUnit,
+						preset,
+						decimalPoints,
+					) + postfix
 				);
 			}
 		}

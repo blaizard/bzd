@@ -8,9 +8,74 @@
             "title": "Temperature {name}",
             "type": "linear",
             "unit": "Cel"
+        },
+        {
+            "inputs": {
+                "/data/humidity/{name}": {}
+            },
+            "max": 1,
+            "min": 0,
+            "title": "Humidity {name}",
+            "type": "linear",
+            "unit": "%"
+        },
+        {
+            "inputs": {
+                "/data/pm25/{name}": {}
+            },
+            "min": 0,
+            "title": "PM2.5 {name}",
+            "type": "linear",
+            "unit": "ug/m3"
+        },
+        {
+            "inputs": {
+                "/data/pm10/{name}": {}
+            },
+            "min": 0,
+            "title": "PM10 {name}",
+            "type": "linear",
+            "unit": "ug/m3"
         }
     ],
     "nodes.schema": {
+        "/data/humidity": {
+            "additionalProperties": {
+                "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number",
+                    "unit": "%"
+                },
+                "type": "array"
+            },
+            "description": "Humidity readings per sensor in percent.",
+            "type": "object"
+        },
+        "/data/pm10": {
+            "additionalProperties": {
+                "items": {
+                    "minimum": 0,
+                    "type": "number",
+                    "unit": "ug/m3"
+                },
+                "type": "array"
+            },
+            "description": "Particulate matter (10 microns or less in diameter) readings per sensor in \u00b5g/m3.",
+            "type": "object"
+        },
+        "/data/pm25": {
+            "additionalProperties": {
+                "items": {
+                    "minimum": 0,
+                    "type": "number",
+                    "unit": "ug/m3"
+                },
+                "type": "array"
+            },
+            "description": "Particulate matter (2.5 microns or less in diameter) readings per sensor in \u00b5g/m3.",
+            "type": "object"
+        },
         "/data/temperature": {
             "additionalProperties": {
                 "items": {

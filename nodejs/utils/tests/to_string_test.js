@@ -28,5 +28,9 @@ describe("ToString", () => {
 			Exception.assertEqual(UCUMToString(0.25, "%"), "25.0%");
 			Exception.assertEqual(UCUMToString(20, "Cel"), "20.0°C");
 		});
+
+		it("Composed", () => {
+			Exception.assertEqual(UCUMToString(2000, "mg/s"), "2.0g/s");
+		});
 	});
 });
