@@ -3,8 +3,8 @@ import LogFactory from "#bzd/nodejs/core/log.js";
 import Command from "#bzd/nodejs/vue/components/terminal/backend/local/command.js";
 import ExecutorShell from "#bzd/apps/job_executor/backend/executor/executor_shell.js";
 
-const Exception = ExceptionFactory("backend", "executor");
-const Log = LogFactory("backend", "executor");
+const Exception = ExceptionFactory("backend", "executor-bazel");
+const Log = LogFactory("backend", "executor-bazel");
 
 export default class ExecutorBazel extends ExecutorShell {
 	static type = "bazel";

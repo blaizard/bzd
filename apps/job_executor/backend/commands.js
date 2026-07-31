@@ -22,12 +22,16 @@ export default class Commands {
 		);
 		this.executors = {};
 		this.scheduler = new Scheduler(this.executors, this.options);
+		this.supported = null;
 	}
 
 	async initialize() {
 		await this.context.initialize();
 
-		const executors = await Executor.discover(this.context);
+		this.supported = await Executor.supported();
+		Log.info("Supported executors for this host are: {}", [...this.supported].join(", "));
+
+		const executors = await Executor.discover(this.context, this.supported);
 		for (const [uid, executor] of Object.entries(executors)) {
 			this.make(uid, executor);
 		}
@@ -38,6 +42,10 @@ export default class Commands {
 				const contextJob = this.getContext(uid);
 				await this.makeDefault(uid, contextJob);
 			}
+		}
+
+		for (const [uid, executor] of Object.entries(this.executors)) {
+			Log.info("Discovered job '{}' with info: {:?}", uid, await executor.getInfo());
 		}
 	}
 
@@ -84,8 +92,13 @@ export default class Commands {
 		this.executors[uid] = executor;
 	}
 
+	getSupportedExecutorTypes() {
+		Exception.assert(this.supported !== null, "Supported executor was not computed, missing call to initialize().");
+		return this.supported;
+	}
+
 	getExecutor(uid) {
-		Exception.assert(uid in this.executors, "Undefined job id '{}'.", uid);
+		Exception.assertPrecondition(uid in this.executors, "Undefined job id '{}'.", uid);
 		return this.executors[uid];
 	}
 

@@ -36,7 +36,7 @@ export default class Executor {
 		this.lock = new Lock();
 
 		this.info = {
-			type: this.executor.constructor.type || null,
+			type: this.executor.constructor.type,
 		};
 		this.output = [];
 		this.outputSize = 0;
@@ -80,10 +80,24 @@ export default class Executor {
 		await this.initialize();
 	}
 
+	/// Get the list of supported executors.
+	static async supported() {
+		let supported = new Set();
+		for (const ExecutorClass of Object.values(Executor.ExecutorClasses)) {
+			if (await ExecutorClass.isSupported()) {
+				supported.add(ExecutorClass.type);
+			}
+		}
+		return supported;
+	}
+
 	/// Discover existing jobs if any.
-	static async discover(context) {
+	static async discover(context, supported) {
 		let discovered = {};
 		for (const ExecutorClass of Object.values(Executor.ExecutorClasses)) {
+			if (!supported.has(ExecutorClass.type)) {
+				continue;
+			}
 			const executors = await ExecutorClass.discover(context);
 			for (const [uid, executor] of Object.entries(executors)) {
 				Exception.assert(!(uid in discovered), "The executor '{}' was discovered twice.", uid);
@@ -126,6 +140,10 @@ export default class Executor {
 
 	writeToStdin(data) {
 		this.event.trigger("input", JSON.stringify({ type: "stream", value: data }));
+	}
+
+	writeToStdout(data) {
+		this.event.trigger("output", data);
 	}
 
 	async execute(args, onTerminate) {

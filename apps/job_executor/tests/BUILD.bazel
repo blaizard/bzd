@@ -1,17 +1,23 @@
-load("@bzd_python//:defs.bzl", "bzd_python_oci")
+load("@bzd_python//:defs.bzl", "bzd_python_hermetic_launcher", "bzd_python_oci")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "sleep",
+    name = "sleep_non_hermetic",
     srcs = [
         "sleep.py",
     ],
+    main = "sleep.py",
+)
+
+bzd_python_hermetic_launcher(
+    name = "sleep",
+    binary = ":sleep_non_hermetic",
     visibility = ["//apps/job_executor/backend:__pkg__"],
 )
 
 bzd_python_oci(
     name = "image_sleep",
-    binary = ":sleep",
+    binary = ":sleep_non_hermetic",
     tags = [
         "manual",
         "no-remote",

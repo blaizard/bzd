@@ -7,7 +7,7 @@ bzd_config_default(
         "config.default.json",
     ],
     data = [
-        "//apps/dyson_fetch",
+        "//apps/dyson_fetch:hermetic",
         "//apps/job_executor/tests:sleep",
     ],
     values = {

@@ -26,16 +26,27 @@ const Log = LogFactory("backend");
 	});
 	await commands.initialize();
 
+	// Filter jobs.
+	const jobs = Object.fromEntries(
+		Object.entries(config.jobs).filter(([name, job]) => {
+			if (!commands.getSupportedExecutorTypes().has(job.type)) {
+				Log.warning("Ignoring job '{}' with type '{}'.", name, job.type);
+				return false;
+			}
+			return true;
+		}),
+	);
+
 	async function schedule(getInputs, scheduler) {
 		const contextJob = await commands.allocate();
 		const uid = contextJob.getUid();
 
 		try {
 			const inputs = await getInputs(contextJob);
-			Exception.assertPrecondition(inputs.type in config.jobs, "Job type is not known: {}", inputs.type);
+			Exception.assertPrecondition(inputs.type in jobs, "Job type is not known: {}", inputs.type);
 
 			// Build the input data.
-			await commands.makeFromSchema(contextJob, config.jobs[inputs.type], inputs);
+			await commands.makeFromSchema(contextJob, jobs[inputs.type], inputs);
 			await commands.schedule(uid, scheduler);
 
 			Log.info("Executing job {} with scheduler type '{}'.", uid, scheduler.type);
@@ -50,6 +61,11 @@ const Log = LogFactory("backend");
 
 	// Run preset instances.
 	for (const instance of config.instances) {
+		if (!(instance.type in jobs)) {
+			Log.warning("Ignoring instance with job type '{}'.", instance.type);
+			continue;
+		}
+
 		const scheduler = instance.scheduler ?? { type: "queue" };
 		await schedule(() => {
 			return Object.assign(
@@ -86,7 +102,7 @@ const Log = LogFactory("backend");
 	});
 
 	backend.rest.handle("get", "/jobs-schema", async (inputs) => {
-		return config.jobs;
+		return jobs;
 	});
 
 	backend.rest.handle("post", "/job/{id}/start", async (inputs) => {

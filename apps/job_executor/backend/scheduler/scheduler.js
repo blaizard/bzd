@@ -98,21 +98,29 @@ export default class Scheduler {
 		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:?}", uid, info);
 
 		await executor.execute(info.args, (status) => {
-			const reschedule = () => {
-				executor
-					.reset()
-					.then(() => {
-						return executor.updateInfo({
-							restart: {
-								count: (info?.restart?.count ?? 0) + 1,
-								lastTimestamp: timestampS(),
-								lastStatus: status,
-							},
+			const reschedule = (isFailure) => {
+				let timeoutMs = 1;
+				if (isFailure) {
+					timeoutMs = 10 * 1000;
+					executor.writeToStdout("\nWaiting 10s before restarting...\n");
+				}
+
+				setTimeout(() => {
+					executor
+						.reset()
+						.then(() => {
+							return executor.updateInfo({
+								restart: {
+									count: (info?.restart?.count ?? 0) + 1,
+									lastTimestamp: timestampS(),
+									lastStatus: status,
+								},
+							});
+						})
+						.catch((e) => {
+							Log.error("Executor for ID '{}' failed to reschedule.", uid);
 						});
-					})
-					.catch((e) => {
-						Log.error("Executor for ID '{}' failed to reschedule.", uid);
-					});
+				}, timeoutMs);
 			};
 
 			if (info.scheduler?.type == "periodically") {
@@ -124,12 +132,12 @@ export default class Scheduler {
 				switch (info.scheduler?.restart) {
 					case "on-failure":
 						if (status == Status.failed) {
-							reschedule();
+							reschedule(/*isFailure*/ true);
 							return;
 						}
 						break;
 					case "always":
-						reschedule();
+						reschedule(/*isFailure*/ status == Status.failed);
 						return;
 					case undefined:
 						break;

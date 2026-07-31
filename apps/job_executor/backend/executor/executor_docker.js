@@ -15,10 +15,14 @@ export default class ExecutorDocker {
 		this.command = new CommandDocker("bzd-job-executor-" + this.uid);
 	}
 
+	static async isSupported() {
+		const result = await localCommand(["docsker", "--version"], { ignoreFailure: true }).join();
+		return result.isSuccess();
+	}
+
 	/// Discover currently running processes. To be used to resume jobs after a restart.
 	static async discover(context) {
-		const result = await localCommand(["docker", "ps", "--format", "json"]);
-		await result.join();
+		const result = await localCommand(["docker", "ps", "--format", "json"]).join();
 		const containers = result
 			.getOutput()
 			.split("\n")
