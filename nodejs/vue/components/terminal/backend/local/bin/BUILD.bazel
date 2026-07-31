@@ -1,9 +1,16 @@
+load("@bzd_python//:defs.bzl", "bzd_python_hermetic_launcher")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "terminal",
+    name = "terminal_non_hermetic",
     srcs = [
         "terminal.py",
     ],
+    main = "terminal.py",
+)
+
+bzd_python_hermetic_launcher(
+    name = "terminal",
+    binary = ":terminal_non_hermetic",
     visibility = ["//nodejs/vue/components/terminal/backend/local:__pkg__"],
 )

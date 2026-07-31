@@ -21,8 +21,13 @@ export default class CommandDocker extends CommandBase {
 	static #dockerSocketPath = null;
 	static async getDockerSocket() {
 		if (CommandDocker.#dockerSocketPath === null) {
-			const result = await localCommand(["docker", "context", "inspect", "--format", "{{ .Endpoints.docker.Host }}"]);
-			await result.join();
+			const result = await localCommand([
+				"docker",
+				"context",
+				"inspect",
+				"--format",
+				"{{ .Endpoints.docker.Host }}",
+			]).join();
 			const maybeSocket = result.getOutput().trim();
 			if (maybeSocket) {
 				Exception.assert(
@@ -43,17 +48,7 @@ export default class CommandDocker extends CommandBase {
 		Exception.assertPrecondition(args.length >= 1, "There must be at least 1 argument.");
 
 		this.setStatus(Status.running);
-		const result = await this.localCommandToOutput([
-			"docker",
-			"run",
-			"--rm",
-			"-it",
-			"--name",
-			this.name,
-			"--detach",
-			...args,
-		]);
-		await result.join();
+		await this.localCommandToOutput(["docker", "run", "--rm", "-it", "--name", this.name, "--detach", ...args]).join();
 	}
 
 	async _monitorDockerContainer() {
@@ -129,12 +124,7 @@ export default class CommandDocker extends CommandBase {
 	}
 
 	async kill() {
-		try {
-			const result = await this.localCommandToOutput(["docker", "kill", this.name]);
-			await result.join();
-		} catch (_) {
-			// Ignore in case of error, kill should not throw if the container does not exists anymore.
-		}
+		await this.localCommandToOutput(["docker", "kill", this.name], { ignoreFailure: true }).join();
 	}
 
 	/// Install the command to be used with websockets.

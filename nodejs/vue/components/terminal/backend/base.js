@@ -35,17 +35,22 @@ export default class CommandBase {
 		});
 	}
 
-	async localCommandToOutput(cmds) {
-		const result = await localCommand(cmds, {
-			maxOutputSize: 0,
-			stdout: (data) => {
-				this.event.trigger("output", data);
-			},
-			stderr: (data) => {
-				this.event.trigger("output", data);
-			},
-		});
-		return result;
+	localCommandToOutput(cmds, options = {}) {
+		return localCommand(
+			cmds,
+			Object.assign(
+				{
+					maxOutputSize: 0,
+					stdout: (data) => {
+						this.event.trigger("output", data);
+					},
+					stderr: (data) => {
+						this.event.trigger("output", data);
+					},
+				},
+				options,
+			),
+		);
 	}
 
 	/// Get the status of the command.

@@ -15,10 +15,9 @@ export default class Command extends CommandBase {
 		Exception.assertPrecondition(command.length >= 1, "There must be at least 1 command.");
 
 		this.setStatus(Status.running);
-		this.result = await this.localCommandToOutput([
-			"nodejs/vue/components/terminal/backend/local/bin/terminal",
-			...command,
-		]);
+		this.result = this.localCommandToOutput(["nodejs/vue/components/terminal/backend/local/bin/terminal", ...command], {
+			ignoreFailure: true,
+		});
 		this.result.on("status", (status) => {
 			this.setStatus(status);
 		});
