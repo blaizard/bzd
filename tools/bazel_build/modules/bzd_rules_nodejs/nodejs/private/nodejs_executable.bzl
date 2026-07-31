@@ -109,6 +109,7 @@ cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
 
     return [default_info, OutputGroupInfo(
         node_modules = depset([install.node_modules]),
+        data = depset(ctx.files.data),
     )] + providers
 
 _bzd_nodejs_binary = rule(

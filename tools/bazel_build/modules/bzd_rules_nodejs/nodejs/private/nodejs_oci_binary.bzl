@@ -13,11 +13,21 @@ def bzd_nodejs_oci_binary(name, binary, **kwargs):
         tags = ["manual"],
     )
 
+    bzd_filegroup_no_runfiles(
+        name = "{}.data".format(name),
+        srcs = [
+            binary,
+        ],
+        output_group = "data",
+        tags = ["manual"],
+    )
+
     bzd_oci_image_from_binary(
         name = name,
         binary = binary,
         layers = [
             "{}.node_modules".format(name),
+            "{}.data".format(name),
         ],
         **kwargs
     )
