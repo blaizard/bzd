@@ -81,6 +81,14 @@ class FragmentRange {
 		this.fragments.push([this.root.concat(key), value, options]);
 		Handlers.sort(this.fragments);
 	}
+
+	toString() {
+		let content = [];
+		for (const fragment of this.all()) {
+			content.push(JSON.stringify([[...this.root, ...fragment.key], fragment.value, fragment.options]));
+		}
+		return content.join("\n");
+	}
 }
 
 export default class Handlers {
@@ -147,7 +155,7 @@ export default class Handlers {
 		fragments = Handlers.sort(fragments).map(([key, value, options = null]) => [
 			key,
 			value,
-			Object.assign(options ?? {}, this.defaultOptions),
+			Object.assign({}, options ?? {}, this.defaultOptions),
 		]);
 
 		for (let index = 0; index < fragments.length; ++index) {
@@ -167,6 +175,7 @@ export default class Handlers {
 					}
 				}
 			}
+			// TODO: move the index forward to the size of the max FragmentRange as all these element have been processed.
 		}
 
 		return fragments;

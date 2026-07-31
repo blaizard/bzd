@@ -24,17 +24,17 @@ export class Nodes {
 	/// A path is determined by the full path up to a value or a list.
 	///
 	/// \return A list of paths and values.
-	static getAllPathAndValues(fragment, rootKey = [], options = {}) {
+	static getAllPathAndValues(fragment, rootKey = null, options = null) {
 		if (fragment && fragment.constructor == Object) {
 			let paths = [];
 			for (const [key, value] of Object.entries(fragment)) {
 				for (const [subKey, subValue] of Nodes.getAllPathAndValues(value)) {
-					paths.push([[...rootKey, key, ...subKey], subValue, options]);
+					paths.push([[...(rootKey ?? []), key, ...subKey], subValue, options ?? {}]);
 				}
 			}
 			return paths;
 		}
-		return [[[...rootKey], fragment, options]];
+		return [[[...(rootKey ?? [])], fragment, options ?? {}]];
 	}
 
 	/// Insert new data at a given path.
