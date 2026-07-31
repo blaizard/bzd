@@ -36,7 +36,7 @@ class Generator:
 					for item in data.get("results", []):
 						publish(
 							timestampMs=item["t"],
-							data={
+							value={
 								"price": item.get("vw") or (item["o"] + item["l"] + item["c"] + item["l"]) / 4,
 								"volume": item["v"],
 								"open": item["o"],
