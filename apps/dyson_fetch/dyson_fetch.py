@@ -133,13 +133,13 @@ class Dyson:
 					)
 
 				for entry in bulk:
-					path = "/".join(entry["key"])
+					path = "/".join(str(entry["key"]))
 					print(f"{path}: {entry['value']} {entry.get('unit', '')}")
 
 				if self.maybeNode is not None:
 					with self.maybeNode.publishBulk() as publish:
 						for entry in bulk:
-							publish(**entry)
+							publish(**entry)  # type: ignore
 
 		except Exception as e:
 			print(f"Error parsing message: {e}")
