@@ -7,7 +7,7 @@
 <script>
 	import Chart from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
-	import { bytesToString, frequencyToString } from "#bzd/nodejs/utils/to_string.js";
+	import { UCUMToString } from "#bzd/nodejs/utils/to_string.js";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
@@ -41,16 +41,6 @@
 			},
 		},
 		mounted() {
-			const nopFormatter = (x) => x;
-			const unitFormatter =
-				{
-					bytes: bytesToString,
-					"bytes/s": (x) => bytesToString(x) + "/s",
-					percent: (x) => x * 100 + "%",
-					celsius: (x) => x + "°C",
-					frequency: (x) => frequencyToString(x),
-				}[this.options.unit] || nopFormatter;
-
 			this.chart = new Chart(
 				this.$refs.graph,
 				this.adaptConfig({
@@ -78,10 +68,11 @@
 								callbacks: {
 									label: (item) => {
 										const label = item.dataset.label || "";
-										if (unitFormatter === nopFormatter) {
-											return label + ": " + item.formattedValue;
+										const formatted = UCUMToString(item.parsed.y, this.options.unit);
+										if (formatted) {
+											return label + ": " + formatted + " (" + item.formattedValue + ")";
 										}
-										return label + ": " + unitFormatter(item.parsed.y) + " (" + item.formattedValue + ")";
+										return label + ": " + item.formattedValue;
 									},
 								},
 							},
@@ -111,8 +102,8 @@
 								suggestedMin: this.options.min,
 								suggestedMax: this.options.max,
 								ticks: {
-									callback: function (value, index, ticks) {
-										return unitFormatter(value);
+									callback: (value, index, ticks) => {
+										return UCUMToString(value, this.options.unit, value);
 									},
 								},
 							},

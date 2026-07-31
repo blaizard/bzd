@@ -172,7 +172,8 @@
         },
         "nodes": {
             "$refs": [
-                "apps/artifacts/backend/config.nodes.compute.json"
+                "apps/artifacts/backend/config.nodes.compute.json",
+                "apps/artifacts/backend/config.nodes.sensors.json"
             ],
             "nodes.data": {
                 "testnode": {

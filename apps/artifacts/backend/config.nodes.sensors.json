@@ -1,0 +1,26 @@
+{
+    "nodes.dashboards": [
+        {
+            "inputs": {
+                "/data/temperature/{name}": {}
+            },
+            "min": 0,
+            "title": "Temperature {name}",
+            "type": "linear",
+            "unit": "Cel"
+        }
+    ],
+    "nodes.schema": {
+        "/data/temperature": {
+            "additionalProperties": {
+                "items": {
+                    "type": "number",
+                    "unit": "Cel"
+                },
+                "type": "array"
+            },
+            "description": "Temperature readings per sensor in degrees Celsius.",
+            "type": "object"
+        }
+    }
+}

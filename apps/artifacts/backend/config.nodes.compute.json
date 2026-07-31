@@ -8,7 +8,7 @@
             "min": 0,
             "title": "CPU {name}",
             "type": "linear",
-            "unit": "percent"
+            "unit": "%"
         },
         {
             "inputs": {
@@ -18,7 +18,7 @@
             "min": 0,
             "title": "GPU {name}",
             "type": "linear",
-            "unit": "percent"
+            "unit": "%"
         },
         {
             "inputs": {
@@ -27,7 +27,7 @@
             "min": 0,
             "title": "CPU Frequency {name}",
             "type": "linear",
-            "unit": "frequency"
+            "unit": "Hz"
         },
         {
             "inputs": {
@@ -37,7 +37,7 @@
             "min": 0,
             "title": "Disk {name}",
             "type": "linear",
-            "unit": "bytes"
+            "unit": "By"
         },
         {
             "inputs": {
@@ -47,7 +47,7 @@
             "min": 0,
             "title": "Memory {name}",
             "type": "linear",
-            "unit": "bytes"
+            "unit": "By"
         },
         {
             "groupBy": [
@@ -60,7 +60,7 @@
             "min": 0,
             "title": "IO usage",
             "type": "linear",
-            "unit": "percent"
+            "unit": "%"
         },
         {
             "groupBy": [
@@ -72,7 +72,7 @@
             "min": 0,
             "title": "IO write",
             "type": "linear",
-            "unit": "bytes/s"
+            "unit": "By/s"
         },
         {
             "groupBy": [
@@ -84,7 +84,7 @@
             "min": 0,
             "title": "IO read",
             "type": "linear",
-            "unit": "bytes/s"
+            "unit": "By/s"
         },
         {
             "groupBy": [
@@ -96,7 +96,7 @@
             "min": 0,
             "title": "Network recv",
             "type": "linear",
-            "unit": "bytes/s"
+            "unit": "By/s"
         },
         {
             "groupBy": [
@@ -118,16 +118,7 @@
             "min": 0,
             "title": "Battery {name}",
             "type": "linear",
-            "unit": "percent"
-        },
-        {
-            "inputs": {
-                "/data/temperature/{name}": {}
-            },
-            "min": 0,
-            "title": "Temperature {name}",
-            "type": "linear",
-            "unit": "celsius"
+            "unit": "%"
         }
     ],
     "nodes.handlers": {
@@ -288,17 +279,6 @@
                 "type": "object"
             },
             "description": "Network traffic per interface, including inbound and outbound throughput.",
-            "type": "object"
-        },
-        "/data/temperature": {
-            "additionalProperties": {
-                "items": {
-                    "type": "number",
-                    "unit": "Cel"
-                },
-                "type": "array"
-            },
-            "description": "Temperature readings per sensor in degrees Celsius.",
             "type": "object"
         },
         "/data/uptime": {

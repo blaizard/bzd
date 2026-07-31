@@ -2,7 +2,10 @@ load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
 
-exports_files(["config.nodes.compute.json"])
+exports_files([
+    "config.nodes.compute.json",
+    "config.nodes.sensors.json",
+])
 
 bzd_config_default(
     name = "config",
@@ -15,6 +18,7 @@ bzd_config_default(
     ],
     deps = [
         "config.nodes.compute.json",
+        "config.nodes.sensors.json",
     ],
 )
 

@@ -58,7 +58,6 @@ export class Nodes {
 		}
 		let fragments = Nodes.getAllPathAndValues(value, key, options);
 		fragments = this.handlers.process(fragments);
-
 		timestamp = this.data.insert(uid, fragments, timestamp);
 
 		// Generate records.

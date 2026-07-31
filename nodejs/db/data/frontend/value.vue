@@ -124,7 +124,6 @@
 							if (min !== NaN) {
 								const max = Math.max(...value);
 								const mean = value.reduce((acc, val) => acc + val, 0) / value.length;
-								Exception.assert();
 								return [
 									"mean: " + (formatter(mean) ?? mean),
 									"min: " + (formatter(min) ?? min),
