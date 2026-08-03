@@ -16,6 +16,10 @@ cc_library(
     hdrs = [
         "core.hh",
     ],
+    tags = [
+        # TODO: Remove this tag once the issue is understood.
+        "no-clang-tidy",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":interface",

@@ -172,10 +172,11 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets
         executable = ctx.attr._bdl.files_to_run,
     )
 
+    direct = [bdl["output"] for bdl in metadata]
     sources = depset([(bdl["input"], bdl["output"]) for bdl in metadata], transitive = [input_sources])
     files = depset([bdl["output"] for bdl in metadata], transitive = [input_files])
 
-    return BdlInfo(sources = sources, files = files, search_paths = search_paths), metadata
+    return BdlInfo(sources = sources, files = files, search_paths = search_paths, direct = direct), metadata
 
 def make_composition_language_providers(ctx, name, deps, target_deps = None, target_bdl_providers = None):
     """Compose the system.
@@ -235,7 +236,9 @@ def make_composition_language_providers(ctx, name, deps, target_deps = None, tar
 
     # Create the language specific data file.
     def deps_to_info(fmt, deps):
-        return [dep[_BdlCompositionInfo].data.get(fmt, {}) for dep in deps if _BdlCompositionInfo in dep]
+        if "composition" in library_extensions[fmt] and "deps_to_info" in library_extensions[fmt]["composition"]:
+            return library_extensions[fmt]["composition"]["deps_to_info"](deps)
+        return {}
 
     language_specific_data = {}
     for fmt, data in library_extensions.items():

@@ -3,14 +3,17 @@ import pathlib
 import typing
 
 from bzd_sanitizer.worker import worker
-from bdl.lib import main as bdlFormatter
+from bdl.object import ObjectContext
+from bdl.generators.bdl.visitor import formatBdl
 
 
 def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
 	workspace, path, check = args
 
 	original = (workspace / path).read_text()
-	formatted = bdlFormatter(formatType="bdl", source=str(workspace / path))
+
+	bdl = ObjectContext().preprocess(source=str(workspace / path))
+	formatted = formatBdl(bdl=bdl)
 
 	if original != formatted:
 		if check:

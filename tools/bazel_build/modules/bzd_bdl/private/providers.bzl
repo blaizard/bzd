@@ -10,6 +10,7 @@ BdlTagInfo = provider(
 BdlInfo = provider(
     doc = "Provider for bdl files.",
     fields = {
+        "direct": "The preprocessed bdl files directly associated with this rule.",
         "files": "All files, contains the same set of files as in `sources`, but uses a different format for convenience.",
         "search_paths": "Ordered list of directory paths to search for preprocessed object files.",
         "sources": "Pair of input and preprocessed bdl files.",

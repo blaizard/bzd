@@ -24,13 +24,6 @@ def preprocess(
 	return objectContext.preprocess(source=source, namespace=namespace)
 
 
-def generate(formatType: str, bdl: Object, data: typing.Optional[Path] = None) -> str:
-	assert formatType in formatters, "Format '{}' not supported.".format(formatType)
-
-	# Format using a specific formatter
-	return formatters[formatType](bdl=bdl, data=data)
-
-
 def compose(
 	formatType: str,
 	bdls: typing.Sequence[Object],
@@ -46,13 +39,3 @@ def compose(
 	# Generate the composition views using a specific formatter and call the language-specific composition.
 	compositions = {target: composition.view(target) for target in targets}
 	compositions_[formatType](compositions=compositions, data=data, output=output)
-
-
-def main(
-	formatType: str,
-	source: str,
-	objectContext: typing.Optional[ObjectContext] = None,
-	data: typing.Optional[Path] = None,
-) -> str:
-	bdl = preprocess(source=source, objectContext=objectContext)
-	return generate(formatType=formatType, bdl=bdl, data=data)

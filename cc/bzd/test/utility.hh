@@ -1,3 +1,5 @@
+#pragma once
+
 #include "cc/bzd/core/async.hh"
 
 #include <iomanip>
@@ -17,20 +19,8 @@ void dump(const T& object)
 	std::cout << std::dec << std::endl;
 }
 
-bzd::Async<> delay(const bzd::Size count) noexcept
-{
-	for (bzd::Size i = 0; i < count; ++i)
-	{
-		co_await bzd::async::yield();
-	}
-	co_return {};
-}
+bzd::Async<> delay(const bzd::Size count) noexcept;
 
-// NOLINTNEXTLINE(bugprone-exception-escape)
-bzd::Async<> timeout(const bzd::Size count) noexcept
-{
-	co_await !delay(count);
-	co_return bzd::error::Timeout("Operation timed out after {} ticks"_csv, count);
-}
+bzd::Async<> timeout(const bzd::Size count) noexcept;
 
 } // namespace bzd::test

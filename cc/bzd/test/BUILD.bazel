@@ -136,6 +136,9 @@ cc_library(
 
 cc_library(
     name = "utility",
+    srcs = [
+        "utility.cc",
+    ],
     hdrs = [
         "utility.hh",
     ],

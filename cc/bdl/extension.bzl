@@ -2,6 +2,7 @@
 
 load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
+load("//cc/bdl:defs.bzl", "bdl_to_cc_library")
 
 def _get_cc_public_header(target):
     """Get all the direct public headers from a target."""
@@ -9,6 +10,9 @@ def _get_cc_public_header(target):
     if CcInfo not in target:
         return []
     return target[CcInfo].compilation_context.direct_public_headers
+
+def _deps_to_info(deps):
+    return [{"hdrs": depset([header for dep in deps for header in _get_cc_public_header(dep)])}]
 
 def _library_providers(ctx, generated):
     return [cc_compile(ctx = ctx, hdrs = generated, deps = ctx.attr._deps_cc + ctx.attr.deps)]
@@ -56,6 +60,7 @@ extension = {
             "deps": [
                 Label("//cc/bdl/generator/impl/adapter:context"),
             ],
+            "deps_to_info": _deps_to_info,
             "output": "{name}.composition.{target}.cc",
             "providers": _composition_providers,
         },
@@ -65,8 +70,10 @@ extension = {
             "deps": [
                 Label("//cc/bdl/generator/impl/adapter:types"),
             ],
+            "generator": bdl_to_cc_library,
             "outputs": ["{name}.hh"],
             "providers": _library_providers,
+            "providers2": [CcInfo],
         },
     },
 }

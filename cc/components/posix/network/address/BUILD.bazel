@@ -27,5 +27,6 @@ cc_library(
         "//cc/bzd/utility/pattern:to_string",
         "//cc/components/posix:error",
         "//cc/components/posix/network:interface",
+        "//interfaces:network",
     ],
 )

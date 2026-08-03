@@ -1,4 +1,4 @@
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_library(
     name = "format",
@@ -15,6 +15,17 @@ py_library(
     name = "composition",
     srcs = [
         "composition.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cc/bdl/generator/impl:visitor",
+    ],
+)
+
+py_binary(
+    name = "library_converter",
+    srcs = [
+        "library_converter.py",
     ],
     visibility = ["//visibility:public"],
     deps = [

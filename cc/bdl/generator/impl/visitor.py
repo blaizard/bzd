@@ -61,9 +61,10 @@ class Transform:
 		self,
 		composition: typing.Optional[CompositionView] = None,
 		data: typing.Optional[Path] = None,
+		dataContent: typing.Optional[typing.Dict[str, typing.Any]] = None,
 	) -> None:
 		self.composition = composition
-		self.data = json.loads(data.read_text()) if data else {}
+		self.data = json.loads(data.read_text()) if data else (dataContent if dataContent else {})
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
@@ -286,9 +287,9 @@ class Transform:
 		return f"template <{', '.join(args)}>"
 
 
-def formatCc(bdl: Object, data: typing.Optional[Path] = None) -> str:
+def formatCc(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-	output = template.render(bdl.tree, Transform(data=data))
+	output = template.render(bdl.tree, Transform(data=None, dataContent=data))
 
 	return output
 

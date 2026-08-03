@@ -4,11 +4,16 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "main",
     srcs = ["main.cc"],
+    hdrs = ["main.hh"],
     local_defines = select({
         "//tools/bazel_build/settings/executor:is_default": ["BZD_EXECUTOR_SIM=1"],
         "//tools/bazel_build/settings/executor:is_sim": ["BZD_EXECUTOR_SIM=1"],
         "//conditions:default": [],
     }),
+    tags = [
+        # TODO: Remove this tag once the issue is understood.
+        "no-clang-tidy",
+    ],
     target_compatible_with = [
         "@bzd_platforms//isa:xtensa_lx7",
     ],

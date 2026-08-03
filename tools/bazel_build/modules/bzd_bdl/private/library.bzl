@@ -1,75 +1,29 @@
 """BDL library rules."""
 
-load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "make_bdl_arguments", "precompile_bdl")
+load("@bdl_extension//:extensions.bzl", "extensions")
+load("//private:common.bzl", "aspect_bdl_providers", "precompile_bdl")
 load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
 
 visibility(["//..."])
 
-def _bdl_library_impl(ctx):
+def _bdl_precompile_library_impl(ctx):
     # Pre-compile the BDLs into their language agnostics format.
-    bdl_provider, metadata = precompile_bdl(
+    bdl_provider, _metadata = precompile_bdl(
         ctx = ctx,
         srcs = ctx.files.srcs,
         deps = ctx.attr.deps,
         presets = ctx.files.presets,
     )
+    return [bdl_provider]
 
-    # Generate the data for the data file for the bdl constructor.
-    language_specific_data = {}
-    for fmt, data in library_extensions.items():
-        if "library" in data:
-            language_specific_data[fmt] = data["library"]["data"](ctx.attr.deps)
-
-    # Write the language specific data file.
-    data_file = ctx.actions.declare_file("{}.data.json".format(ctx.label.name))
-    ctx.actions.write(
-        output = data_file,
-        content = json.encode(language_specific_data),
-    )
-
-    # Generate the various providers
-    providers = []
-    for fmt, data in library_extensions.items():
-        if "library" in data:
-            generated = []
-            for bdl in metadata:
-                # Generate the output
-                outputs = [ctx.actions.declare_file(output.format(name = bdl["relative_name"])) for output in data["library"]["outputs"]]
-                ctx.actions.run(
-                    inputs = depset([data_file], transitive = [bdl_provider.files]),
-                    outputs = outputs,
-                    progress_message = "Generating {} build files from manifest {}".format(data["display"], bdl["input"].short_path),
-                    arguments = make_bdl_arguments(
-                        stage = "generate",
-                        search_paths = bdl_provider.search_paths,
-                        format = fmt,
-                        output = outputs[0].path,
-                        data = data_file,
-                        args = [bdl["input"].path],
-                    ),
-                    executable = ctx.attr._bdl.files_to_run,
-                )
-                generated += outputs
-
-            # Generate the various providers
-            providers.extend(data["library"]["providers"](ctx = ctx, generated = generated))
-
-    return [
-        bdl_provider,
-        BdlTagInfo(),
-    ] + providers
-
-bdl_library = rule(
-    implementation = _bdl_library_impl,
-    doc = """Bzd Description Language generator rule.
-    It generates language provider from a .bdl file.
-    The files are generated at the same path of the target, with the name of the target appended with a language specific file extension.
-    """,
+_bdl_precompile_library = rule(
+    implementation = _bdl_precompile_library_impl,
+    doc = """Bzd Description Language generator rule.""",
     attrs = {
         "deps": attr.label_list(
             providers = [BdlInfo],
             aspects = [aspect_bdl_providers],
-            doc = "List of bdl dependencies. Language specific dependencies will have their public interface included in the generated file.",
+            doc = "List of bdl dependencies.",
         ),
         "presets": attr.label_list(
             allow_files = [".json"],
@@ -85,11 +39,78 @@ bdl_library = rule(
             cfg = "exec",
             executable = True,
         ),
-    } | {("_deps_" + name): (attr.label_list(
-        default = data["library"]["deps"],
-    )) for name, data in library_extensions.items() if "library" in data},
-    toolchains = [
-        "@rules_cc//cc:toolchain_type",
-    ],
-    fragments = ["cpp"],
+    },
+)
+
+def _aggregate_library_providers_impl(ctx):
+    providers = [
+        ctx.attr.bdl[BdlInfo],
+        BdlTagInfo(),
+    ]
+    for fmt, rule in ctx.attr.generators.items():
+        for provider in extensions[fmt]["library"]["providers2"]:
+            providers.append(rule[provider])
+
+    return providers
+
+_aggregate_library_providers = rule(
+    implementation = _aggregate_library_providers_impl,
+    doc = """Aggregates the providers from the various language specific generators.""",
+    attrs = {
+        "bdl": attr.label(
+            mandatory = True,
+            providers = [BdlInfo],
+            doc = "Bdl precompiler rule.",
+        ),
+        "generators": attr.string_keyed_label_dict(
+            mandatory = True,
+            doc = "Generator identifiers to generator rules.",
+        ),
+    },
+)
+
+def _bdl_library_impl(name, visibility, srcs, deps, **kwargs):
+    _bdl_precompile_library(
+        name = "{}.precompile".format(name),
+        srcs = srcs,
+        deps = deps,
+        **kwargs
+    )
+
+    generators = {}
+    for fmt, extension in extensions.items():
+        if "library" in extension:
+            generators[fmt] = "{}.{}".format(name, fmt)
+            extension["library"]["generator"](
+                name = generators[fmt],
+                visibility = visibility,
+                bdl = "{}.precompile".format(name),
+                srcs = srcs,
+                deps = deps,
+            )
+
+    _aggregate_library_providers(
+        name = name,
+        bdl = "{}.precompile".format(name),
+        generators = generators,
+        visibility = visibility,
+    )
+
+bdl_library = macro(
+    doc = "Bdl library with language specific generators.",
+    implementation = _bdl_library_impl,
+    inherit_attrs = _bdl_precompile_library,
+    attrs = {
+        "deps": attr.label_list(
+            providers = [BdlInfo],
+            aspects = [aspect_bdl_providers],
+            doc = "List of bdl dependencies.",
+        ),
+        "srcs": attr.label_list(
+            mandatory = True,
+            allow_files = [".bdl"],
+            doc = "List of Bzd Description Language (bdl) files to be included.",
+            configurable = False,
+        ),
+    },
 )

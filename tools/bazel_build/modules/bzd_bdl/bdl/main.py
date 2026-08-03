@@ -3,7 +3,7 @@ from pathlib import Path
 
 import bzd.parser.error
 from bdl.object import ObjectContext
-from bdl.lib import formatters, main, preprocess, generate, compose
+from bdl.lib import formatters, preprocess, compose
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")
@@ -32,8 +32,9 @@ if __name__ == "__main__":
 	)
 	parser.add_argument(
 		"--stage",
-		choices=["preprocess", "generate", "compose"],
-		help="Only perform a specific stage of the full process.",
+		choices=["preprocess", "compose"],
+		required=True,
+		help="Perform a specific stage of the full process.",
 	)
 	parser.add_argument(
 		"--data",
@@ -73,31 +74,10 @@ if __name__ == "__main__":
 			targets=set(config.targets),
 			data=config.data,
 		)
-	else:
+	elif config.stage == "preprocess":
 		for source in config.inputs:
-			if config.stage == "preprocess":
-				preprocess(
-					source=source,
-					namespace=config.namespace.split(".") if config.namespace else None,
-					objectContext=objectContext,
-				)
-
-			else:
-				if config.stage == "generate":
-					maybePreprocess = objectContext.findPreprocess(source=source)
-					assert maybePreprocess is not None, f"Source file '{source}' is not preprocessed."
-					bdl = objectContext.loadPreprocess(preprocess=maybePreprocess)
-					output = generate(formatType=config.format, bdl=bdl, data=config.data)
-
-				else:
-					output = main(
-						formatType=config.format,
-						source=source,
-						objectContext=objectContext,
-						data=config.data,
-					)
-
-				if config.output is None:
-					print(output)
-				else:
-					config.output.write_text(output, encoding="ascii")
+			preprocess(
+				source=source,
+				namespace=config.namespace.split(".") if config.namespace else None,
+				objectContext=objectContext,
+			)

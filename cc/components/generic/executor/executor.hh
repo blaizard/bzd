@@ -4,6 +4,7 @@
 #include "cc/bzd/core/async.hh"
 #include "cc/bzd/core/logger.hh"
 #include "cc/bzd/utility/apply.hh"
+#include "cc/components/generic/executor_profiler/noop/noop.hh"
 #include "interfaces/core.hh"
 #include "interfaces/executor.hh"
 

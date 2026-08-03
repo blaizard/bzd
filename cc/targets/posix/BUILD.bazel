@@ -13,6 +13,7 @@ filegroup(
 cc_library(
     name = "main",
     srcs = ["main.cc"],
+    hdrs = ["main.hh"],
     visibility = ["//visibility:public"],
     deps = [
         "//cc/bzd/platform:panic",
