@@ -3,18 +3,11 @@ from pathlib import Path
 
 import bzd.parser.error
 from bdl.object import ObjectContext
-from bdl.lib import formatters, preprocess, compose
+from bdl.lib import preprocess
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")
 	parser.add_argument("-o", "--output", default=None, type=Path, help="Output path of generated file.")
-	parser.add_argument(
-		"--format",
-		default="bdl",
-		type=str,
-		choices=formatters.keys(),
-		help="Formatting type.",
-	)
 	parser.add_argument("--no-color", action="store_true", help="Don't use colors.")
 	parser.add_argument(
 		"--namespace",
@@ -32,7 +25,7 @@ if __name__ == "__main__":
 	)
 	parser.add_argument(
 		"--stage",
-		choices=["preprocess", "compose"],
+		choices=["preprocess"],
 		required=True,
 		help="Perform a specific stage of the full process.",
 	)
@@ -61,20 +54,7 @@ if __name__ == "__main__":
 	# Set colors if running on a terminal
 	bzd.parser.error.useColors = not config.no_color
 
-	if config.stage == "compose":
-		bdls = []
-		for source in config.inputs:
-			maybePreprocess = objectContext.findPreprocess(source=source)
-			assert maybePreprocess, f"Source file '{source}' is not preprocessed."
-			bdls.append(objectContext.loadPreprocess(preprocess=maybePreprocess))
-		compose(
-			formatType=config.format,
-			bdls=bdls,
-			output=config.output,
-			targets=set(config.targets),
-			data=config.data,
-		)
-	elif config.stage == "preprocess":
+	if config.stage == "preprocess":
 		for source in config.inputs:
 			preprocess(
 				source=source,

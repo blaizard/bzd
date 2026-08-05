@@ -1,5 +1,4 @@
 import typing
-import json
 from pathlib import Path
 
 from bzd.template.template import Template
@@ -60,11 +59,10 @@ class Transform:
 	def __init__(
 		self,
 		composition: typing.Optional[CompositionView] = None,
-		data: typing.Optional[Path] = None,
-		dataContent: typing.Optional[typing.Dict[str, typing.Any]] = None,
+		data: typing.Optional[typing.Dict[str, typing.Any]] = None,
 	) -> None:
 		self.composition = composition
-		self.data = json.loads(data.read_text()) if data else (dataContent if dataContent else {})
+		self.data = data if data else {}
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
@@ -289,18 +287,14 @@ class Transform:
 
 def formatCc(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
-	output = template.render(bdl.tree, Transform(data=None, dataContent=data))
+	output = template.render(bdl.tree, Transform(composition=None, data=data))
 
 	return output
 
 
 def compositionCc(
-	compositions: typing.Dict[str, CompositionView],
-	output: Path,
-	data: typing.Optional[Path] = None,
-) -> None:
+	composition: CompositionView,
+	data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
-
-	for target, composition in compositions.items():
-		content = template.render(composition, Transform(composition=composition, data=data))
-		(output.parent / f"{output.name}.{target}.cc").write_text(content)
+	return template.render(composition, Transform(composition=composition, data=data))

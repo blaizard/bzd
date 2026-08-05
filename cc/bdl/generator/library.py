@@ -5,7 +5,7 @@ from bdl.object import ObjectContext
 from cc.bdl.generator.impl.visitor import formatCc
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Bdl library generator for the Rust language.")
+	parser = argparse.ArgumentParser(description="Bdl library generator for the C++ language.")
 	parser.add_argument(
 		"--bdl",
 		action="append",

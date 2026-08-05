@@ -3,10 +3,10 @@ import pathlib
 
 from bdl.object import ObjectContext
 from bdl.visitors.composition.visitor import Composition
-from cc.bdl.generator.impl.visitor import compositionCc
+from bdl.generators.json.visitor import compositionJson
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="Bdl composition generator for the C++ language.")
+	parser = argparse.ArgumentParser(description="Bdl composition generator to a JSON file.")
 	parser.add_argument(
 		"--output",
 		type=pathlib.Path,
@@ -17,7 +17,6 @@ if __name__ == "__main__":
 		required=True,
 		help="The target to process.",
 	)
-	parser.add_argument("--include", action="append", default=[], type=pathlib.Path, help="Include files.")
 	parser.add_argument(
 		"bdls",
 		nargs="+",
@@ -32,12 +31,7 @@ if __name__ == "__main__":
 		composition.visit(ObjectContext().loadPreprocess(preprocess=bdl))
 	composition.process()
 
-	content = compositionCc(
+	content = compositionJson(
 		composition=composition.view(args.target),
-		data={
-			"cc": {
-				"includes": {"all": [str(f) for f in args.include]},
-			},
-		},
 	)
 	args.output.write_text(content)

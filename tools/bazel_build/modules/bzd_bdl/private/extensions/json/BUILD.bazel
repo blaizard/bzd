@@ -1,0 +1,12 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "composition",
+    srcs = [
+        "composition.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//bdl:lib",
+    ],
+)

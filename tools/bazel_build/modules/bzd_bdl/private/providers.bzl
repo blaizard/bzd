@@ -27,10 +27,11 @@ BdlTargetInfo = provider(
     },
 )
 
-BdlSystemInfo = provider(
-    doc = "Provider for a system rule.",
+BdlCompositionInfo = provider(
+    doc = "Provider for the system composition.",
     fields = {
-        "data": "Data specific keyed by extension.",
+        "bdls": "All bdls info providers for the system.",
+        "deps": "Target-specific dependencies.",
     },
 )
 

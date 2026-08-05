@@ -6,7 +6,7 @@ bdl_library(
         "file_descriptor.bdl",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//cc/components/posix/io/impl:file_descriptor",
-    ],
+    implementation = {
+        "cc": "//cc/components/posix/io/impl:file_descriptor",
+    },
 )

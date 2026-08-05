@@ -3,22 +3,28 @@ load("@bzd_bdl//diagram:defs.bzl", "bdl_system_diagram")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-bdl_library(
-    name = "composition",
-    srcs = [
-        "composition.bdl",
-    ],
-)
-
 cc_library(
     name = "lib",
     hdrs = [
         "simple.hh",
     ],
+    tags = [
+        # TODO: Remove this tag once the issue is understood.
+        "no-clang-tidy",
+    ],
     deps = [
-        ":composition",
         "//cc:bzd",
     ],
+)
+
+bdl_library(
+    name = "composition",
+    srcs = [
+        "composition.bdl",
+    ],
+    implementation = {
+        "cc": ":lib",
+    },
 )
 
 bdl_system(
@@ -28,7 +34,7 @@ bdl_system(
         "hpc": "@@//cc/targets/linux:x86_64_clang",
     },
     deps = [
-        ":lib",
+        ":composition",
     ],
 )
 

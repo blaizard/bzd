@@ -48,7 +48,7 @@ def _aggregate_library_providers_impl(ctx):
         BdlTagInfo(),
     ]
     for fmt, rule in ctx.attr.generators.items():
-        for provider in extensions[fmt]["library"]["providers2"]:
+        for provider in extensions[fmt]["library"]["providers"]:
             providers.append(rule[provider])
 
     return providers
@@ -69,7 +69,7 @@ _aggregate_library_providers = rule(
     },
 )
 
-def _bdl_library_impl(name, visibility, srcs, deps, **kwargs):
+def _bdl_library_impl(name, visibility, srcs, deps, implementation, **kwargs):
     _bdl_precompile_library(
         name = "{}.precompile".format(name),
         srcs = srcs,
@@ -86,7 +86,7 @@ def _bdl_library_impl(name, visibility, srcs, deps, **kwargs):
                 visibility = visibility,
                 bdl = "{}.precompile".format(name),
                 srcs = srcs,
-                deps = deps,
+                deps = deps + ([implementation[fmt]] if fmt in implementation else []),
             )
 
     _aggregate_library_providers(
@@ -103,8 +103,11 @@ bdl_library = macro(
     attrs = {
         "deps": attr.label_list(
             providers = [BdlInfo],
-            aspects = [aspect_bdl_providers],
             doc = "List of bdl dependencies.",
+        ),
+        "implementation": attr.string_keyed_label_dict(
+            doc = "Implementation for a specific language, will be added to generated code for the given language.",
+            configurable = False,
         ),
         "srcs": attr.label_list(
             mandatory = True,

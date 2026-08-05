@@ -44,14 +44,14 @@ _cc_generate_headers = rule(
             doc = "List of bdl dependencies.",
         ),
         "_tool": attr.label(
-            default = Label("//cc/bdl/generator:library_converter"),
+            default = Label("//cc/bdl/generator:library"),
             cfg = "exec",
             executable = True,
         ),
     },
 )
 
-def _bdl_to_cc_library_impl(
+def _generator_cc_library_impl(
         name,
         visibility,
         bdl,
@@ -78,9 +78,9 @@ def _bdl_to_cc_library_impl(
         **kwargs
     )
 
-bdl_to_cc_library = macro(
-    doc = "Convert a bdl library to a C++ library.",
-    implementation = _bdl_to_cc_library_impl,
+generator_cc_library = macro(
+    doc = "Convert a bdl library into a C++ library.",
+    implementation = _generator_cc_library_impl,
     attrs = {
         "bdl": attr.label(mandatory = True, doc = "The bdl target to be converted to a C++ library."),
         "deps": attr.label_list(doc = "The dependencies from the bdl file."),

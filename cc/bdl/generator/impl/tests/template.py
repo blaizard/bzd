@@ -40,7 +40,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		composition = Composition(targets={"default"})
+		composition = Composition()
 		composition.visit(bdl).process()
 		return composition
 

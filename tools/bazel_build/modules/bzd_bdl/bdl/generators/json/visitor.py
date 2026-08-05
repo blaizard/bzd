@@ -1,18 +1,12 @@
 import json
 import typing
-import pathlib
 
-from bdl.object import Object
 from bdl.visitors.composition.visitor import CompositionView
 from bdl.visitors.composition.components import ExpressionEntry
 from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 
 Json = typing.Dict[str, typing.Any]
-
-
-def formatJson(bdl: Object, data: typing.Optional[pathlib.Path] = None) -> str:
-	return ""
 
 
 def parametersToJson(parameters: ParametersResolved) -> typing.Sequence[Json]:
@@ -72,22 +66,16 @@ def ioToJson(io: typing.Dict[str, typing.Any]) -> Json:
 	return result
 
 
-def compositionJson(
-	compositions: typing.Dict[str, CompositionView],
-	output: pathlib.Path,
-	data: typing.Optional[pathlib.Path] = None,
-) -> None:
+def compositionJson(composition: CompositionView) -> str:
 
-	for target, composition in compositions.items():
-		contexts = []
+	contexts = []
 
-		for index, context in enumerate(composition.contexts):
-			registry = {uid: expressionEntryToJson(registry) for uid, registry in composition.registry.get(context, {}).items()}
-			workloads = [expressionEntryToJson(workload) for workload in composition.workloads.get(context, [])]
-			services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
-			contexts.append({"registry": registry, "workloads": workloads, "services": services})
+	for index, context in enumerate(composition.contexts):
+		registry = {uid: expressionEntryToJson(registry) for uid, registry in composition.registry.get(context, {}).items()}
+		workloads = [expressionEntryToJson(workload) for workload in composition.workloads.get(context, [])]
+		services = [expressionEntryToJson(service) for service in composition.services.get(context, [])]
+		contexts.append({"registry": registry, "workloads": workloads, "services": services})
 
-		ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
+	ios = {uid: ioToJson(io) for uid, io in composition.iosRegistry.items() if io}
 
-		jsonData = json.dumps({"target": target, "ios": ios, "contexts": contexts}, indent=4)
-		(output.parent / f"{output.name}.{target}.json").write_text(jsonData)
+	return json.dumps({"target": composition.target, "ios": ios, "contexts": contexts}, indent=4)

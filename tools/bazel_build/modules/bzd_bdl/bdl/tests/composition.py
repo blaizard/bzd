@@ -32,7 +32,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(interface).visit(compositionNormal).process()
+		Composition().visit(interface).visit(compositionNormal).process()
 
 	def testCompositionOrder(self) -> None:
 		interface = Object.fromContent(
@@ -60,7 +60,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(interface).visit(compositionNormal).process()
+		Composition().visit(interface).visit(compositionNormal).process()
 
 		# Variable defined after.
 		compositionWrongOrder = Object.fromContent(
@@ -77,7 +77,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(interface).visit(compositionWrongOrder).process()
+		Composition().visit(interface).visit(compositionWrongOrder).process()
 
 		# Variable defined after with wrong contract.
 		compositionWrongOrder = Object.fromContent(
@@ -95,7 +95,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 		with self.assertRaisesRegex(Exception, r"lower than"):
-			Composition(targets={"default"}).visit(interface).visit(compositionWrongOrder).process()
+			Composition().visit(interface).visit(compositionWrongOrder).process()
 
 	def testCompositionInit(self) -> None:
 		bdl = Object.fromContent(
@@ -115,7 +115,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 
-		composition = Composition(targets={"default"})
+		composition = Composition()
 		composition.visit(bdl).process()
 
 	def testNestedComposition(self) -> None:
@@ -141,7 +141,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 
-		composition = Composition(targets={"default"})
+		composition = Composition()
 		composition.visit(bdl).process()
 		composition.view(target="default").entity("default.test1.world")
 		composition.view(target="default").entity("default.test2.world")
@@ -178,7 +178,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 		with self.assertRaisesRegex(Exception, r"is not a valid sink IO"):
-			Composition(targets={"default"}).visit(common).visit(composition).process()
+			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(
 			content="""
@@ -189,7 +189,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 		with self.assertRaisesRegex(Exception, r"between the same types"):
-			Composition(targets={"default"}).visit(common).visit(composition).process()
+			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(
 			content="""
@@ -199,7 +199,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(common).visit(composition).process()
+		Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(
 			content="""
@@ -211,7 +211,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 		with self.assertRaisesRegex(Exception, r"is already connected to"):
-			Composition(targets={"default"}).visit(common).visit(composition).process()
+			Composition().visit(common).visit(composition).process()
 
 		composition = Object.fromContent(
 			content="""
@@ -223,7 +223,7 @@ class TestRun(unittest.TestCase):
 			objectContext=ObjectContext(resolve=True),
 		)
 		with self.assertRaisesRegex(Exception, r"not a valid source IO"):
-			Composition(targets={"default"}).visit(common).visit(composition).process()
+			Composition().visit(common).visit(composition).process()
 
 	def testCompositionThis(self) -> None:
 		composition = Object.fromContent(
@@ -248,7 +248,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(composition).process()
+		Composition().visit(composition).process()
 
 	def testCompositionThisMulti(self) -> None:
 		composition = Object.fromContent(
@@ -275,7 +275,7 @@ class TestRun(unittest.TestCase):
 			""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(composition).process()
+		Composition().visit(composition).process()
 
 	def testExecutor(self) -> None:
 		composition = Object.fromContent(
@@ -296,7 +296,7 @@ class TestRun(unittest.TestCase):
 				""",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Composition(targets={"default"}).visit(composition).process()
+		Composition().visit(composition).process()
 
 		with self.assertRaisesRegex(Exception, r"executors between this expression"):
 			composition = Object.fromContent(
@@ -314,7 +314,7 @@ class TestRun(unittest.TestCase):
 					""",
 				objectContext=ObjectContext(resolve=True),
 			)
-			Composition(targets={"default"}).visit(composition).process()
+			Composition().visit(composition).process()
 
 
 if __name__ == "__main__":

@@ -25,14 +25,12 @@ class Entities:
 
 	defaultExecutorName_ = "~defaultExecutor"
 
-	def __init__(self, symbols: SymbolMap, targets: typing.Set[str]) -> None:
+	def __init__(self, symbols: SymbolMap) -> None:
 		self.symbols = symbols
 		# Map of all available components and their dependencies.
 		self.expressions = Components()
 		# Map of all available connections.
 		self.connections = Connections(self.symbols)
-		# The targets of this system.
-		self.targets = targets
 
 	def processFirstStage(
 		self, expression: Expression, fqns: typing.Optional[typing.Set[str]]
@@ -220,15 +218,10 @@ class Entities:
 	def getContextFromExecutor(self, executor: str) -> Context:
 		"""Get a context from an executor, throw if none is found."""
 
-		# Identify the target.
-		target = None
-		for t in self.targets:
-			if executor.startswith(f"{t}."):
-				target = t
-		assert target is not None, (
-			f"There is no target associated with this executor '{executor}', available targets are: {str(self.targets)}."
+		assert "." in executor, (
+			f"There is no target associated with this executor '{executor}', it should have the following format: <target>.<executor>"
 		)
-
+		target, *_ = executor.split(".")
 		return Context(executor=executor, target=target)
 
 	def process(self, expressions: typing.Iterable[Expression]) -> None:

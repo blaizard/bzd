@@ -1,5 +1,7 @@
 """JSON extension for bdl rules."""
 
+load("//private/extensions/json:composition.bzl", "generator_json_composition")
+
 def _composition_data(_info, _info_per_target):
     return {}
 
@@ -19,6 +21,7 @@ extension = {
         "composition": {
             "data": _composition_data,
             "deps": [],
+            "generator": generator_json_composition,
             "output": "{name}.composition.{target}.json",
             "providers": _composition_providers,
         },

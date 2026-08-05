@@ -66,11 +66,9 @@ class CompositionView:
 
 
 class Composition:
-	def __init__(self, targets: typing.Set[str]) -> None:
-		# All targets available, an empty set if there are no target for this composition.
-		self.targets = targets
+	def __init__(self) -> None:
 		self.symbols = SymbolMap()
-		self.entities = Entities(symbols=self.symbols, targets=self.targets)
+		self.entities = Entities(symbols=self.symbols)
 		# Unique identifiers
 		self.uids: typing.Dict[str, int] = {}
 

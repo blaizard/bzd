@@ -1,8 +1,9 @@
 """C++ extension for bdl rules."""
 
-load("@bzd_toolchain_cc//cc:defs.bzl", "cc_compile", "cc_link")
+load("@bzd_toolchain_cc//cc:defs.bzl", "cc_link")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
-load("//cc/bdl:defs.bzl", "bdl_to_cc_library")
+load("//cc/bdl/generator:composition.bzl", "generator_cc_composition")
+load("//cc/bdl/generator:library.bzl", "generator_cc_library")
 
 def _get_cc_public_header(target):
     """Get all the direct public headers from a target."""
@@ -13,12 +14,6 @@ def _get_cc_public_header(target):
 
 def _deps_to_info(deps):
     return [{"hdrs": depset([header for dep in deps for header in _get_cc_public_header(dep)])}]
-
-def _library_providers(ctx, generated):
-    return [cc_compile(ctx = ctx, hdrs = generated, deps = ctx.attr._deps_cc + ctx.attr.deps)]
-
-def _library_data(deps):
-    return {"includes": {"": [f.short_path for dep in deps for f in _get_cc_public_header(dep)]}}
 
 def _aspect_files(target):
     return _get_cc_public_header(target)
@@ -61,19 +56,14 @@ extension = {
                 Label("//cc/bdl/generator/impl/adapter:context"),
             ],
             "deps_to_info": _deps_to_info,
+            "generator": generator_cc_composition,
             "output": "{name}.composition.{target}.cc",
             "providers": _composition_providers,
         },
         "display": "C++",
         "library": {
-            "data": _library_data,
-            "deps": [
-                Label("//cc/bdl/generator/impl/adapter:types"),
-            ],
-            "generator": bdl_to_cc_library,
-            "outputs": ["{name}.hh"],
-            "providers": _library_providers,
-            "providers2": [CcInfo],
+            "generator": generator_cc_library,
+            "providers": [CcInfo],
         },
     },
 }

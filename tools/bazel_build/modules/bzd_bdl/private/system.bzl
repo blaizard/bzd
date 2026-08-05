@@ -1,32 +1,17 @@
 """BDL system rules."""
 
-load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "make_composition_language_providers", "precompile_bdl", "transition_platform")
-load("//private:providers.bzl", "BdlSystemInfo", "BdlSystemJsonInfo", "BdlTargetInfo")
+load("@bdl_extension//:extensions.bzl", "extensions")
+load("//private:common.bzl", "aspect_bdl_providers", "precompile_bdl", "transition_platform")
+load("//private:providers.bzl", "BdlCompositionInfo", "BdlInfo", "BdlSystemJsonInfo", "BdlTargetInfo")
 
 visibility(["//..."])
 
-_BDL_SYSTEM_GENERIC_ATTR = {
-    "deps": attr.label_list(
-        doc = "Dependencies for the rule.",
-    ),
-    "platform": None,
-    "system": None,
-    "target": None,
-    "target_name": None,
-    "targets": attr.string_keyed_label_dict(
-        doc = "A dictionary with name and target corresponding to the binaries for this system.",
-        configurable = False,
-    ),
-    "testonly": attr.bool(
-        doc = "Set testonly attribute.",
-        configurable = False,
-    ),
-}
-
-def _bdl_system_impl(ctx):
+def _bdl_composition_impl(ctx):
     # Loop through all the name/target pairs and generate the composition files.
     bdl_providers = {}
     deps = {}
+
+    # Generate the composition per format and per target.
     for name, target in ctx.attr.targets.items():
         target_provider = target[BdlTargetInfo]
         target_name = "{}.{}".format(ctx.label.name, name)
@@ -43,24 +28,13 @@ def _bdl_system_impl(ctx):
         bdl_providers[name] = bdl_provider
         deps[name] = target_provider.deps
 
-    # Generate the composition files.
-    providers = make_composition_language_providers(
-        ctx = ctx,
-        name = ctx.attr.name,
-        deps = ctx.attr.deps,
-        target_deps = deps,
-        target_bdl_providers = bdl_providers,
-    )
+    return [BdlCompositionInfo(
+        deps = deps,
+        bdls = bdl_providers.values() + [dep[BdlInfo] for dep in ctx.attr.deps if BdlInfo in dep],
+    )]
 
-    # JSON provider should always be present.
-    json = {target: data["files"]["json"] for target, data in providers["json"].items()}
-
-    return [BdlSystemInfo(
-        data = providers,
-    ), BdlSystemJsonInfo(json = json)]
-
-_bdl_system = rule(
-    implementation = _bdl_system_impl,
+_bdl_composition = rule(
+    implementation = _bdl_composition_impl,
     doc = """Generate a system from targets.""",
     attrs = {
         "deps": attr.label_list(
@@ -79,56 +53,59 @@ _bdl_system = rule(
             cfg = "exec",
             executable = True,
         ),
-    } | {("_deps_" + name): (attr.label_list(
-        default = data["composition"]["deps"],
-    )) for name, data in library_extensions.items() if "composition" in data},
+    },
 )
 
 def _bdl_binary_impl(ctx):
-    target_provider = ctx.attr.target[BdlTargetInfo]
-    system = ctx.attr.system[BdlSystemInfo]
-    name = ctx.label.name
+    target = ctx.attr.target[BdlTargetInfo]
+    composition = ctx.attr.compositions.get(target.language)
+    if target.language and not composition:
+        fail("Composition for language '{}' was requested, but it is not implemented.".format(target.language))
+    composition_default_info = composition[DefaultInfo] if composition else DefaultInfo(files = depset([]))
 
-    fmt = target_provider.language
-    if fmt in library_extensions:
-        provider = system.data[fmt][ctx.attr.target_name]
-        binary = target_provider.binary
-        if binary:
-            binary_file = ctx.actions.declare_file(ctx.label.name + ".binary")
-            runfiles = ctx.runfiles(
-                files = provider.get("files", {}).values() + ctx.files.data,
-            ).merge(binary[DefaultInfo].default_runfiles)
-            if "runfiles" in provider:
-                runfiles = runfiles.merge(provider["runfiles"])
-            ctx.actions.write(
-                is_executable = True,
-                output = binary_file,
-                content = "{executable} {args} \"$@\"".format(
-                    executable = binary[DefaultInfo].files_to_run.executable.short_path,
-                    args = " ".join(["--{}='{}'".format(key, value.short_path) for key, value in provider.get("files", {}).items()]),
-                ),
-            )
-            providers = [
-                DefaultInfo(executable = binary_file, runfiles = runfiles, files = depset(provider.get("files", {}).values())),
-            ]
-            metadata = []
-        elif "binary" in library_extensions[fmt]:
-            providers, metadata = library_extensions[fmt]["binary"]["build"](ctx, name, provider)
-        else:
-            fail("No binary associated with target language '{}'.".format(fmt))
+    if target.binary:
+        files = composition_default_info.files.to_list()
+        runfiles = ctx.runfiles(
+            files = ctx.files.data + files,
+        ).merge(target.binary[DefaultInfo].default_runfiles)
+        if composition_default_info.default_runfiles:
+            runfiles = runfiles.merge(composition_default_info.default_runfiles)
+        ctx.actions.write(
+            output = ctx.outputs.executable,
+            content = "{executable} {args} \"$@\"".format(
+                executable = target.binary[DefaultInfo].files_to_run.executable.short_path,
+                args = " ".join(["--{}='{}'".format(target.language, f.short_path) for f in files]),
+            ),
+            is_executable = True,
+        )
+        return DefaultInfo(
+            executable = ctx.outputs.executable,
+            runfiles = runfiles,
+            files = depset(files),
+        )
+
+    elif composition_default_info.default_runfiles:
+        ctx.actions.symlink(
+            output = ctx.outputs.executable,
+            target_file = composition_default_info.files_to_run.executable,
+            is_executable = True,
+        )
+        return DefaultInfo(
+            executable = ctx.outputs.executable,
+            runfiles = composition_default_info.default_runfiles,
+        )
 
     else:
-        fail("Unsupported target language '{}'.".format(fmt))
-
-    return [
-        OutputGroupInfo(metadata = metadata),
-        ctx.attr.system[BdlSystemJsonInfo],
-    ] + providers
+        fail("No binary associated with target '{}' -> '{}'.".format(ctx.label, ctx.attr.target_name))
 
 _bdl_binary = rule(
     implementation = _bdl_binary_impl,
     doc = """Create a binary from a system rule.""",
     attrs = {
+        "compositions": attr.string_keyed_label_dict(
+            mandatory = True,
+            doc = "The composition per language.",
+        ),
         "data": attr.label_list(
             allow_files = True,
             doc = "Files to be added to the runfiles.",
@@ -136,11 +113,6 @@ _bdl_binary = rule(
         "platform": attr.label(
             default = None,
             doc = "The platform used for the transition of this rule.",
-        ),
-        "system": attr.label(
-            mandatory = True,
-            doc = "The system rule associated with this target.",
-            providers = [BdlSystemInfo, BdlSystemJsonInfo],
         ),
         "target": attr.label(
             mandatory = True,
@@ -154,26 +126,28 @@ _bdl_binary = rule(
         "_allowlist_function_transition": attr.label(
             default = Label("@bazel_tools//tools/allowlists/function_transition_allowlist"),
         ),
-        "_debug": attr.label(
-            default = Label("@@//tools/bazel_build/settings/debug"),
-        ),
-        "_executor": attr.label(
-            default = Label("@@//tools/bazel_build/settings/executor"),
-        ),
-        "_map_analyzer_script": attr.label(
-            executable = True,
-            cfg = "exec",
-            default = Label("@bzd_python//bzd/apps/map_analyzer"),
-        ),
-    } | {("_metadata_" + name): (attr.label_list(
-        default = data["binary"]["metadata"],
-    )) for name, data in library_extensions.items() if "binary" in data},
-    toolchains = [
-        "@rules_cc//cc:toolchain_type",
-    ],
-    fragments = ["cpp"],
+    },
     cfg = transition_platform,
     executable = True,
+)
+
+def _bdl_system_impl(ctx):
+    return [
+        BdlSystemJsonInfo(
+            json = {target_name: target[DefaultInfo].files.to_list()[0] for target_name, target in ctx.attr.json_compositions.items()},
+        ),
+    ]
+
+_bdl_system = rule(
+    implementation = _bdl_system_impl,
+    doc = """Create a system.""",
+    attrs = {
+        "json_compositions": attr.string_keyed_label_dict(
+            mandatory = True,
+            doc = "The json composition for each target.",
+        ),
+    },
+    provides = [BdlSystemJsonInfo],
 )
 
 def _target_to_platform(target):
@@ -182,30 +156,63 @@ def _target_to_platform(target):
         return None
     return "{}.platform".format(str(Label(target)))
 
-def _bdl_system_macro_impl(name, visibility, targets, testonly, deps, **kwargs):
-    _bdl_system(
-        name = name,
+def _bdl_system_macro_impl(name, visibility, targets, testonly, deps, data, **kwargs):
+    _bdl_composition(
+        name = "{}.composition".format(name),
         targets = targets,
-        testonly = testonly,
         visibility = visibility,
         deps = deps,
+        testonly = testonly,
         tags = ["manual"],
     )
 
     for target_name, target in targets.items():
+        compositions = {}
+        for fmt, extension in extensions.items():
+            if "composition" in extension:
+                compositions[fmt] = "{}.{}.{}.composition".format(name, target_name, fmt)
+                extension["composition"]["generator"](
+                    name = compositions[fmt],
+                    target_name = target_name,
+                    target = target,
+                    composition = "{}.composition".format(name),
+                    deps = deps,
+                    testonly = testonly,
+                    tags = ["manual"],
+                )
         _bdl_binary(
             name = "{}.{}".format(name, target_name),
             platform = _target_to_platform(target),
-            target = target,
             target_name = target_name,
+            target = target,
             testonly = testonly,
-            system = name,
+            data = data,
+            compositions = compositions,
             visibility = visibility,
-            **kwargs
         )
+
+    _bdl_system(
+        name = name,
+        json_compositions = {target_name: ":{}.{}.json.composition".format(name, target_name) for target_name in targets.keys()},
+        testonly = testonly,
+        visibility = visibility,
+        **kwargs
+    )
 
 bdl_system = macro(
     implementation = _bdl_system_macro_impl,
-    inherit_attrs = _bdl_binary,
-    attrs = _BDL_SYSTEM_GENERIC_ATTR,
+    inherit_attrs = _bdl_system,
+    attrs = {
+        "data": attr.label_list(
+            doc = "Data for the rule.",
+        ),
+        "deps": attr.label_list(
+            doc = "Dependencies for the rule.",
+        ),
+        "json_compositions": None,
+        "targets": attr.string_keyed_label_dict(
+            doc = "A dictionary with name and target corresponding to the binaries for this system.",
+            configurable = False,
+        ),
+    },
 )
