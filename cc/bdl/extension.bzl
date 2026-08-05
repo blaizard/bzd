@@ -1,6 +1,5 @@
 """C++ extension for bdl rules."""
 
-load("@bzd_toolchain_cc//cc:defs.bzl", "cc_link")
 load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("//cc/bdl/generator:composition.bzl", "generator_cc_composition")
 load("//cc/bdl/generator:library.bzl", "generator_cc_library")
@@ -12,58 +11,18 @@ def _get_cc_public_header(target):
         return []
     return target[CcInfo].compilation_context.direct_public_headers
 
-def _deps_to_info(deps):
-    return [{"hdrs": depset([header for dep in deps for header in _get_cc_public_header(dep)])}]
-
 def _aspect_files(target):
     return _get_cc_public_header(target)
 
-def _composition_data(info, info_per_target):
-    def _info_to_includes(infos):
-        return [hdr.short_path for hdr in depset(transitive = [info["hdrs"] for info in infos]).to_list()]
-
-    return {"includes": {
-        "all": _info_to_includes(info),
-    } | {target: _info_to_includes(info) for target, info in info_per_target.items()}}
-
-def _composition_providers(_ctx, output, deps):
-    return {"deps": deps, "srcs": [output]}
-
-def _binary_build(ctx, name, provider):
-    binary_file, metadata_files = cc_link(ctx, name = name, srcs = provider["srcs"], deps = provider["deps"], map_analyzer = ctx.attr._map_analyzer_script)
-
-    return [DefaultInfo(
-        executable = binary_file,
-    ), coverage_common.instrumented_files_info(
-        ctx,
-        dependency_attributes = ["deps"],
-    )], ctx.files._metadata_cc + metadata_files
-
 extension = {
-    "cc": {
-        "aspect_files": {
-            "hdrs": _aspect_files,
-        },
-        "binary": {
-            "build": _binary_build,
-            "metadata": [
-                Label("//cc/bdl/assets:metadata_json"),
-            ],
-        },
-        "composition": {
-            "data": _composition_data,
-            "deps": [
-                Label("//cc/bdl/generator/impl/adapter:context"),
-            ],
-            "deps_to_info": _deps_to_info,
-            "generator": generator_cc_composition,
-            "output": "{name}.composition.{target}.cc",
-            "providers": _composition_providers,
-        },
-        "display": "C++",
-        "library": {
-            "generator": generator_cc_library,
-            "providers": [CcInfo],
-        },
+    "aspect_files": {
+        "hdrs": _aspect_files,
+    },
+    "composition": {
+        "generator": generator_cc_composition,
+    },
+    "library": {
+        "generator": generator_cc_library,
+        "providers": [CcInfo],
     },
 }

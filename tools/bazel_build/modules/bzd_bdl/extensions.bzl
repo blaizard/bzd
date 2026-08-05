@@ -19,7 +19,7 @@ def _bdl_extension_impl(module_ctx):
             )
             deps_extensions.append(register.extension)
 
-    extensions_content += """extensions = {}\n""".format(" | ".join(extensions.keys()))
+    extensions_content += """extensions = {{ {} }}\n""".format(", ".join(["'{}': {}".format(name, name) for name in extensions.keys()]))
 
     bzd_repository_maker(
         name = "bdl_extension",

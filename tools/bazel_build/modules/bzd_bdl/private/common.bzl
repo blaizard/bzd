@@ -2,15 +2,13 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
-load("@rules_cc//cc:defs.bzl", "CcInfo")
 load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
-load("//private/extensions:json.bzl", extension_json = "extension")
 
 visibility(["//..."])
 
 # ---- Extensions ----
 
-library_extensions = {} | extension_json | extensions
+library_extensions = {} | extensions
 
 # ---- Private Providers ----
 
@@ -177,105 +175,3 @@ def precompile_bdl(ctx, srcs, deps, output_dir = None, namespace = None, presets
     files = depset([bdl["output"] for bdl in metadata], transitive = [input_files])
 
     return BdlInfo(sources = sources, files = files, search_paths = search_paths, direct = direct), metadata
-
-def make_composition_language_providers(ctx, name, deps, target_deps = None, target_bdl_providers = None):
-    """Compose the system.
-
-    Args:
-        ctx: The context of the action running the composition.
-        name: The name of the generated output.
-        deps: The dependencies associated with this action, it shall contain BdlInfo and language specific providers
-              such as CcInfo, etc.
-        target_deps: Dictionary keyed by target name of the dependencies.
-        target_bdl_providers: Dictionary keyed by target of extra BdlInfo to be added.
-
-    Returns:
-        Returns provider per format and target in the following form:
-        {
-            fmt: {
-                target: {
-                    str1: ...,
-                    str2: ....
-                }
-            }
-        }
-        for example:
-        {
-            json: {
-                machine1: {
-                    hello: file1
-                }
-            }
-        }
-    """
-
-    # Set the default value for optional arguments.
-    target_deps = target_deps if target_deps else {}
-    target_bdl_providers = target_bdl_providers if target_bdl_providers else {}
-
-    # Contains all BDL providers following this schema: List[Pair[BdlInfo, Optional[target]]]
-    bdl_providers = [(provider, name) for name, provider in target_bdl_providers.items()] + [(dep[BdlInfo], None) for dep in deps if BdlInfo in dep]
-
-    # Source list with the following format <path>@<precompiled>@<target> (where @<target> is optional)
-    sources = ["{}@{}".format(source[0].path, source[1].path) for provider, target in bdl_providers for source in provider.sources.to_list()]
-
-    # Contains all bdl files, this is used for debugging purpose.
-    files = depset(transitive = [provider.files for provider, target in bdl_providers])
-
-    search_paths = sets.to_list(sets.make([sp for provider, target in bdl_providers for sp in provider.search_paths]))
-
-    # Contains all deps grouped by target.
-    combined_deps = dict({"all": deps}, **target_deps)
-
-    # List all targets
-    targets = [target for target in target_bdl_providers.keys()]
-
-    # If there is no files to process, ignore.
-    if not files:
-        return [CcInfo()]
-
-    # Create the language specific data file.
-    def deps_to_info(fmt, deps):
-        if "composition" in library_extensions[fmt] and "deps_to_info" in library_extensions[fmt]["composition"]:
-            return library_extensions[fmt]["composition"]["deps_to_info"](deps)
-        return {}
-
-    language_specific_data = {}
-    for fmt, data in library_extensions.items():
-        if "composition" in data:
-            language_specific_data[fmt] = data["composition"]["data"](deps_to_info(fmt, deps), {target: deps_to_info(fmt, deps) for target, deps in target_deps.items()})
-
-    # Write the language specific data file.
-    data_file = ctx.actions.declare_file("{}.data.json".format(name))
-    ctx.actions.write(
-        output = data_file,
-        content = json.encode(language_specific_data),
-    )
-
-    system_providers = {}
-    for fmt, data in library_extensions.items():
-        if "composition" in data:
-            # Generate the expected output files.
-            outputs = {target: ctx.actions.declare_file(data["composition"]["output"].format(name = name, target = target)) for target in (targets if targets else ["all"])}
-
-            ctx.actions.run(
-                # files also needs to be passed into argument for debugging purpose, in order to display a nice error message.
-                inputs = depset([data_file], transitive = [files]),
-                outputs = outputs.values(),
-                progress_message = "Generating {} composition for {}".format(data["display"], ctx.label),
-                arguments = make_bdl_arguments(
-                    stage = "compose",
-                    format = fmt,
-                    search_paths = search_paths,
-                    targets = targets,
-                    output = "{}/{}.composition".format(outputs.values()[0].dirname, name),
-                    data = data_file,
-                    args = sources,
-                ),
-                executable = ctx.attr._bdl.files_to_run,
-            )
-
-            deps = combined_deps["all"] + ctx.attr._deps_cc
-            system_providers[fmt] = {target: data["composition"]["providers"](ctx, output, deps + ([] if target == "all" else combined_deps.get(target, []))) for target, output in outputs.items()}
-
-    return system_providers
