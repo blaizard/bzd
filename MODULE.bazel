@@ -112,6 +112,10 @@ bdl_extension.register(
     name = "cc",
     extension = "//cc/bdl:extension.bzl",
 )
+bdl_extension.register(
+    name = "rust",
+    extension = "//rust/bdl:extension.bzl",
+)
 
 # NodeJs
 

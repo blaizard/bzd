@@ -1,0 +1,19 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+)
+
+rust_library(
+    name = "implementation",
+    srcs = [
+        "implementation.rs",
+    ],
+    deps = [
+        ":interface",
+    ],
+)

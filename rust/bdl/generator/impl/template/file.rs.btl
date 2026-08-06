@@ -1,0 +1,21 @@
+{% for data in nestedList %}
+	{% if not data.isExtern %}
+		{% if data.category == Category.interface %}
+pub trait {{ data.name }} {
+{% for method in data.interface.methodList %}
+	{% if method.isSymbol %}
+    fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %}) -> {{ method.symbol | symbolToStr }};
+	{% else %}
+    fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %});
+	{% end %}
+{% end %}
+}
+		{%- elif data.category == Category.struct %}
+{# TODO: struct support - out of scope #}
+		{%- elif data.category == Category.component %}
+{# TODO: component support - out of scope #}
+		{%- elif data.category == Category.composition %}
+{# TODO: composition support - out of scope #}
+		{%- end -%}
+	{%- end -%}
+{%- end -%}

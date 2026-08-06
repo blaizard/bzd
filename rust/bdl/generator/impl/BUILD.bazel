@@ -1,0 +1,21 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "visitor",
+    srcs = [
+        "builtins.py",
+        "symbol.py",
+        "visitor.py",
+    ],
+    data = [
+        "template/file.rs.btl",
+    ],
+    visibility = [
+        "//rust/bdl:__subpackages__",
+    ],
+    deps = [
+        "@bzd_bdl//bdl:visitor",
+        "@bzd_python//bzd/parser",
+        "@bzd_python//bzd/template",
+    ],
+)
