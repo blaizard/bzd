@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
-load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library")
 
 def _bzd_nodejs_web_transition_impl(_settings, _attr):
     return {"//:build_type": "nodejs_web"}
@@ -123,9 +123,8 @@ def _bzd_nodejs_web_library_impl(name, visibility, srcs, packages, deps, apis, t
 
     _ = data  # @unused
 
-    bzd_nodejs_install(
-        name = name + ".install",
-        tags = ["manual", "nodejs"],
+    bzd_nodejs_library(
+        name = name + ".library",
         srcs = srcs,
         apis = apis,
         packages = [
@@ -137,6 +136,13 @@ def _bzd_nodejs_web_library_impl(name, visibility, srcs, packages, deps, apis, t
         ] + packages,
         deps = deps,
         tools = tools,
+        tags = ["manual", "nodejs"],
+    )
+
+    bzd_nodejs_install(
+        name = name + ".install",
+        library = name + ".library",
+        tags = ["manual", "nodejs"],
     )
 
     _vite_bundle(

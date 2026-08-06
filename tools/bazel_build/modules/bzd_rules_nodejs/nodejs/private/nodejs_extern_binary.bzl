@@ -1,7 +1,7 @@
 """NodeJs external binary rule."""
 
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
-load("//nodejs:private/nodejs_install.bzl", "bzd_nodejs_make_node_modules")
+load("//nodejs:private/nodejs_library.bzl", "bzd_nodejs_make_node_modules")
 load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 def _bzd_nodejs_extern_binary_impl(ctx):

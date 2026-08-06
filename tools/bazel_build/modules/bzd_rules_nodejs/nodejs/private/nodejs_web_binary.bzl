@@ -2,7 +2,7 @@
 
 load("@bzd_lib//:web_server_binary.bzl", "bzd_web_server_binary")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
-load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library")
 load("//nodejs:private/nodejs_web_library.bzl", "bzd_nodejs_web_transition", "vite_run")
 
 def _vite_bundle_impl(ctx):
@@ -122,9 +122,8 @@ _vite_bundle = rule(
 def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, tools, tags, **kwargs):
     """Create a web application with NodeJs."""
 
-    bzd_nodejs_install(
-        name = name + ".install",
-        tags = ["manual", "nodejs"],
+    bzd_nodejs_library(
+        name = name + ".library",
         srcs = srcs,
         apis = apis,
         packages = [
@@ -136,6 +135,13 @@ def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, to
         ] + packages,
         deps = deps,
         tools = tools,
+        tags = ["manual", "nodejs"],
+    )
+
+    bzd_nodejs_install(
+        name = name + ".install",
+        library = name + ".library",
+        tags = ["manual", "nodejs"],
     )
 
     _vite_bundle(

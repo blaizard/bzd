@@ -3,7 +3,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//nodejs:private/nodejs_install.bzl", "BzdNodeJsInstallInfo", "bzd_nodejs_install")
-load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS")
+load("//nodejs:private/nodejs_library.bzl", "LIBRARY_ATTRS", "bzd_nodejs_library")
 
 _COMMON_EXEC_ATTRS = {
     "data": attr.label_list(
@@ -59,7 +59,7 @@ def _bzd_nodejs_executable_impl(ctx):
 
     # Look for the entry point.
     paths = {
-        install.path_mapping[ctx.file.main].short_path: "main",
+        install.file_mapping[ctx.file.main].short_path: "main",
     }
 
     # Gather toolchain executable.
@@ -132,15 +132,21 @@ _bzd_nodejs_test = rule(
 )
 
 def _bzd_nodejs_binary_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+    bzd_nodejs_library(
+        name = name + ".library",
+        apis = apis,
+        srcs = srcs,
+        deps = deps,
+        data = data,
+        tools = tools,
+        packages = packages,
+        tags = ["nodejs", "manual"],
+    )
+
     bzd_nodejs_install(
         name = name + ".install",
-        data = data,
-        deps = deps,
-        packages = packages,
-        srcs = srcs,
-        apis = apis,
+        library = name + ".library",
         tags = ["nodejs", "manual"],
-        tools = tools,
     )
 
     _bzd_nodejs_binary(
@@ -162,15 +168,21 @@ bzd_nodejs_binary = macro(
 )
 
 def _bzd_nodejs_test_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+    bzd_nodejs_library(
+        name = name + ".library",
+        apis = apis,
+        srcs = srcs,
+        deps = deps,
+        data = data,
+        tools = tools,
+        packages = packages,
+        tags = ["nodejs", "manual"],
+    )
+
     bzd_nodejs_install(
         name = name + ".install",
-        data = data,
-        deps = deps,
-        packages = packages,
-        srcs = srcs,
-        apis = apis,
+        library = name + ".library",
         tags = ["nodejs", "manual"],
-        tools = tools,
     )
 
     _bzd_nodejs_test(
