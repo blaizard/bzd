@@ -23,16 +23,22 @@ runs:
     steps:
         - name: "Post comment to Gitea"
           shell: bash
+          env:
+              BODY_FILE: ${{ inputs.body_file }}
+              TOKEN: ${{ inputs.token }}
+              API_URL: ${{ inputs.api_url }}
+              REPOSITORY: ${{ inputs.repository }}
+              ISSUE_NUMBER: ${{ inputs.issue_number }}
           run: |
               set -euo pipefail
-              if [ ! -s "${{ inputs.body_file }}" ]; then
-                  echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
+              if [ ! -s "$BODY_FILE" ]; then
+                  echo "Error: Body file '$BODY_FILE' is missing or empty."
                   exit 1
               fi
-              payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
+              payload=$(jq -n --rawfile body "$BODY_FILE" '{body: $body}')
               curl -sS --fail-with-body -X POST \
-                  -H "Authorization: token ${{ inputs.token }}" \
+                  -H "Authorization: token $TOKEN" \
                   -H "Content-Type: application/json" \
                   -d "$payload" \
-                  "${{ inputs.api_url }}/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
+                  "$API_URL/repos/$REPOSITORY/issues/$ISSUE_NUMBER/comments"
               echo "SUCCESS: comment created."
