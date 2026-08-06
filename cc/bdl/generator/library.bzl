@@ -81,10 +81,10 @@ def _generator_cc_library_impl(
 generator_cc_library = macro(
     doc = "Convert a bdl library into a C++ library.",
     implementation = _generator_cc_library_impl,
+    inherit_attrs = "common",
     attrs = {
         "bdl": attr.label(mandatory = True, doc = "The bdl target to be converted to a C++ library."),
         "deps": attr.label_list(doc = "The dependencies from the bdl file."),
         "srcs": attr.label_list(doc = "The bdl source files.", configurable = False),
-        "tags": attr.string_list(doc = "Tags for the generated C++ library.", configurable = False),
     },
 )

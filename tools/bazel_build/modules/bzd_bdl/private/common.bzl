@@ -2,7 +2,7 @@
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bdl_extension//:extensions.bzl", "extensions")
-load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
+load("//private:providers.bzl", "BdlInfo")
 
 visibility(["//..."])
 
@@ -10,32 +10,12 @@ visibility(["//..."])
 
 library_extensions = {} | extensions
 
-# ---- Private Providers ----
-
-_BdlCompositionInfo = provider(
-    doc = "Provider to gather language specific data for composition.",
-    fields = {
-        "data": "Data specific keyed by extension.",
-    },
-)
-
 # ---- Aspects ----
 
 def _aspect_bdl_providers_impl(target, ctx):
     """Aspects to gather all bdl dependency outputs."""
 
-    # Are considered composition public headers when the target is not a BDL library but has a bdl library as a direct dependency.
-    # Then it means it relies on a BDL interface.
     has_deps = hasattr(ctx.rule.attr, "deps")
-    is_direct = (BdlTagInfo not in target) and has_deps and (any([dep for dep in ctx.rule.attr.deps if BdlTagInfo in dep]))
-    transitive_composition = [dep[_BdlCompositionInfo] for dep in ctx.rule.attr.deps if _BdlCompositionInfo in dep] if has_deps else []
-    provider_data = {fmt: {} for fmt in library_extensions.keys()}
-    for fmt, data in library_extensions.items():
-        if "aspect_files" in data:
-            for key, aspect in data["aspect_files"].items():
-                data = aspect(target) if is_direct else []
-                provider_data[fmt][key] = depset(data, transitive = [t.data[fmt].get(key, depset()) for t in transitive_composition])
-
     if BdlInfo not in target and has_deps:
         return [
             BdlInfo(
@@ -43,10 +23,9 @@ def _aspect_bdl_providers_impl(target, ctx):
                 files = depset(transitive = [dep[BdlInfo].files for dep in ctx.rule.attr.deps if BdlInfo in dep]),
                 search_paths = sets.to_list(sets.make([d for dep in ctx.rule.attr.deps if BdlInfo in dep for d in dep[BdlInfo].search_paths])),
             ),
-            _BdlCompositionInfo(data = provider_data),
         ]
 
-    return [_BdlCompositionInfo(data = provider_data)]
+    return []
 
 aspect_bdl_providers = aspect(
     implementation = _aspect_bdl_providers_impl,

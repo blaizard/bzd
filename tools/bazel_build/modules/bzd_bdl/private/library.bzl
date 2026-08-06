@@ -2,7 +2,7 @@
 
 load("@bdl_extension//:extensions.bzl", "extensions")
 load("//private:common.bzl", "aspect_bdl_providers", "precompile_bdl")
-load("//private:providers.bzl", "BdlInfo", "BdlTagInfo")
+load("//private:providers.bzl", "BdlInfo")
 
 visibility(["//..."])
 
@@ -45,7 +45,6 @@ _bdl_precompile_library = rule(
 def _aggregate_library_providers_impl(ctx):
     providers = [
         ctx.attr.bdl[BdlInfo],
-        BdlTagInfo(),
     ]
     for fmt, rule in ctx.attr.generators.items():
         for provider in extensions[fmt]["library"]["providers"]:

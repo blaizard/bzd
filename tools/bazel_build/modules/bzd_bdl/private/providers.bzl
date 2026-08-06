@@ -2,11 +2,6 @@
 
 visibility(["//..."])
 
-BdlTagInfo = provider(
-    doc = "Empty provider to identify a BDL library.",
-    fields = [],
-)
-
 BdlInfo = provider(
     doc = "Provider for bdl files.",
     fields = {

@@ -1,6 +1,6 @@
 # System
 
-A system is a group or targets. It constitutes one or multiple binaries that are ready for deployment.
+A system is a group of targets. It constitutes one or multiple binaries that are ready for deployment.
 It is the most top level view of the composition.
 
 ## Definition
@@ -8,47 +8,71 @@ It is the most top level view of the composition.
 Defining a system is done with Bazel through a rule, as follow:
 
 ```bzl
-bdl_system(
-    nae = "application",
-    targets = {
-        "esp32": "//cc/targets/esp32",
-        "hpc": "//cc/targets/linux:x86_64_clang",
-        "script": "//python/targets/linux",
-    },
-    deps = [
-        "//:lib"
-    ],
-)
-```
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
 
-This tells that this system contains 3 binaries, the first one runs on a C++ `esp32` target platform and which
-executors are referred under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
-under the namespace `hpc`. The third one, is a python binary that runs under `linux` and defined under `script` namespace.
-
-Under the hood, this rule will invoke 1 composition process and 3 binary rules that uses the same composition BDL files.
-
-To describe a target, the user should use the following rule:
-
-```bdl
-bdl_target(
-    name = "x86_64_clang",
-    compositions = [
+bdl_library(
+    name = "composition",
+    srcs = [
         "composition.bdl",
     ],
-    platform = "//platform:linux_x86_64_clang",
-    language = "cc",
+    implementation = {
+        "cc": "//path/to/my/implementation",
+    },
+)
+
+bdl_system(
+    name = "application",
+    targets = {
+        "esp32": "//cc/targets/esp32:gcc",
+        "hpc": "//cc/targets/linux:x86_64_clang",
+    },
     deps = [
-        ":lib",
-    ]
+        ":composition",
+    ],
 )
 ```
+
+This tells that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and which
+executors are referred under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
+under the namespace `hpc`.
+
+The `deps` are `bdl_library` targets that contain the composition BDL files shared by all the targets of the system.
+
+Under the hood, this macro expands into several rules, one composition process per target, one binary per target and one
+system rule aggregating the results, all of them using the same composition BDL files.
+
+## Target
+
+Each entry of the `targets` dictionary references a `bdl_target`. A target describes a binary: its composition files,
+its platform, its language and its dependencies.
+
+```bzl
+load("@bzd_bdl//:defs.bzl", "bdl_target")
+
+bdl_target(
+    name = "x86_64_clang",
+    composition = [
+        "composition.bdl",
+    ],
+    language = "cc",
+    platform = "@clang//:platform-linux-x86_64",
+    deps = [
+        ":main",
+    ],
+    visibility = ["//visibility:public"],
+)
+```
+
+Note that a target whose name ends with `auto` must not define a `platform` attribute. In this case the platform is
+provided by platform specific variants that inherit the composition, deps and language via the `parent` attribute.
+A `bdl_target` always generates a `<name>.platform` alias used for the platform transition of the resulting binary.
 
 ## Process
 
 A system rule will perform the following operations to generate the various binaries for the system.
-Givien the following targets:
+Given the following targets:
 
-```bdl
+```bzl
 bdl_target(
     name = "a",
     composition = [
@@ -57,9 +81,10 @@ bdl_target(
     deps = [
         "//:a_lib",
     ],
+    language = "cc",
     platform = "@target_platform//:linux",
-    language = "cc"
 )
+
 bdl_target(
     name = "b",
     composition = [
@@ -68,9 +93,10 @@ bdl_target(
     deps = [
         "//:b_lib",
     ],
+    language = "cc",
     platform = "@target_platform//:windows",
-    language = "cc"
 )
+
 bdl_system(
     name = "app",
     targets = {
@@ -78,33 +104,43 @@ bdl_system(
         "win": ":b",
     },
     deps = [
-        "//:lib"
+        "//:lib",
     ],
 )
 ```
 
 ```mermaid
 flowchart TB
-    subgraph ide1 [Precompile targets compositions]
+    subgraph ide0 [Composition]
     direction TB
-    A[`a_composition`\nassociate the namespace `hpc`]
-    B[`b_composition`\nassociate the namespace `win`]
+    A[`app.composition`\nprecompile each target composition,\nassociate the namespace `hpc` and `win`]
+    B[`app.hpc.cc.composition`\ngenerate the C++ composition for `hpc`]
+    C[`app.win.cc.composition`\ngenerate the C++ composition for `win`]
+    A --> B
+    A --> C
     end
-    C[Compose all bdl files\n`a_composition`, `:a_lib`, `b_composition`, `:b_lib` and `:lib`]
-    D[Generate all C++/Python/etc. files for the composition.]
-    subgraph ide2 [Compile]
+    subgraph ide1 [Binary]
     direction TB
-    E[Compile `hpc` with platform `:linux`\n`a`, `app` and `hpc.*` executors from composition]
-    F[Compile `win` with platform `:windows`\n`b`, `app` and `win.*` executors from composition]
+    D[`app.hpc`\nwrap the composition into the `hpc` binary\nwith platform `:linux`]
+    E[`app.win`\nwrap the composition into the `win` binary\nwith platform `:windows`]
     end
-    G[Binary for `hpc`]
-    H[Binary for `win`]
-    A & B --> C
-    C --> D
-    D --> E & F
-    E --> G
-    F --> H
+    F[`app`\naggregate the json composition for each target]
+    B --> D
+    C --> E
+    D --> F
+    E --> F
 ```
+
+The first step precompiles the composition BDL files of every target, injecting each target name as the namespace in
+which its executors are resolved. This single step is shared by all targets.
+
+Then, for each registered language extension, a composition generator produces the language specific composition output.
+For example the `cc` extension generates a `cc_binary` from the composition, while the `json` extension generates the
+json representation of the system. This is done per target, with the platform transition applied to the binary.
+
+Finally, one `_bdl_binary` rule per target wraps the generated composition into the actual binary using the target's
+`binary` executable when set, and a `_bdl_system` rule aggregates the json compositions of every target into a
+`BdlSystemJsonInfo` provider, available to downstream rules such as deployment.
 
 ## Parameters
 
