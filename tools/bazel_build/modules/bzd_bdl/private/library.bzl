@@ -86,6 +86,7 @@ def _bdl_library_impl(name, visibility, srcs, deps, implementation, **kwargs):
                 bdl = "{}.precompile".format(name),
                 srcs = srcs,
                 deps = deps + ([implementation[fmt]] if fmt in implementation else []),
+                tags = ["manual"],
             )
 
     _aggregate_library_providers(

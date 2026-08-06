@@ -131,7 +131,7 @@ def bzd_nodejs_create_apis(ctx, apis, base_dir_name):
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
-        The generated API file
+        The generated API file.
     """
 
     api = ctx.actions.declare_file("{}/api.json".format(base_dir_name))
@@ -221,7 +221,7 @@ def _bzd_nodejs_library_impl(ctx):
     tools = [tool[DefaultInfo].default_runfiles.files for tool in ctx.attr.tools]
     data = depset(ctx.files.data, transitive = [deps_providers.data] + tools)
     packages = depset(ctx.attr.packages, transitive = [deps_providers.packages])
-    apis = depset(ctx.attr.apis, transitive = [deps_providers.apis])
+    apis = depset(ctx.files.apis, transitive = [deps_providers.apis])
     file_locations = deps_providers.file_locations
     file_locations_srcs = [(f, f, _file_to_path(f)) for f in ctx.files.srcs]
 

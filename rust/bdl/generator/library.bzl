@@ -4,11 +4,22 @@ load("@bzd_bdl//:providers.bzl", "BdlInfo")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 def label_to_crate_name(label):
-    """Convert a bazel label into a crate name."""
+    """Convert a bazel label into a crate name.
+
+    Args:
+        label: The label to be converted.
+
+    Returns:
+        A sanitized and safe to use crate name.
+    """
 
     if type(label) == "string":
         label = Label(label)
-    return label.name
+
+    name = label.name
+    sanitized_name = "".join([c if c.isalnum() else "_" for c in name.elems()])
+
+    return sanitized_name
 
 def _rust_generate_headers_impl(ctx):
     info = ctx.attr.bdl[BdlInfo]
