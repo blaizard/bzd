@@ -10,14 +10,14 @@ def _rust_binary_impl(name, visibility, crate_name, tags, **kwargs):
     rust_binary_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
-        tags = tags,
+        tags = (tags or []) + ["manual"],
         **kwargs
     )
     _bzd_runner_rust_binary(
         name = name,
         binary = ":{}.original".format(name),
         visibility = visibility,
-        tags = tags,
+        tags = (tags or []) + ["rust"],
     )
 
 rust_binary = macro(
@@ -40,7 +40,7 @@ def _rust_test_impl(name, visibility, crate_name, deps, tags, target, **kwargs):
         name = name,
         binary = ":{}.original".format(name),
         visibility = visibility,
-        tags = tags,
+        tags = (tags or []) + ["rust"],
     )
 
 rust_test = macro(

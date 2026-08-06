@@ -77,7 +77,7 @@ build:remote --remote_download_minimal
 # local
 build:local --remote_executor=
 
-# Select only C++ targets
+# C++ targets
 build --build_tag_filters=-cc-coverage
 test --test_tag_filters=-cc-coverage
 build:cc --build_tag_filters=cc,-cc-coverage
@@ -95,7 +95,7 @@ build --copt=-Wextra-semi
 build --copt=-Wnull-dereference
 build --copt=-Wswitch-enum
 
-# Select only Python targets
+# Python targets
 build:py --build_tests_only
 test:py --test_lang_filters=py
 # Note: coverage for python seems to be broken, waiting for https://github.com/bazelbuild/rules_python/pull/977 to land.
@@ -103,10 +103,14 @@ test:py --test_lang_filters=py
 # Use hermetic python interpreter for bootstrap script also, see: https://github.com/bazel-contrib/rules_python/issues/2727
 # common --@rules_python//python/config_settings:bootstrap_impl=script
 
-# Select only NodeJs targets
+# NodeJs targets
 build:nodejs --build_tag_filters=nodejs
 test:nodejs --test_tag_filters=nodejs
 coverage:nodejs --test_env=LCOV_MERGER=/bin/true
+
+# Rust targets
+build:rust --build_tag_filters=rust
+test:rust --test_tag_filters=rust
 
 # Add stamping
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
