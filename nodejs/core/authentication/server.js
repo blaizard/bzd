@@ -59,7 +59,7 @@ export default class AuthenticationServer {
 		if (!maybeSession) {
 			return false;
 		}
-		if (scopes) {
+		if (scopes && scopes.length > 0) {
 			if (!maybeSession.getScopes().matchAny(scopes)) {
 				return false;
 			}
