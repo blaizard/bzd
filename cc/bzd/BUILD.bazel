@@ -1,0 +1,12 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
+
+doc_library(
+    name = "documentation",
+    srcs = [
+        ("**", "//cc/bzd/algorithm:documentation"),
+        ("**", "//cc/bzd/container:documentation"),
+        ("Core", "//cc/bzd/core:documentation"),
+        ("Utility", "//cc/bzd/utility:documentation"),
+    ],
+    visibility = ["//cc:__pkg__"],
+)

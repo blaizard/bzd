@@ -7,18 +7,10 @@ doc_library(
         ("Syntax", "syntax.md"),
         ("Components", "components.md"),
         ("Build", "build.md"),
-        ("Generators", ":generators"),
         ("Library", "library.md"),
         ("Executors", "executors.md"),
         ("Gateway", "gateway.md"),
         ("System", "system.md"),
     ],
     visibility = ["//visibility:public"],
-)
-
-doc_library(
-    name = "generators",
-    srcs = [
-        ("C++", "cc.md"),
-    ],
 )

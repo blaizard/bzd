@@ -1,4 +1,13 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Logger", "README.md"),
+    ],
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "logger",

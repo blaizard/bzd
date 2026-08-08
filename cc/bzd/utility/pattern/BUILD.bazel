@@ -1,4 +1,4 @@
-load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_library")
 
@@ -91,10 +91,14 @@ cc_library(
     ],
 )
 
-doc_library(
+doc_binary(
     name = "documentation",
     srcs = [
-        ("Pattern", "README.md"),
+        ("Overview", "README.md"),
+        ("Pattern String Syntax", "docs/syntax.md"),
+        ("Formatting (toString / toStream)", "docs/formatting.md"),
+        ("Parsing (fromString / fromStream)", "docs/parsing.md"),
+        ("Custom Specializations", "docs/specializations.md"),
     ],
-    visibility = ["//cc:__pkg__"],
+    visibility = ["//visibility:public"],
 )

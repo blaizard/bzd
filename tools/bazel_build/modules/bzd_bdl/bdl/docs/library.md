@@ -83,4 +83,4 @@ The `implementation` attribute of the library is passed as a dependency to the g
 the generated code is linked against the implementation provided by the user.
 
 Consumers of a library therefore use the language artifacts they need, for example a C++ binary includes the generated
-headers and links against the generated `cc_library`, see the [C++](cc.md) generator for details.
+headers and links against the generated `cc_library`, see the C++ generator for details.

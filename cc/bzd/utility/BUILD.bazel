@@ -1,3 +1,4 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_library")
 
@@ -319,4 +320,12 @@ cc_library(
     deps = [
         "//cc/bzd/type_traits:iterator",
     ],
+)
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Pattern", "//cc/bzd/utility/pattern:documentation"),
+    ],
+    visibility = ["//visibility:public"],
 )

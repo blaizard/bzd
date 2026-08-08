@@ -1,5 +1,19 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//cc/bdl:cc.bzl", "bzd_cc_library")
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Overview", "README.md"),
+        ("**", "//cc/bzd/core/assert:documentation"),
+        ("**", "//cc/bzd/core/async:documentation"),
+        ("**", "//cc/bzd/core/io:documentation"),
+        ("**", "//cc/bzd/core/logger:documentation"),
+        ("**", "//cc/bzd/core/serialization:documentation"),
+    ],
+    visibility = ["//visibility:public"],
+)
 
 bzd_cc_library(
     name = "core",

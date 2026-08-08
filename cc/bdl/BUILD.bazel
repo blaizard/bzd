@@ -1,4 +1,13 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("BDL", "README.md"),
+    ],
+    visibility = ["//visibility:public"],
+)
 
 exports_files([
     "cc.bzl",

@@ -1,4 +1,13 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("//cc/bdl:cc.bzl", "bzd_cc_library")
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Serialization", "README.md"),
+    ],
+    visibility = ["//visibility:public"],
+)
 
 bzd_cc_library(
     name = "serialization",
