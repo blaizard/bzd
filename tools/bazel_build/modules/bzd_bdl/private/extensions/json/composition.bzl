@@ -21,7 +21,9 @@ def _generator_json_composition_impl(ctx):
         executable = ctx.executable._tool,
     )
 
-    return [DefaultInfo(files = depset([output]))]
+    runfiles = ctx.runfiles().merge_all([dep[DefaultInfo].default_runfiles for dep in ctx.attr.deps])
+
+    return [DefaultInfo(runfiles = runfiles, files = depset([output]))]
 
 generator_json_composition = rule(
     implementation = _generator_json_composition_impl,
