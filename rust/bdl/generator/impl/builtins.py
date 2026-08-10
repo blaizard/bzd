@@ -70,7 +70,80 @@ class StringType:
 	toType = "&'static str"
 
 
+class AnyType:
+	constexpr = True
+	toType = ""
+
+
+class ListType:
+	constexpr = True
+	toType = ""
+
+
+class SpanType:
+	constexpr = False
+
+	@staticmethod
+	def toType(
+		entity: Symbol,
+		nested: typing.List[str],
+		reference: bool,
+		values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
+		element = nested[0] if nested else "()"
+		return "&'static [{}]".format(element), []
+
+
+class ArrayType:
+	constexpr = False
+
+	@staticmethod
+	def toType(
+		entity: Symbol,
+		nested: typing.List[str],
+		reference: bool,
+		values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
+		maybeContractCapacity = entity.contracts.get("capacity")
+		capacity = int(maybeContractCapacity.valueNumber) if maybeContractCapacity else 1
+		element = nested[0] if nested else "()"
+		return "&[{}; {}]".format(element, capacity), []
+
+
+class VectorType:
+	constexpr = False
+
+	@staticmethod
+	def toType(
+		entity: Symbol,
+		nested: typing.List[str],
+		reference: bool,
+		values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
+		element = nested[0] if nested else "()"
+		return "&[{}]".format(element), []
+
+
+class ResultType:
+	constexpr = False
+
+	@staticmethod
+	def toType(
+		entity: Symbol,
+		nested: typing.List[str],
+		reference: bool,
+		values: typing.Optional[typing.Sequence[str]],
+	) -> TypeConversionCallableReturn:
+		if len(nested) == 0:
+			nested.append("()")
+		if len(nested) == 1:
+			nested.append("bzd::base::error::Error")
+		return "Result", nested
+
+
 builtins: typing.Dict[str, typing.Any] = {
+	"Any": AnyType,
+	"list": ListType,
 	"Integer": IntegerType,
 	"Float": FloatType,
 	"None": NoneType,
@@ -78,4 +151,8 @@ builtins: typing.Dict[str, typing.Any] = {
 	"Byte": Byte,
 	"Boolean": Boolean,
 	"String": StringType,
+	"Span": SpanType,
+	"Array": ArrayType,
+	"Vector": VectorType,
+	"Result": ResultType,
 }

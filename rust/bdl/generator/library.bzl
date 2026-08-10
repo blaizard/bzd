@@ -85,7 +85,7 @@ def _generator_rust_library_impl(
             "{}.rs".format(name),
         ],
         visibility = visibility,
-        deps = deps,
+        deps = deps + ["//rust/bzd:bzd"],
         **kwargs
     )
 

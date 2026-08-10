@@ -4,7 +4,7 @@
 pub trait {{ data.name }} {
 {% for method in data.interface.methodList %}
 	{% if method.isSymbol %}
-    fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %}) -> {{ method.symbol | symbolToStr }};
+    fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %}) -> {{ method.symbol | symbolNonConstToStr }};
 	{% else %}
     fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %});
 	{% end %}

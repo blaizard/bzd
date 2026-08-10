@@ -16,9 +16,11 @@ class _VisitorRustSymbol(Visitor):
 		self,
 		symbol: Symbol,
 		reference: bool,
+		nonConst: bool = False,
 		values: typing.Optional[typing.Sequence[str]] = None,
 	) -> None:
 		self.reference = reference
+		self.nonConst = nonConst
 		self.values_ = values
 		self.symbol = symbol
 		super().__init__(symbol=symbol)
@@ -60,6 +62,10 @@ class _VisitorRustSymbol(Visitor):
 			outputList.append(output)
 		output = "::".join(outputList)
 
+		# Special value, which defines an empty type.
+		if output == "":
+			return ""
+
 		# Apply the nested template if any.
 		if nested:
 			output += "<{}>".format(", ".join(nested))
@@ -72,10 +78,19 @@ class _VisitorRustSymbol(Visitor):
 			else:
 				output += "&"
 
+		# Apply const if needed. In Rust, a const type is a shared reference.
+		# Types that already are references are left untouched.
+		if symbol.const and self.isTopLevel and not self.nonConst and not output.startswith("&"):
+			output = "&" + output
+
 		return output
 
 
-def symbolRustToStr(symbol: typing.Optional[Symbol], reference: bool = False) -> str:
+def symbolRustToStr(
+	symbol: typing.Optional[Symbol],
+	reference: bool = False,
+	nonConst: bool = False,
+) -> str:
 	if symbol is None:
 		return "()"
-	return _VisitorRustSymbol(symbol=symbol, reference=reference).result
+	return _VisitorRustSymbol(symbol=symbol, reference=reference, nonConst=nonConst).result

@@ -20,6 +20,9 @@ class Transform:
 	def symbolToStr(self, symbol: Optional[Symbol]) -> str:
 		return symbolRustToStr(symbol)
 
+	def symbolNonConstToStr(self, symbol: Optional[Symbol]) -> str:
+		return symbolRustToStr(symbol, nonConst=True)
+
 	def symbolReferenceToStr(self, symbol: Optional[Symbol]) -> str:
 		return symbolRustToStr(symbol, reference=True)
 

@@ -1,0 +1,15 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "error",
+    srcs = [
+        "error.rs",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+rust_test(
+    name = "error_test",
+    crate = ":error",
+)
