@@ -50,16 +50,12 @@ export default class RestServer extends Base {
 				return cors;
 			}, []);
 			if (cors) {
-				this.options.channel.addRoute(
-					"options",
-					this.getEndpoint(endpoint),
-					(serverContext) => {
-						serverContext.setHeader("Access-Control-Allow-Origin", "*");
-						serverContext.setHeader("Access-Control-Allow-Methods", [...cors, "options"].join(", "));
-						serverContext.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
-						serverContext.sendStatus(200, "OK");
-					},
-				);
+				this.options.channel.addRoute("options", this.getEndpoint(endpoint), (serverContext) => {
+					serverContext.setHeader("Access-Control-Allow-Origin", "*");
+					serverContext.setHeader("Access-Control-Allow-Methods", [...cors, "options"].join(", "));
+					serverContext.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
+					serverContext.sendStatus(200, "OK");
+				});
 			}
 		}
 	}
