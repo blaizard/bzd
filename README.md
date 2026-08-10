@@ -14,14 +14,14 @@ This mono-repository enables the following technologies:
 
 ## Overview
 
-This framework is built to run on all sort of embedded platforms, from bare metals 8-bit microcontrollers to high performance compute units.
+This framework is built to run on all sorts of embedded platforms, from bare-metal 8-bit microcontrollers to high-performance compute units.
 It is made to remove any dependencies from STL, but provide a similar set of components and utilities to develop applications in an
 efficient and safe manner.
 
 It features the following:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
-- The core library is self contained, no reliance on third-party, only on the freestanding STL.
+- The core library is self-contained, no reliance on third-party, only on the freestanding STL.
 - Flexible error handling model.
 - Based on C++ coroutines.
 - Compile-time string formatting tool.
@@ -34,7 +34,7 @@ The following target platforms are currently supported:
 
 | Name                   | Compiler | Version | Executors   | Debug |
 | ---------------------- | -------- | ------- | ----------- | ----- |
-| linux_x86_64_clang\*   | clang    | 17.0.2  | host\*      |       |
+| linux_x86_64_clang\*   | clang    | 19.1.7  | host\*      |       |
 | linux_x86_64_gcc       | gcc      | 14.2.0  | host\*      |       |
 | esp32_xtensa_lx6_gcc   | gcc      | 14.2.0  | sim\*, uart | x     |
 | esp32s3_xtensa_lx7_gcc | gcc      | 14.2.0  | sim\*, uart | x     |
@@ -87,7 +87,7 @@ To run all tests, run the following command:
 ```
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that
-formatter and linters for YAML, json and markdown are also available.
+formatters and linters for YAML, json and markdown are also available.
 
 | Language | Formatters   | Code Analyzers                      | Code Coverage | Test Framework | Documentation |
 | -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
@@ -110,7 +110,7 @@ bazel run @rules_rust//tools/rust_analyzer:gen_rust_project -- //rust/...
 
 ## Naming Convention
 
-The code in this repository follows several principle regarding naming convention. The following rules are applied cross languages.
+The code in this repository follows several principles regarding naming conventions. The following rules are applied cross languages.
 
 - Files and directories are named lower case `snake_case` using only the characters matching the regexpr: `[a-z0-9_/.]`. This is enforced by tools/sanitizer/actions/structure.
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.

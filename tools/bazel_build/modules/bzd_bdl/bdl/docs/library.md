@@ -5,7 +5,7 @@ available to other rules, such as a composition or another library.
 
 ## Definition
 
-Defining a library is done with Bazel through a rule, as follow:
+Defining a library is done with Bazel through a rule, as follows:
 
 ```bzl
 load("@bzd_bdl//:defs.bzl", "bdl_library")
@@ -53,7 +53,7 @@ flowchart TB
     end
     subgraph ide2 [Language specific generators]
     direction TB
-    D[`cc` generator runs the `library_converter` tool]
+    D[`cc` generator runs the `library` tool]
     E[Generates a `.hh` header per `.bdl.o` object]
     F[Headers are wrapped into a `cc_library`]
     end
@@ -75,7 +75,7 @@ The generators stage is then run for each language extension registered with the
 extension declares a `library.generator` rule that consumes the precompiled objects and the providers it contributes to
 the library, for example the `cc` extension:
 
-- Runs the `library_converter` tool that turns each precompiled `.bdl.o` object into a `.hh` header.
+- Runs the `library` tool that turns each precompiled `.bdl.o` object into a `.hh` header.
 - Wraps those headers into a `cc_library`, together with the BDL adapter types and the dependencies.
 - Exposes the resulting `CcInfo` provider.
 

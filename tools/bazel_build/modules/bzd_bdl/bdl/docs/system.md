@@ -5,7 +5,7 @@ It is the most top level view of the composition.
 
 ## Definition
 
-Defining a system is done with Bazel through a rule, as follow:
+Defining a system is done with Bazel through a rule, as follows:
 
 ```bzl
 load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
@@ -32,7 +32,7 @@ bdl_system(
 )
 ```
 
-This tells that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and which
+This means that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and which
 executors are referred under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
 under the namespace `hpc`.
 
@@ -149,10 +149,10 @@ Finally, one `_bdl_binary` rule per target wraps the generated composition into 
 Some attributes might require parametrization, for example when defining a gateway for a specific platform, the IP address
 might be needed for an ethernet-based gateway.
 This can be done via composition using the contract `override` to tell that this symbol is overriding an existing symbol.
-Not adding this contract will result into a symbol conflict and raise an error.
+Not adding this contract will result in a symbol conflict and raise an error.
 
-Note, parameters are only overritable at composition stage. This information is passed top down to the component via its
-configuration. This is different form Bazel build settings mechanism for example where such variant is passed through the
+Note, parameters are only overridable at composition stage. This information is passed top down to the component via its
+configuration. This is different from Bazel build settings mechanism for example where such variant is passed through the
 build tree and available at all stages of the build.
 
 ```bd

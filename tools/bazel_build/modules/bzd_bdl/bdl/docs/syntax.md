@@ -8,18 +8,18 @@ The following describes the syntax of the Bzd Description Language (BDL) used to
 
 The following built-in types are made available by the implementation as built-in types.
 
-| Syntax    | Description                                                                                      |
-| --------- | ------------------------------------------------------------------------------------------------ |
-| Void      | Empty type, usually used for return statements.                                                  |
-| Boolean   | Binary type evaluating to `true` or `false`.                                                     |
-| Integer   | Represents an arithmetic integer. Its size can be defined with contracts.                        |
-| Float     | Represents an arithmetic floating point. Its size can be defined with contracts.                 |
-| Byte      | Type representing a byte.                                                                        |
-| String    | Type representing a string.                                                                      |
-| Result<T> | Templated type that contains either a value of type `T` or an error.                             |
-| Async<T>  | Templated type that contains an asynchronous prommise returning a value of type `T` or an error. |
-| Array<T>  | A fixed length array of type `T`. Its capacity may be defined with contracts.                    |
-| Vector<T> | A resizable and sequential container of type `T`. Its capacity may be defined with contracts.    |
+| Syntax    | Description                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| Void      | Empty type, usually used for return statements.                                                 |
+| Boolean   | Binary type evaluating to `true` or `false`.                                                    |
+| Integer   | Represents an arithmetic integer. Its size can be defined with contracts.                       |
+| Float     | Represents an arithmetic floating point. Its size can be defined with contracts.                |
+| Byte      | Type representing a byte.                                                                       |
+| String    | Type representing a string.                                                                     |
+| Result<T> | Templated type that contains either a value of type `T` or an error.                            |
+| Async<T>  | Templated type that contains an asynchronous promise returning a value of type `T` or an error. |
+| Array<T>  | A fixed length array of type `T`. Its capacity may be defined with contracts.                   |
+| Vector<T> | A resizable and sequential container of type `T`. Its capacity may be defined with contracts.   |
 
 ### Literals
 
@@ -56,7 +56,7 @@ enum MyEnum
 
 ### Strong Types
 
-Strong typing is supported with the `using` keyword. For example, to define an integer with strong typing, this can be done as follow:
+Strong typing is supported with the `using` keyword. For example, to define an integer with strong typing, this can be done as follows:
 
 ```
 using MyStrongType = Integer [min(0) max(23)];
@@ -83,7 +83,7 @@ use "cc/bzd/core/my_interface.bdl"
 
 ## Expressions
 
-An expression is defined as follow:
+An expression is defined as follows:
 
 ```
 [const] <type> <name> [= <values>] [[<contracts>...]];
@@ -98,7 +98,7 @@ where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`
 
 ## Methods
 
-A function is defined as follow:
+A function is defined as follows:
 
 ```
 method <name>(<expression1>, ...) [-> <type>] [[<contracts>...]];
@@ -113,11 +113,11 @@ Note that the definition does not imply a specific interface implementation.
 
 A component is the implementation of one or multiple interfaces. It can be instantiated and exposes
 the functionality of the interface it inherits from.
-In addition it describes its configuration and compisition to the description language.
+In addition it describes its configuration and composition to the description language.
 
 ### Configuration
 
-A component should tell how it is instancited during composition, this is done under the `config` scope as follow:
+A component should tell how it is instantiated during composition, this is done under the `config` scope as follows:
 
 ```bdl
 component MyModule

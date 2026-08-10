@@ -4,14 +4,14 @@ Bzd templating language (`btl`) library that supports:
 
 ## Syntax
 
-- Substitutions blocks are denoted as follow: `{{...}}`
-- Control blocks are denoted as follow: `{%...%}`
-- Comment blocks are denoted as follow: `{#...#}`
+- Substitutions blocks are denoted as follows: `{{...}}`
+- Control blocks are denoted as follows: `{%...%}`
+- Comment blocks are denoted as follows: `{#...#}`
 - The sequences `{{`, `{%` and `{#` can respectively be escaped using: `{{{`, `{{%` and `{{#`.
 
 ### White spaces
 
-- All blocks implement whitespace control. Using `-` inside a block will strip the left of right side of the expression,
+- All blocks implement whitespace control. Using `-` inside a block will strip the left or right side of the expression,
   ex: `{%- ... %}` or `{{ ... -}}`
 - The first newline after a block and trailing spaces are stripped (for all control and comment blocks).
 

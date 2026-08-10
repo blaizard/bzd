@@ -1,8 +1,8 @@
 # Components
 
-This framework offers component based development. Components comes at various level of the development and can be associated to become a larger component. Components can also contains sub-components. It defines a composable entity which roles can vary from a driver to a functional component.
+This framework offers component based development. Components come at various levels of the development and can be associated to become a larger component. Components can also contain sub-components. It defines a composable entity whose roles can vary from a driver to a functional component.
 
-A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation specific configuration.
+A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation-specific configuration.
 
 For example, we will define a square which interface is a generic shape.
 
@@ -57,7 +57,7 @@ Area ComplexShape::surface()
 }
 ```
 
-Sub-components helps for encapsulation and hence reduce the complexity and composability while improving re-usability.
+Sub-components help with encapsulation and hence reduce the complexity and composability while improving re-usability.
 For example, imagine a complex sub-system:
 
 ```bdl

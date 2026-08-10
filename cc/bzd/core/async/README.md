@@ -4,7 +4,7 @@
 
 ### Handle
 
-The thing referred by `bzd::async::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
+The thing referred to by `bzd::async::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
 Thanks to this object you can, for example, resume the coroutine. The coroutine_handle is a templated type, where Promise type is its template argument.
 
 ### Frame
@@ -102,19 +102,19 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 ### To be aware
 
 - Coroutine in C++ together with lambda capture is nasty, better not use it: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
-- Generators should not use the error propagation syntax, otherwise the generator async is consudered as terminated, while it might be reused.
+- Generators should not use the error propagation syntax, otherwise the generator async is considered as terminated, while it might be reused.
 
 ### Task
 
 `bzd::Async` is the task-coroutine type of this framework.
 
-A `void` coroutine is declared as follow:
+A `void` coroutine is declared as follows:
 
 ```c++
 bzd::Async<> myFunc() { ... }
 ```
 
-A non-`void` coroutine is declared as follow:
+A non-`void` coroutine is declared as follows:
 
 ```c++
 bzd::Async<int> myFunc() { ... }
@@ -124,19 +124,19 @@ bzd::Async<int> myFunc() { ... }
 
 `bzd::Generator` is the asynchronous generator-coroutine type of this framework.
 
-A `void` generator is declared as follow:
+A `void` generator is declared as follows:
 
 ```c++
-bzd::Generaotr<> myFunc() { ... }
+bzd::Generator<> myFunc() { ... }
 ```
 
-A non-`void` coroutine is declared as follow:
+A non-`void` coroutine is declared as follows:
 
 ```c++
 bzd::Generator<int> myFunc() { ... }
 ```
 
-Generator are not intended to be used directly with `co_await`. Instead, they should be used as ranges using the following pattern:
+Generators are not intended to be used directly with `co_await`. Instead, they should be used as ranges using the following pattern:
 
 ```c++
 auto it = co_await !myFunc.begin();
@@ -153,7 +153,7 @@ while (it != myFunc.end()) {
 
 Coroutine can be composed and executed in parallel, depending on the executor used underneath.
 
-To have multiple coroutine run in parallel, this can be done as follow:
+To have multiple coroutines run in parallel, this can be done as follows:
 
 ```c++
 const auto result = co_await bzd::async::all(myFunc(), myFunc(), myFunc());
@@ -164,13 +164,13 @@ This will execute myFunc (assuming it is a coroutine), 3 times and return the re
 #### Any
 
 You might also want to execute coroutine and return when the first one terminates, this is handy to implement
-timeouts for example. It can be done as follow:
+timeouts for example. It can be done as follows:
 
 ```c++
 const auto result = co_await bzd::async::any(myFunc(), timeout(1_s));
 ```
 
-This will return a result that is a tuple of optional results of the 2 coroutine executed.
+This will return a result that is a tuple of optional results of the 2 coroutines executed.
 
 ### Error propagation
 
@@ -181,7 +181,7 @@ type provides a convenient operator to reduce boiler plate code:
 const auto value = co_await !myFunc();
 ```
 
-The value is directly returned from the coroutine, any error is propagate to the caller of this coroutine. This piece of code
+The value is directly returned from the coroutine, any error is propagated to the caller of this coroutine. This piece of code
 is equivalent to the following:
 
 ```c++
@@ -193,10 +193,10 @@ if (!result)
 const auto value = result.value();
 ```
 
-The error propagate goes to upper levels until an awaitable handling errors is found.
+The error propagation goes to upper levels until an awaitable handling the error is found.
 
 Error propagation can also apply to `bzd::async::any` coroutines, and it will ensure the coroutine at a specific index
-returns a valid result, otherwise the error will be propagate to the caller.
+returns a valid result, otherwise the error will be propagated to the caller.
 
 ```c++
 const auto value = co_await !bzd::async::any(myFunc(), timeout(1_s));
@@ -233,9 +233,9 @@ flowchart TD
     D -->|null| A
 ```
 
-The executor context, is unique to the instance of the executor, it is passed to the current coroutine being executed or cancelled.
-It has for role to contain the continuation if any, that will be used for the next coroutine to be executed. This could be done
+The executor context is unique to the instance of the executor, it is passed to the current coroutine being executed or cancelled.
+Its role is to contain the continuation if any, that will be used for the next coroutine to be executed. This could be done
 directly by returning it in the `await_suspend`, this would work fine in a single threaded system. Here we want to allow parallel
 execution on different cores if available, and for branching (`async::all` or `async::any`), we would have a race if multiple
-continuation are called concurrently. Having it after the completion of the coroutine helps with that effect, because it ensures that
+continuations are called concurrently. Having it after the completion of the coroutine helps with that effect, because it ensures that
 the parent is completed before the execution of the continuation.

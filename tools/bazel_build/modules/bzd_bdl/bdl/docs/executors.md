@@ -1,6 +1,6 @@
 # Executors
 
-An executor is a group of computation units (cores) that can share workloads between each others (by work-stealing strategy).
+An executor is a group of computation units (cores) that can share workloads between each other (by work-stealing strategy).
 They share the same work queue and a component gets executed on an arbitrary core.
 
 ```mermaid
@@ -35,12 +35,12 @@ Multiple executors can be created and deployed on the same process/binary, this 
 
 ## Thread safety
 
-By default a component or task is assigned to a specific core during its lifetime. This done at runtime as the number of cores is not always known at build time.
-This ensures that all resources within a component is accessible safely.
+By default a component or task is assigned to a specific core during its lifetime. This is done at runtime as the number of cores is not always known at build time.
+This ensures that all resources within a component are accessible safely.
 
 ### Interaction between components
 
-Components have various ways to interact with each others.
+Components have various ways to interact with each other.
 
 - They can be passed as `config`.
 - They can be passed as argument through their interface.
@@ -60,9 +60,9 @@ When the system only has a single executor, it is automatically assigned to all 
 
 ## Association
 
-If the system contains multiple executor, however, it is necessary to define where workloads are running.
+If the system contains multiple executors, however, it is necessary to define where workloads are running.
 
-This can be done in 2 different ways. By either specifying it at component instantiation, This is done with the `executor` contract.
+This can be done in 2 different ways. By either specifying it at component instantiation, this is done with the `executor` contract.
 
 ```bdl
 composition

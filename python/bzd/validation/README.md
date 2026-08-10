@@ -4,7 +4,7 @@ Framework to validate dictionaries.
 
 ## Usage
 
-The simplest usage form is as follow:
+The simplest usage form is as follows:
 
 ```py
 # Create a validation schema, here it tests that the entry "test" validates into an integer
@@ -30,7 +30,7 @@ result.values == [2]
 
 ### Noexcept
 
-The validate function can be used to not throw if the schema does not validate. This is done as follow:
+The validate function can be used to not throw if the schema does not validate. This is done as follows:
 
 ```py
 result = schema.validate({"test": "2"}, output="return")
