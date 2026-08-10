@@ -76,7 +76,7 @@ export default class MockHttpServer {
 				if (e instanceof HttpError) {
 					e.send(context);
 				} else if (e instanceof ExceptionPrecondition) {
-					response.status(400).send(e.message);
+					context.sendStatus(400, e.message);
 				} else {
 					throw e;
 				}
