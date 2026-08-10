@@ -391,14 +391,6 @@ export default class HttpServer {
 				// Create the context.
 				const context = new HttpServerContext(request, response);
 
-				// Check if this request needs authentication.
-				if (options.authentication) {
-					context.session = await httpServer.config.authentication.verify(context, options.authentication);
-					if (!context.session) {
-						return context.sendStatus(401, "Unauthorized");
-					}
-				}
-
 				// Override the params.
 				// This is needed because Express apply a urldecode operation to the params which is not
 				// wanted with variable arguments. Because we need to differentiate between / and %2F.
@@ -412,6 +404,14 @@ export default class HttpServer {
 				request.params = match;
 
 				try {
+					// Check if this request needs authentication.
+					if (options.authentication) {
+						context.session = await httpServer.config.authentication.verify(context, options.authentication);
+						if (!context.session) {
+							throw httpServer.config.authentication.httpErrorUnauthorized(/*requestAuthentication*/ true);
+						}
+					}
+
 					await callback.call(this, context);
 				} catch (e) {
 					if (e instanceof HttpError) {

@@ -1,6 +1,7 @@
 {
     "tests": [
         {
+            "doc": "Check the authentication for downloading a file (1/2).",
             "expects": {
                 "headers": {
                     "www-authenticate": [
@@ -16,6 +17,7 @@
             ]
         },
         {
+            "doc": "Check the authentication for downloading a file (2/2).",
             "expects": {
                 "data": "content for locked a",
                 "status": 200
@@ -23,6 +25,38 @@
             "request": [
                 "get",
                 "/file/memory_private/a.txt",
+                {
+                    "headers": {
+                        "authorization": "basic aGVsbG86YWJjMTIz"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Check the authentication for access endpoint (webdav) (1/2).",
+            "expects": {
+                "headers": {
+                    "www-authenticate": [
+                        "Basic",
+                        "Bearer"
+                    ]
+                },
+                "status": 401
+            },
+            "request": [
+                "get",
+                "/x/memory_private/webdav/a.txt"
+            ]
+        },
+        {
+            "doc": "Check the authentication for access endpoint (webdav) (2/2).",
+            "expects": {
+                "data": "content for locked a",
+                "status": 200
+            },
+            "request": [
+                "get",
+                "/x/memory_private/webdav/a.txt",
                 {
                     "headers": {
                         "authorization": "basic aGVsbG86YWJjMTIz"

@@ -3,15 +3,23 @@ import LogFactory from "#bzd/nodejs/core/log.js";
 import Router from "#bzd/nodejs/core/router.js";
 import MockServerContext from "#bzd/nodejs/core/http/mock/server_context.js";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.js";
+import { HttpError } from "#bzd/nodejs/core/http/server_context.js";
 
 const Log = LogFactory("http", "server", "mock");
 const Exception = ExceptionFactory("http", "server", "mock");
 
 export default class MockHttpServer {
-	constructor() {
+	constructor(config) {
 		this.started = false;
 		this.routers = {};
 		this.statistics = new StatisticsProvider("http.server");
+		this.config = Object.assign(
+			{
+				/// Authentication object.
+				authentication: null,
+			},
+			config,
+		);
 	}
 
 	async start() {
@@ -29,7 +37,24 @@ export default class MockHttpServer {
 	}
 
 	addRoute(method, path, callback, options) {
+		// Update the options
+		options = Object.assign(
+			{
+				/// Authentication constraints/scopes.
+				authentication: null,
+			},
+			options,
+		);
+
 		Exception.assert(this.started === false, "Cannot add new routes if the server is started.");
+		if (options.authentication !== null) {
+			Exception.assert(
+				this.config.authentication,
+				"The route {}::{} has authentication requirement but no authentication object was specified.",
+				method,
+				path,
+			);
+		}
 
 		const methodLower = method.toLowerCase();
 		if (!(methodLower in this.routers)) {
@@ -38,10 +63,20 @@ export default class MockHttpServer {
 
 		this.routers[methodLower].add(path, async (params, context) => {
 			try {
+				// Check if this request needs authentication.
+				if (options.authentication) {
+					context.session = await this.config.authentication.verify(context, options.authentication);
+					if (!context.session) {
+						throw this.config.authentication.httpErrorUnauthorized(/*requestAuthentication*/ true);
+					}
+				}
+
 				await callback(context.withParams(params));
 			} catch (e) {
-				if (e instanceof ExceptionPrecondition) {
-					context.sendStatus(400, e.message);
+				if (e instanceof HttpError) {
+					e.send(context);
+				} else if (e instanceof ExceptionPrecondition) {
+					response.status(400).send(e.message);
 				} else {
 					throw e;
 				}

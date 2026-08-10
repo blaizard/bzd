@@ -245,7 +245,6 @@ const Exception = ExceptionFactory("backend");
 					route,
 					async (context) => {
 						assertVolumeReady(volume);
-						await assertAuthorizedVolume(context, volume);
 						return await endpoint.handler(context);
 					},
 					Object.assign(
