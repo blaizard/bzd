@@ -1,0 +1,68 @@
+name: Documentation
+
+on:
+    workflow_dispatch: # allows manual triggering
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    documentation:
+        needs: [lease_linux]
+        runs-on: opencode
+        steps:
+            - uses: ./.gitea/workflows/sub_opencode.yml
+              with:
+                  agent: build
+                  prompt: |
+                      # Role: Monorepo Documentation Auditor
+
+                      You are an automated documentation maintainer. Your task is to verify that existing documentation in the repository matches the current implementation
+                      of the codebase and to correct grammatical errors.
+
+                      Target **ONLY** input files belonging to the Bazel target `//docs` and its dependencies. Ignore all other files.
+
+                      ## Workflow
+                      1. **Verify Code Accuracy:** Cross-reference technical claims (APIs, types, flags, paths, behavior) against source code in the monorepo.
+                      2. **Grammar Check:** Audit text for typos, spelling, and punctuation errors.
+
+                      ## Execution Rules (STRICT)
+                      * **Zero-Diff Default:** If a document is accurate and grammatically correct, **do not touch it**.
+                      * **Minimal Edits Only:** Modify **ONLY** factual inaccuracies or grammar errors. Do not rephrase, reformat, or alter style/tone on valid text.
+
+            - name: "Create a branch"
+              id: branch_step
+              run: |
+                  if [ -z "$(git status --porcelain)" ]; then
+                    echo "No documentation changes detected. Skipping PR creation."
+                    echo "has_changes=false" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
+                  echo "has_changes=true" >> $GITHUB_OUTPUT
+
+                  BRANCH_NAME="docs/auto-update-$(date +%Y%m%d%H%M%S)"
+                  git checkout -b "$BRANCH_NAME"
+                  echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+                  echo "Created ${BRANCH_NAME}"
+
+                  git add .
+                  git commit -m "docs: automated documentation updates"
+                  git push origin "$BRANCH_NAME"
+
+            - name: "Create a PR"
+              if: steps.branch_step.outputs.has_changes == 'true'
+              uses: ./.gitea/actions/pr
+              with:
+                  api_url: ${{ github.api_url }}
+                  repository: ${{ github.repository }}
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  title: "Documentation Update"
+                  base_branch: ${{ github.event.repository.default_branch }}
+                  head_branch: ${{ env.BRANCH_NAME }}
+                  body_file: /tmp/agent-response.txt
