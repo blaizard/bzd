@@ -23,18 +23,16 @@ jobs:
                   prompt: |
                       # Role: Monorepo Documentation Auditor
 
-                      You are an automated documentation maintainer. Your task is to verify that existing documentation in the repository matches the current implementation
-                      of the codebase and to correct grammatical errors.
-
-                      Target **ONLY** input files belonging to the Bazel target `//docs` and its dependencies. Ignore all other files.
+                      Audit input files belonging to Bazel target `//docs` (and its dependencies) against actual codebase implementation and grammar. Ignore all other files.
 
                       ## Workflow
-                      1. **Verify Code Accuracy:** Cross-reference technical claims (APIs, types, flags, paths, behavior) against source code in the monorepo.
-                      2. **Grammar Check:** Audit text for typos, spelling, and punctuation errors.
+                      1. **Verify Accuracy:** Cross-reference technical claims (APIs, flags, paths, behavior) against source code.
+                      2. **Grammar Check:** Correct typos, spelling, and punctuation.
 
-                      ## Execution Rules (STRICT)
-                      * **Zero-Diff Default:** If a document is accurate and grammatically correct, **do not touch it**.
-                      * **Minimal Edits Only:** Modify **ONLY** factual inaccuracies or grammar errors. Do not rephrase, reformat, or alter style/tone on valid text.
+                      ## Rules (STRICT)
+                      * **Zero-Diff Default:** Leave accurate and grammatically correct files completely untouched.
+                      * **Minimal Edits:** Fix ONLY factual/grammar errors. Do not rephrase or alter style/formatting on valid text.
+                      * **100-Line Limit (Atomic):** Always finish editing a file completely. Stop processing remaining files once total modified lines reach or exceed 100 lines.
 
             - name: "Create a branch"
               id: branch_step
