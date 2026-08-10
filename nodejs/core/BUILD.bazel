@@ -14,7 +14,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "log",
     srcs = [
-        "log.js",
+        "log.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -25,13 +25,13 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "exception",
     srcs = [
-        "exception.js",
-        "//nodejs/core/impl/exception:backend.js",
+        "exception.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":format",
         ":log",
+        "//nodejs/core/impl/exception:backend",
     ],
 )
 
@@ -46,7 +46,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "format",
     srcs = [
-        "format.js",
+        "format.ts",
     ],
     visibility = ["//visibility:public"],
 )
