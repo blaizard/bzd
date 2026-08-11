@@ -9,18 +9,10 @@ inputs:
         description: "The agent to be using."
         required: false
         default: "build"
-    opencode_token:
-        description: "Opencode token"
-        required: true
 
 runs:
     using: "composite"
     steps:
-        - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
-          with:
-              lease: "true"
-              opencode_token: ${{ inputs.opencode_token }}
-
         - name: "Opencode version"
           shell: bash
           run: |

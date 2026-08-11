@@ -17,11 +17,15 @@ jobs:
         needs: [lease_linux]
         runs-on: opencode
         steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
+
             - name: "Maintain documentation"
               uses: ./.gitea/actions/opencode
               with:
                   agent: build
-                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
                   prompt: |
                       # Role: Monorepo Documentation Auditor
 
