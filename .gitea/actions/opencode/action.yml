@@ -1,0 +1,45 @@
+name: "Run opencode"
+description: "Runs the opencode agent"
+
+inputs:
+    prompt:
+        description: "The prompt to be used for the agent."
+        required: true
+    agent:
+        description: "The agent to be using."
+        required: false
+        default: "build"
+    opencode_token:
+        description: "Opencode token"
+        required: true
+
+runs:
+    using: "composite"
+    steps:
+        - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+          with:
+              lease: "true"
+              opencode_token: ${{ inputs.opencode_token }}
+
+        - name: "Opencode version"
+          shell: bash
+          run: |
+              opencode --version
+
+        - name: "Run opencode"
+          shell: bash
+          env:
+              PROMPT: ${{ inputs.prompt }}
+              AGENT: ${{ inputs.agent }}
+          run: |
+              set -euo pipefail
+              echo  "==== prompt ================================================="
+              echo "$PROMPT"
+              echo  "==== processing ============================================="
+              bzd-lease opencode run --dangerously-skip-permissions --agent "$AGENT" "$PROMPT" > /tmp/agent-response.txt || {
+                echo "==== Opencode failed, dumping last log ======================"
+                tail -n 100 "$(ls -t ~/.local/share/opencode/log/*.log 2>/dev/null | head -n 1)" || echo "No log found"
+                exit 1
+              }
+              echo  "==== response ==============================================="
+              cat /tmp/agent-response.txt

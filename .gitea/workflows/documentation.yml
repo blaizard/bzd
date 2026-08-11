@@ -18,9 +18,10 @@ jobs:
         runs-on: opencode
         steps:
             - name: "Maintain documentation"
-              uses: ./.gitea/workflows/sub_opencode.yml
+              uses: ./.gitea/actions/opencode
               with:
                   agent: build
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
                   prompt: |
                       # Role: Monorepo Documentation Auditor
 

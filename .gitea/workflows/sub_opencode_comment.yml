@@ -21,9 +21,10 @@ jobs:
     update_pr:
         runs-on: opencode
         steps:
-            - uses: ./.gitea/workflows/sub_opencode.yml
+            - uses: ./.gitea/actions/opencode
               with:
                   agent: ${{ inputs.agent }}
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
                   prompt: ${{ inputs.prompt }}
 
             - name: "Post comment on PR"
