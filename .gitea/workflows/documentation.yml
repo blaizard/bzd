@@ -40,9 +40,12 @@ jobs:
                       * **Minimal Edits:** Fix ONLY factual/grammar errors. Do not rephrase or alter style/formatting on valid text.
                       * **100-Line Limit (Atomic):** Always finish editing a file completely. Stop processing remaining files once total modified lines reach or exceed 100 lines.
 
+                      ## Output
+                      Provide a short summary of the changes made.
+
             - name: "Sanitize"
               run: |
-                  bzd-node ./tools/bazel run :sanitizer
+                  bzd-lease ./tools/bazel run //:sanitizer
 
             - name: "Create a branch"
               id: branch_step
