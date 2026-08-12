@@ -36,7 +36,7 @@ runs:
 
               payload=$(jq -n \
                 --arg title "$TITLE" \
-                --rawfile body "$BODY" \
+                --arg body "$BODY" \
                 '{title: $title, body: $body}')
 
               curl -sS --fail-with-body -X POST \
