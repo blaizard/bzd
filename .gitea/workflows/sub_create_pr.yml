@@ -75,18 +75,13 @@ jobs:
             - name: "Create a PR"
               uses: ./.gitea/actions/pr
               with:
-                  api_url: ${{ github.api_url }}
-                  repository: ${{ github.repository }}
                   token: ${{ secrets.BZD_AGENT_TOKEN }}
                   title: ${{ env.PR_TITLE }}
-                  base_branch: ${{ github.event.repository.default_branch }}
                   head_branch: ${{ env.PR_HEAD_BRANCH }}
                   body_file: /tmp/pr-description.txt
 
             - name: "Delete comment"
               uses: ./.gitea/actions/comment_delete
               with:
-                  api_url: ${{ github.api_url }}
-                  repository: ${{ github.repository }}
                   token: ${{ secrets.BZD_AGENT_TOKEN }}
                   comment_id: ${{ github.event.comment.id }}

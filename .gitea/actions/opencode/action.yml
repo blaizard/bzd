@@ -10,6 +10,11 @@ inputs:
         required: false
         default: "build"
 
+outputs:
+    response_file:
+        description: "Path of the raw agent response."
+        value: "/tmp/agent-response.txt"
+
 runs:
     using: "composite"
     steps:

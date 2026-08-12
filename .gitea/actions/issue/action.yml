@@ -1,0 +1,48 @@
+name: issue
+description: "Create a new issue"
+
+inputs:
+    api_url:
+        description: "The Gitea API URL (e.g., https://gitea.com/api/v1)"
+        required: false
+        default: ${{ github.api_url }}
+    repository:
+        description: "The repository to comment on (format: owner/repo)"
+        required: false
+        default: ${{ github.repository }}
+    token:
+        description: "Gitea personal access token with permissions to create a new issue"
+        required: true
+    title:
+        description: "Title of the new issue"
+        required: true
+    body:
+        description: "The ussye description (support markdown)"
+        required: true
+
+runs:
+    using: composite
+    steps:
+        - name: "Create a new issue"
+          shell: bash
+          env:
+              API_URL: ${{ inputs.api_url }}
+              REPOSITORY: ${{ inputs.repository }}
+              TOKEN: ${{ inputs.token }}
+              TITLE: ${{ inputs.title }}
+              BODY: ${{ inputs.body }}
+          run: |
+              set -euo pipefail
+
+              payload=$(jq -n \
+                --arg title "$TITLE" \
+                --rawfile body "$BODY" \
+                '{title: $title, body: $body}')
+
+              curl -sS --fail-with-body -X POST \
+                  -H "Authorization: token $TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -d "$payload" \
+                  "$API_URL/repos/$REPOSITORY/issues"
+
+              echo "SUCCESS: Issue created."
