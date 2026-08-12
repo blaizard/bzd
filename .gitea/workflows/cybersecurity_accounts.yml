@@ -2,6 +2,8 @@ name: Cybersecurity for apps/accounts
 
 on:
     workflow_dispatch: # allows manual triggering
+    schedule:
+        - cron: "0 18 * * 5" # runs every friday at 18:00 UTC (03:00 JST)
 
 jobs:
     lease_linux:
