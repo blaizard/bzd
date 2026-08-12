@@ -38,6 +38,6 @@ runs:
               #  tail -n 100 "$(ls -t ~/.local/share/opencode/log/*.log 2>/dev/null | head -n 1)" || echo "No log found"
               #  exit 1
               #}
-              echo "{\"vulnerability_found\":true,\"title\":"test",\"severity\": \"Critical\"}" > /tmp/agent-response.txt
+              echo "{\"vulnerability_found\":true,\"title\":\"test\",\"severity\": \"Critical\"}" > /tmp/agent-response.txt
               echo  "==== response ==============================================="
               cat /tmp/agent-response.txt
