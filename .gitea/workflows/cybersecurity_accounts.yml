@@ -1,0 +1,29 @@
+name: Cybersecurity for apps/accounts
+
+on:
+    workflow_dispatch: # allows manual triggering
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    cybersecurity_accounts:
+        needs: lease_linux
+        runs-on: opencode
+        uses: ./.gitea/workflows/sub_cybersecurity.yml
+        secrets: inherit
+        with:
+            prompt: |
+                Deploy the app with:
+                `./tools/bazel run //apps/accounts/backend --config=prod -- --port 8080 --test-data`
+
+                Stress-test and probe its API (on http://localhost:8080) for security flaws:
+                auth issues, injection, input validation, rate limiting, info disclosure,
+                confirm rate limiting on login attempt, etc.
+                Enumerate endpoints first, then test each.
