@@ -126,6 +126,7 @@
             "type": "storage"
         },
         "disk": {
+            "private": true,
             "storage": {
                 "options": {
                     "mustExists": true

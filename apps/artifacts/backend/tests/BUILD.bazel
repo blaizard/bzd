@@ -12,6 +12,12 @@ bzd_config(
 
 bzd_artifacts_binary(
     name = "restricted_user",
+    args = [
+        "--static",
+        "apps/artifacts/frontend/frontend.bundle",
+        "--uid",
+        "local-artifacts",
+    ],
     configs = {
         "//apps/artifacts/backend:config": ":config_backend",
         "//nodejs/vue/apps:config": ":config.apps.json",

@@ -8,4 +8,7 @@ bzd_nodejs_library(
     visibility = [
         "//apps/artifacts:__subpackages__",
     ],
+    deps = [
+        "//nodejs/core:exception",
+    ],
 )

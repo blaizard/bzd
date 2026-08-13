@@ -106,6 +106,7 @@ const Exception = ExceptionFactory("backend");
 	// Adding REST handlers.
 	function getInternalPath(key) {
 		Exception.assert(Array.isArray(key), "Path must be an array: '{:?}'", key);
+		key = Utils.sanitizeKey(key);
 		return { volume: key[0], pathList: key.slice(1) };
 	}
 
