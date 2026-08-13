@@ -14,7 +14,7 @@ from apps.node_manager.private.server.workload import Workload
 from bzd.utils.scheduler import Scheduler
 from bzd.sync.singleton import Singleton
 from apps.artifacts.api.python.node.node import Node
-from bzd.http.server import HttpServer
+from bzd.http.server import HttpServer, RESTServerContext
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Node Manager.")
@@ -112,10 +112,16 @@ if __name__ == "__main__":
 	}
 
 	if args.power:
+
+		def requireToken(fn: typing.Callable, context: RESTServerContext) -> None:
+			token = context.request.headers.get("Authorization", "")
+			assert args.node_token and token == f"Bearer {args.node_token}", "Unauthorized"
+			fn(context)
+
 		handlers["get"].update(
 			{
-				"/suspend": handlerSuspend,
-				"/shutdown": handlerShutdown,
+				"/suspend": lambda context: requireToken(handlerSuspend, context),
+				"/shutdown": lambda context: requireToken(handlerShutdown, context),
 			}
 		)
 		handlers["post"].update(
