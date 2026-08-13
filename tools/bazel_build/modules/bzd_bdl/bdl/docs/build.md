@@ -6,7 +6,7 @@ Resolving symbols within a `bdl` file is done at different build stages to allow
 
 The build process consists of 3 main stages, the `preprocess`, the `composition` and the `generators` stages.
 
-Both stages outputs artifacts, and the `composition` process consumes the `preprocess` artifact, this gives the possibility to cache and reuse outputs for various composition processes.
+Both stages output artifacts, and the `composition` process consumes the `preprocess` artifact, this gives the possibility to cache and reuse outputs for various composition processes.
 
 ## Preprocess
 
@@ -23,12 +23,12 @@ The build step has the responsibility to gather dependencies and resolve symbols
 
 The output of the preprocess stage is a `bdl` object which mainly consists of a `Symbol Map` and a `Symbol Tree`.
 
-A `Symbol Map` links symbols with their actual definition. It consists of a dictionary of fully qualified names to resolved elements. Elements that are unnamed get allocated a unique private fqn, that is visible only to this local compilation unit.
+A `Symbol Map` links symbols with their actual definition. It consists of a dictionary of fully qualified names to resolved elements. Elements that are unnamed get allocated a unique private fqn, which is visible only to this local compilation unit.
 
 A `Symbol Tree` is a hierarchical view of the file, it can be used to recreate a given file and should contain all the necessary
 information. It only uses symbols defined in the `Symbol Map`. In short it is a hierarchical view of a `Symbol Map`.
 
-A bdl file is serialized into a `.o` file for caching purpose. Each `.bdl` should have its corresponding `.o` file after the build process.
+A bdl file is serialized into a `.o` file for caching purposes. Each `.bdl` should have its corresponding `.o` file after the build process.
 
 ### Symbol Resolution
 
@@ -54,9 +54,9 @@ Components might come from the platform used, others are functional to perform t
 During `composition` stage, all top level composition elements are being resolved. Nested composition elements are
 only resolved if the corresponding component is instantiated. Unused components in the build tree are automatically removed.
 
-The composition stage is done in 2 sub-stages, the first one that only process certain type of builtin expression, such as `bind`
+The composition stage is done in 2 sub-stages, the first one that only processes certain types of builtin expressions, such as `bind`
 for example. This assigns contracts to expressions before being evaluated.
-The second stage process all the rest of top level elements and their dependencies.
+The second stage processes all the rest of top level elements and their dependencies.
 
 ## Generators
 

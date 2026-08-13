@@ -68,7 +68,7 @@ flowchart TB
 ```
 
 The precompile stage is language agnostic and happens only once per library. Its output, a `.bdl.o` object per input
-file, is cached and reused by every consumer, this stage is the same as the one described in the
+file, is cached and reused by every consumer. This stage is the same as the one described in the
 [build](build.md) documentation.
 
 The generators stage is then run for each language extension registered with the `bdl_extension` module extension. The

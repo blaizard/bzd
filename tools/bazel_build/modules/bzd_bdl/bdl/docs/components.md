@@ -57,7 +57,7 @@ Area ComplexShape::surface()
 }
 ```
 
-Sub-components help with encapsulation and hence reduce the complexity and composability while improving re-usability.
+Sub-components help with encapsulation and hence reduce the complexity and improve composability while improving re-usability.
 For example, imagine a complex sub-system:
 
 ```bdl

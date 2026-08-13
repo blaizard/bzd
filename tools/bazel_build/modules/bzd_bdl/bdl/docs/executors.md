@@ -46,7 +46,7 @@ Components have various ways to interact with each other.
 - They can be passed as argument through their interface.
 - They can use variables to communicate.
 
-To identify on which core, which component should run on, it depends on its dependency with others.
+To identify on which core a component should run, it depends on its dependency with others.
 If a non-thread safe component is a dependency of another component, they will both run on the same core.
 However, if it is marked with the tag `[threadsafe]`, it will be scheduled on any available core.
 

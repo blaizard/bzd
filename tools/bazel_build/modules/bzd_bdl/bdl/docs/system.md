@@ -32,8 +32,8 @@ bdl_system(
 )
 ```
 
-This means that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and which
-executors are referred under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
+This means that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and whose
+executors are referred to under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
 under the namespace `hpc`.
 
 The `deps` are `bdl_library` targets that contain the composition BDL files shared by all the targets of the system.

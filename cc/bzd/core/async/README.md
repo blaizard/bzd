@@ -4,13 +4,13 @@
 
 ### Handle
 
-The thing referred to by `bzd::async::impl::coroutine_handle<>` is an object, that refers to the coroutine’s dynamically allocated state.
-Thanks to this object you can, for example, resume the coroutine. The coroutine_handle is a templated type, where Promise type is its template argument.
+The thing referred to by `bzd::async::impl::coroutine_handle<>` is an object that refers to the coroutine’s dynamically allocated state.
+Thanks to this object you can, for example, resume the coroutine. The coroutine_handle is a templated type, where the Promise type is its template argument.
 
 ### Frame
 
 The frame contains the current state of the coroutine.
-Coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = delay(10_ms);`
+A coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = delay(10_ms);`
 
 ```c++
 Async<> delay(args...)
@@ -101,8 +101,8 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 
 ### To be aware
 
-- Coroutine in C++ together with lambda capture is nasty, better not use it: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rcoro-capture
-- Generators should not use the error propagation syntax, otherwise the generator async is considered as terminated, while it might be reused.
+- Coroutine in C++ together with lambda capture is nasty, better not use it: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp51-do-not-use-capturing-lambdas-that-are-coroutines
+- Generators should not use the error propagation syntax, otherwise the generator async is considered terminated, while it might be reused.
 
 ### Task
 
@@ -151,7 +151,7 @@ while (it != myFunc.end()) {
 
 #### All
 
-Coroutine can be composed and executed in parallel, depending on the executor used underneath.
+Coroutines can be composed and executed in parallel, depending on the executor used underneath.
 
 To have multiple coroutines run in parallel, this can be done as follows:
 
@@ -163,7 +163,7 @@ This will execute myFunc (assuming it is a coroutine), 3 times and return the re
 
 #### Any
 
-You might also want to execute coroutine and return when the first one terminates, this is handy to implement
+You might also want to execute coroutines and return when the first one terminates, this is handy to implement
 timeouts for example. It can be done as follows:
 
 ```c++
@@ -207,7 +207,7 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 ### Suspend
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments,
-the first, that is guaranteed to be called, contains a movable-only suspended executable object as argument.
+the first, which is guaranteed to be called, contains a movable-only suspended executable object as argument.
 The user needs to dispose it within this callback. Once the callback is completed, the suspended executable object
 cannot be moved anymore.
 It is also guaranteed that no cancellation can occur during the lifetime of this callback.
@@ -220,7 +220,7 @@ This can be used in the context of ISR.
 
 The executors are used to run and schedule asyncs (aka coroutines).
 
-This is what the executor flowchart looks like;
+This is what the executor flowchart looks like:
 
 ```mermaid
 flowchart TD

@@ -23,7 +23,7 @@ The following built-in types are made available by the implementation as built-i
 
 ### Literals
 
-Literals is a notation of a value that may define an arbitrary type, written in the bdl format.
+Literals are a notation of a value that may define an arbitrary type, written in the bdl format.
 Available literals in bdl are:
 
 - integers: `1`, `-4`, ...
