@@ -27,6 +27,11 @@ Apply this skill:
 - OCP & LSP: Design for extension via composition and interfaces without modifying legacy code. Subtypes must satisfy all base type invariants.
 - ISP & DIP: Keep interfaces narrow and caller-focused. Depend strictly on abstractions, never on concrete implementations.
 
+## YAGNI
+
+- Implement only what is required for the current task.
+- Don't add functionality, abstraction, or configuration for hypothetical future needs.
+
 ## Testability
 
 - Isolation: Decouple code from I/O, system time, randomness, and external state using dependency injection.
@@ -45,5 +50,6 @@ Run this mentally before every plan and every implementation step:
 - [ ] DRY: Have I verified this logic or pattern doesn't already exist?
 - [ ] SRP: Does every new class/function have exactly one job?
 - [ ] DIP: Are dependencies pointing toward interfaces/abstractions rather than concretions?
+- [ ] YAGNI: Is this needed now, or am I building for "maybe later"?
 - [ ] Testability: Can I unit-test this in isolation, including all failure modes?
 - [ ] Documentation: Is the code self-documenting, omitting redundant comments except for user-facing APIs?
