@@ -31,7 +31,7 @@
         "default": {
             "interval": "30"
         },
-        "executable": "apps/dyson_fetch/hermetic",
+        "executable": "apps/utils/dyson_fetch/hermetic",
         "inputs": [
             {
                 "caption": "Serial Number",

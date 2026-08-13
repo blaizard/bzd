@@ -1,0 +1,10 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "json",
+    srcs = ["json_test.py"],
+    main = "json_test.py",
+    deps = [
+        "//apps/utils/json:json_lib",
+    ],
+)

@@ -1,4 +1,4 @@
-name: Cybersecurity for apps/accounts
+name: Cybersecurity for apps/artifacts
 
 on:
     workflow_dispatch: # allows manual triggering
@@ -15,7 +15,7 @@ jobs:
                   name: "ci"
                   ttl: "300"
 
-    cybersecurity_accounts:
+    cybersecurity_artifacts:
         needs: [lease_linux]
         runs-on: opencode
         uses: ./.gitea/workflows/sub_cybersecurity.yml
@@ -23,9 +23,8 @@ jobs:
         with:
             prompt: |
                 Deploy the app with (this call is blocking, run in a detached process):
-                `./tools/bazel run //apps/accounts/backend --config=prod -- --port 8080 --test-data`
+                `./tools/bazel run //apps/artifacts/backend/tests:restricted_user --config=prod -- --port 8081`
 
-                Stress-test and probe its API (on http://localhost:8080) for security flaws:
-                auth issues, injection, input validation, rate limiting, info disclosure,
-                confirm rate limiting on login attempt, etc.
+                Stress-test and probe its API (on http://localhost:8081) for security flaws:
+                auth issues, injection, input validation, rate limiting, info disclosure, etc.
                 Enumerate endpoints first, then test each.

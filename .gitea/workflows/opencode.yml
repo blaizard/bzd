@@ -48,8 +48,8 @@ jobs:
                           exit 1
                       else
                           echo "No routing needed for this event."
-                      fi    
-                  elif [[ "$EVENT_NAME" == "pull_request" && "$ACTOR" == "agent" ]]; then
+                      fi
+                  elif [[ "$EVENT_NAME" == "pull_request" && "$ACTOR" == "agent" && "$PR_BODY" == *"[Issue #"* ]]; then
                       route="initialize_pr"
                   elif [[ "$EVENT_NAME" == "pull_request_review" && "$ACTOR" != "agent" ]]; then
                       route="update_pr"
@@ -150,7 +150,7 @@ jobs:
         needs: [router, lease_linux]
         runs-on: opencode
         if: needs.router.outputs.route == 'create_pr'
-        uses: ./.gitea/workflows/sub_create_pr.yml
+        uses: ./.gitea/workflows/sub_create_pr_from_comment.yml
         secrets: inherit
 
     route_initialize_pr:

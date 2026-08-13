@@ -25,7 +25,7 @@ class Feature:
 	def __init__(self, args: argparse.Namespace) -> None:
 		self.args = args
 		self.isAvailable: bool = True
-		self.groups: typing.List[str] = []
+		self.groups: typing.List[typing.Union[int, str]] = []
 		self.volumes: typing.List[str] = []
 		self.dockerFile: typing.List[str] = []
 		self.dockerCompose: typing.Dict[str, typing.List[str]] = {}
@@ -177,7 +177,8 @@ class FeatureOpenCode(Feature):
 			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
 			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
 			f"ENV OPENCODE_CONFIG_DIR={context.home}/.opencode_config",
-			"RUN sudo apt install -y nodejs npm",
+			# Note: ripgrep (rp) is often used by agents.
+			"RUN sudo apt install -y nodejs npm ripgrep",
 			"RUN sudo npm install -g opencode-ai@latest",
 			f"RUN echo '{
 				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
@@ -222,7 +223,7 @@ class FeatureDocker(Feature):
 				return dockerSocket.resolve()
 		return None
 
-	def getDockerGid(self) -> str:
+	def getDockerGid(self) -> int:
 		"""Get the docker group.
 
 		This method is also compatible with macos, where the docker socket is created only with docker.
@@ -244,7 +245,7 @@ class FeatureDocker(Feature):
 			capture_output=True,
 		)
 		assert result.returncode == 0, "Failed to get docker group id from container."
-		return str(result.stdout.decode().strip().strip("'\""))
+		return int(result.stdout.decode().strip().strip("'\""))
 
 	def process(self, context: "SandboxContainer") -> None:
 		self.groups += [self.getDockerGid()]
@@ -303,19 +304,27 @@ class SandboxContainer:
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 
 		self.root = args.root.resolve().absolute()
-		self.home = pathlib.Path.home()
+		self.home = args.home
 		self.temporaryPath = temporaryPath
-		self.uid = os.getuid()
-		self.gid = os.getgid()
-		self.userNamespaceRemapping = SandboxContainer.isUserNamespaceRemapping()
+		self.uid = args.uid
+		self.gid = args.gids[0]
+		self.gids = sorted(set(args.gids) - {self.gid})
+		self.userNamespaceRemapping = args.user_namespace_remapping
 		self.isInteractive = False if args.no_tty else (sys.stdin.isatty() and sys.stdout.isatty())
-		self.user = "root" if self.userNamespaceRemapping else getpass.getuser()
+		self.user = "root" if self.userNamespaceRemapping else args.user
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
 
 	@cached_property
 	def toHash(self) -> typing.List[str]:
-		toHash = [f"root={self.root.as_posix()}", f"user={getpass.getuser()}", f"interactive={self.isInteractive}"]
+		toHash = [
+			f"root={self.root.as_posix()}",
+			f"user={self.user}",
+			f"uid={self.uid}",
+			f"gid={self.gid}",
+			f"gids={self.gids}",
+			f"interactive={self.isInteractive}",
+		]
 		toHash += sorted([feature.__class__.__name__ for feature in self.features])
 		argNames = sorted([kwargs.get("dest", name) for feature in self.features for name, kwargs in feature.cli().items()])
 		toHash += [f"{name}={getattr(self.args, name)}" for name in argNames]
@@ -393,20 +402,27 @@ class SandboxContainer:
 				f"RUN mkdir -p {self.home}",
 			]
 		else:
-			user_groups = {gid: grp.getgrgid(gid).gr_name for gid in os.getgrouplist(self.user, self.gid)}
-			groups = sorted(
-				set(
-					[str(gid) for gid in user_groups.keys()]
-					+ ["sudo"]
-					+ [group for feature in self.features for group in feature.groups]
-				)
-			)
+
+			def getGroupName(gid: int) -> str:
+				try:
+					return grp.getgrgid(gid).gr_name
+				except KeyError:
+					return f"group_{gid}"
+
+			groups = [self.gid, *self.gids, "sudo"] + [group for feature in self.features for group in feature.groups]
+			groupsInt = {g: getGroupName(g) for g in groups if isinstance(g, int)}
+			groupsStr = [g for g in groups if isinstance(g, str)]
+
+			# Delete any existing user with the same uid if any.
+			instructions += [f"RUN id -u {self.uid} &>/dev/null && userdel -r $(id -un {self.uid}) || true"]
 			# Create all user groups if not existing.
-			instructions += [f"RUN getent group {gid} || groupadd -g {gid} '{name}'" for gid, name in user_groups.items()]
 			instructions += [
-				# Delete any existing user with the same uid if any.
-				f"RUN id -u {self.uid} &>/dev/null && userdel -r $(id -un {self.uid}) || true",
-				f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join(groups)} {self.user}",
+				f"RUN getent group {gid} || groupadd -g {gid} '{name}' || groupmod -g {gid} '{name}'"
+				for gid, name in groupsInt.items()
+			]
+			instructions += [f"RUN getent group '{name}' || groupadd '{name}'" for name in groupsStr]
+			instructions += [
+				f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join([str(gid) for gid in groupsInt.keys()] + groupsStr)} {self.user}",
 				f"""RUN echo "\"{self.user}\" ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers""",
 				f'RUN chown "{self.user}" /bzd/startup.sh',
 				f"USER {self.user}",
@@ -717,6 +733,7 @@ services:
 		}
 
 		parser = argparse.ArgumentParser(
+			formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 			description="Sandbox container.",
 			epilog=f"Additional commands: {', '.join(additionalCommands.keys())}",
 		)
@@ -737,6 +754,31 @@ services:
 			type=pathlib.Path,
 			default=pathlib.Path.cwd(),
 			help="The root (top) folder to be mounted in the container.",
+		)
+		parser.add_argument(
+			"--home",
+			type=pathlib.Path,
+			default=pathlib.Path.home(),
+			help="The home user folder.",
+		)
+		parser.add_argument("--user", help="The user name.", default=getpass.getuser())
+		parser.add_argument(
+			"--uid",
+			type=int,
+			default=os.getuid(),
+			help="The user identifier for this container.",
+		)
+		parser.add_argument(
+			"--gids",
+			type=lambda value: [int(v) for v in value.split(",") if v.strip()],
+			default=[os.getgid(), *os.getgrouplist(getpass.getuser(), os.getgid())],
+			help="The user group identifier for this container.",
+		)
+		parser.add_argument(
+			"--user-namespace-remapping",
+			action=argparse.BooleanOptionalAction,
+			default=SandboxContainer.isUserNamespaceRemapping(),
+			help="Enable or disable verbose output.",
 		)
 		parser.add_argument(
 			"--env",

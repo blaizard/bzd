@@ -56,7 +56,7 @@ jobs:
               id: parse
               shell: bash
               run: |
-                  cp /tmp/agent-response.txt /tmp/agent-response.json
+                  bzd-lease ./tools/bazel run //apps/utils/json -- --file /tmp/agent-response.txt --repair --dump > /tmp/agent-response.json
 
                   echo "==== json =============================================="
                   cat /tmp/agent-response.json

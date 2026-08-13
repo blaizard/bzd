@@ -1,0 +1,21 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "json_lib",
+    srcs = [
+        "json.py",
+    ],
+    visibility = [
+        "//apps/utils/json:__subpackages__",
+    ],
+)
+
+py_binary(
+    name = "json",
+    srcs = [
+        "json.py",
+    ],
+    deps = [
+        ":json_lib",
+    ],
+)

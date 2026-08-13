@@ -53,6 +53,7 @@ sh_binary_wrapper(
 py_binary(
     name = "sandbox",
     srcs = ["sandbox.py"],
+    visibility = ["//visibility:public"],
 )
 
 bzd_executable_test(

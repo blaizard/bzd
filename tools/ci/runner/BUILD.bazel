@@ -1,0 +1,46 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "generate_dockerfile",
+    srcs = [
+        "generate_dockerfile.py",
+    ],
+    deps = [
+        "//:sandbox",
+    ],
+)
+
+genrule(
+    name = "linux_dockerfile",
+    outs = ["Dockerfile.linux"],
+    cmd = "$(execpath :generate_dockerfile) --output $@ linux",
+    tools = [":generate_dockerfile"],
+)
+
+sh_binary_wrapper(
+    name = "linux",
+    command = """
+        docker build -f $(readlink -f {Dockerfile}) "$@" .
+    """,
+    locations = {
+        ":Dockerfile.linux": "Dockerfile",
+    },
+)
+
+genrule(
+    name = "opencode_dockerfile",
+    outs = ["Dockerfile.opencode"],
+    cmd = "$(execpath :generate_dockerfile) --output $@ opencode",
+    tools = [":generate_dockerfile"],
+)
+
+sh_binary_wrapper(
+    name = "opencode",
+    command = """
+        docker build -f $(readlink -f {Dockerfile}) "$@" .
+    """,
+    locations = {
+        ":Dockerfile.opencode": "Dockerfile",
+    },
+)

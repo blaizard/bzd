@@ -34,8 +34,6 @@ jobs:
             - name: "Post comment on PR"
               uses: ./.gitea/actions/comment
               with:
-                  api_url: ${{ github.api_url }}
-                  repository: ${{ github.repository }}
                   issue_number: ${{ inputs.issue_number }}
                   token: ${{ secrets.BZD_AGENT_TOKEN }}
                   body_file: /tmp/agent-response.txt

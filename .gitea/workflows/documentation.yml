@@ -3,7 +3,7 @@ name: Documentation
 on:
     workflow_dispatch: # allows manual triggering
     schedule:
-        - cron: "0 18 * * 4" # runs every thursday at 18:00 UTC (03:00 JST)
+        - cron: "0 18 * * 4" # runs every thursday at 18:00 UTC (friday 03:00 JST)
 
 jobs:
     lease_linux:

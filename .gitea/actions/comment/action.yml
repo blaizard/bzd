@@ -4,10 +4,12 @@ description: "Comment on an issue or pull request"
 inputs:
     api_url:
         description: "The Gitea API URL (e.g., https://gitea.com/api/v1)"
-        required: true
+        required: false
+        default: ${{ github.api_url }}
     repository:
         description: "The repository to comment on (format: owner/repo)"
-        required: true
+        required: false
+        default: ${{ github.repository }}
     issue_number:
         description: "The issue or pull request number to comment on"
         required: true
@@ -23,16 +25,21 @@ runs:
     steps:
         - name: "Post comment to Gitea"
           shell: bash
+          env:
+              API_URL: ${{ inputs.api_url }}
+              REPOSITORY: ${{ inputs.repository }}
+              TOKEN: ${{ inputs.token }}
+              ISSUE_NUMBER: ${{ inputs.issue_number }}
+              BODY_FILE: ${{ inputs.body_file }}
           run: |
               set -euo pipefail
-              if [ ! -s "${{ inputs.body_file }}" ]; then
-                  echo "Error: Body file '${{ inputs.body_file }}' is missing or empty."
-                  exit 1
-              fi
-              payload=$(jq -n --rawfile body "${{ inputs.body_file }}" '{body: $body}')
+
+              payload=$(jq -n --rawfile body "$BODY_FILE" '{body: $body}')
+
               curl -sS --fail-with-body -X POST \
-                  -H "Authorization: token ${{ inputs.token }}" \
+                  -H "Authorization: token $TOKEN" \
                   -H "Content-Type: application/json" \
                   -d "$payload" \
-                  "${{ inputs.api_url }}/repos/${{ inputs.repository }}/issues/${{ inputs.issue_number }}/comments"
+                  "$API_URL/repos/$REPOSITORY/issues/$ISSUE_NUMBER/comments"
+
               echo "SUCCESS: comment created."

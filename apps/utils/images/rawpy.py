@@ -3,7 +3,7 @@ import pathlib
 import rawpy
 from PIL import Image
 
-from apps.images.converter import Converter, OutputFormat, ConversionResult
+from apps.utils.images.converter import Converter, OutputFormat, ConversionResult
 
 
 class ConverterRawpy(Converter):

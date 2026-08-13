@@ -7,8 +7,8 @@ bzd_config_default(
         "config.default.json",
     ],
     data = [
-        "//apps/dyson_fetch:hermetic",
         "//apps/job_executor/tests:sleep",
+        "//apps/utils/dyson_fetch:hermetic",
     ],
     values = {
         "jobs.sleep.executable": "$(rootpath //apps/job_executor/tests:sleep)",
@@ -17,8 +17,8 @@ bzd_config_default(
         "//deployment:__subpackages__",
     ],
     deps = [
-        "//apps/dyson_fetch:config.job_executor.json",
         "//apps/ebook:config.job_executor.json",
+        "//apps/utils/dyson_fetch:config.job_executor.json",
     ],
 )
 

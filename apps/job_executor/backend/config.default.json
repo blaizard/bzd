@@ -14,7 +14,7 @@
     "jobs": {
         "$refs": [
             "apps/ebook/config.job_executor.json",
-            "apps/dyson_fetch/config.job_executor.json"
+            "apps/utils/dyson_fetch/config.job_executor.json"
         ],
         "bash": {
             "args": [],
