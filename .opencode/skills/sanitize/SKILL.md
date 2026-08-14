@@ -1,6 +1,6 @@
 ---
 name: sanitize
-description: Sanitizes, refactors, and cleans up modified code files to meet senior engineering standards. Use when the user asks to sanitize, clean up, refactor code, run formatters/linters, fix comments, or prepare files for a commit.
+description: Use when asked to implement, sanitize, clean up, refactor code, run formatters/linters, fix comments, or prepare files for a commit.
 compatibility: opencode
 ---
 
