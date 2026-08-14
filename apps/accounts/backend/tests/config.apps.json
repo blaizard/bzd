@@ -1,0 +1,1075 @@
+{
+    "tests": [
+        {
+            "doc": "Enumeration parity (registered email): attempt 1 with wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (registered email): attempt 2 with wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (registered email): attempt 3 with wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (registered email): attempt 4 with wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (registered email): attempt 5 with wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (registered email): attempt 6 is over-limit (429), same status as a ghost account.",
+            "expects": {
+                "status": 429
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-0@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.1"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 1.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 2.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 3.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 4.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 5.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Enumeration parity (ghost email): attempt 6 is over-limit (429), matching the registered account's 429.",
+            "expects": {
+                "status": 429
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ghost@nobody.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.2"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 1 of 6): wrong attempt.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 2 of 6): wrong attempt.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 3 of 6): wrong attempt.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 4 of 6): wrong attempt.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 5 of 6): wrong attempt.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Over-limit blocks a correct password (attempt 6 of 6): even the correct password is rejected with 429.",
+            "expects": {
+                "status": 429
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "1234",
+                        "persistent": false,
+                        "uid": "dummy-1@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.3"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "A fresh account with the correct password still logs in (rate limiting is per-key, not global).",
+            "expects": {
+                "status": 200
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "1234",
+                        "persistent": false,
+                        "uid": "dummy-2@dummy.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.4"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 1 of 31): 1 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-00@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 2 of 31): 2 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-01@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 3 of 31): 3 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-02@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 4 of 31): 4 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-03@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 5 of 31): 5 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-04@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 6 of 31): 6 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-05@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 7 of 31): 7 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-06@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 8 of 31): 8 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-07@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 9 of 31): 9 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-08@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 10 of 31): 10 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-09@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 11 of 31): 11 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-10@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 12 of 31): 12 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-11@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 13 of 31): 13 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-12@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 14 of 31): 14 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-13@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 15 of 31): 15 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-14@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 16 of 31): 16 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-15@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 17 of 31): 17 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-16@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 18 of 31): 18 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-17@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 19 of 31): 19 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-18@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 20 of 31): 20 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-19@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 21 of 31): 21 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-20@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 22 of 31): 22 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-21@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 23 of 31): 23 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-22@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 24 of 31): 24 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-23@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 25 of 31): 25 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-24@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 26 of 31): 26 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-25@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 27 of 31): 27 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-26@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 28 of 31): 28 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-27@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 29 of 31): 29 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-28@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 30 of 31): 30 distinct email from this IP.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-29@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit (attempt 31 of 31): a new distinct email from the same IP is now blocked (429).",
+            "expects": {
+                "status": 429
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-31@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.5"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "IP over-limit: a fresh IP is not blocked (per-IP isolation), still 401 for a wrong password.",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": "wrong",
+                        "persistent": false,
+                        "uid": "ip-e@x.com"
+                    },
+                    "headers": {
+                        "x-forwarded-for": "10.0.0.6"
+                    }
+                }
+            ]
+        }
+    ]
+}

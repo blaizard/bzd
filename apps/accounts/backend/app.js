@@ -6,11 +6,13 @@ import kvsMakeFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.j
 import emailMakeFromConfig from "#bzd/nodejs/email/make_from_config.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import RateLimiter from "#bzd/nodejs/core/rate_limit.js";
 import Authentication from "#bzd/nodejs/core/authentication/session/server.js";
 import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/server.js";
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/server.js";
 import Result from "#bzd/nodejs/utils/result.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
+import User from "#bzd/apps/accounts/backend/users/user.js";
 import Users from "#bzd/apps/accounts/backend/users/users.js";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.js";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.js";
@@ -50,7 +52,8 @@ const Log = LogFactory("backend");
 		.useStaticContentOptions({
 			headers: headers,
 		})
-		.useServices();
+		.useServices()
+		.useCache();
 
 	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
 	const email = await emailMakeFromConfig(configBackend.email);
@@ -63,6 +66,10 @@ const Log = LogFactory("backend");
 
 	// Applications
 	const applications = new Applications(keyValueStore);
+
+	// Rate limiting
+	let emailLimiter;
+	let ipLimiter;
 
 	// ---- Helpers ----
 
@@ -98,29 +105,52 @@ const Log = LogFactory("backend");
 	// ---- Authentication ----
 
 	let authentication = new Authentication({
-		verifyIdentity: async (email, password = null) => {
-			const maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
-			if (maybeUser === null) {
-				return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
-			}
-			// Limit the number of login attempt against brute forcing for an interval of 2s.
-			if (maybeUser.getLastFailedLoginTimestamp() + 2000 > Date.now()) {
+		verifyIdentity: async (email, password = null, callerId = null) => {
+			// Per-caller (IP) rate limiting applies first, if a caller identifier is available.
+			if (callerId && (await ipLimiter.isOverLimit(callerId))) {
 				return Result.makeError(Authentication.ErrorVerifyIdentity.tooManyAttempts);
 			}
-			// Check the password if provided.
-			if (password !== null) {
-				const isEqual = await maybeUser.isPasswordEqual(password);
-				if (!isEqual) {
-					await users.update(
-						maybeUser.getUid(),
-						(user) => {
-							user.setLastFailedLogin();
-							return user;
-						},
-						/*silent*/ true,
-					);
-					return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
+			if (await emailLimiter.isOverLimit(email)) {
+				return Result.makeError(Authentication.ErrorVerifyIdentity.tooManyAttempts);
+			}
+
+			// Add timing randomness to avoid account enumeration.
+			await delayMs(Math.random() * 20);
+
+			const maybeUser = await users.getFromEmail(email, /*allowNull*/ true);
+			if (maybeUser === null) {
+				await emailLimiter.record(email);
+				if (callerId) {
+					await ipLimiter.record(callerId);
 				}
+				return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
+			}
+
+			const passwordOk =
+				password !== null
+					? await maybeUser.isPasswordEqual(password)
+					: // SSO login: the identity was already verified upstream, no password to check.
+						true;
+
+			if (!passwordOk) {
+				await emailLimiter.record(email);
+				if (callerId) {
+					await ipLimiter.record(callerId);
+				}
+				await users.update(
+					maybeUser.getUid(),
+					(user) => {
+						user.setLastFailedLogin();
+						return user;
+					},
+					/*silent*/ true,
+				);
+				return Result.makeError(Authentication.ErrorVerifyIdentity.unauthorized);
+			}
+
+			await emailLimiter.reset(email);
+			if (callerId) {
+				await ipLimiter.reset(callerId);
 			}
 			await users.update(
 				maybeUser.getUid(),
@@ -284,6 +314,17 @@ const Log = LogFactory("backend");
 	// ---- REST ----
 
 	backend.useAuthentication(authentication).useRest(APIv1.rest).useLoggerMemory().setup();
+
+	emailLimiter = new RateLimiter(backend.cache, {
+		bucket: "rate.limit.login",
+		threshold: 5,
+		windowMs: 900 * 1000,
+	});
+	ipLimiter = new RateLimiter(backend.cache, {
+		bucket: "rate.limit.ip",
+		threshold: 30,
+		windowMs: 900 * 1000,
+	});
 
 	backend.rest.installPlugins(authenticationGoogle, authenticationFacebook, users, applications, payment);
 

@@ -145,6 +145,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "rate_limit",
+    srcs = [
+        "rate_limit.js",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "router",
     srcs = [
         "router.js",

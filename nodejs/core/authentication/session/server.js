@@ -197,7 +197,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	async _login(context, identifier, persistent, uid, password = undefined) {
-		const sessionInfoResult = await this.options.verifyIdentity(uid, password);
+		const sessionInfoResult = await this.options.verifyIdentity(uid, password, context.getIp());
 		if (sessionInfoResult.hasValue()) {
 			const session = new Session(sessionInfoResult.value().uid, sessionInfoResult.value().scopes);
 

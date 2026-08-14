@@ -19,7 +19,9 @@ export default class AuthenticationServer {
 				/// This function can be called with only the uid, this case must be taken into account.
 				/// In return on success, it will return the UID to be used and scopes as a dictionary.
 				/// Otherwise, an error Result with a code from ErrorVerifyIdentity should be returned.
-				/// The signature of this function is `async (uid, password)`.
+				/// The signature of this function is `async (uid, password, callerId)`.
+				/// `callerId` is an optional opaque per-caller identifier (e.g. the client IP address) used for
+				/// rate limiting, and may be omitted for backward compatibility.
 				/// It should return an error Result if it doesn't verify. Otherwise, it should return a Result of
 				/// a dict containing the `uid` and `scopes` as key.
 				verifyIdentity: null,

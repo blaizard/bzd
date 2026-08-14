@@ -1,0 +1,28 @@
+load("@bzd_lib//:defs.bzl", "bzd_executable_test")
+load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("//apps/accounts:defs.bzl", "bzd_accounts_binary")
+
+bzd_config(
+    name = "config_apps",
+    srcs = [
+        "config.apps.json",
+    ],
+    base = "//apps/accounts:config.base",
+)
+
+bzd_accounts_binary(
+    name = "rate_limit_test_backend",
+    configs = {
+        "//apps/accounts:config": ":config_apps",
+    },
+)
+
+bzd_executable_test(
+    name = "rate_limit_tests",
+    args = [
+        "--test",
+        "--test-data",
+    ],
+    executable = ":rate_limit_test_backend",
+    expected_returncode = "0",
+)

@@ -80,7 +80,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 
 		rest.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair
-			const sessionInfoResult = await authentication.options.verifyIdentity(inputs.uid, inputs.password);
+			const sessionInfoResult = await authentication.options.verifyIdentity(inputs.uid, inputs.password, this.getIp());
 			if (sessionInfoResult.hasValue()) {
 				return generateTokens.call(
 					this,
@@ -92,10 +92,10 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 			}
 			switch (sessionInfoResult.error()) {
 				case AuthenticationServer.ErrorVerifyIdentity.tooManyAttempts:
-					throw context.httpError(429, "Too Many Requests");
+					throw this.httpError(429, "Too Many Requests");
 				case AuthenticationServer.ErrorVerifyIdentity.unauthorized:
 				default:
-					throw this.httpErrorUnauthorized(/*requestAuthentication*/ false);
+					throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
 			}
 		});
 

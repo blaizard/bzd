@@ -1,11 +1,13 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { toString } from "#bzd/nodejs/core/stream.js";
 import { HttpError } from "#bzd/nodejs/core/http/server_context.js";
+import HttpServerContextCommon from "../server_context_common.js";
 
 const Exception = ExceptionFactory("http", "server", "context", "mock");
 
-export default class MockServerContext {
+export default class MockServerContext extends HttpServerContextCommon {
 	constructor() {
+		super();
 		this.request = {
 			path: null,
 			method: "GET",

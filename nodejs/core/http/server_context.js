@@ -1,4 +1,5 @@
 import ExceptionFactory from "../exception.js";
+import HttpServerContextCommon from "./server_context_common.js";
 import { pipeline, finished } from "stream/promises";
 import Busboy from "busboy";
 import { toString } from "#bzd/nodejs/core/stream.js";
@@ -24,8 +25,9 @@ export class HttpError extends Error {
 }
 
 /// Abstraction of the request/response pair of the server.
-export class HttpServerContext {
+export class HttpServerContext extends HttpServerContextCommon {
 	constructor(request, response) {
+		super();
 		this.request = request;
 		this.response = response;
 		this.session = null;

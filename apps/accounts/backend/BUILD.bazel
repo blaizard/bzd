@@ -8,6 +8,7 @@ bzd_config_default(
         "config.default.json",
     ],
     visibility = [
+        "//apps/accounts:__subpackages__",
         "//deployment:__subpackages__",
     ],
 )
@@ -35,6 +36,7 @@ bzd_nodejs_binary(
     ],
     visibility = [
         "//apps/accounts:__pkg__",
+        "//apps/accounts/backend:__subpackages__",
     ],
     deps = [
         "//apps/accounts/backend/applications",
@@ -42,6 +44,7 @@ bzd_nodejs_binary(
         "//apps/accounts/backend/test_data",
         "//apps/accounts/backend/users",
         "//nodejs/core:filesystem",
+        "//nodejs/core:rate_limit",
         "//nodejs/core/authentication/facebook:server",
         "//nodejs/core/authentication/google:server",
         "//nodejs/core/authentication/session:server",
@@ -56,7 +59,7 @@ bzd_nodejs_binary(
 )
 
 bzd_executable_test(
-    name = "tests",
+    name = "backend_tests",
     args = [
         "--test",
         "--test-data",

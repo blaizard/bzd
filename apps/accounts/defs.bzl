@@ -10,3 +10,12 @@ bzd_accounts_oci, _ = make_bzd_config_apply(
         Label("//apps/artifacts/api:config"),
     ],
 )
+
+bzd_accounts_binary, _binary = make_bzd_config_apply(
+    target = Label("//apps/accounts/backend"),
+    configs = [
+        Label("//apps/accounts:config"),
+        Label("//apps/accounts/backend:config"),
+    ],
+    executable = True,
+)

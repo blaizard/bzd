@@ -43,6 +43,14 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
+    name = "server_context_common",
+    srcs = [
+        "server_context_common.js",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+bzd_nodejs_library(
     name = "server_context",
     srcs = [
         "server_context.js",
@@ -52,6 +60,7 @@ bzd_nodejs_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":server_context_common",
         "//nodejs/core:exception",
         "//nodejs/core:stream",
     ],
