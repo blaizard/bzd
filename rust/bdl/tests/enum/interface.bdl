@@ -1,0 +1,11 @@
+
+namespace bzd.components.esp;
+
+
+enum UartDevice
+{
+	uart0
+,	uart1
+}
+
+

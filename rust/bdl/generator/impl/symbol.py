@@ -9,6 +9,10 @@ from bdl.entities.impl.types import Category
 from rust.bdl.generator.impl.builtins import builtins
 
 
+def fqnToCapitalized(fqn: str) -> str:
+	return "".join([part[:1].upper() + part[1:] for part in FQN.toNamespace(fqn)])
+
+
 class _VisitorRustSymbol(Visitor):
 	"""Visitor to print a Rust type."""
 
@@ -47,18 +51,14 @@ class _VisitorRustSymbol(Visitor):
 
 		outputList: typing.List[str] = []
 		output: str
-		for index, fqn in enumerate(symbol.kinds):
+		for fqn in symbol.kinds:
 			if fqn in builtins:
 				if callable(builtins[fqn].toType):
 					output, nested = builtins[fqn].toType(symbol, nested, useReference, self.values)
 				else:
 					output = builtins[fqn].toType
 			else:
-				namespace = FQN.toNamespace(fqn)
-				if index == 0:
-					output = "::".join(namespace)
-				else:
-					output = namespace[-1]
+				output = fqnToCapitalized(fqn=fqn)
 			outputList.append(output)
 		output = "::".join(outputList)
 
@@ -80,7 +80,9 @@ class _VisitorRustSymbol(Visitor):
 
 		# Apply const if needed. In Rust, a const type is a shared reference.
 		# Types that already are references are left untouched.
-		if symbol.const and self.isTopLevel and not self.nonConst and not output.startswith("&"):
+		# Scalar value types are trivially copyable and are passed by value instead.
+		isValueType = symbol.kinds[0] in builtins and getattr(builtins[symbol.kinds[0]], "isCopy", False)
+		if symbol.const and self.isTopLevel and not self.nonConst and not output.startswith("&") and not isValueType:
 			output = "&" + output
 
 		return output

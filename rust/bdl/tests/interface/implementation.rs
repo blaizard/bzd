@@ -1,14 +1,14 @@
 #![no_std]
 #![no_main]
 
-use interface::MyInterface;
+use rust_bdl_tests_interface_interface::BzdTestMyInterface;
 
 #[allow(dead_code)]
 struct Calculator;
 
-impl MyInterface for Calculator {
-    fn add(&self, a: &i32, b: &i32) -> i32 {
-        *a + *b
+impl BzdTestMyInterface for Calculator {
+    fn add(&self, a: i32, b: i32) -> i32 {
+        a + b
     }
 }
 
@@ -20,7 +20,7 @@ mod tests {
     #[test]
     fn test_calculator() -> TestResult {
         let calculator = Calculator;
-        assert_eq!(calculator.add(&2, &3), 5)?;
+        assert_eq!(calculator.add(2, 3), 5)?;
         Ok(())
     }
 }

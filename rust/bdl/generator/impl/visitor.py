@@ -8,6 +8,7 @@ from bdl.object import Object
 from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.types import Category as CategoryOriginal
 
+from rust.bdl.generator.impl.symbol import fqnToCapitalized as fqnToCapitalizedOriginal
 from rust.bdl.generator.impl.symbol import symbolRustToStr
 
 
@@ -16,6 +17,13 @@ class Transform:
 
 	def __init__(self, data: Optional[Dict[str, Any]] = None) -> None:
 		self.data = data if data else {}
+
+	def fqnToCapitalized(self, fqn: str) -> str:
+		return fqnToCapitalizedOriginal(fqn=fqn)
+
+	def toCamelCase(self, string: str) -> str:
+		assert len(string), "String cannot be empty."
+		return string[0].upper() + string[1:]
 
 	def symbolToStr(self, symbol: Optional[Symbol]) -> str:
 		return symbolRustToStr(symbol)

@@ -10,6 +10,7 @@ doc_binary(
         #("Bazel", "//docs/api/bazel"),
         ("C++", "//cc:documentation"),
         ("Python", "@bzd_python//:documentation"),
+        ("Rust", "//rust:documentation"),
     ],
     data = glob([
         "**/*.png",

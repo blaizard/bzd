@@ -13,7 +13,77 @@ class TestInterface(unittest.TestCase):
 }
 """
 		expectedContent = """pub trait MyInterface {
-    fn add(&self, a: &i32, b: &i32) -> i32;
+    fn add(&self, a: i32, b: i32) -> i32;
+}
+"""
+
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertEqual(
+			actual.rstrip("\n"),
+			expectedContent.rstrip("\n"),
+		)
+
+	def testNamespace(self) -> None:
+
+		bdlContent = """namespace bzd.test;
+
+interface MyInterface {
+	method add(a = const Integer, b = const Integer) -> Integer;
+}
+"""
+		expectedContent = """pub trait BzdTestMyInterface {
+    fn add(&self, a: i32, b: i32) -> i32;
+}
+"""
+
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertEqual(
+			actual.rstrip("\n"),
+			expectedContent.rstrip("\n"),
+		)
+
+	def testEnum(self) -> None:
+
+		bdlContent = """namespace bzd.components.esp;
+
+enum UartDevice
+{
+	uart0
+,	uart1
+}
+"""
+		expectedContent = """#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum BzdComponentsEspUartDevice {
+    Uart0,
+    Uart1,
+}
+"""
+
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertEqual(
+			actual.rstrip("\n"),
+			expectedContent.rstrip("\n"),
+		)
+
+	def testEnumNoNamespace(self) -> None:
+
+		bdlContent = """enum LightState {
+	on
+,	off
+}
+"""
+		expectedContent = """#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum LightState {
+    On,
+    Off,
 }
 """
 
@@ -34,7 +104,7 @@ class TestInterface(unittest.TestCase):
 }
 """,
 				"""pub trait MyInterface {
-    fn f(&self, a: &f32) -> f32;
+    fn f(&self, a: f32) -> f32;
 }
 """,
 			),
@@ -44,7 +114,7 @@ class TestInterface(unittest.TestCase):
 }
 """,
 				"""pub trait MyInterface {
-    fn f(&self, a: &bool) -> bool;
+    fn f(&self, a: bool) -> bool;
 }
 """,
 			),
@@ -54,7 +124,7 @@ class TestInterface(unittest.TestCase):
 }
 """,
 				"""pub trait MyInterface {
-    fn f(&self, a: &u8) -> u8;
+    fn f(&self, a: u8) -> u8;
 }
 """,
 			),
@@ -114,7 +184,7 @@ class TestInterface(unittest.TestCase):
 }
 """,
 				"""pub trait MyInterface {
-    fn f(&self, a: &i32) -> &[i32; 1];
+    fn f(&self, a: i32) -> &[i32; 1];
 }
 """,
 			),
@@ -134,7 +204,17 @@ class TestInterface(unittest.TestCase):
 }
 """,
 				"""pub trait MyInterface {
-    fn f(&self, a: &i32) -> &[i32];
+    fn f(&self, a: i32) -> &[i32];
+}
+""",
+			),
+			"Result parameter": (
+				"""interface MyInterface {
+	method f(a = const Result<Integer>) -> Integer;
+}
+""",
+				"""pub trait MyInterface {
+    fn f(&self, a: &Result<i32, bzd::base::error::Error>) -> i32;
 }
 """,
 			),

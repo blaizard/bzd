@@ -8,6 +8,7 @@ TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
 
 class IntegerType:
 	constexpr: bool = True
+	isCopy: bool = True
 
 	@staticmethod
 	def toType(
@@ -42,6 +43,7 @@ class IntegerType:
 
 class FloatType:
 	constexpr = True
+	isCopy: bool = True
 	toType = "f32"
 
 
@@ -57,11 +59,13 @@ class NoneType:
 
 class Byte:
 	constexpr = True
+	isCopy: bool = True
 	toType = "u8"
 
 
 class Boolean:
 	constexpr = True
+	isCopy: bool = True
 	toType = "bool"
 
 

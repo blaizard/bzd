@@ -1,0 +1,10 @@
+
+namespace bzd.test;
+
+
+interface FileB {
+	method compute() -> Integer;
+	
+}
+
+

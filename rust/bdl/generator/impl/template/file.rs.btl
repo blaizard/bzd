@@ -1,13 +1,20 @@
-{% for data in nestedList %}
+{% for data in sequence %}
 	{% if not data.isExtern %}
 		{% if data.category == Category.interface %}
-pub trait {{ data.name }} {
+pub trait {{ data.fqn | fqnToCapitalized }} {
 {% for method in data.interface.methodList %}
 	{% if method.isSymbol %}
     fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %}) -> {{ method.symbol | symbolNonConstToStr }};
 	{% else %}
     fn {{ method.name }}(&self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %});
 	{% end %}
+{% end %}
+}
+		{%- elif data.category == Category.enum %}
+#[repr(u8)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+pub enum {{ data.fqn | fqnToCapitalized }} {
+{% for value in data.values %}    {{ value.name | toCamelCase }},
 {% end %}
 }
 		{%- elif data.category == Category.struct %}

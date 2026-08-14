@@ -77,6 +77,9 @@ bdl_library(
     deps = [
         "//cc/bzd/core:channel",
     ],
+    implementation = {
+        "rust": "//rust/interfaces/impl:stream",
+    },
 )
 
 bdl_library(

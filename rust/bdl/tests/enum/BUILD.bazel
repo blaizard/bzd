@@ -1,0 +1,26 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+)
+
+rust_library(
+    name = "implementation",
+    srcs = [
+        "implementation.rs",
+    ],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+    ],
+)
+
+rust_test(
+    name = "implementation_test",
+    crate = ":implementation",
+)

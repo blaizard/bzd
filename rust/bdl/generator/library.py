@@ -13,6 +13,12 @@ if __name__ == "__main__":
 		help="Preprocessed Bdl files.",
 	)
 	parser.add_argument(
+		"--include",
+		action="append",
+		type=str,
+		help="Crate name of a bdl dependency to re-export.",
+	)
+	parser.add_argument(
 		"--output",
 		type=pathlib.Path,
 		required=True,
@@ -22,6 +28,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	content = "#![no_std]\n\n"
+	for include in args.include or []:
+		content += f"pub use {include}::*;\n"
+	content += "\n"
 	for inputPath in args.bdl:
 		bdl = ObjectContext().loadPreprocess(preprocess=inputPath)
 		content += f"// Code generation for {inputPath}\n\n"
