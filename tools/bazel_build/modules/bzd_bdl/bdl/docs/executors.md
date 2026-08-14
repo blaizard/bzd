@@ -20,7 +20,7 @@ composition
 }
 ```
 
-Sometimes, for portability purpose, you might want to inject the knowledge of cores at runtime.
+Sometimes, for portability purposes, you might want to inject the knowledge of cores at runtime.
 To do so, a platform specific executor can be made, abstracting the notion of cores.
 For example, a linux machine can be composed as follow:
 
@@ -31,7 +31,7 @@ composition
 }
 ```
 
-Multiple executors can be created and deployed on the same process/binary, this can be useful to have different task priorities for example.
+Multiple executors can be created and deployed on the same process/binary; this can be useful to have different task priorities for example.
 
 ## Thread safety
 
@@ -62,7 +62,7 @@ When the system only has a single executor, it is automatically assigned to all 
 
 If the system contains multiple executors, however, it is necessary to define where workloads are running.
 
-This can be done in 2 different ways. By either specifying it at component instantiation, this is done with the `executor` contract.
+This can be done in 2 different ways: either by specifying it at component instantiation with the `executor` contract,
 
 ```bdl
 composition

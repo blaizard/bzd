@@ -163,7 +163,7 @@ This will execute myFunc (assuming it is a coroutine), 3 times and return the re
 
 #### Any
 
-You might also want to execute coroutines and return when the first one terminates, this is handy to implement
+You might also want to execute coroutines and return when the first one terminates; this is handy to implement
 timeouts for example. It can be done as follows:
 
 ```c++
@@ -206,7 +206,7 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 
 ### Suspend
 
-Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments,
+Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments:
 the first, which is guaranteed to be called, contains a movable-only suspended executable object as argument.
 The user needs to dispose it within this callback. Once the callback is completed, the suspended executable object
 cannot be moved anymore.
@@ -233,9 +233,9 @@ flowchart TD
     D -->|null| A
 ```
 
-The executor context is unique to the instance of the executor, it is passed to the current coroutine being executed or cancelled.
+The executor context is unique to the instance of the executor; it is passed to the current coroutine being executed or cancelled.
 Its role is to contain the continuation if any, that will be used for the next coroutine to be executed. This could be done
-directly by returning it in the `await_suspend`, this would work fine in a single threaded system. Here we want to allow parallel
+directly by returning it in the `await_suspend`; this would work fine in a single threaded system. Here we want to allow parallel
 execution on different cores if available, and for branching (`async::all` or `async::any`), we would have a race if multiple
 continuations are called concurrently. Having it after the completion of the coroutine helps with that effect, because it ensures that
 the parent is completed before the execution of the continuation.

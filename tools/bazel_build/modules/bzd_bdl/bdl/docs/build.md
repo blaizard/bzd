@@ -6,7 +6,7 @@ Resolving symbols within a `bdl` file is done at different build stages to allow
 
 The build process consists of 3 main stages, the `preprocess`, the `composition` and the `generators` stages.
 
-Both stages output artifacts, and the `composition` process consumes the `preprocess` artifact, this gives the possibility to cache and reuse outputs for various composition processes.
+Both stages output artifacts, and the `composition` process consumes the `preprocess` artifact; this gives the possibility to cache and reuse outputs for various composition processes.
 
 ## Preprocess
 
@@ -32,7 +32,7 @@ A bdl file is serialized into a `.o` file for caching purposes. Each `.bdl` shou
 
 ### Symbol Resolution
 
-During file `preprocessing` stage, all symbols are resolved and are matched with the previously discovered symbols.
+During the file `preprocessing` stage, all symbols are resolved and are matched with the previously discovered symbols.
 These symbols are stored into the `Symbol Map`.
 In other words, all symbols used must have been previously defined. However, there are few exceptions that do
 not follow this rule, which are any symbol within a `composition` scope or within a `config` section.
@@ -41,7 +41,7 @@ In a `composition` scope, only the name of the entity is registered, but the ent
 words, in `hello = my.func(a = 1);`, the name `hello` is registered but the function `my.func` is not resolved, so it can
 be declared later on.
 
-In a `config` section, nothing is resolved, this is because config names are not part of the id tree, they are virtual
+In a `config` section, nothing is resolved; this is because config names are not part of the id tree, they are virtual
 entities that do not concretely translate into code. Parameters in `config` are only resolved when the corresponding
 entity is instantiated.
 
@@ -51,7 +51,7 @@ The composition stage brings all components together to compose a running system
 
 Components might come from the platform used, others are functional to perform tasks related to the application.
 
-During `composition` stage, all top level composition elements are being resolved. Nested composition elements are
+During the `composition` stage, all top level composition elements are being resolved. Nested composition elements are
 only resolved if the corresponding component is instantiated. Unused components in the build tree are automatically removed.
 
 The composition stage is done in 2 sub-stages, the first one that only processes certain types of builtin expressions, such as `bind`

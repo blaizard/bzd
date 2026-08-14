@@ -21,7 +21,7 @@ efficient and safe manner.
 It features the following:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
-- The core library is self-contained, no reliance on third-party, only on the freestanding STL.
+- The core library is self-contained, no reliance on third-party libraries, only on the freestanding STL.
 - Flexible error handling model.
 - Based on C++ coroutines.
 - Compile-time string formatting tool.
@@ -41,7 +41,7 @@ The following target platforms are currently supported:
 
 \* Default.
 
-When debug is supported by the platform, one can run a target with `--config=debug` option and a debug environment will
+When debug is supported by the platform, one can run a target with the `--config=debug` option and a debug environment will
 be made available.
 
 ## Build
@@ -54,7 +54,7 @@ To build everything, just run:
 bazel test //...
 ```
 
-This will build locally, it will fetch all tools needed to build on your machine.
+This will build locally; it will fetch all tools needed to build on your machine.
 
 ### Remote
 

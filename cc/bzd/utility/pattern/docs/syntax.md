@@ -27,7 +27,7 @@ bzd::toString(range, "Literal: {{ }}"_csv);           // "Literal: { }"
 ```
 
 An argument can be referenced multiple times and in any order. Every argument must appear at
-least once in the pattern, this is enforced at compile time.
+least once in the pattern; this is enforced at compile time.
 
 ## Format Specification
 

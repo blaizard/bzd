@@ -70,7 +70,7 @@ To prevent symbol leakage, files can be defined to be under a specific namespace
 namespace bzd.dummy;
 ```
 
-In this example, all entities declared in this file will be accessed prepended by the `bzd.dummy` namespace.
+In this example, all entities declared in this file will be accessed with the `bzd.dummy` namespace prepended.
 Only one namespace can be declared within a file and the namespace statement must be at the top of the file.
 
 ## Dependencies
