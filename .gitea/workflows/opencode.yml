@@ -82,7 +82,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
-            agent: "plan_orchestrator"
+            agent: "plan"
             prompt: |
                 You are working on the repository '${{ github.repository }}' and handling issue #${{ needs.router.outputs.issue_number }}.
 
@@ -120,7 +120,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
-            agent: "debug_orchestrator"
+            agent: "build"
             prompt: |
                 You are working on the repository '${{ github.repository }}' and handling issue #${{ needs.router.outputs.issue_number }}.
 
@@ -162,7 +162,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
-            agent: "build_orchestrator"
+            agent: "build"
             prompt: |
                 You are an expert software engineer. You are currently assigned to repository '${{ github.repository }}' to implement the changes requested in PR #${{ needs.router.outputs.issue_number }}.
 
@@ -204,7 +204,7 @@ jobs:
         secrets: inherit
         with:
             issue_number: ${{ needs.router.outputs.issue_number }}
-            agent: "build_orchestrator"
+            agent: "build"
             prompt: |
                 You are an expert software engineer assigned to repository '${{ github.repository }}' to update PR #${{ needs.router.outputs.issue_number }}.
 
