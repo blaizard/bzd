@@ -1,4 +1,4 @@
-name: Cybersecurity Agent
+name: "Sub: Cybersecurity Agent"
 
 on:
     workflow_call:

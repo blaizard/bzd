@@ -1,4 +1,4 @@
-name: Create a PR
+name: "Sub: Create a PR"
 
 on:
     workflow_call:

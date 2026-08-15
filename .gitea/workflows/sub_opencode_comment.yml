@@ -1,4 +1,4 @@
-name: Update a PR with opencode
+name: "Sub: Update a PR with opencode"
 
 on:
     workflow_call:
