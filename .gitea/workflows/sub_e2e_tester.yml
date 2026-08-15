@@ -14,7 +14,7 @@ on:
                 type: string
 
 jobs:
-    cybersecurity:
+    e2e_tester:
         runs-on: opencode
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main

@@ -15,7 +15,7 @@ jobs:
                   name: "ci"
                   ttl: "300"
 
-    tester:
+    e2e_tester_artifacts:
         needs: [lease_linux]
         runs-on: opencode
         uses: ./.gitea/workflows/sub_e2e_tester.yml
