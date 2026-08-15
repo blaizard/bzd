@@ -16,11 +16,14 @@ def deleteBranch(branch: str) -> None:
 
 	Args:
 		branch: The name of the branch to delete.
+
+	Raises:
+		RuntimeError: If the branch deletion failed.
 	"""
 
 	result = localCommand(["git", "push", "origin", "--delete", branch], ignoreFailure=True)
 	if not result.isSuccess():
-		logger.warning(f"Failed to delete branch '{branch}'.")
+		raise RuntimeError(f"Failed to delete branch '{branch}'.")
 
 
 def isMergedInto(mainBranch: str, branch: str) -> bool:
@@ -109,6 +112,11 @@ def main() -> None:
 		default=os.environ.get("MAIN_BRANCH", "master"),
 		help="The main branch to check if branches are merged into.",
 	)
+	parser.add_argument(
+		"--dry-run",
+		action="store_true",
+		help="Only report what would be deleted without deleting anything.",
+	)
 	args = parser.parse_args()
 
 	if args.backend == "gitea":
@@ -135,11 +143,15 @@ def main() -> None:
 
 		if isMergedInto(args.main_branch, branch):
 			logger.info(f"Deleting stale merged branch: {branch}")
-			deleteBranch(branch)
 		elif branch in openPullRequestBranches:
 			logger.warning(f"Skipping stale unmerged branch (has open PR): {branch}")
+			continue
 		else:
 			logger.info(f"Deleting stale unmerged branch (no open PR): {branch}")
+
+		if args.dry_run:
+			logger.info(f"Dry run, skipping deletion of branch: {branch}")
+		else:
 			deleteBranch(branch)
 
 
