@@ -1,4 +1,4 @@
-name: "GitHub <-> Gitea"
+name: "Git: GitHub <-> Gitea"
 
 on:
     workflow_dispatch: # allows manual triggering

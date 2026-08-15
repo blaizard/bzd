@@ -1,4 +1,4 @@
-name: Housekeeping
+name: "Git: Housekeeping"
 
 on:
     workflow_dispatch: # allows manual triggering

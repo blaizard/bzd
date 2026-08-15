@@ -28,7 +28,7 @@ class Gitea:
 			RuntimeError: If the open pull requests could not be fetched.
 		"""
 
-		url = f"{self.url}/api/v1/repos/{repo}/pulls"
+		url = f"{self.url}/repos/{repo}/pulls"
 		branches: typing.Set[str] = set()
 		page = 1
 		limit = 50
