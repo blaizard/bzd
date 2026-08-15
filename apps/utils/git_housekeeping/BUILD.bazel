@@ -1,0 +1,13 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "git_housekeeping",
+    srcs = [
+        "git_housekeeping.py",
+    ],
+    deps = [
+        "//apps/utils/git_housekeeping/backend",
+        "@bzd_python//bzd/logging",
+        "@bzd_python//bzd/utils:run",
+    ],
+)
