@@ -7,7 +7,6 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_python//bzd/logging",
-        "@bzd_python//bzd/utils:run",
+        "@bzd_python//bzd/http:client",
     ],
 )

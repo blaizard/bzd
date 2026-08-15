@@ -1,10 +1,7 @@
 import json
 import typing
 
-from bzd.logging import Logger
-from bzd.utils.run import localCommand
-
-logger = Logger("git_housekeeping.backend.gitea")
+from bzd.http.client import HttpClient
 
 
 class Gitea:
@@ -26,41 +23,38 @@ class Gitea:
 
 		Returns:
 			A set of branch names with open pull requests.
+
+		Raises:
+			RuntimeError: If the open pull requests could not be fetched.
 		"""
 
 		url = f"{self.url}/api/v1/repos/{repo}/pulls"
 		branches: typing.Set[str] = set()
-		page = 0
+		page = 1
 		limit = 50
 
 		while True:
-			result = localCommand(
-				[
-					"curl",
-					"-s",
-					"-H",
-					f"Authorization: token {self.token}",
-					f"{url}?state=open&limit={limit}&page={page}",
-				],
-				ignoreFailure=True,
+			response = HttpClient.get(
+				url,
+				query={"state": "open", "limit": limit, "page": page},
+				headers={"Authorization": f"token {self.token}"},
 			)
-			if not result.isSuccess():
-				logger.warning(f"Failed to fetch open pull requests (page {page}).")
-				break
 
 			try:
-				pulls = json.loads(result.getStdout())
+				pulls = response.json
 			except json.JSONDecodeError as e:
-				logger.warning(f"Failed to fetch open pull requests (page {page}): {e}")
-				break
+				raise RuntimeError(f"Failed to fetch open pull requests (page {page}): {e}") from e
 
 			if not isinstance(pulls, list):
-				break
+				raise RuntimeError(f"Failed to fetch open pull requests (page {page}): unexpected response.")
 
 			for pull in pulls:
+				if not isinstance(pull, dict):
+					raise RuntimeError(f"Failed to fetch open pull requests (page {page}): unexpected entry.")
 				head = pull.get("head")
-				if isinstance(head, dict) and head.get("ref"):
-					branches.add(head["ref"])
+				if not isinstance(head, dict) or not head.get("ref"):
+					raise RuntimeError(f"Failed to fetch open pull requests (page {page}): missing head reference.")
+				branches.add(head["ref"])
 
 			if len(pulls) < limit:
 				break

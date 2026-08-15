@@ -47,7 +47,12 @@ def isMergedInto(mainBranch: str, branch: str) -> bool:
 		],
 		ignoreFailure=True,
 	)
-	return result.isSuccess()
+	returnCode = result.getReturnCode()
+	if returnCode == 0:
+		return True
+	if returnCode == 1:
+		return False
+	raise RuntimeError(f"Failed to check if branch '{branch}' is merged into '{mainBranch}'.")
 
 
 def getRemoteBranches() -> typing.List[typing.Tuple[str, int]]:
@@ -58,12 +63,15 @@ def getRemoteBranches() -> typing.List[typing.Tuple[str, int]]:
 	"""
 
 	result = localCommand(
-		["git", "for-each-ref", "--format=%(refname:short)|%(committerdate:unix)", "refs/remotes/origin/"]
+		["git", "for-each-ref", "--format=%(refname)|%(committerdate:unix)", "refs/remotes/origin/"]
 	).getStdout()
 	branches: typing.List[typing.Tuple[str, int]] = []
 	for line in result.splitlines():
 		ref, commitTimestampStr = line.split("|", 1)
-		branches.append((ref[len("origin/") :], int(commitTimestampStr)))
+		branch = ref[len("refs/remotes/origin/") :]
+		if not branch:
+			continue
+		branches.append((branch, int(commitTimestampStr)))
 	return branches
 
 
@@ -129,6 +137,7 @@ def main() -> None:
 
 	# Fetch the branch names of all open pull requests (Git cannot see PR status).
 	openPullRequestBranches = backend.fetchOpenPullRequestBranches(args.repository)
+	logger.info(f"Open pull requests: {', '.join(sorted(openPullRequestBranches)) if openPullRequestBranches else 'none'}")
 
 	cutoff = int((datetime.datetime.now() - datetime.timedelta(days=args.days_old)).timestamp())
 
