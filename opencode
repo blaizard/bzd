@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
 AGENT_NUM=1
+BUILD_ARGS=""
 if [[ "$1" =~ ^[0-9]+$ ]]; then
     AGENT_NUM=$1
+    shift
+elif [[ "$1" == "--build" || "$1" == "--build-force" ]]; then
+    BUILD_ARGS="$1"
     shift
 fi
 
 echo -ne "\033]0;Agent $AGENT_NUM\007"
-./sandbox.py -p "agent${AGENT_NUM}" --prefix "opencode${AGENT_NUM}" opencode "$@"
+./sandbox.py -p "agent${AGENT_NUM}" --prefix "opencode${AGENT_NUM}" $BUILD_ARGS opencode "$@"

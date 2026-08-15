@@ -83,6 +83,30 @@ class FeatureVolume(Feature):
 		self.dockerCompose = {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
 
 
+class FeatureTools(Feature):
+	"""Feature: Add support for sessions."""
+
+	def process(self, context: "SandboxContainer") -> None:
+		self.dockerFile += [
+			"RUN sudo apt install -y dtach",
+			"""RUN sudo tee /usr/local/bin/session <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p "\\$HOME/.dtach"
+name="\\${1:-main}"
+sock="\\$HOME/.dtach/\\$name"
+export BZD_SESSION="\\$name"
+# Create the master detached.
+if [ ! -S "\\$sock" ]; then
+	dtach -n "\\$sock" bash
+fi
+# Attach to it.
+exec dtach -a "\\$sock"
+EOF""",
+			"RUN sudo chmod +x /usr/local/bin/session",
+		]
+
+
 class FeatureSession(Feature):
 	"""Feature: Add support for sessions."""
 
@@ -173,12 +197,26 @@ class FeatureOpenCode(Feature):
 		self.includes(
 			".opencode/skills/software-architecture", f"{context.home}/.opencode_config/skills/software-architecture", context
 		)
+		# Add Linux essential tools
+		llmEssentials = [
+			"jq",
+			"ripgrep",
+			"coreutils",
+			"diffutils",
+			"lsof",
+			"net-tools",
+			"netcat-openbsd",
+			"iproute2",
+			"tree",
+			"coreutils",
+			"findutils",
+		]
 		self.dockerFile += [
 			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
 			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
 			f"ENV OPENCODE_CONFIG_DIR={context.home}/.opencode_config",
 			# Note: ripgrep (rp) is often used by agents.
-			"RUN sudo apt install -y nodejs npm ripgrep",
+			f"RUN sudo apt install -y nodejs npm {' '.join(llmEssentials)}",
 			"RUN sudo npm install -g opencode-ai@latest",
 			f"RUN echo '{
 				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
