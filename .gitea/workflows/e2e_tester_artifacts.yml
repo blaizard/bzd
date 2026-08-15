@@ -1,0 +1,44 @@
+name: "E2E Tester: Artifacts"
+
+on:
+    workflow_dispatch: # allows manual triggering
+    schedule:
+        - cron: "0 18 * * 2" # runs every tuesday at 18:00 UTC (wednesday 03:00 JST)
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    tester:
+        needs: [lease_linux]
+        runs-on: opencode
+        uses: ./.gitea/workflows/sub_e2e_tester.yml
+        secrets: inherit
+        with:
+            prompt: |
+                ## Goal
+                Deploy, map all endpoints, execute thorough tests and stress-test.
+
+                1. Deploy & Wait
+                Run both commands in the background (&). Poll localhost:8080 and localhost:8081 until both accept connections:
+                ```bash
+                ./tools/bazel run //apps/accounts/backend --config=prod -- --port 8080 --test-data &
+                ./tools/bazel run //apps/artifacts/backend/tests:restricted_user --config=prod -- --port 8081 &
+                ```
+
+                2. Endpoint Discovery
+                Inspect source files, etc. to map all public APIs.
+
+                3. Functional Testing
+                Test protected routes before and after authenticating, ensure expected status codes and valid responses.
+                Test all routes with a variety of arguments.
+                Test edge cases: missing parameters, bad types, malformed JSON, invalid IDs, etc.
+
+                4. Stress Testing
+                Fire 1,000+ requests across primary endpoints with multiple concurrent connections.
