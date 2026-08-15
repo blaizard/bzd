@@ -15,7 +15,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<Form
+				<component
+					:is="$formComponent"
 					v-for="(row, index) in rowListToDisplay"
 					class="irform-table-row"
 					tag="tr"
@@ -29,7 +30,7 @@
 					@update-with-context="itemUpdate(row.index, $event)"
 					@active="handleActive"
 				>
-				</Form>
+				</component>
 			</tbody>
 		</table>
 	</div>
@@ -38,13 +39,16 @@
 <script>
 	import Element from "./element.vue";
 	import TableItem from "./table_item.vue";
-	import { defineAsyncComponent } from "vue";
+	import ExceptionFactory from "../../../../core/exception.js";
+
+	const Exception = ExceptionFactory("form");
 
 	export default {
 		mixins: [Element],
-		components: {
-			// Load asynchronously the form to avoid any circular dependencies
-			Form: defineAsyncComponent(() => import("../form.vue")),
+		inject: {
+			$formComponent: {
+				default: () => Exception.assert(false, "The table element must be used within a form."),
+			},
 		},
 		data: function () {
 			return {

@@ -103,6 +103,11 @@
 			tooltip: DirectiveTooltip,
 		},
 		name: "FormElement",
+		provide() {
+			return {
+				$formComponent: this.$options,
+			};
+		},
 		data: function () {
 			return {
 				currentValue: {},

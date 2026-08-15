@@ -14,7 +14,8 @@
 			>
 				<div class="irform-array-item-draghandle" v-if="gripHandle">&nbsp;</div>
 
-				<Form
+				<component
+					:is="$formComponent"
 					class="irform-array-item-body"
 					:description="template"
 					:disable="disable"
@@ -23,7 +24,7 @@
 					@update-with-context="itemUpdate(index, $event)"
 					@active="handleActive"
 				>
-				</Form>
+				</component>
 
 				<div class="irform-array-item-delete" v-if="allowDelete" @click.stop="itemDelete(index)">x</div>
 			</div>
@@ -33,7 +34,14 @@
 			v-if="allowAdd && (isAddEnabled || !hideAddWhenDisabled)"
 			:class="{ 'irform-array-add': true, 'irform-disable': !isAddEnabled }"
 		>
-			<Form :description="templateAdd" :disable="!isAddEnabled" @active="handleActive" @submit="itemAdd"> </Form>
+			<component
+				:is="$formComponent"
+				:description="templateAdd"
+				:disable="!isAddEnabled"
+				@active="handleActive"
+				@submit="itemAdd"
+			>
+			</component>
 		</span>
 	</div>
 </template>
@@ -41,13 +49,16 @@
 <script>
 	import Element from "./element.vue";
 	import Touch from "../../../directives/touch.js";
-	import { defineAsyncComponent } from "vue";
+	import ExceptionFactory from "../../../../core/exception.js";
+
+	const Exception = ExceptionFactory("form");
 
 	export default {
 		mixins: [Element],
-		components: {
-			// Load asynchronously the form to avoid any circular dependencies
-			Form: defineAsyncComponent(() => import("../form.vue")),
+		inject: {
+			$formComponent: {
+				default: () => Exception.assert(false, "The array element must be used within a form."),
+			},
 		},
 		directives: {
 			touch: Touch,

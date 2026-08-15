@@ -68,6 +68,7 @@
 </template>
 
 <script>
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Input from "#bzd/nodejs/vue/components/form/element/input.vue";
 	import Password from "#bzd/nodejs/vue/components/form/element/password.vue";
 	import Checkbox from "#bzd/nodejs/vue/components/form/element/checkbox.vue";
@@ -83,6 +84,11 @@
 	import DateElement from "#bzd/nodejs/vue/components/form/element/date.vue";
 
 	export default {
+		provide() {
+			return {
+				$formComponent: Form,
+			};
+		},
 		components: {
 			Input,
 			Password,
