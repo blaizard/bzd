@@ -1,0 +1,36 @@
+name: Housekeeping
+
+on:
+    workflow_dispatch: # allows manual triggering
+    schedule:
+        - cron: "0 18 * * 0" # runs every monday at 18:00 UTC (tuesday 03:00 JST)
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    documentation:
+        needs: [lease_linux]
+        runs-on: linux
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+                  git_token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
+
+            - name: "Remove stale git branches"
+              id: parse
+              shell: bash
+              env:
+                  GITEA_URL: ${{ github.api_url }}
+                  REPOSITORY: ${{ github.repository }}
+                  GITEA_TOKEN: ${{ secrets.BZD_AGENT_TOKEN }}
+              run: |
+                  bzd-lease ./tools/bazel run //apps/utils/git_housekeeping -- --backend gitea --api-url "$GITEA_URL" --repository "$REPOSITORY" --days-old 15 --main-branch master

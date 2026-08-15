@@ -25,6 +25,7 @@ jobs:
                   ssh_private_key: ${{ secrets.BZD_SYNC_GITHUB_GITEA_SSH_KEY }}
 
             - name: "GitHub <-> Gitea"
+              shell: bash
               run: |
                   set -euo pipefail
 
