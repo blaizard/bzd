@@ -9,3 +9,14 @@ bzd_nodejs_test(
         "//nodejs/core/authentication:scopes",
     ],
 )
+
+bzd_nodejs_test(
+    name = "session",
+    srcs = ["session_test.js"],
+    main = "session_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core/authentication/session:server",
+        "//nodejs/core/http:server_context",
+    ],
+)

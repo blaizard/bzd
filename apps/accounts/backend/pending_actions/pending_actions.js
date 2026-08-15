@@ -1,3 +1,5 @@
+import Crypto from "crypto";
+
 import LogFactory from "#bzd/nodejs/core/log.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
@@ -36,7 +38,7 @@ export default class PendingActions {
 	async create(actionType, uid, data) {
 		Exception.assert(actionType in this.actions, "Undefined action type: {}", actionType);
 
-		const code = Math.floor(Math.random() * 1000000);
+		const code = Crypto.randomInt(1000000);
 		const action = this.actions[actionType];
 		await this.keyValueStore.set(actionType, uid, {
 			code: code,

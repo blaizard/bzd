@@ -296,7 +296,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	}
 
 	_makeTokenHash() {
-		return Crypto.createHash("shake256", { outputLength: 32 }).update(Math.random().toString()).digest("hex");
+		return Crypto.randomBytes(32).toString("hex");
 	}
 
 	_makeToken(uid, tokenHash) {

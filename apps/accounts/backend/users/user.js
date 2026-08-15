@@ -1,3 +1,5 @@
+import Crypto from "crypto";
+
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.js";
@@ -74,7 +76,7 @@ export default class User {
 	}
 
 	async setRandomPassword() {
-		await this.setPassword(Math.random().toString());
+		await this.setPassword(Crypto.randomBytes(32).toString("hex"));
 	}
 
 	async isPasswordEqual(password) {
