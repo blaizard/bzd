@@ -1,4 +1,4 @@
-name: Cybersecurity for apps/accounts
+name: "Cybersecurity: apps/accounts"
 
 on:
     workflow_dispatch: # allows manual triggering
