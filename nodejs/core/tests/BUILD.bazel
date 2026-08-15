@@ -21,6 +21,8 @@ test_srcs = glob([
         "//nodejs/core:validation_schema",
         "//nodejs/core/clock:mock",
         "//nodejs/core/cryptography:bcrypt",
+        "//nodejs/core/http:server_context_common",
+        "//nodejs/core/http/mock:server_context",
         "//nodejs/core/persistence:disk",
         "//nodejs/core/persistence:timeseries",
     ],
