@@ -23,6 +23,11 @@ export default class Users {
 	///
 	/// \param email The email to be converted.
 	_emailToUid(email) {
+		Exception.assertPrecondition(
+			typeof email == "string",
+			"The email address must be a string, instead: '{:?}'",
+			email,
+		);
 		return Crypto.createHash("shake256", { outputLength: 16 }).update(email).digest("hex");
 	}
 

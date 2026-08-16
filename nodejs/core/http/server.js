@@ -470,7 +470,9 @@ function resetErrorHandler(reject) {
 function middlewareErrorHandler(e, req, res, next) {
 	Exception.print("Receive error; {}", e);
 	try {
-		res.status(500).send(e.message);
+		// Body-parser errors (e.g. malformed JSON) carry a client error status, otherwise default to 500.
+		const status = e.status || e.statusCode || 500;
+		res.status(status >= 400 && status < 500 ? status : 500).send(e.message);
 	} catch (error) {
 		Log.error("While reporting error to client: {}", error.message);
 	}

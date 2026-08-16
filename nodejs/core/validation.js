@@ -193,7 +193,7 @@ export default class Validation {
 
 		options = Object.assign(
 			{
-				/// Output type, can be either "throw", "result" or "return"
+				/// Output type, can be either "throw", "throw_precondition", "result" or "return"
 				output: "throw",
 				/// Callback deciding whether or not a valid is conisdered as existent
 				valueExists: (key, value) => {
@@ -252,6 +252,14 @@ export default class Validation {
 					const maybeMessage = Validation.resultToString(result);
 					if (maybeMessage) {
 						throw new Exception(maybeMessage);
+					}
+				}
+				break;
+			case "throw_precondition":
+				{
+					const maybeMessage = Validation.resultToString(result);
+					if (maybeMessage) {
+						throw Exception.makePreconditionException(maybeMessage);
 					}
 				}
 				break;

@@ -131,6 +131,8 @@ export default class RestServer extends Base {
 					const validation = new Validation(requestOptions.validation);
 					validation.validate(data, {
 						all: true,
+						// Client input is a precondition violation (HTTP 400), not a server error (HTTP 500).
+						output: "throw_precondition",
 					});
 				}
 
