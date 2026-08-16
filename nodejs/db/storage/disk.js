@@ -5,6 +5,7 @@ import ExceptionFactory from "../../core/exception.js";
 import FileSystem from "../../core/filesystem.js";
 import LogFactory from "../../core/log.js";
 import { copy as copyStream } from "../../core/stream.js";
+import pathlib from "../../utils/pathlib.js";
 import { CollectionPaging } from "../utils.js";
 
 import Permissions from "./permissions.js";
@@ -92,7 +93,8 @@ export default class StorageDisk extends Storage {
 	}
 
 	_getFullPath(pathList) {
-		return Path.join(this.path, ...pathList);
+		const path = pathlib.path(pathList).normalize;
+		return Path.join(this.path, ...path.parts);
 	}
 
 	async _isImpl(pathList) {

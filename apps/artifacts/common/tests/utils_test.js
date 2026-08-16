@@ -16,6 +16,10 @@ describe("Utils", () => {
 		it("decodes URI components", () => {
 			Exception.assertEqual(Utils.pathToKey("/foo%20bar/baz"), ["foo bar", "baz"]);
 		});
+
+		it("decodes encoded separators within a segment", () => {
+			Exception.assertEqual(Utils.pathToKey("/cache/..%2F..%2Fetc%2Fpasswd"), ["cache", "../../etc/passwd"]);
+		});
 	});
 
 	describe("keyToPath", () => {
@@ -35,6 +39,10 @@ describe("Utils", () => {
 	describe("sanitizeKey", () => {
 		it("keeps a simple key unchanged", () => {
 			Exception.assertEqual(Utils.sanitizeKey(["a", "b", "c"]), ["a", "b", "c"]);
+		});
+
+		it("keeps segments containing a path separator unchanged", () => {
+			Exception.assertEqual(Utils.sanitizeKey(["cache", "../../etc/passwd"]), ["cache", "../../etc/passwd"]);
 		});
 
 		it("normalizes parent directory segments", () => {

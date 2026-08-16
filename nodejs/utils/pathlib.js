@@ -7,6 +7,16 @@ function _pathToArray(path) {
 	if (path instanceof Path) {
 		return path.path;
 	}
+	if (Array.isArray(path)) {
+		for (const segment of path) {
+			Exception.assertPrecondition(
+				typeof segment === "string" && !segment.includes("/"),
+				"Path segment '{}' is invalid: a segment cannot contain a path separator.",
+				segment,
+			);
+		}
+		return path.filter(Boolean);
+	}
 	return path.split("/").filter(Boolean);
 }
 
@@ -45,7 +55,7 @@ class Path {
 		for (const segment of this.path) {
 			if (segment == "..") {
 				const result = normalizedPath.pop();
-				Exception.assert(
+				Exception.assertPrecondition(
 					result !== undefined,
 					"Path cannot be normalized '{}', the '..' expands beyond the root.",
 					this.asPosix(),

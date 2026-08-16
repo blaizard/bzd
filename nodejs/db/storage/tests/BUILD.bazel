@@ -1,0 +1,11 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "disk",
+    srcs = ["disk_test.js"],
+    main = "disk_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/db/storage:disk",
+    ],
+)
