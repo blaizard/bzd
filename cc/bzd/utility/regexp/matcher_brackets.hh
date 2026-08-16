@@ -30,7 +30,7 @@ public:
 
 	constexpr Result operator()(const char c) noexcept
 	{
-		// Regexpr within the brackets to be tested.matcherProcessor
+		// Regexp within the brackets to be tested.
 		auto itRegexpr = bzd::begin(regexp_);
 		const auto endRegexpr = bzd::end(regexp_);
 

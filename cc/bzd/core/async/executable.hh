@@ -111,11 +111,11 @@ private:
 	// Type of executable.
 	Type type_{Type::unset};
 	// Flags associated with this executable.
-	// It is the form of a bit set formatted as follow:
+	// It is in the form of a bit set formatted as follows:
 	// LSB                                      MSB
-	//  | skip | pined core |     core ID        |
-	// - skip (1b): The executable should be not be executed.
-	// - pined core (1b): If set to 1, the executable is pinned to a particular core.
+	//  | skip | pinned core |     core ID        |
+	// - skip (1b): The executable should not be executed.
+	// - pinned core (1b): If set to 1, the executable is pinned to a particular core.
 	// - core id (16b): The executable must only be scheduled on this particular core.
 	bzd::Atomic<UInt32> flags_{0u};
 };

@@ -35,7 +35,7 @@ enum class IteratorCategory
 	bidirectional = 0x08 | forward,
 	/// A random access iterator is an iterator that can be moved to point to any element in constant time.
 	randomAccess = 0x10 | bidirectional,
-	/// A contiguous iterator is a random access iterator that provides a guarantee that its elements are stored contiguously in the memory.
+	/// A contiguous iterator is a random access iterator that provides a guarantee that its elements are stored contiguously in memory.
 	contiguous = 0x20 | randomAccess,
 };
 
@@ -112,7 +112,7 @@ concept inputOrOutputIterator = iterator<T> && requires(T t) {
 	++t;
 };
 
-/// One-pass iterator. Does not change the value of a container in other word, this is a read-only iterator.
+/// One-pass iterator. Does not change the value of a container, in other words, this is a read-only iterator.
 template <class T>
 concept inputIterator = inputOrOutputIterator<T> && iteratorCategory<T, typeTraits::IteratorCategory::input>;
 

@@ -4,13 +4,13 @@ namespace bzd;
 
 // Executes workload on a single or multiple logical cores.
 interface Executor {
-	// Start the executor and starts all cores previously initialized.
+	// Start the executor and all the cores previously initialized.
 	// This function might return or not, depending on the implementation.
 	method start() -> Result<Void>;
-	// Wait for all execution workload to be completed and terminates.
+	// Wait for all the workload to be completed and then terminate.
 	method stop() -> Result<Void>;
 	// Retrieve all cores associated with this executor.
-	// There is no guaranty that this list remains, it is up the implementation to decide.
+	// There is no guarantee that this list remains, it is up to the implementation to decide.
 	method getCores();
 	
 }

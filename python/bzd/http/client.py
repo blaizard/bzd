@@ -12,7 +12,7 @@ import http.client
 
 
 class HttpClientRequestProtocol(typing.Protocol):
-	"""Interface for the the HttpClientRequest."""
+	"""Interface for the HttpClientRequest."""
 
 	def __call__(
 		self,
@@ -25,7 +25,7 @@ class HttpClientRequestProtocol(typing.Protocol):
 
 
 class HttpClientProtocol(typing.Protocol):
-	"""Interface for the the HttpClient."""
+	"""Interface for the HttpClient."""
 
 	def get(self, *args: typing.Any, **kwargs: typing.Any) -> "HttpResponse": ...
 

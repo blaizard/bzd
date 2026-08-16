@@ -7,7 +7,7 @@
 
 namespace bzd {
 
-/// Container for a suspended executable, this variant ensure that no
+/// Container for a suspended executable, this variant ensures that no
 /// schedule event is missed.
 ///
 /// @tparam T The type of suspended executable.
@@ -45,8 +45,8 @@ private:
 ///
 /// \tparam Tick The type used to hold a time.
 /// \tparam Impl The timer implementation, this is the CRTP of the child.
-/// \tparam retroactiveAlarm If the ISR triggers retroactive counters, in other word,
-///         if the counter is older that the timer, will an interrupt be trigger?
+/// \tparam retroactiveAlarm If the ISR triggers retroactive counters, in other words,
+///         if the counter is older than the timer, will an interrupt be triggered?
 template <class Tick, class Impl, Bool retroactiveAlarm = true>
 class TimerISR
 {
@@ -189,9 +189,9 @@ private:
 
 		if constexpr (!retroactiveAlarm)
 		{
-			// Check if the current time is already passed, if so trigger the callback.
-			// This is needed for some architecture that will not trigger the ISR if the
-			// alarm is already passed.
+			// Check if the current time is already past, if so trigger the callback.
+			// This is needed for some architectures that will not trigger the ISR if the
+			// alarm is already past.
 			auto maybeTime = impl().getTicks();
 			if (!maybeTime)
 			{

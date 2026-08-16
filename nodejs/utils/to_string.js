@@ -5,8 +5,8 @@ const Exception = ExceptionFactory("to_string");
 
 /// Formats a raw numeric value into a human-readable string using a hierarchical list of units.
 ///
-/// \param unitList unitList An array of unit definitions, ordered from smallest to largest.
-/// \param value value The raw numeric value to be converted.
+/// \param unitList An array of unit definitions, ordered from smallest to largest.
+/// \param value The raw numeric value to be converted.
 /// \param startIndex The index in unitList corresponding to the input value's base unit.
 /// \param maxNbUnits The maximum number of distinct unit components to include in the output string.
 /// \param decimalPoints The number of decimal places to apply strictly to the final/smallest displayed unit.

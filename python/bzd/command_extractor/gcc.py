@@ -57,7 +57,7 @@ class CommandExtractorGcc(CommandExtractor):
 			self.addSearchPath(Categories.librarySearchPath, path)
 
 	def addLibrary(self, name: str, factory: ItemFactory = ItemFactory()) -> None:
-		"""Add a new library the the list."""
+		"""Add a new library to the list."""
 
 		fileName = name if re.match(r"lib.*\.a", pathlib.Path(name).name) else "lib{}.a".format(name)
 		for path in self.librarySearchPaths:
@@ -69,7 +69,7 @@ class CommandExtractorGcc(CommandExtractor):
 		print("WARNING: cannot locate library {}".format(name))
 
 	def addLinkerScript(self, fileName: str, factory: ItemFactory = ItemFactory()) -> None:
-		"""Add a new linker script the the list."""
+		"""Add a new linker script to the list."""
 
 		for path in self.librarySearchPaths:
 			fullPath = path / fileName

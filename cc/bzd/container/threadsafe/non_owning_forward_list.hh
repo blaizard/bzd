@@ -87,8 +87,8 @@ public:
 	[[nodiscard]] constexpr bool empty() const noexcept { return size_.load() == 0; }
 
 	/// Insert an element into the list from the root element.
-	/// The idea is to ensure that the last operation is the one that make the element discoverable,
-	/// this ensures that any element is consistent.
+	/// The idea is to ensure that the last operation is the one that makes the element discoverable,
+	/// this ensures that every element is consistent.
 	///
 	/// Given the following:
 	/// | R | -> | A |
@@ -172,9 +172,9 @@ public:
 		return nullresult;
 	}
 
-	/// Remove an element from the queue.
+	/// Remove an element from the list.
 	///
-	/// \param element Element to be inserted.
+	/// \param element Element to be removed.
 	/// \return An error in case of failure, void otherwise.
 	template <class... Args>
 	[[nodiscard]] constexpr Result<void> pop(ElementType& element) noexcept
@@ -335,12 +335,12 @@ public:
 		return nullresult;
 	}
 
-	/// Remove an element from the queue. Unlike pop, the element can be immediately discarded.
+	/// Remove an element from the list. Unlike pop, the element can be immediately discarded.
 	///
 	/// Calling this function ensures that no user of the list is currently pointing to this element,
-	/// which could lead to a sigfault situation.
+	/// which could lead to a segfault situation.
 	///
-	/// \param element Element to be inserted.
+	/// \param element Element to be removed.
 	/// \return An error in case of failure, void otherwise.
 	[[nodiscard]] constexpr Result<void> popToDiscard(ElementType& element) noexcept
 	requires(ElementType::supportDiscard)
@@ -446,7 +446,7 @@ protected:
 	}
 
 protected:
-	// Having a front & back elemment will simplify the logic to not have to take care of the edge cases.
+	// Having a front & back element will simplify the logic to not have to take care of the edge cases.
 	ElementType front_;
 	ElementType back_;
 	// Number of elements.

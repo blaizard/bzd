@@ -57,8 +57,8 @@ private:
 
 /// \brief This is the type used for returning and propagating errors.
 ///
-/// It is a variants with 2 states, valid, representing success and containing a
-/// value, and error, representing error and containing an error value.
+/// It is a variant with two states: a valid state representing success and containing a
+/// value, and an error state representing a failure and containing an error value.
 template <class T = void, class E = bzd::Bool>
 class Result
 {

@@ -18,7 +18,7 @@ protected:
 	using StorageType = typename Parent::StorageType;
 
 protected:
-	// This function is not constepr, hence need to re-implement it
+	// This function is not constexpr, hence the need to re-implement it.
 	constexpr Size strlen(const T* const str) noexcept
 	{
 		Size length = 0;

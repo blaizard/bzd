@@ -57,7 +57,7 @@ public:
 		auto result = buffer_.ring_.nextForWriting();
 		if (result)
 		{
-			// Notify of a new set only after the object destruction.
+			// Notify of a new set only after the object's destruction.
 			return SourceSetResult<Value>{bzd::move(result),
 										  bzd::FunctionRef<void(void)>::toMember<Buffer, &Buffer::notifyNewData>(buffer_)};
 		}

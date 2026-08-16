@@ -70,7 +70,7 @@ public:
 			{
 				currentOffset -= span.size();
 			}
-			// This is where offset is within the current span and not null.
+			// This is where the offset is within the current span and is not null.
 			else if (currentOffset)
 			{
 				const auto spanCount = bzd::min(currentCount, span.size() - currentOffset);
@@ -78,7 +78,7 @@ public:
 				currentOffset = 0;
 				currentCount -= (currentCount == npos) ? 0 : spanCount;
 			}
-			//  This is where content with no offset is added.
+			// This is where content with no offset is added.
 			else
 			{
 				const auto spanCount = bzd::min(currentCount, span.size());

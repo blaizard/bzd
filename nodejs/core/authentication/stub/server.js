@@ -30,7 +30,7 @@ export default class StubAuthenticationServer extends AuthenticationServer {
 	///
 	/// This verifies the access token.
 	/// \note We cannot refresh the access token as part of this process
-	/// because it needs to live in a query (not cookie) because of of fetch requests.
+	/// because it needs to live in a query (not cookie) because of fetch requests.
 	async _verifyImpl(context) {
 		const maybeAccessToken = AuthenticationServer._getAccessToken(context);
 		let scopes = this.options.scopes;

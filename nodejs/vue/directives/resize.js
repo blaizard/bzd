@@ -1,4 +1,4 @@
-// Used to generated unique Ids
+// Used to generate unique Ids
 let elementUid = 0;
 
 // Map to keep track of current observers

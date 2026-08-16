@@ -13,8 +13,8 @@
 namespace bzd::algorithm {
 
 namespace impl {
-/// Build a max heap where value of each child is always smaller
-/// than value of their parent.
+/// Build a max heap where the value of each child is always smaller
+/// than the value of its parent.
 template <class Iterator, class Compare>
 constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noexcept
 {
@@ -23,7 +23,7 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 
 	for (IndexType i = 1; i < size; i++)
 	{
-		// If child is bigger than parent.
+		// If the child is bigger than its parent.
 		if (comparison(first[(i - 1) / 2], first[i]))
 		{
 			IndexType j = i;
@@ -73,13 +73,13 @@ constexpr void sort(Iterator first, Sentinel last, Compare comparison = Compare{
 		{
 			index = (2 * j + 1);
 
-			// If left child is smaller than right child point index variable to right child.
+			// If the left child is smaller than the right child, point the index variable to the right child.
 			if (index < (i - 1) && comparison(first[index], first[index + 1]))
 			{
 				++index;
 			}
 
-			// If parent is smaller than child then swapping parent with child having higher value.
+			// If the parent is smaller than the child, swap the parent with the child having the higher value.
 			if (index < i && comparison(first[j], first[index]))
 			{
 				bzd::swap(first[j], first[index]);
@@ -92,7 +92,7 @@ constexpr void sort(Iterator first, Sentinel last, Compare comparison = Compare{
 }
 
 /// \copydoc sort
-/// \param[in,out] range The brange of elements to be sorted.
+/// \param[in,out] range The range of elements to be sorted.
 template <concepts::randomAccessRange Range, class... Args>
 constexpr void sort(Range&& range, Args&&... args) noexcept
 {

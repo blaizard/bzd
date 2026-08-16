@@ -118,7 +118,7 @@ protected:
 	///
 	/// It is also important that the user relies on the returned buffer to read the data,
 	/// as the input buffer might not be used to avoid unnecessary copies. This provides an interface
-	/// to achieve zero copy in certain situation.
+	/// to achieve zero copy in certain situations.
 	///
 	/// \param[in] data A buffer to contain the data to be read.
 	/// \return A generator to read the data.

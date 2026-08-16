@@ -2,7 +2,7 @@
 namespace bzd;
 
 // A system clock.
-// This represents the best guest of the actual UTC time.
+// This represents the best guess of the actual UTC time.
 extern interface Clock;
 
 

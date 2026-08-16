@@ -14,7 +14,7 @@ namespace bzd {
 /// Platform agnostic error type.
 enum class ErrorType : bzd::UInt8
 {
-	/// Any error that do not fall in the below categories.
+	/// Any error that does not fall in the below categories.
 	failure,
 	/// Happens when a timeout occurs, it could provide information to the handler
 	/// that either the timeout was too short or the input was too slow.
@@ -25,16 +25,16 @@ enum class ErrorType : bzd::UInt8
 	/// Happens when a stream reaches the end of its channel for example.
 	eof,
 	/// Error related to data received, it can be due to data corruption, etc. Generally,
-	/// reason that are out of our control.
+	/// reasons that are out of our control.
 	data
 };
 
 /// Global definition of an error object.
 ///
-/// This is a lightwheight data structure that combines the following:
+/// This is a lightweight data structure that combines the following:
 /// - An abstracted information regarding the error type on which
 ///   the error handler could react.
-/// - The error location to trace the error for debugging purpose.
+/// - The error location to trace the error for debugging purposes.
 /// - A human readable message that describes details of the actual
 ///   error, which could include for example, implementation specific information.
 class [[nodiscard]] Error

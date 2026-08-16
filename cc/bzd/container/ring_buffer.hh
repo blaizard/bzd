@@ -96,7 +96,7 @@ public: // Modifiers.
 		read_ += n;
 	}
 
-	/// Re-add to the list the last n element previously consumed.
+	/// Re-add to the ring the last n elements previously consumed.
 	///
 	/// \param n The number of elements to "unconsume".
 	/// \return The number of elements that have been "unconsumed".
@@ -113,7 +113,7 @@ public: // Modifiers.
 		return n;
 	}
 
-	/// Re-add to the list the buffer passed into argument, if the buffer is already part of
+	/// Re-add the buffer passed as argument to the ring, if the buffer is already part of
 	/// the ring, do not copy it, otherwise copy it.
 	///
 	/// \param span The span to "unconsume".
@@ -125,7 +125,7 @@ public: // Modifiers.
 		{
 			const auto actualSpan = span.last(n);
 			const auto spanForReading = asSpanForReading();
-			// Copy the data if it it not the same.
+			// Copy the data if it is not the same.
 			if (spanForReading.data() != actualSpan.data())
 			{
 				bzd::ignore = copy(read_, actualSpan);

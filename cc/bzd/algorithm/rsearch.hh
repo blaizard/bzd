@@ -18,7 +18,7 @@ namespace bzd::algorithm {
 /// \param[in] first2 The beginning of the range of elements to search.
 /// \param[in] last2 The ending of the range of elements to search.
 /// \param[in] predicate The binary predicate which returns \c ​true for the same elements.
-/// \return Iterator to the beginning of last occurrence of the sequence [first2, last2[ in the range [first1, last1[.
+/// \return Iterator to the beginning of the last occurrence of the sequence [first2, last2[ in the range [first1, last1[.
 /// If no such occurrence is found, last1 is returned.
 template <concepts::forwardIterator Iterator1,
 		  concepts::sentinelFor<Iterator1> Sentinel1,

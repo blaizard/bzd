@@ -33,7 +33,7 @@ public:
 
 	/// Get the unique identifier of this context across this executor.
 	[[nodiscard]] constexpr IdType getUId() const noexcept { return contextUId_; }
-	/// Get the unique identifier of this context across this executor.
+	/// Get the unique identifier of this core across this executor.
 	[[nodiscard]] constexpr IdType getCoreUId() const noexcept { return coreUId_; }
 	/// Get the current tick for this executor.
 	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_; }
@@ -134,7 +134,7 @@ public:
 			status_.compareExchange(expected, Status::running);
 		}
 
-		// Run at least the number of time there are elements in the queue, this is to ensure that
+		// Run at least the number of times there are elements in the queue, this is to ensure that
 		// all the services are running at least once.
 		const auto minIterationCount = getQueueCount();
 
@@ -281,7 +281,7 @@ private:
 		if (increment)
 		{
 			// It is important to update the counters before being pushed, otherwise the executable might be
-			// popped before the counters are increases, leaving them in an incoherent state.
+			// popped before the counters are increased, leaving them in an incoherent state.
 			incrementCounters(executable);
 		}
 		// Only at the end push the executable to the work queue.
@@ -357,7 +357,7 @@ private:
 	/// Number of entries in the queue.
 	bzd::Atomic<Size> queueCount_{0u};
 	/// Number of workload asyncs in the queue.
-	/// Note getWorkloadCount() should never be negative, we use an int32 here only for testing purpose
+	/// Note getWorkloadCount() should never be negative, we use an int32 here only for testing purposes
 	/// to avoid an infinite loop.
 	bzd::Atomic<Int32> workloadCount_{0u};
 };

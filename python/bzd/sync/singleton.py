@@ -15,7 +15,7 @@ class Singleton:
 		return Singleton(pathlib.Path(tempfile.gettempdir()) / f"singleton_{name}.lock")
 
 	def lock(self) -> bool:
-		"""Detect if an an instance with the label is already running, globally
+		"""Detect if an instance with the label is already running, globally
 		at the operating system level.
 
 		Using `os.open` ensures that the file pointer won't be closed

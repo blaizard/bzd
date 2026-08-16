@@ -7,7 +7,7 @@ const Exception = ExceptionFactory("lock-file");
 
 /// Simple file based lock.
 ///
-/// This is lock is meant to work across processes.
+/// This lock is meant to work across processes.
 export default class LockFile {
 	static Status = Object.freeze({
 		// It is unlocked.
@@ -43,7 +43,7 @@ export default class LockFile {
 
 	/// Try to lock a file by creating it atomically.
 	///
-	/// \return true of false, whether the lock was acquired of not.
+	/// \return true or false, whether the lock was acquired or not.
 	async _tryLock(path) {
 		try {
 			await this.options.fs.mkdir(path, { force: false });
@@ -82,7 +82,7 @@ export default class LockFile {
 		}
 	}
 
-	/// Check if the status of the lock.
+	/// Check the status of the lock.
 	///
 	/// \return the status of the lock.
 	async getStatus() {

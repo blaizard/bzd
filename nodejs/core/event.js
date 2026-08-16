@@ -7,7 +7,7 @@ export default class Event {
 			this.options[id] = Object.assign(
 				{
 					/// Set to true if the event once triggered will also
-					/// trigger new one.
+					/// trigger a new one.
 					proactive: false,
 				},
 				options[id],

@@ -77,14 +77,14 @@ public: // Constructor/assignment
 public: // Size.
 	/// \brief Returns the maximum number of elements the container can hold.
 	///
-	/// \return Maximum number of element this container can hold.
+	/// \return Maximum number of elements this container can hold.
 	[[nodiscard]] constexpr Size capacity() const noexcept { return this->capacity_; }
 	[[nodiscard]] constexpr Bool full() const noexcept { return this->capacity_ == this->size(); }
 
 public: // Modifiers.
 	/// Change the size of the container.
 	///
-	/// \param n The new size. Note, it must a be lower or equal to the capacity.
+	/// \param n The new size. Note, it must be lower than or equal to the capacity.
 	constexpr void resize(const Size n) noexcept
 	{
 		const auto newSize = (n < capacity_) ? n : capacity_;

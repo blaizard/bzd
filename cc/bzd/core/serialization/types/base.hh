@@ -11,10 +11,10 @@
 
 namespace bzd::impl::serialization {
 
-/// To byte order
+/// Normalize the byte order of serialized data.
 inline constexpr auto normalizeByteOrder() noexcept
 {
-	// The endianness of serialized data are little endian.
+	// The endianness of serialized data is little endian.
 	if constexpr (bzd::Endian::native == bzd::Endian::little)
 	{
 		return bzd::ranges::all();

@@ -9,7 +9,7 @@ namespace bzd::impl {
 /// Implementation of a B-tree.
 ///
 /// A B-Tree of order M has the following properties:
-/// - Every nodes has at most *M* children.
+/// - Every node has at most *M* children.
 /// - A non-leaf node with k children contains k-1 keys.
 /// - The root has at least 2 children if it is not a leaf node.
 /// - Every non-leaf node (except root) has at least M / 2 children.
@@ -36,7 +36,7 @@ public:
 	/**
 	 * Insert a new element into the B-Tree.
 	 *
-	 * Inserting into a B-Tree of order M is done as follow:
+	 * Inserting into a B-Tree of order M is done as follows:
 	 * 1. Find the leaf node where the item should be inserted.
 	 * 2. If the leaf node can accommodate another item (it has no more than M - 1
 	 * items), insert the item into the correct location in the node.

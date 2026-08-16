@@ -47,7 +47,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			substitutions if isinstance(substitutions, SubstitutionWrapper) else SubstitutionWrapper(substitutions)
 		)
 		self.includeDirs = includeDirs
-		# Indent multiline substitution blocks to mmaatch the start of the block.
+		# Indent multiline substitution blocks to match the start of the block.
 		self.indent = indent
 		self.indentRegexpr = re.compile(r"(?:^|\n)([ \t]*)$")
 		# Used to trigger the else condition, this works as any un-resolved if must be followed by the else (if any).

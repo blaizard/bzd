@@ -6,7 +6,7 @@
 
 namespace bzd::algorithm {
 
-/// Returns an iterator to the first element in the range [first, last) that equals to value.
+/// Returns an iterator to the first element in the range [first, last) that equals value.
 ///
 /// \param[in] first The beginning of the range of elements to examine.
 /// \param[in] last The ending of the range of elements to examine.

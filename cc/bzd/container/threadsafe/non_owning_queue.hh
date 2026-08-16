@@ -147,7 +147,7 @@ public:
 		{
 			previousHead->next_.store(&element);
 		}
-		// Make sure only the first element from the a fresh head will be moved to the tail.
+		// Make sure only the first element from a fresh head will be moved to the tail.
 		else
 		{
 			tail_.store(&element);

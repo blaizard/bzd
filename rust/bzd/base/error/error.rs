@@ -8,7 +8,7 @@ use core::panic::Location;
 #[repr(u8)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ErrorType {
-    /// Any error that do not fall in the below categories.
+    /// Any error that does not fall in the below categories.
     Failure,
     /// Happens when a timeout occurs, it could provide information to the handler
     /// that either the timeout was too short or the input was too slow.
@@ -19,7 +19,7 @@ pub enum ErrorType {
     /// Happens when a stream reaches the end of its channel for example.
     Eof,
     /// Error related to data received, it can be due to data corruption, etc. Generally,
-    /// reason that are out of our control.
+    /// reasons that are out of our control.
     Data,
 }
 

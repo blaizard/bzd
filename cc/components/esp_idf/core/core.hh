@@ -29,7 +29,7 @@ public:
 		// stack_.taint(freertosStackTaintingByte);
 		workload_ = workload;
 		// Use a binary semaphore instead of a mutex as it can be taken in the same thread.
-		// Also it is by default taken, which doesn't require to call xSemaphoreTake here.
+		// Also it is by default taken, which doesn't require calling xSemaphoreTake here.
 		if (!(mutex_ = xSemaphoreCreateBinaryStatic(&mutexBuffer_)))
 		{
 			return bzd::error::Failure("xSemaphoreCreateBinaryStatic"_csv);

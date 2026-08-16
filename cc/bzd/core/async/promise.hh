@@ -55,7 +55,7 @@ public:
 
 	/// Enqueue a new executable after the execution of the current executable.
 	/// This is needed for thread safe scheduling, to avoid executing the continuation
-	/// before the current coroutine state is not completed.
+	/// before the current coroutine state is completed.
 	constexpr void thenEnqueueContinuation() noexcept
 	{
 		bzd::assert::isTrue(context_);

@@ -17,7 +17,7 @@ public:
 	/// Process a new character.
 	///
 	/// \return An error result if there is no match.
-	///         An empty result if there are matched but no full match.
+	///         An empty result if there are matches but no full match.
 	///         An iterator if there is a full match.
 	constexpr void process(const bzd::StringView view) noexcept
 	{

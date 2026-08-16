@@ -47,7 +47,7 @@ class Validation(typing.Generic[Schema]):
 
 		self.processed: typing.Dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
-		# Arguments to be passed the the check and process functions.
+		# Arguments to be passed to the check and process functions.
 		# It should not be passed into the install function, otherwise this would
 		# make memoization invalid.
 		self.args = args
@@ -97,7 +97,7 @@ class Validation(typing.Generic[Schema]):
 			else:
 				self.processed[key] = ProcessedSchema()
 
-				# Parse each constraints strings
+				# Parse each constraint string.
 				parsed = Validation.parse(constraints)
 				# Install the constraint
 				for name, args in parsed.items():

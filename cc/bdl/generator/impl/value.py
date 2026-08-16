@@ -73,7 +73,7 @@ def valueToStr(
 		if registry:
 			value = f"registry.{value}_.get()"
 		if symbols is not None:
-			# Cast values to there underlying interface type.
+			# Cast values to their underlying interface type.
 			expectedInterface = item.expected.underlyingInterfaceFQN or item.expected.underlyingTypeFQN
 			assert expectedInterface is not None
 			if symbols.getEntityResolved(expectedInterface).value.category == Category.interface:

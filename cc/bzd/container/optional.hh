@@ -35,8 +35,8 @@ private:
 
 namespace bzd {
 
-// \brief Type managing an optional contained value, i.e. a value that may or
-// may not be present.
+/// \brief Type managing an optional contained value, i.e. a value that may or
+/// may not be present.
 template <class T>
 class Optional
 {
@@ -109,7 +109,7 @@ public: // API
 		return (hasValue()) ? data_.template get<ValueContainer>() : defaultValue;
 	}
 
-	/// Returns of copy of the contained value if the optional has a value, otherwise returns defaultValue.
+	/// Returns a copy of the contained value if the optional has a value, otherwise returns defaultValue.
 	///
 	/// \param defaultValue The value to use in case *this is empty.
 	/// \return The current value if *this has a value, or defaultValue otherwise.

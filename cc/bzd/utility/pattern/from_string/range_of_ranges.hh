@@ -91,7 +91,7 @@ protected:
 		/// Process a new character.
 		///
 		/// \return An error result if there is no match.
-		///         An empty result if there are matched but no full match.
+		///         An empty result if there are matches but no full match.
 		///         An iterator if there is a full match.
 		constexpr bzd::Result<bzd::Optional<Iterator>> process(const bzd::Byte c) noexcept
 		{
@@ -158,7 +158,7 @@ public:
 				sortedRange.output = maybeResult.value().value();
 			}
 
-			// Dot not look further if lazy mode.
+			// Do not look further if in lazy mode.
 			if (metadata.mode == Metadata::Mode::lazy && sortedRange.output.hasValue())
 			{
 				break;

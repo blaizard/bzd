@@ -1,11 +1,11 @@
 /// Set of utility to manage dictionary keys from array of string.
 const KeyMapping = {
-	/// Hash a array of strings.
+	/// Hash an array of strings.
 	keyToInternal(internalsOrKeys) {
 		return internalsOrKeys.join("\x01");
 	},
 
-	/// Unhash a array of strings.
+	/// Unhash an array of strings.
 	internalToKey(internal) {
 		return internal.split("\x01");
 	},
