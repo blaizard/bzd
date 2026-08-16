@@ -18,61 +18,14 @@ jobs:
     documentation:
         needs: [lease_linux]
         runs-on: opencode
-        steps:
-            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
-              with:
-                  lease: "true"
-                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
+        uses: ./.gitea/workflows/sub_documentation.yml
+        secrets: inherit
+        with:
+            prompt: |
+                # Role: Monorepo Documentation Auditor
 
-            - name: "Maintain documentation"
-              uses: ./.gitea/actions/opencode
-              with:
-                  agent: build
-                  prompt: |
-                      # Role: Monorepo Documentation Auditor
+                Audit input files belonging to Bazel target `//docs` (and its dependencies) against actual codebase implementation and grammar. Ignore all other files.
 
-                      Audit input files belonging to Bazel target `//docs` (and its dependencies) against actual codebase implementation and grammar. Ignore all other files.
-
-                      ## Workflow
-                      1. **Verify Accuracy:** Cross-reference technical claims (APIs, flags, paths, behavior) against source code.
-                      2. **Grammar Check:** Correct typos, spelling, and punctuation.
-
-                      ## Rules (STRICT)
-                      * **Zero-Diff Default:** Leave accurate and grammatically correct files completely untouched.
-                      * **Minimal Edits:** Fix ONLY factual/grammar errors. Do not rephrase or alter style/formatting on valid text.
-                      * **100-Line Limit (Atomic):** Always finish editing a file completely. Stop processing remaining files once total modified lines reach or exceed 100 lines.
-
-                      ## Output
-                      Provide a short summary of the changes made.
-
-            - name: "Sanitize"
-              run: |
-                  bzd-lease ./tools/bazel run //:sanitizer
-
-            - name: "Create a branch"
-              id: branch_step
-              run: |
-                  if [ -z "$(git status --porcelain)" ]; then
-                    echo "No documentation changes detected. Skipping PR creation."
-                    echo "has_changes=false" >> $GITHUB_OUTPUT
-                    exit 0
-                  fi
-                  echo "has_changes=true" >> $GITHUB_OUTPUT
-
-                  BRANCH_NAME="docs/auto-update-$(date +%Y%m%d%H%M%S)"
-                  git checkout -b "$BRANCH_NAME"
-                  echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-                  echo "Created ${BRANCH_NAME}"
-
-                  git add .
-                  git commit -m "docs: automated documentation updates"
-                  git push origin "$BRANCH_NAME"
-
-            - name: "Create a PR"
-              if: steps.branch_step.outputs.has_changes == 'true'
-              uses: ./.gitea/actions/pr
-              with:
-                  token: ${{ secrets.BZD_AGENT_TOKEN }}
-                  title: "[DOCUMENTATION] Automatic maintenance"
-                  head_branch: ${{ env.BRANCH_NAME }}
-                  body_file: /tmp/agent-response.txt
+                ## Workflow
+                1. **Verify Accuracy:** Cross-reference technical claims (APIs, flags, paths, behavior) against source code.
+                2. **Grammar Check:** Correct typos, spelling, and punctuation.

@@ -1,0 +1,71 @@
+name: "Sub: Documentation"
+
+on:
+    workflow_call:
+        inputs:
+            prompt:
+                description: "The prompt to be used for the agent."
+                required: true
+                type: string
+            agent:
+                description: "The agent to be using."
+                required: false
+                default: "build"
+                type: string
+
+jobs:
+    documentation:
+        runs-on: opencode
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  lease: "true"
+                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
+
+            - name: "Maintain documentation"
+              uses: ./.gitea/actions/opencode
+              with:
+                  agent: ${{ inputs.agent }}
+                  prompt: |
+                      Act as a technical writer.
+
+                      ${{ inputs.prompt }}
+
+                      CRITICAL CONSTRAINTS:
+                      - **DO NOT touch executable code:** Never alter code syntax, logic, functions, or variable names. Modify comments only.
+                      - **100-Line Limit (Atomic):** Always finish editing a file completely. Stop processing remaining files once total modified lines across all files reach or exceed 100 lines.
+
+                      OUTPUT:
+                      Provide a short summary of the changes made.
+
+            - name: "Sanitize"
+              run: |
+                  bzd-lease ./tools/bazel run //:sanitizer
+
+            - name: "Create a branch"
+              id: branch_step
+              run: |
+                  if [ -z "$(git status --porcelain)" ]; then
+                    echo "No documentation changes detected. Skipping PR creation."
+                    echo "has_changes=false" >> $GITHUB_OUTPUT
+                    exit 0
+                  fi
+                  echo "has_changes=true" >> $GITHUB_OUTPUT
+
+                  BRANCH_NAME="docs/auto-update-$(date +%Y%m%d%H%M%S)"
+                  git checkout -b "$BRANCH_NAME"
+                  echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+                  echo "Created ${BRANCH_NAME}"
+
+                  git add .
+                  git commit -m "docs: automated documentation updates"
+                  git push origin "$BRANCH_NAME"
+
+            - name: "Create a PR"
+              if: steps.branch_step.outputs.has_changes == 'true'
+              uses: ./.gitea/actions/pr
+              with:
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  title: "[DOCUMENTATION] Automatic maintenance"
+                  head_branch: ${{ env.BRANCH_NAME }}
+                  body_file: /tmp/agent-response.txt

@@ -1,0 +1,31 @@
+name: "Documentation: Comments"
+
+on:
+    workflow_dispatch: # allows manual triggering
+    schedule:
+        - cron: "0 18 * * 2"
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    documentation_comments:
+        needs: [lease_linux]
+        runs-on: opencode
+        uses: ./.gitea/workflows/sub_documentation.yml
+        secrets: inherit
+        with:
+            prompt: |
+                # Role: Monorepo Technical Editor & Comments Auditor
+
+                Examine comments within the codebase for quality and accuracy.
+
+                ## Workflow
+                1. **Verify Accuracy:** Cross-reference technical comments against surrounding source code. Update incorrect claims to match reality.
+                2. **Grammar & Tone Check:** Fix typos, spelling, punctuation, and phrasing. Keep comments concise and professional.
