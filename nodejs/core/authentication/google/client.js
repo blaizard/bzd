@@ -9,17 +9,15 @@ const Log = LogFactory("authentication", "google");
 async function triggerAuthentication(clientId, url) {
 	await loadScript("https://accounts.google.com/gsi/client");
 
-	return new Promise(async (resolve, reject) => {
-		// Using https://developers.google.com/identity/oauth2/web/guides/use-code-model
-		const client = google.accounts.oauth2.initCodeClient({
-			client_id: clientId,
-			scope: "https://www.googleapis.com/auth/userinfo.email",
-			ux_mode: "redirect",
-			redirect_uri: url + "/authentication/google",
-		});
-
-		client.requestCode();
+	// Using https://developers.google.com/identity/oauth2/web/guides/use-code-model
+	const client = google.accounts.oauth2.initCodeClient({
+		client_id: clientId,
+		scope: "https://www.googleapis.com/auth/userinfo.email",
+		ux_mode: "redirect",
+		redirect_uri: new URL("/authentication/google", url).href,
 	});
+
+	client.requestCode();
 }
 
 export default class Google {
@@ -45,6 +43,10 @@ export default class Google {
 					path: "/authentication/google",
 					handler: async () => {
 						const query = getQueryAsDict();
+						if (query.error) {
+							Log.warn("Google authentication returned error: {}.", query.error);
+							return;
+						}
 						await this.rest.loginWithRest("post", "/auth/google", {
 							code: query.code,
 						});
