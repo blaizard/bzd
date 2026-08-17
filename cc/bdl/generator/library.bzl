@@ -57,12 +57,13 @@ def _generator_cc_library_impl(
         bdl,
         srcs,  # @unused
         deps,
+        implementation_deps,
         tags,
         **kwargs):
     _cc_generate_headers(
         name = "{}.generate".format(name),
         bdl = bdl,
-        deps = deps,
+        deps = deps + implementation_deps,
     )
 
     cc_library(
@@ -70,7 +71,7 @@ def _generator_cc_library_impl(
         hdrs = [
             "{}.generate".format(name),
         ],
-        deps = deps + [
+        deps = deps + implementation_deps + [
             Label("//cc/bdl/generator/impl/adapter:types"),
         ],
         visibility = visibility,
@@ -85,6 +86,7 @@ generator_cc_library = macro(
     attrs = {
         "bdl": attr.label(mandatory = True, doc = "The bdl target to be converted to a C++ library."),
         "deps": attr.label_list(doc = "The dependencies from the bdl file."),
+        "implementation_deps": attr.label_list(doc = "The language specific implementation dependencies."),
         "srcs": attr.label_list(doc = "The bdl source files.", configurable = False),
     },
 )
