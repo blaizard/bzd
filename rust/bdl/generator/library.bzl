@@ -31,6 +31,9 @@ def _rust_generate_headers_impl(ctx):
     args.add_all(info.direct, before_each = "--bdl")
     for dep in ctx.attr.deps:
         if rust_common.crate_info in dep:
+            args.add("--import", dep[rust_common.crate_info].name)
+    for dep in ctx.attr.implementation_deps:
+        if rust_common.crate_info in dep:
             args.add("--include", dep[rust_common.crate_info].name)
     args.add("--output", ctx.outputs.output)
 
@@ -56,6 +59,9 @@ _rust_generate_headers = rule(
         "deps": attr.label_list(
             doc = "List of bdl dependencies.",
         ),
+        "implementation_deps": attr.label_list(
+            doc = "List of language specific implementation dependencies.",
+        ),
         "output": attr.output(
             mandatory = True,
             doc = "The generated rust file.",
@@ -74,12 +80,14 @@ def _generator_rust_library_impl(
         bdl,
         srcs,  # @unused
         deps,
+        implementation_deps,
         **kwargs):
     _rust_generate_headers(
         name = "{}.generate".format(name),
         output = "{}.rs".format(name),
         bdl = bdl,
         deps = deps,
+        implementation_deps = implementation_deps,
     )
 
     rust_library(
@@ -89,7 +97,7 @@ def _generator_rust_library_impl(
             "{}.rs".format(name),
         ],
         visibility = visibility,
-        deps = deps + [Label("//rust/bzd:bzd")],
+        deps = deps + implementation_deps + [Label("//rust/bzd:bzd")],
         **kwargs
     )
 
@@ -100,6 +108,7 @@ generator_rust_library = macro(
     attrs = {
         "bdl": attr.label(mandatory = True, doc = "The bdl target to be converted to a C++ library."),
         "deps": attr.label_list(doc = "The dependencies from the bdl file."),
+        "implementation_deps": attr.label_list(doc = "The language specific implementation dependencies."),
         "srcs": attr.label_list(doc = "The bdl source files.", configurable = False),
     },
 )

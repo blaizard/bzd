@@ -2,9 +2,10 @@
 namespace bzd.test;
 
 
-interface FileA {
-	method value() -> Integer;
-	
+enum TypeA
+{
+	zero
+,	one
 }
 
 

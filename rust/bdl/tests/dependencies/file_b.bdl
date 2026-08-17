@@ -1,9 +1,10 @@
+use "rust/bdl/tests/dependencies/file_a.bdl"
 
 namespace bzd.test;
 
 
 interface FileB {
-	method compute() -> Integer;
+	method compute() -> TypeA;
 	
 }
 

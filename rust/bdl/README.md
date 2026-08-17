@@ -89,7 +89,7 @@ pub enum BzdComponentsEspUartDevice {
 
 ## Dependencies
 
-When a `bdl_library` declares `deps`, the generated Rust file re-exports the symbols of each dependency:
+When a `bdl_library` declares `deps`, the generated Rust file imports the symbols of each dependency privately:
 
 ```python
 bdl_library(
@@ -99,4 +99,16 @@ bdl_library(
 )
 ```
 
-The generated code for `file_b` starts with `pub use file_a::*;`, exposing all of `file_a`'s symbols to downstream users.
+The generated code for `file_b` starts with `use file_a::*;`, importing `file_a`'s symbols for internal use without re-exporting them. Downstream users must depend on `file_a` directly to access its symbols.
+
+Rust dependencies provided through the `implementation` attribute are re-exported as part of the public API:
+
+```python
+bdl_library(
+    name = "interface",
+    srcs = ["interface.bdl"],
+    implementation = {"rust": ":stream_impl"},
+)
+```
+
+The generated code re-exports the implementation crate with `pub use stream_impl::*;`, publishing its symbols to downstream users.

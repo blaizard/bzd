@@ -2,21 +2,21 @@ load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_test")
 
-bdl_library(
-    name = "file_a",
+rust_library(
+    name = "stream_impl",
     srcs = [
-        "file_a.bdl",
+        "stream_impl.rs",
     ],
 )
 
 bdl_library(
-    name = "file_b",
+    name = "interface",
     srcs = [
-        "file_b.bdl",
+        "interface.bdl",
     ],
-    deps = [
-        ":file_a",
-    ],
+    implementation = {
+        "rust": ":stream_impl",
+    },
 )
 
 rust_library(
@@ -25,8 +25,7 @@ rust_library(
         "implementation.rs",
     ],
     deps = [
-        ":file_a",
-        ":file_b",
+        ":interface",
         "//rust/bzd",
     ],
 )
