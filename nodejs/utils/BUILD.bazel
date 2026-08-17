@@ -11,7 +11,8 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "color",
     srcs = [
-        "color.js",
+        "color.ts",
+        "//nodejs/utils/impl/color:backend.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
