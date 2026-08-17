@@ -41,7 +41,7 @@ services:
 
         networks:
             traefik:
-                ipv4_address: 172.18.0.2
+                ipv4_address: 172.18.0.254 # Avoid IP collision with auto-assigned IPs.
                 aliases:
                 {% for docker in dockers %}
                     - {{ docker.host }}
@@ -56,7 +56,7 @@ services:
             - "./data/{{ hostToName(docker.host) }}:/bzd/data"
         environment:
             - BZD_NODE_UID={{ docker.host }}
-            - BZD_TRUSTED_PROXIES=172.18.0.2
+            - BZD_TRUSTED_PROXIES=172.18.0.254
             {% if docker.node_token %}
             - BZD_NODE_TOKEN={{ docker.node_token }}
             {% end %}
