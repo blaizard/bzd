@@ -23,7 +23,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "delay",
     srcs = [
-        "delay.js",
+        "delay.ts",
     ],
     visibility = ["//visibility:public"],
 )
@@ -50,7 +50,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "query",
     srcs = [
-        "query.js",
+        "query.ts",
     ],
     visibility = ["//visibility:public"],
 )
