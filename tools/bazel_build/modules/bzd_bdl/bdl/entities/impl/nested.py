@@ -16,7 +16,7 @@ class Nested(Entity):
 	        - category: struct, component, interface... see Nested.categoriesAllowed_
 	        - [name]: The name of this entity, for example `struct MyType` would have the name MyType.
 	- Sequences:
-	        - [inheritance]: In case the the struct have one or multiple base class.
+	        - [inheritance]: In case the struct has one or multiple base classes.
 	        - [config]
 	        - [interface]
 	        - [composition]

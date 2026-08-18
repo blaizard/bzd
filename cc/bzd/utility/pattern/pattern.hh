@@ -233,7 +233,7 @@ constexpr auto parse() noexcept
 }
 
 /// Adapter used for the current parsing operation.
-/// Different adapters are used for compile timme or runtime operations.
+/// Different adapters are used for compile time or runtime operations.
 template <class... Ts>
 class Adapter : public Ts...
 {

@@ -20,7 +20,7 @@ public:
 	/// format_spec ::=  [sign][#][.precision][type]
 	/// sign        ::=  "+" | "-" | " "
 	/// precision   ::=  integer
-	/// type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "f" | "p" | "%"
+	/// type        ::=  "b" | "d" | "f" | "o" | "x" | "X" | "p" | "%"
 	/// d	Decimal integer
 	/// b	Binary format
 	/// o	Octal format
@@ -28,13 +28,11 @@ public:
 	/// X	Hexadecimal format (upper case)
 	/// f	Displays fixed point number (Default: 6)
 	/// p   Pointer
-	/// %	Percentage. Multiples by 100 and puts % at the end.
+	/// %	Percentage. Multiplies by 100 and puts % at the end.
 	/// \endcode
 	///
-	/// This is an after text
-	///
-	/// \param out Output stream where the formatting string will be written to.
-	/// \param str run-time or compile-time string containing the format.
+	/// \param range Output stream where the formatting string will be written to.
+	/// \param pattern run-time or compile-time string containing the format.
 	/// \param args Arguments to be passed for the format.
 	template <bzd::concepts::outputByteCopyableRange Range, class... Args>
 	static constexpr bzd::Optional<bzd::Size> process(Range&& range, const Pattern& pattern, const Args&... args) noexcept

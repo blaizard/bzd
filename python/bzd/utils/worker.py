@@ -76,7 +76,7 @@ class WorkerContextManager:
 			yield result
 
 	def add(self, data: Any, timeoutS: int = 0) -> None:
-		"""Add a new workload to processed.
+		"""Add a new workload to be processed.
 
 		Args:
 		        data: The data to be passed to the workload.

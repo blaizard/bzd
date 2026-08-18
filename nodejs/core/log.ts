@@ -63,7 +63,7 @@ class Logger {
         );
     }
 
-    // Support traces
+    // Process the message through all configured backends.
     process(level: string, topics?: string[], str: any = "", ...args: any[]) {
         const date = new Date();
         const logLevel = Logger.levels[level];

@@ -14,7 +14,7 @@ namespace bzd {
 
 /// Simple regular expression matcher.
 ///
-/// Supports a limited version of typical regular expressions. it is a single pass algorithm,
+/// Supports a limited version of typical regular expressions. It is a single-pass algorithm,
 /// with no preprocessing which limits its capabilities.
 /// Here are the set of features this version supports:
 /// - String matching.

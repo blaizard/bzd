@@ -10,7 +10,7 @@ class Use(Entity):
 	"""
 	A use statement is equivalent to include or import in other languages.
 	- Attributes:
-	        - value: The path the be included.
+	        - value: The path to be included.
 	"""
 
 	def __init__(self, element: Element) -> None:

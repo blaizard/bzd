@@ -198,7 +198,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 							streamWrite.destroy();
 							// Prevent Unhandled Promise Rejections.
 							await Promise.all([promiseSend.catch(() => {}), promiseWrite.catch(() => {})]);
-							// Only after cleanup the the files and report the error.
+							// Only after cleanup, delete the files and report the error.
 							await storage.tryDelete(temporaryPath);
 							await storage.tryDelete(pathList);
 							sendErrorFromException(context, url, e);

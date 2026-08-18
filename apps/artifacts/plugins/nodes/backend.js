@@ -277,7 +277,7 @@ export default class Plugin extends PluginBase {
 
 		/// Endpoint to perform time synchronization.
 		///
-		/// This is used to get the time from the server and measurte the time
+		/// This is used to get the time from the server and measure the time
 		/// delay between the client and the server clock.
 		/// It can be measured as follow:
 		/// ~ ((timestamp - t1) + (t4 - timestamp)) / 2

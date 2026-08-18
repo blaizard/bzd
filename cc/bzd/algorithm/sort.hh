@@ -41,8 +41,8 @@ constexpr void makeHeap(Iterator first, Iterator last, Compare& comparison) noex
 
 /// Sorts the elements in the range [first, last) in non-descending order. The order of equal elements is not guaranteed to be preserved.
 ///
-/// This implementation uses heap sort (n*log(n) complexity), sort elements in-place
-/// and do not require extra memory (stack or other) to process.
+/// This implementation uses heap sort (n*log(n) complexity), sorts elements in-place
+/// and does not require extra memory (stack or other) to process.
 /// The implementation is inspired by: https://www.geeksforgeeks.org/iterative-heap-sort/
 ///
 /// \param[in,out] first The beginning of the range of elements to be sorted.

@@ -100,7 +100,6 @@ class Parser:
 				index += m.end()
 
 		except Exception as e:
-			# Uncomment for debug
 			print("**** debug ****\n", root)
 			for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() + self.defaultGrammarPost):
 				print(item.regexpr)

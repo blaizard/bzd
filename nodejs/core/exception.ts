@@ -54,13 +54,13 @@ export class ExceptionPrecondition extends Error {
 
 export const ExceptionFactory = (...topics: string[]) => {
     return class Exception extends Error implements ExceptionInstance {
-        // All the errors this exception carries. The first in the list being the earliest.
+        // All the errors this exception carries. The first in the list is the earliest.
         e: _ExceptionFragment[] = [];
-        // Topics associated with this object
+        // Topics associated with this object.
         topics: string[] = topics;
 
         constructor(messageOrException: unknown, ...args: unknown[]) {
-            // This should capture a callstack
+            // Capture the call stack.
             super();
 
             if (messageOrException instanceof Exception) {
@@ -109,7 +109,7 @@ export const ExceptionFactory = (...topics: string[]) => {
         /// \brief Assert that expression evaluates to true.
         ///
         /// \param expression The expression to evaluate.
-        /// \param str (optional) The message to display if the assertion fails.
+        /// \param message (optional) The message to display if the assertion fails.
         /// \param ...args (optional) Arguments to add to the message.
         static assert(expression: unknown, message: string = "", ...args: unknown[]): void {
             if (!expression) {
@@ -120,7 +120,7 @@ export const ExceptionFactory = (...topics: string[]) => {
         /// \brief Assert that a precondition is satisfied.
         ///
         /// \param expression The expression to evaluate.
-        /// \param str (optional) The message to display if the assertion fails.
+        /// \param message (optional) The message to display if the assertion fails.
         /// \param ...args (optional) Arguments to add to the message.
         static assertPrecondition(expression: unknown, message: string = "", ...args: unknown[]): void {
             if (!expression) {
@@ -131,35 +131,35 @@ export const ExceptionFactory = (...topics: string[]) => {
             }
         }
 
-        /// Assert that the result passed into argument has a value.
+        /// Assert that the result passed as an argument has a value.
         ///
-        // \param expression The result to evaluate.
+        /// \param result The result to evaluate.
         static assertResult(result: ResultInterface): void {
             if (result.hasError()) {
                 throw new Exception("Assertion failed; {}", result.error());
             }
         }
 
-        /// Assert that the result passed into argument has an error.
+        /// Assert that the result passed as an argument has an error.
         ///
-        // \param expression The result to evaluate.
+        /// \param result The result to evaluate.
         static assertResultError(result: ResultInterface): void {
             if (result.hasValue()) {
                 throw new Exception("Assertion failed; result contains the value: {:?}", result.value());
             }
         }
 
-        /// Assert that the result passed into argument has a value.
+        /// Assert that the result passed as an argument has a value.
         ///
-        /// \param expression The result to evaluate.
+        /// \param result The result to evaluate.
         static assertPreconditionResult(result: ResultInterface): void {
             if (result.hasError()) {
                 throw Exception.makePreconditionException("Precondition failed; {}", result.error());
             }
         }
 
-        /// \brief Assert that 2 values are equal.
-        /// This is not a strict assert.
+        /// \brief Assert that two values are equal.
+        /// This is not a strict equality check.
         ///
         /// \param value1 The first value.
         /// \param value2 The second value.
@@ -201,7 +201,7 @@ export const ExceptionFactory = (...topics: string[]) => {
             );
         }
 
-        /// Ensures that a specific block of code throws an exception with a specific message
+        /// Ensures that a specific block of code throws an exception matching a specific message.
         static async assertThrowsWithMatch(
             block: () => unknown,
             match: string,
@@ -227,27 +227,27 @@ export const ExceptionFactory = (...topics: string[]) => {
             }
         }
 
-        /// Ensures that a specific block of code throws an exception
+        /// Ensures that a specific block of code throws an exception.
         static async assertThrows(block: () => unknown, message: string = "", ...args: unknown[]): Promise<void> {
             Exception.assertThrowsWithMatch(block, "", message, ...args);
         }
 
-        /// Error reached
+        /// Throw an error with the given message.
         static error(message: string, ...args: unknown[]): never {
             throw new Exception("Error; " + message, ...args);
         }
 
-        /// Error reached
+        /// Throw a precondition error with the given message.
         static errorPrecondition(message: string, ...args: unknown[]): never {
             throw Exception.makePreconditionException("Error; " + message, ...args);
         }
 
-        /// Flag a line of code unreachable
+        /// Flag a line of code as unreachable.
         static unreachable(message: string, ...args: unknown[]): never {
             throw new Exception("Code unreachable; " + message, ...args);
         }
 
-        /// Print a formatted exception message
+        /// Print a formatted exception message.
         static print(...args: unknown[]): void {
             Log.custom(
                 {
@@ -258,7 +258,7 @@ export const ExceptionFactory = (...topics: string[]) => {
             );
         }
 
-        /// Print a formatted exception message
+        /// Print a formatted exception message.
         print(...args: unknown[]): void {
             let exception: ExceptionInstance = this;
             if (args.length) {
@@ -272,7 +272,7 @@ export const ExceptionFactory = (...topics: string[]) => {
             return this.e.map((e) => e.message).join("\n");
         }
 
-        /// Print the current exception object
+        /// Print the current exception object.
         toString(): string {
             let content = [this.message];
             if (this.e.length > 0) {
@@ -285,7 +285,7 @@ export const ExceptionFactory = (...topics: string[]) => {
 
 const E = ExceptionFactory("exception");
 
-// Register uncaught exception handler
+// Register uncaught exception handler.
 uncaughtExceptionHandler(E);
 
 export default ExceptionFactory;

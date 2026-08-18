@@ -68,7 +68,7 @@ class Constraint:
 	@staticmethod
 	def _toFloat(value: str) -> float:
 		"""
-		Convert to integer or throw.
+		Convert to float or throw.
 		"""
 		try:
 			return float(value)

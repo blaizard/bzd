@@ -5,7 +5,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 	"""Calculate the matching weight of a word into another.
 
 	It performs a fuzzy search on the word using a fast algorithm.
-	The word can ba a subset of the word to compare.
+	The word can be a subset of the word to compare.
 	"""
 
 	if len(word) == 0 or len(compareWith) == 0:
@@ -41,7 +41,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 
 		weight = max(weight, curWeight)
 
-	# Normalize the result and make the result exponential to add importance on full matches
+	# Normalize the result by the length of the word.
 	weight /= len(word)
 
 	# Add a penalty on word size to ensure that an exact match always get more weight than a substring match

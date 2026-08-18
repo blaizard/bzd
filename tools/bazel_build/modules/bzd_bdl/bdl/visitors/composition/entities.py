@@ -35,7 +35,7 @@ class Entities:
 	def processFirstStage(
 		self, expression: Expression, fqns: typing.Optional[typing.Set[str]]
 	) -> typing.Optional[Expression]:
-		"""Process first stage expression and return the one that are not processed."""
+		"""Process first stage expression and return the ones that are not processed."""
 
 		if expression.isSymbol:
 			if expression.symbol.fqn == "bind":
@@ -94,7 +94,7 @@ class Entities:
 
 	@cached_property
 	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
-		"""Get the sorted wokloads expression entry list for a specific context."""
+		"""Get the sorted workloads expression entry list for a specific context."""
 
 		result: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
 		for context, entries in self.all.items():

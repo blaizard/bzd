@@ -47,7 +47,7 @@ def makeGrammarNested(
 	nested: typing.Optional[typing.Set[str]] = None,
 ) -> Grammar:
 	"""
-	Generate a grammar for a nested entity, it accepst the following format:
+	Generate a grammar for a nested entity, it accepts the following format:
 	(interface|struct|component|composition) [name] [contracts] [: inheritance1, inheritance2, ...] {
 	        nestedGrammar
 	}

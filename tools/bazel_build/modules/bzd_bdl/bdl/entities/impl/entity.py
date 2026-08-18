@@ -525,7 +525,7 @@ class EntityExpression(Entity):
 	@property
 	def isRValue(self) -> bool:
 		"""If the expression represents an RValue, in this context an rvalue is a temporary,
-		but it could be extended to move semantic."""
+		but it could be extended to move semantics."""
 
 		return self.isRoleValue and self.underlyingValueFQN is None
 

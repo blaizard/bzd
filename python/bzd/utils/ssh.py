@@ -104,7 +104,7 @@ class SSH:
 		"""Decompose a SSH string and gets its components.
 
 		A SSH string must have the following format:
-		<username>@<host>:<port>, where only <host> is mandatory.
+		<username>@<host>:<port>, where <username> and <host> are mandatory and <port> is optional.
 		"""
 
 		def splitLocation(location: str) -> typing.Tuple[str, int]:

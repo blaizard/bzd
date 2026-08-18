@@ -15,7 +15,7 @@ class HttpParser:
 		"""Generic HTTP Parser.
 
 		Args:
-		        reader: A callable to red a chunk of data.
+		        reader: A callable to read a chunk of data.
 		        timeoutS: Timeout in seconds of a single read request. The whole reading can take longer as long as every read is satisfied within the
 		        provided timeout.
 		"""
@@ -51,8 +51,8 @@ class HttpParser:
 	def _readHeaders(self) -> None:
 		"""Process the data and parse the headers.
 
-		Returns:
-		        The part of the body of the HTTP request that was read but not processed.
+		Note:
+		        The unprocessed part of the body is kept in the buffer.
 		"""
 
 		# Read the header.

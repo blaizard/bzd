@@ -41,7 +41,7 @@ class SymbolTree(EntitySequence):
 	@staticmethod
 	def fromSerialize(data: typing.List[str], symbols: SymbolMap) -> "SymbolTree":
 		"""
-		Create a symbol map from a serialized object.
+		Create a symbol tree from a serialized object.
 		"""
 		tree = SymbolTree(symbols=symbols)
 		# Checks

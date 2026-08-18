@@ -92,7 +92,7 @@ class Symbol:
 		)
 
 		# Resolve the entity, this is needed if the entity is not discovered yet.
-		# It might happens for entities that are defined in a config section for example, which are only
+		# It might happen for entities that are defined in a config section for example, which are only
 		# resolved when used.
 		entity.resolveMemoized(resolver=resolver.make(namespace=self.namespace))
 

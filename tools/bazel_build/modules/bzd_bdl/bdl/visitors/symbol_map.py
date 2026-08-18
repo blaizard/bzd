@@ -280,7 +280,7 @@ class SymbolMap:
 		        conflicts: Handle symbol FQN conflicts.
 		"""
 		if name is None:
-			# These are the unnamed elements that should be progpagated to other translation units.
+			# These are the unnamed elements that should be propagated to other translation units.
 			if Group.composition in group:
 				fqn = FQN.makeUnique(namespace=namespace)
 				# If not, they will be kept private.
@@ -293,7 +293,7 @@ class SymbolMap:
 
 		# Save the FQN to the element, so that it can be found during [de]serialization.
 		# This is also used to refer to the element with the symbol tree, the top-level ones only.
-		# In addition, it is assumed that during while resolved any element have a valid FQN.
+		# In addition, it is assumed that during resolution any element has a valid FQN.
 		ElementBuilder.cast(element, ElementBuilder).setAttr("fqn", fqn)
 
 		if self.contains(fqn=fqn):
@@ -422,7 +422,7 @@ class SymbolMap:
 		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
 
 	def similarFQN(self, fqn: str) -> typing.List[str]:
-		"""Find a related FQN that has similar name that the one in argument."""
+		"""Find a related FQN that has similar name to the one in argument."""
 
 		all_fqns = [k for k in [*self.map.keys(), *self.builtins.keys()] if not k.endswith("~")]
 		similar = sortMatchingWeight(fqn, all_fqns)

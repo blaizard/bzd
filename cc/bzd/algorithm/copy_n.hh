@@ -27,7 +27,7 @@ constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 	return result;
 }
 
-/// \copydoc copy
+/// \copydoc copyN
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>

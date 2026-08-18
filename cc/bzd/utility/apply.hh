@@ -19,7 +19,7 @@ namespace bzd {
 /// Invoke the Callable object f with a fixed size container.
 ///
 /// \param f Callable object to be invoked.
-/// \param t whose elements to be used as arguments to f.
+/// \param t The container whose elements are to be used as arguments to f.
 /// \return The value returned by f.
 template <class F, class T>
 constexpr decltype(auto) apply(F&& f, T&& t)

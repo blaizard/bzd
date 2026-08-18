@@ -186,7 +186,7 @@ class Components:
 				return self.makeId(expression) in discovered
 
 			def isSatisfied(group: DependencyGroup) -> bool:
-				"""Check that the group dependency is statified with the current map."""
+				"""Check that the group dependency is satisfied with the current map."""
 
 				for expression in group:
 					if not isExpressionDiscovered(expression):
@@ -216,7 +216,7 @@ class Components:
 		self.resolve()
 
 	def insert(self, expression: Expression, entryType: EntryType, context: Context) -> typing.Optional[ExpressionEntry]:
-		"""Insert a new entry in the map, return the entry if it does not exists or if it can be updated,
+		"""Insert a new entry in the map, return the entry if it does not exist or if it can be updated,
 		otherwise it returns None."""
 
 		assert not self.isResolved

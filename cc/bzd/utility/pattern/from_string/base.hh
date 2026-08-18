@@ -26,7 +26,7 @@ struct FromString : ::bzd::FromString<typeTraits::RemoveCVRef<T>>
 
 } // namespace typeTraits
 
-/// Match the value of a data type from a byte stream.
+/// Read the value of a data type from a byte stream.
 ///
 /// \param range The input range to be read from.
 /// \param args The value(s) to be read.

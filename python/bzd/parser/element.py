@@ -214,20 +214,20 @@ class Element:
 		return bool(kind in self.sequences)
 
 	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
-		"""Get a current sequence of None if it does not exists."""
+		"""Get the current sequence, or None if it does not exist."""
 
 		assert kind != "@", "Nested sequence name '@' cannot be used."
 		return self.sequences.get(kind, None)
 
 	def getNestedSequenceAssert(self, kind: str) -> Sequence:
-		"""Get a current sequence of None if it does not exists."""
+		"""Get the current sequence, or assert if it does not exist."""
 
 		maybeSequence = self.getNestedSequence(kind)
 		assert maybeSequence is not None, "Sequence must be non-null."
 		return maybeSequence
 
 	def getNestedSequenceOrEmpty(self, kind: str) -> Sequence:
-		"""Get a current sequence of an empty one if it does not exists."""
+		"""Get the current sequence, or an empty one if it does not exist."""
 
 		maybeSequence = self.getNestedSequence(kind)
 		if maybeSequence is None:

@@ -167,21 +167,21 @@ public: // Access.
 		return {};
 	}
 
-	/// Get the a scoped range of the next element available for writing.
-	/// If \b count is defined, it will return a scope with the specific number of element.
+	/// Get a scoped range of the next element available for writing.
+	/// If \b count is defined, it will return a scope with the specific number of elements.
 	/// If not or null, all remaining elements will be returned in the range.
 	// [[nodiscard]] constexpr auto asSpansForWriting(const Index count = 0u) noexcept
 	// {
 	// }
 
-	/// Get the a scoped range of elements available for reading.
-	/// If \b count is defined, it will return a scope with the specific number of element,
+	/// Get a scoped range of elements available for reading.
+	/// If \b count is defined, it will return a scope with the specific number of elements,
 	/// starting from the \b first or last depending on the parameter value.
 	/// If not or null, all remaining elements will be returned in the range.
 	///
-	/// \param count The number of element to include the output range. If null, all available elements are returned.
+	/// \param count The number of elements to include in the output range. If 0, all available elements are returned.
 	/// \param first If set, the range will start from the first element inserted, otherwise from the latest.
-	/// \param start Starting from a specific index, in other word, excluding every entries oldest that this.
+	/// \param start Starting from a specific index, in other words, excluding every entry older than this index.
 	[[nodiscard]] constexpr RingBufferResult<bzd::Spans<const T, 2u>> asSpansForReading(const Index count = 0u,
 																						const Index first = true,
 																						const Index start = 0u) noexcept

@@ -40,12 +40,12 @@ def updateDeep(
 	"""Deep update of 2 dictionaries.
 
 	Args:
-	        d: Dictionary to merge, the merge happen in-place, so this dictionary will be modified.
+	        d: Dictionary to merge, the merge happens in-place, so this dictionary will be modified.
 	        u: Dictionary to apply.
 	        policy: The policy to be used when merging.
 			extendLists: Whether to extend lists instead of replacing them.
 
-	Return:
+	Returns:
 	        The updated dictionary.
 	"""
 

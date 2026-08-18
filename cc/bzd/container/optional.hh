@@ -186,7 +186,7 @@ public: // Monadic API.
 	/// Returns *this if it contains a value. Otherwise, returns the result of `callable`.
 	///
 	/// \param callable A suitable function or Callable object that returns an optional.
-	/// \return The result of 'callable' or an empty optional.
+	/// \return *this if it contains a value, or the result of 'callable' otherwise.
 	template <concepts::invocable<> Callable>
 	requires(concepts::sameClassAs<typeTraits::InvokeResult<Callable>, Optional>)
 	constexpr Optional orElse(Callable&& callable) && noexcept

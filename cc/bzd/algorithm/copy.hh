@@ -40,7 +40,7 @@ constexpr auto copy(InputRange&& input, Output output)
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 ///
-/// \return The remain of the output range.
+/// \return The remainder of the output range.
 template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copy(InputRange&& input, OutputRange&& output)
 {

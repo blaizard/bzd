@@ -124,7 +124,7 @@ class Visitor(VisitorBase[T, T]):
 	@property
 	def namespace(self) -> typing.List[str]:
 		"""
-		Get the list of name constituing the namespace.
+		Get the list of names constituting the namespace.
 		"""
 		return [name for parent in self.parents for name in parent.namespace]
 
@@ -285,7 +285,7 @@ class Visitor(VisitorBase[T, T]):
 
 	def visitUse(self, entity: Use, result: T) -> None:
 		"""
-		Called when discovering an use statement.
+		Called when discovering a use statement.
 		"""
 		pass
 

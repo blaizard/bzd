@@ -23,7 +23,7 @@ class Namespace(Entity):
 	"""
 	A namespace defines a scope in which entities are available.
 	- Sequence:
-	        - name: The list of names constituing the namespace.
+	        - name: The list of names constituting the namespace.
 	"""
 
 	def __init__(self, element: Element) -> None:

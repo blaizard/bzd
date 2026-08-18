@@ -69,7 +69,7 @@ private:
 		}
 		else
 		{
-			// Still wait for a cycle to avoid the caller to take
+			// Still wait for a cycle to avoid the caller taking
 			// all CPU if the producer is faster than the consumer.
 			co_await bzd::async::yield();
 		}

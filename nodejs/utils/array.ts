@@ -1,4 +1,4 @@
-/// Find the common prefixes of an array.
+/// Find the longest common prefix shared by all the given arrays.
 export function arrayFindCommonPrefix<T>(...arrays: T[][]): T[] {
     const first = arrays[0] ?? [];
     let commonPrefix = first.length;

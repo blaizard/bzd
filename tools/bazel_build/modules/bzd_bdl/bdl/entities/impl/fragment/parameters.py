@@ -292,7 +292,7 @@ class Parameters(ParametersCommon):
 
 	def copy(self) -> "Parameters":
 		"""
-		Copy the parameter list and optionally filter it.
+		Copy the parameter list.
 		"""
 		parameters = Parameters(element=self.element, NestedElementType=self.NestedElementType)
 		parameters.list = self.list.copy()

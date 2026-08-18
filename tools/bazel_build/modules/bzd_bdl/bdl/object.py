@@ -130,7 +130,7 @@ class ObjectContext:
 		"""Preprocess a bdl file and save its output, or use the preprocessed file if present.
 
 		Args:
-		        source: The source file the be preprocessed.
+		        source: The source file to be preprocessed.
 		        namespace: An optional wrapping namespace to be used for this file.
 		"""
 
@@ -200,7 +200,7 @@ class Object:
 
 	@staticmethod
 	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
-		"""Make an object from a the content of a bdl file.
+		"""Make an object from the content of a bdl file.
 
 		This is mainly used for testing purpose.
 		"""
@@ -213,7 +213,7 @@ class Object:
 
 	def entity(self, fqn: str) -> EntityType:
 		"""Convenience function to lookup for an entity based on its FQN and return it.
-		If the symbol does not exists, this will throw."""
+		If the symbol does not exist, this will throw."""
 
 		maybeEntity = self.symbols.getEntity(fqn)
 		assert bool(maybeEntity), maybeEntity.error

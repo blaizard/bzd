@@ -14,7 +14,7 @@ namespace bzd::algorithm {
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 ///
-/// \return The remain of the output range.
+/// \return The remainder of the output range.
 template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 {
@@ -51,7 +51,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 ///
-/// \return The remain of the output range.
+/// \return The remainder of the output range.
 template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr bzd::Size byteCopyReturnSize(InputRange&& input, OutputRange&& output)
 {

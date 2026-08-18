@@ -83,7 +83,7 @@ class Contracts:
 
 	def validate(self) -> None:
 		"""
-		Validate the contracts. it checks the follow:
+		Validate the contracts. It checks the following:
 		        - Valid contract types.
 		"""
 
@@ -97,7 +97,7 @@ class Contracts:
 
 	def merge(self, contracts: "Contracts") -> None:
 		"""
-		Merge a base contract into this one. The order is important, as type are inherited from the deepest base.
+		Merge a base contract into this one. The order is important, as types are inherited from the deepest base.
 		"""
 
 		elementBuilder = ElementBuilder.cast(self.element, ElementBuilder)

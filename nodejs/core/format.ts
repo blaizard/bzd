@@ -1,6 +1,6 @@
 /// Dump the given object as a string for observability purposes.
 ///
-/// Unlike JSON.stringify, it handles very large objects by printing only the first `maxSize` bytes.
+/// Unlike JSON.stringify, it handles very large objects by printing only the first `maxSize` characters.
 export function toDumpString(object: unknown, maxSize: number = 1000): string {
     const iterableToString = (
         iterable: Iterable<unknown>,
@@ -108,11 +108,11 @@ export default function formatString(str: string, ...args: unknown[]): string {
     let substitutionIndex = 0;
 
     const replacer = (_: string, name: string, metadata?: string): string => {
-        // Handle the operation if any match
+        // Handle the formatting operation for each match.
         const format = _parseFormat(name, metadata || "", substitutionIndex);
         ++substitutionIndex;
 
-        // Sync the match with the args
+        // Resolve the value matching the placeholder.
         let value: unknown = null;
         if (typeof format.index === "string") {
             const a = args[0];

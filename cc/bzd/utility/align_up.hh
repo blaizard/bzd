@@ -9,7 +9,7 @@ namespace bzd {
 /// \tparam Align Power of 2 alignment.
 /// \param value Value to be aligned.
 ///
-/// \return The value at or after than the provided value that is at least alignment bytes aligned.
+/// \return The value at or after the provided value that is aligned to at least Align bytes.
 template <UInt8 Align, class T>
 constexpr T alignUp(const T value) noexcept
 {

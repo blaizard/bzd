@@ -23,7 +23,7 @@ class Sh(Factory):
 		return "Sh-compatible shell"
 
 	def isCompatible(self) -> bool:
-		"""Tell if this is a sh-compatibel shell."""
+		"""Tell if this is a sh-compatible shell."""
 
 		return os.environ.get("SHELL", "").endswith(
 			(
