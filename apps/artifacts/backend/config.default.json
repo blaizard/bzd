@@ -121,6 +121,20 @@
                     }
                 }
             ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/api/v1/list",
+                {
+                    "data": {
+                        "path": "memory"
+                    }
+                }
+            ]
         }
     ],
     "tokens": {
