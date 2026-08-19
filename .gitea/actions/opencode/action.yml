@@ -30,9 +30,8 @@ runs:
               AGENT: ${{ inputs.agent }}
           run: |
               set -euo pipefail
-              echo  "==== prompt ================================================="
-              echo "$PROMPT"
-              echo  "==== processing ============================================="
+
               ./tools/bazel run //apps/utils/agent -- --output /tmp/agent-response.txt --agent "$AGENT" "$PROMPT"
+
               echo  "==== response ==============================================="
               cat /tmp/agent-response.txt
