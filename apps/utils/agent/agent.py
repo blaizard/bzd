@@ -12,9 +12,9 @@ from bzd.utils.run import localCommand
 def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) -> typing.Optional[str]:
 	"""Run opencode."""
 
-	print("==== prompt ================================================")
-	print(prompt)
-	print("==== agent =================================================")
+	print("==== prompt ================================================", flush=True)
+	print(prompt, flush=True)
+	print("==== agent =================================================", flush=True)
 	result = localCommand(
 		[
 			"opencode",
@@ -35,17 +35,17 @@ def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) 
 	if result.isFailure():
 		logDir = pathlib.Path.home() / ".local" / "share" / "opencode" / "log"
 		logFiles = sorted(logDir.glob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
-		print(f"==== opencode failed ({result.getReturnCode()}), dumping last logs ==================")
+		print(f"==== opencode failed ({result.getReturnCode()}), dumping last logs ==================", flush=True)
 		if logFiles:
 			lines = logFiles[0].read_text(errors="replace").splitlines()
-			print("\n".join(lines[-100:]))
+			print("\n".join(lines[-100:]), flush=True)
 		else:
-			print("No log found.")
+			print("No log found.", flush=True)
 		return None
 
 	output = result.getStdout()
 	if len(output.strip()) == 0:
-		print("No output.")
+		print("No output.", flush=True)
 		return None
 
 	return output
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
 	while retry < args.max_retries:
 		if retry > 0:
-			print(f"retrying {retry}/{args.max_retries}")
+			print(f"retrying {retry}/{args.max_retries}", flush=True)
 		output = opencode(
 			cwd=args.cwd,
 			agent=args.agent,
@@ -83,13 +83,13 @@ if __name__ == "__main__":
 		if output is not None:
 			break
 
-		print("==== error =================================================")
+		print("==== error =================================================", flush=True)
 		retry += 1
 		continueSession = True
 		prompt = "continue"
 
 	if output is None:
-		print("No output.")
+		print("No output.", flush=True)
 		sys.exit(1)
 
 	if args.output:
