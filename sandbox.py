@@ -83,30 +83,6 @@ class FeatureVolume(Feature):
 		self.dockerCompose = {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
 
 
-class FeatureTools(Feature):
-	"""Feature: Add support for sessions."""
-
-	def process(self, context: "SandboxContainer") -> None:
-		self.dockerFile += [
-			"RUN sudo apt install -y dtach",
-			"""RUN sudo tee /usr/local/bin/session <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-mkdir -p "\\$HOME/.dtach"
-name="\\${1:-main}"
-sock="\\$HOME/.dtach/\\$name"
-export BZD_SESSION="\\$name"
-# Create the master detached.
-if [ ! -S "\\$sock" ]; then
-	dtach -n "\\$sock" bash
-fi
-# Attach to it.
-exec dtach -a "\\$sock"
-EOF""",
-			"RUN sudo chmod +x /usr/local/bin/session",
-		]
-
-
 class FeatureSession(Feature):
 	"""Feature: Add support for sessions."""
 
@@ -120,12 +96,7 @@ mkdir -p "\\$HOME/.dtach"
 name="\\${1:-main}"
 sock="\\$HOME/.dtach/\\$name"
 export BZD_SESSION="\\$name"
-# Create the master detached.
-if [ ! -S "\\$sock" ]; then
-	dtach -n "\\$sock" bash
-fi
-# Attach to it.
-exec dtach -a "\\$sock"
+exec dtach -zA "\\$sock" bash
 EOF""",
 			"RUN sudo chmod +x /usr/local/bin/session",
 		]
@@ -138,7 +109,8 @@ class FeatureIsolation(Feature):
 	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
 		return {
 			"isolate": {
-				"action": "store_true",
+				"action": argparse.BooleanOptionalAction,
+				"default": False,
 				"help": "Isolate the container from the host.",
 			}
 		}
@@ -157,11 +129,12 @@ class FeatureIsolation(Feature):
 				]
 			}
 		else:
+			hostHome = pathlib.Path.home()
 			self.volumes += [
-				# Add some files as volumes only if they exist (otherwise docker-compose will create an empty directory).
-				f"{file}:{file}"
-				for file in [context.home / ".cache", context.home / ".bash_history", context.home / ".netrc"]
-				if file.exists()
+				# Copy some files from home as volumes only if they exist (otherwise docker-compose will create an empty directory).
+				f"{hostHome / file}:{context.home / file}"
+				for file in [".cache", ".bash_history", ".netrc", ".ssh"]
+				if (hostHome / file).exists()
 			]
 			self.dockerCompose = {"service": ["network_mode: host"]}
 
@@ -222,14 +195,15 @@ class FeatureOpenCode(Feature):
 				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
 			}' > {context.home}/.opencode_config/opencode.json",
 		]
+		hostHome = pathlib.Path.home()
 		self.volumes += [
-			f"{path}:{path}"
+			f"{hostHome / path}:{context.home / path}"
 			for path in [
-				context.home / ".config/opencode",
-				context.home / ".local/share/opencode",
-				context.home / ".local/state/opencode",
+				".config/opencode",
+				".local/share/opencode",
+				".local/state/opencode",
 			]
-			if path.exists()
+			if (hostHome / path).exists()
 		]
 
 		if not self.args.opencode or "playwright" in self.args.opencode:
@@ -342,13 +316,13 @@ class SandboxContainer:
 	def __init__(self, args: argparse.Namespace, features: typing.Sequence[Feature], temporaryPath: pathlib.Path) -> None:
 
 		self.root = args.root.resolve().absolute()
-		self.home = args.home
 		self.temporaryPath = temporaryPath
 		self.uid = args.uid
 		self.gid = args.gids[0]
 		self.gids = sorted(set(args.gids) - {self.gid})
 		self.userNamespaceRemapping = args.user_namespace_remapping
 		self.isInteractive = False if args.no_tty else (sys.stdin.isatty() and sys.stdout.isatty())
+		self.home = pathlib.Path("/root") if self.userNamespaceRemapping else args.home
 		self.user = "root" if self.userNamespaceRemapping else args.user
 		self.features = [feature for feature in features if feature.isAvailable]
 		self.args = args
@@ -891,7 +865,6 @@ services:
 		features = [allFeatures[name](args) for name in sorted(featureNames)] + [
 			feature(args) for feature in additionalFeatures
 		]
-
 		sandbox = SandboxContainer(args=args, features=features, temporaryPath=args.temp)
 		sandbox.initialize(dry=args.dry, verbose=args.verbose)
 		if not args.dry:
