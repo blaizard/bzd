@@ -1,6 +1,6 @@
 ---
 name: cc
-description: How to write C++ code
+description: Use when writing C++ code
 compatibility: opencode
 ---
 

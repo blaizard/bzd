@@ -41,6 +41,8 @@ Apply this skill:
 
 - Expressive Design: Code must speak for itself through intentional naming, clear flow, and minimal scope.
 - Documentation Constraint: Avoid writing comments or external documentation unless strictly necessary to explain non-obvious business logic, or required for public, user-facing APIs.
+- Always use descriptive variable/symbol names (never 'i', 's', etc).
+- Do not use magic numbers, use a constant with a descriptive name.
 
 ## Checklist
 
