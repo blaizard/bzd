@@ -39,7 +39,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "optional",
     srcs = [
-        "optional.js",
+        "optional.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [

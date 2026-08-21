@@ -41,6 +41,16 @@ bzd_nodejs_test(
 )
 
 bzd_nodejs_test(
+    name = "optional",
+    srcs = ["optional_test.js"],
+    main = "optional_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:optional",
+    ],
+)
+
+bzd_nodejs_test(
     name = "pathlib",
     srcs = ["pathlib_test.js"],
     main = "pathlib_test.js",
