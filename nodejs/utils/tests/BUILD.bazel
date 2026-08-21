@@ -79,3 +79,13 @@ bzd_nodejs_test(
         "//nodejs/utils:result",
     ],
 )
+
+bzd_nodejs_test(
+    name = "run",
+    srcs = ["run_test.js"],
+    main = "run_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:run",
+    ],
+)

@@ -38,7 +38,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "event",
     srcs = [
-        "event.js",
+        "event.ts",
     ],
     visibility = ["//visibility:public"],
 )

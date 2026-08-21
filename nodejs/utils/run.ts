@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn, type ChildProcess, type SpawnOptions } from "child_process";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import Event from "#bzd/nodejs/core/event.js";
 
@@ -12,28 +12,43 @@ export const Status = Object.freeze({
 	cancelled: "cancelled",
 });
 
+type StatusType = (typeof Status)[keyof typeof Status];
+
+type OutputHandler = (data: string) => void;
+
+interface LocalCommandOptions {
+	stdout?: boolean | OutputHandler | OutputHandler[] | null;
+	stderr?: boolean | OutputHandler | OutputHandler[] | null;
+	maxOutputSize?: number;
+	ignoreFailure?: boolean;
+	env?: NodeJS.ProcessEnv | null;
+}
+
 class ExecuteResult {
-	constructor(subprocess, { maxOutputSize }) {
+	subprocess: ChildProcess;
+	maxOutputSize: number;
+	promise: Promise<unknown> | null = null;
+	returncode: number | null = null;
+
+	output: [boolean, string][] = [];
+	outputSize: number = 0;
+	status: StatusType = Status.idle;
+	event: Event = new Event();
+
+	constructor(subprocess: ChildProcess, { maxOutputSize }: { maxOutputSize: number }) {
 		this.subprocess = subprocess;
 		this.maxOutputSize = maxOutputSize;
-		this.promise = null;
-		this.returncode = null;
-
-		this.output = [];
-		this.outputSize = 0;
-		this.status = Status.idle;
-		this.event = new Event();
-		this.event.on("status", (status) => {
+		this.event.on("status", (status: StatusType) => {
 			this.status = status;
 		});
 	}
 
-	async join() {
+	async join(): Promise<ExecuteResult> {
 		await this.promise;
 		return this;
 	}
 
-	_addToBuffer(isStdout, data) {
+	_addToBuffer(isStdout: boolean, data: string): void {
 		if (data) {
 			// Trigger output events.
 			if (isStdout) {
@@ -46,13 +61,13 @@ class ExecuteResult {
 			this.output.push([isStdout, data]);
 			this.outputSize += data.length;
 			while (this.outputSize > this.maxOutputSize) {
-				const removed = this.output.shift();
+				const removed = this.output.shift()!;
 				this.outputSize -= removed[1].length;
 			}
 		}
 	}
 
-	on(topic, handler) {
+	on(topic: string, handler: (...args: unknown[]) => void): void {
 		Exception.assertPrecondition(
 			["status", "stdout", "stderr", "output"].includes(topic),
 			"Unsupported topic: " + topic,
@@ -60,7 +75,7 @@ class ExecuteResult {
 		this.event.on(topic, handler);
 	}
 
-	remove(topic, handler) {
+	remove(topic: string, handler: (...args: unknown[]) => void): void {
 		Exception.assertPrecondition(
 			["status", "stdout", "stderr", "output"].includes(topic),
 			"Unsupported topic: " + topic,
@@ -68,8 +83,8 @@ class ExecuteResult {
 		this.event.remove(topic, handler);
 	}
 
-	async kill() {
-		const promise = new Promise((resolve) => {
+	async kill(): Promise<void> {
+		const promise = new Promise<void>((resolve) => {
 			this.subprocess.on("exit", () => {
 				resolve();
 			});
@@ -78,48 +93,54 @@ class ExecuteResult {
 		return promise;
 	}
 
-	getStdout() {
+	getStdout(): string {
 		return this.output
 			.filter((entry) => entry[0])
 			.map((entry) => entry[1])
 			.join("");
 	}
 
-	getStderr() {
+	getStderr(): string {
 		return this.output
 			.filter((entry) => !entry[0])
 			.map((entry) => entry[1])
 			.join("");
 	}
 
-	getOutput() {
+	getOutput(): string {
 		return this.output.map((entry) => entry[1]).join("");
 	}
 
-	writeToStdin(data) {
-		this.subprocess.stdin.write(data);
+	writeToStdin(data: string): void {
+		this.subprocess.stdin!.write(data);
 	}
 
-	getReturnCode() {
+	getReturnCode(): number | null {
 		return this.returncode;
 	}
 
-	isSuccess() {
+	isSuccess(): boolean {
 		return this.returncode === 0;
 	}
 
-	isFailure() {
+	isFailure(): boolean {
 		return this.returncode !== 0;
 	}
 }
 
 export function localCommand(
-	cmds,
-	{ stdout = null, stderr = null, maxOutputSize = 1000000, ignoreFailure = false, env = null } = {},
-) {
+	cmds: string[],
+	{
+		stdout = null,
+		stderr = null,
+		maxOutputSize = 1000000,
+		ignoreFailure = false,
+		env = null,
+	}: LocalCommandOptions = {},
+): ExecuteResult {
 	Exception.assert(Array.isArray(cmds) && cmds.length > 0, "No command to run");
 
-	const spawnOptions = {
+	const spawnOptions: SpawnOptions = {
 		stdio: ["pipe", "pipe", "pipe"],
 	};
 	if (env !== null) {
@@ -130,38 +151,34 @@ export function localCommand(
 	const result = new ExecuteResult(subprocess, { maxOutputSize: maxOutputSize });
 
 	// Helper for the output handlers.
-	if (stdout === null) {
-		stdout = [];
-	}
-	if (stderr === null) {
-		stderr = [];
-	}
+	let stdoutHandlers: OutputHandler[] = [];
+	let stderrHandlers: OutputHandler[] = [];
 	if (stdout === true) {
-		stdout = [process.stdout.write];
+		stdoutHandlers = [process.stdout.write];
+	} else if (typeof stdout === "function") {
+		stdoutHandlers = [stdout];
+	} else if (Array.isArray(stdout)) {
+		stdoutHandlers = stdout;
 	}
 	if (stderr === true) {
-		stderr = [process.stderr.write];
+		stderrHandlers = [process.stderr.write];
+	} else if (typeof stderr === "function") {
+		stderrHandlers = [stderr];
+	} else if (Array.isArray(stderr)) {
+		stderrHandlers = stderr;
 	}
-	if (typeof stdout === "function") {
-		stdout = [stdout];
-	}
-	if (typeof stderr === "function") {
-		stderr = [stderr];
-	}
-	Exception.assert(Array.isArray(stdout), "Invalid stdout handlers");
-	Exception.assert(Array.isArray(stderr), "Invalid stderr handlers");
 	if (maxOutputSize > 0) {
-		stdout.push((data) => result._addToBuffer(true, data));
-		stderr.push((data) => result._addToBuffer(false, data));
+		stdoutHandlers.push((data) => result._addToBuffer(true, data));
+		stderrHandlers.push((data) => result._addToBuffer(false, data));
 	}
 
-	subprocess.stdout.setEncoding("utf8");
-	subprocess.stdout.on("data", (data) => {
-		stdout.forEach((handler) => handler(data));
+	subprocess.stdout!.setEncoding("utf8");
+	subprocess.stdout!.on("data", (data) => {
+		stdoutHandlers.forEach((handler) => handler(data));
 	});
-	subprocess.stderr.setEncoding("utf8");
-	subprocess.stderr.on("data", (data) => {
-		stderr.forEach((handler) => handler(data));
+	subprocess.stderr!.setEncoding("utf8");
+	subprocess.stderr!.on("data", (data) => {
+		stderrHandlers.forEach((handler) => handler(data));
 	});
 
 	subprocess.on("spawn", () => {
@@ -169,7 +186,7 @@ export function localCommand(
 	});
 
 	// Do not reject not to end up with an unhandled rejection.
-	result.promise = new Promise((resolve, reject) => {
+	result.promise = new Promise<void>((resolve, reject) => {
 		const handleError = () => {
 			if (ignoreFailure) {
 				resolve();
@@ -181,7 +198,7 @@ export function localCommand(
 		subprocess.on("error", (err) => {
 			result.event.trigger("status", Status.failed);
 			const message = "Process failed to start: " + String(err);
-			stderr.forEach((handler) => handler(message));
+			stderrHandlers.forEach((handler) => handler(message));
 			handleError();
 		});
 
@@ -194,12 +211,12 @@ export function localCommand(
 				} else {
 					result.event.trigger("status", Status.failed);
 					const message = "Process failed with error code: " + code;
-					stderr.forEach((handler) => handler(message));
+					stderrHandlers.forEach((handler) => handler(message));
 					handleError();
 				}
 			} else {
 				result.event.trigger("status", Status.cancelled);
-				stderr.forEach((handler) => handler("Cancelled"));
+				stderrHandlers.forEach((handler) => handler("Cancelled"));
 				handleError();
 			}
 		});

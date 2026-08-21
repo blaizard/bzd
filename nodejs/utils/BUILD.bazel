@@ -69,7 +69,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "run",
     srcs = [
-        "run.js",
+        "run.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
