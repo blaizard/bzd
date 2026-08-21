@@ -15,6 +15,7 @@ if __name__ == "__main__":
 		action="store_true",
 		help="Force re-build/clean the container if set.",
 	)
+	parser.add_argument("--no-isolate", action="store_true", help="Disable isolation.")
 
 	args, remaining = parser.parse_known_args()
 	sandboxArgs = []
@@ -22,6 +23,8 @@ if __name__ == "__main__":
 		sandboxArgs += ["--build"]
 	if args.build_force:
 		sandboxArgs += ["--build-force"]
+	if args.no_isolate:
+		sandboxArgs += ["--no-isolate"]
 	SandboxContainer.fromCLI(
 		["--preset", f"agent{args.id}", "--prefix", f"opencode{args.id}", *sandboxArgs, "opencode", *remaining]
 	)
