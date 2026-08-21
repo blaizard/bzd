@@ -1,0 +1,12 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "user",
+    srcs = ["user_test.js"],
+    main = "user_test.js",
+    deps = [
+        "//apps/accounts/backend/users",
+        "//nodejs/core:exception",
+        "//nodejs/db/key_value_store:memory",
+    ],
+)

@@ -75,15 +75,63 @@ export default class User {
 		this.value.password = hash;
 	}
 
-	async setRandomPassword() {
-		await this.setPassword(Crypto.randomBytes(32).toString("hex"));
-	}
-
 	async isPasswordEqual(password) {
 		if (!this.value.password || !password) {
 			return false;
 		}
 		return await Bcrypt.compare(this.value.password, password);
+	}
+
+	/// Set the password reset token of the user.
+	///
+	/// Only the hash of the token is stored, so that a leaked database cannot be used to reset a password.
+	/// Overwriting replaces any previous token (rotation).
+	///
+	/// \param token The raw token to be stored.
+	/// \param durationMs Validity duration of the token in milliseconds.
+	setPasswordResetToken(token, durationMs = 3600 * 1000) {
+		this.modified.push("password_reset");
+		this.value.password_reset = {
+			hash: Crypto.createHash("sha256").update(token).digest("hex"),
+			expiration: Date.now() + durationMs,
+		};
+		this.setLastPasswordReset();
+	}
+
+	/// Set a random password reset token.
+	///
+	/// Only the hash of the token is stored, so that a leaked database cannot be used to reset a password.
+	/// Overwriting replaces any previous token (rotation).
+	///
+	/// \param durationMs Validity duration of the token in milliseconds.
+	/// \return The raw token to be given to the user.
+	setRandomPasswordResetToken(durationMs = 3600 * 1000) {
+		const token = Crypto.randomBytes(32).toString("hex");
+		this.setPasswordResetToken(token, durationMs);
+		return token;
+	}
+
+	/// Check if a password reset token is valid (present and not expired).
+	///
+	/// \param token The raw token to be checked.
+	/// \return true if the token matches and is not expired, false otherwise.
+	checkPasswordResetToken(token) {
+		if (!token || !this.value.password_reset) {
+			return false;
+		}
+		if (this.value.password_reset.expiration < Date.now()) {
+			return false;
+		}
+		const hash = Crypto.createHash("sha256").update(token).digest("hex");
+		return this.value.password_reset.hash === hash;
+	}
+
+	/// Remove the password reset token, making it single use.
+	clearPasswordResetToken() {
+		if ("password_reset" in this.value) {
+			this.modified.push("password_reset");
+			delete this.value.password_reset;
+		}
 	}
 
 	getCreationTimestamp() {

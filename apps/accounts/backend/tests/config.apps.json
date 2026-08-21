@@ -1094,6 +1094,23 @@
                     }
                 }
             ]
+        },
+        {
+            "doc": "Password change with an invalid reset token is rejected (401).",
+            "expects": {
+                "status": 401
+            },
+            "request": [
+                "post",
+                "/api/v1/password-change",
+                {
+                    "data": {
+                        "password": "attacker-chosen",
+                        "token": "invalid-reset-token",
+                        "uid": "ff5766cfc055b6b6dc34fc4b1d95d91c"
+                    }
+                }
+            ]
         }
     ]
 }

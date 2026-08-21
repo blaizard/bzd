@@ -75,21 +75,16 @@ const Log = LogFactory("backend");
 
 	/// Generate a reset password like for a specific user.
 	async function createResetPasswordLink(user, newPassword = false) {
-		// Set a password if there is none and timestamp the operation.
+		// Create a single-use, expiring reset token and persist only its hash.
+		let token;
 		user = await users.update(
 			user.getUid(),
-			async (user) => {
-				user.setLastPasswordReset();
-				if (!user.getPassword()) {
-					await user.setRandomPassword();
-				}
+			(user) => {
+				token = user.setRandomPasswordResetToken();
 				return user;
 			},
 			/*silent*/ true,
 		);
-
-		const password = user.getPassword();
-		Exception.assert(password, "The user must have a valid password.");
 
 		return (
 			config.url +
@@ -98,7 +93,7 @@ const Log = LogFactory("backend");
 			"/" +
 			encodeURIComponent(user.getUid()) +
 			"/" +
-			encodeURIComponent(password)
+			encodeURIComponent(token)
 		);
 	}
 
@@ -375,11 +370,12 @@ const Log = LogFactory("backend");
 		if (maybeUser === null) {
 			throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
 		}
-		if (!inputs.token || maybeUser.getPassword() !== inputs.token) {
-			throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
-		}
 		await users.update(maybeUser.getUid(), async (user) => {
+			if (!user.checkPasswordResetToken(inputs.token)) {
+				throw backend.authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);
+			}
 			await user.setPassword(inputs.password);
+			user.clearPasswordResetToken();
 			return user;
 		});
 	});
