@@ -6,17 +6,19 @@ load("@rules_rust//rust:defs.bzl", "rust_common", rust_binary_original = "rust_b
 _bzd_runner_rust_binary = bzd_runner_factory(is_test = False, providers = [rust_common.crate_info, rust_common.test_crate_info])
 _bzd_runner_rust_test = bzd_runner_factory(is_test = True, providers = [rust_common.crate_info, rust_common.test_crate_info])
 
-def _rust_binary_impl(name, visibility, crate_name, tags, **kwargs):
+def _rust_binary_impl(name, visibility, crate_name, tags, testonly, **kwargs):
     rust_binary_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
         tags = (tags or []) + ["manual"],
+        testonly = testonly,
         **kwargs
     )
     _bzd_runner_rust_binary(
         name = name,
         binary = ":{}.original".format(name),
         visibility = visibility,
+        testonly = testonly,
         tags = (tags or []) + ["rust"],
     )
 
@@ -25,7 +27,7 @@ rust_binary = macro(
     implementation = _rust_binary_impl,
 )
 
-def _rust_test_impl(name, visibility, crate_name, deps, tags, target, **kwargs):
+def _rust_test_impl(name, visibility, crate_name, deps, tags, target, testonly, **kwargs):
     rust_test_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
@@ -34,12 +36,14 @@ def _rust_test_impl(name, visibility, crate_name, deps, tags, target, **kwargs):
         deps = (deps or []) + target + [
             "//rust/libs/bzd_test",
         ],
+        testonly = testonly,
         **kwargs
     )
     _bzd_runner_rust_test(
         name = name,
         binary = ":{}.original".format(name),
         visibility = visibility,
+        testonly = testonly,
         tags = (tags or []) + ["rust"],
     )
 
