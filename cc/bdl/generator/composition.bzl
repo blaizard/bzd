@@ -96,7 +96,7 @@ def _generator_cc_composition_impl(name, visibility, target_name, target, compos
     )
 
 generator_cc_composition = macro(
-    doc = "Convert a bdl composition into a C++ library.",
+    doc = "Convert a bdl composition into a C++ binary.",
     implementation = _generator_cc_composition_impl,
     inherit_attrs = "common",
     attrs = {
