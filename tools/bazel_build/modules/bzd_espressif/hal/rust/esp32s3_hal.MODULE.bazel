@@ -59,6 +59,14 @@ crates_esp32s3.spec(
     version = "0.5.1",
 )
 crates_esp32s3.spec(
+    package = "embassy-sync",
+    version = "0.8.0",
+)
+crates_esp32s3.spec(
+    package = "embedded-io-async",
+    version = "0.7.0",
+)
+crates_esp32s3.spec(
     package = "static_cell",
     version = "2.1.1",
 )
