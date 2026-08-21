@@ -1,3 +1,4 @@
+load("@bzd_bdl//:defs.bzl", "bdl_target")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_binary")
 
@@ -10,18 +11,6 @@ rust_library(
     deps = [
         "//rust/bzd",
         "@bzd_espressif//hal/rust",
-    ],
-    alwayslink = True,
-)
-
-rust_library(
-    name = "embassy",
-    srcs = ["embassy.rs"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//rust/bzd",
-        "@bzd_espressif//hal/rust",
-        "@bzd_espressif//hal/rust:embassy",
     ],
     alwayslink = True,
 )
@@ -47,4 +36,23 @@ rust_binary(
         "//rust/bzd",
         "@bzd_espressif//hal/rust",
     ],
+)
+
+bdl_target(
+    name = "auto",
+    composition = [
+        "composition.bdl",
+    ],
+    data = {
+        "deps": [
+            "//rust/bzd",
+            "@bzd_espressif//hal/rust",
+            "@bzd_espressif//hal/rust:embassy",
+        ],
+        "main": [
+            "embassy.rs",
+        ],
+    },
+    language = "rust",
+    visibility = ["//visibility:public"],
 )

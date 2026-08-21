@@ -8,12 +8,9 @@ use embassy_sync::signal::Signal;
 use esp_hal::system::software_reset;
 use esp_println::{print, println};
 
-esp_bootloader_esp_idf::esp_app_desc!();
+use composition::executor;
 
-static FINISHED_SIGNAL: Signal<CriticalSectionRawMutex, ()> = Signal::new();
-unsafe extern "Rust" {
-    fn run_executor(spawner: Spawner);
-}
+esp_bootloader_esp_idf::esp_app_desc!();
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
@@ -37,8 +34,8 @@ pub fn exit(code: i32) -> ! {
 }
 
 #[esp_rtos::main]
-async fn main(spawner: Spawner) -> ! {
-    unsafe { run_executor(spawner) };
-    FINISHED_SIGNAL.wait().await;
+async fn main(_spawner: Spawner) -> ! {
+    let result = executor().await;
+    println!("executor() completed with {result}");
     exit(0);
 }
