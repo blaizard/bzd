@@ -101,7 +101,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "regexpr",
     srcs = [
-        "regexpr.js",
+        "regexpr.ts",
     ],
     visibility = ["//visibility:public"],
 )

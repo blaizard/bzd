@@ -59,3 +59,13 @@ bzd_nodejs_test(
         "//nodejs/utils:pathlib",
     ],
 )
+
+bzd_nodejs_test(
+    name = "regexpr",
+    srcs = ["regexpr_test.js"],
+    main = "regexpr_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:regexpr",
+    ],
+)
