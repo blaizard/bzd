@@ -101,4 +101,34 @@ describe("User", () => {
 			}, "Old password is different");
 		});
 	});
+
+	describe("deleteWithPassword", () => {
+		let users;
+		before(async () => {
+			const keyValueStore = await KeyValueStoreMemory.make("users-delete-test");
+			users = new Users(keyValueStore);
+		});
+
+		const makeUserWithPassword = async (email) => {
+			const user = await users.create(email);
+			return await users.update(user.getUid(), async (u) => {
+				await u.setPassword("1234");
+				return u;
+			});
+		};
+
+		it("rejects a wrong password", async () => {
+			const user = await makeUserWithPassword("dummy-3@dummy.com");
+			await Exception.assertThrows(async () => {
+				await users.deleteWithPassword(user.getUid(), "WRONGPASSWORD");
+			}, "The password is incorrect");
+			Exception.assert((await users.get(user.getUid(), /*allowNull*/ true)) !== null, "The user must still exist.");
+		});
+
+		it("deletes the user with the correct password", async () => {
+			const user = await makeUserWithPassword("dummy-4@dummy.com");
+			await users.deleteWithPassword(user.getUid(), "1234");
+			Exception.assert((await users.get(user.getUid(), /*allowNull*/ true)) === null, "The user must be deleted.");
+		});
+	});
 });

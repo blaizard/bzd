@@ -86,6 +86,18 @@ export default class Users {
 		Log.info("User with uid '{}' has been deleted.", uid);
 	}
 
+	/// Delete an existing user, but only if the supplied password matches.
+	///
+	/// This is used to re-authenticate the caller before this destructive operation.
+	///
+	/// \param uid User ID.
+	/// \param password The password to verify against the stored hash.
+	async deleteWithPassword(uid, password) {
+		const user = await this.get(uid);
+		Exception.assertPrecondition(await user.isPasswordEqual(password), "The password is incorrect");
+		await this.delete(uid);
+	}
+
 	/// Get user data from the email address.
 	///
 	/// \param email The user email.
@@ -176,7 +188,7 @@ export default class Users {
 		});
 
 		api.handle("delete", "/user", async (inputs, user) => {
-			await this.delete(user.getUid());
+			await this.deleteWithPassword(user.getUid(), inputs.password);
 		});
 
 		api.handle("get", "/subscription", async function (inputs, user) {
