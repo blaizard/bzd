@@ -69,3 +69,13 @@ bzd_nodejs_test(
         "//nodejs/utils:regexpr",
     ],
 )
+
+bzd_nodejs_test(
+    name = "result",
+    srcs = ["result_test.js"],
+    main = "result_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:result",
+    ],
+)

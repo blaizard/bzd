@@ -109,7 +109,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "result",
     srcs = [
-        "result.js",
+        "result.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
