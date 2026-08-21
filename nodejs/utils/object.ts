@@ -43,7 +43,7 @@ export function isObject(item: unknown): item is Record<string, unknown> {
 /// \param ...sources
 ///
 /// \return The merged object.
-export function deepMerge<T extends Record<string, any>>(target: T, ...sources: T[]): T {
+export function deepMerge<T extends Record<string, any>>(target: T, ...sources: Record<string, unknown>[]): T {
     if (!sources.length) return target;
     const source = sources.shift()!;
 

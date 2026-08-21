@@ -2,8 +2,8 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
 
 bzd_nodejs_test(
     name = "array",
-    srcs = ["array_test.js"],
-    main = "array_test.js",
+    srcs = ["array_test.ts"],
+    main = "array_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:array",
@@ -12,8 +12,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "to_string",
-    srcs = ["to_string_test.js"],
-    main = "to_string_test.js",
+    srcs = ["to_string_test.ts"],
+    main = "to_string_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:to_string",
@@ -22,8 +22,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "color",
-    srcs = ["color_test.js"],
-    main = "color_test.js",
+    srcs = ["color_test.ts"],
+    main = "color_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:color",
@@ -32,8 +32,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "object",
-    srcs = ["object_test.js"],
-    main = "object_test.js",
+    srcs = ["object_test.ts"],
+    main = "object_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:object",
@@ -42,8 +42,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "optional",
-    srcs = ["optional_test.js"],
-    main = "optional_test.js",
+    srcs = ["optional_test.ts"],
+    main = "optional_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:optional",
@@ -52,8 +52,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "pathlib",
-    srcs = ["pathlib_test.js"],
-    main = "pathlib_test.js",
+    srcs = ["pathlib_test.ts"],
+    main = "pathlib_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:pathlib",
@@ -62,8 +62,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "regexpr",
-    srcs = ["regexpr_test.js"],
-    main = "regexpr_test.js",
+    srcs = ["regexpr_test.ts"],
+    main = "regexpr_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:regexpr",
@@ -72,8 +72,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "result",
-    srcs = ["result_test.js"],
-    main = "result_test.js",
+    srcs = ["result_test.ts"],
+    main = "result_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:result",
@@ -82,8 +82,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "run",
-    srcs = ["run_test.js"],
-    main = "run_test.js",
+    srcs = ["run_test.ts"],
+    main = "run_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:run",
@@ -92,8 +92,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "timestamp",
-    srcs = ["timestamp_test.js"],
-    main = "timestamp_test.js",
+    srcs = ["timestamp_test.ts"],
+    main = "timestamp_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:timestamp",
@@ -102,8 +102,8 @@ bzd_nodejs_test(
 
 bzd_nodejs_test(
     name = "uid",
-    srcs = ["uid_test.js"],
-    main = "uid_test.js",
+    srcs = ["uid_test.ts"],
+    main = "uid_test.ts",
     deps = [
         "//nodejs/core:exception",
         "//nodejs/utils:uid",

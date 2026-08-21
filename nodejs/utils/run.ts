@@ -67,15 +67,15 @@ class ExecuteResult {
 		}
 	}
 
-	on(topic: string, handler: (...args: unknown[]) => void): void {
-		Exception.assertPrecondition(
-			["status", "stdout", "stderr", "output"].includes(topic),
-			"Unsupported topic: " + topic,
-		);
-		this.event.on(topic, handler);
-	}
+on(topic: string, handler: (...args: any[]) => void): void {
+        Exception.assertPrecondition(
+            ["status", "stdout", "stderr", "output"].includes(topic),
+            "Unsupported topic: " + topic,
+        );
+        this.event.on(topic, handler);
+    }
 
-	remove(topic: string, handler: (...args: unknown[]) => void): void {
+    remove(topic: string, handler: (...args: any[]) => void): void {
 		Exception.assertPrecondition(
 			["status", "stdout", "stderr", "output"].includes(topic),
 			"Unsupported topic: " + topic,
