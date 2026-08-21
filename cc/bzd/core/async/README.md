@@ -159,7 +159,7 @@ To have multiple coroutines run in parallel, this can be done as follows:
 const auto result = co_await bzd::async::all(myFunc(), myFunc(), myFunc());
 ```
 
-This will execute myFunc (assuming it is a coroutine), 3 times and return the result as a tuple.
+This will execute `myFunc` three times and return the result as a tuple.
 
 #### Any
 

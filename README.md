@@ -58,7 +58,7 @@ This will build locally; it will fetch all tools needed to build on your machine
 
 ### Remote
 
-To build bazel targets simply run bazel appended with `--config=remote`.
+To build Bazel targets, simply run Bazel with `--config=remote` appended.
 
 For debugging purposes, toolchains can be run locally in a docker sandbox which is very similar to what runs on remote execution.
 To enable this configuration, run bazel with `--config=docker`.
@@ -74,7 +74,7 @@ bazel run //docs
 ## Code Quality
 
 All supported languages come with their set of code quality related tools.
-To run all static sanity checks at once, code formatters and documentation generators, run the following command:
+To run all static sanity checks, code formatters and documentation generators at once, run the following command:
 
 ```bash
 bazel run //:sanitizer
@@ -87,7 +87,7 @@ To run all tests, run the following command:
 ```
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that,
-formatters and linters for YAML, json and markdown are also available.
+formatters and linters for YAML, JSON and Markdown are also available.
 
 | Language | Formatters   | Code Analyzers                      | Code Coverage | Test Framework | Documentation |
 | -------- | ------------ | ----------------------------------- | ------------- | -------------- | ------------- |
