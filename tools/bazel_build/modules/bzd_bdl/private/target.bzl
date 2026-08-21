@@ -16,12 +16,14 @@ def _bdl_target_impl(ctx):
 
         composition = parent.composition + ctx.files.composition
         deps = parent.deps + ctx.attr.deps
+        data = ctx.attr.data | parent.data
         language = parent.language
         binary = parent.binary
 
     else:
         composition = ctx.files.composition
         deps = ctx.attr.deps
+        data = ctx.attr.data
         language = ctx.attr.language
         binary = ctx.attr.binary
 
@@ -31,6 +33,7 @@ def _bdl_target_impl(ctx):
     return BdlTargetInfo(
         composition = composition,
         deps = deps,
+        data = data,
         language = language,
         binary = binary,
     )
@@ -47,6 +50,10 @@ _bdl_target = rule(
         "composition": attr.label_list(
             allow_files = [".bdl"],
             doc = "List of composition bdl source files for this target.",
+        ),
+        "data": attr.label_list_dict(
+            doc = "Additional files and/or bazel targets to be associated with this target.",
+            allow_files = True,
         ),
         "deps": attr.label_list(
             doc = "List of dependencies.",

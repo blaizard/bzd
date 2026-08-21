@@ -1,0 +1,11 @@
+use "interfaces/stream.bdl"
+
+namespace bzd.components.std;
+
+
+component Out : bzd.OStream {
+interface:
+	
+}
+
+

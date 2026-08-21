@@ -1,0 +1,25 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//interfaces:stream",
+    ],
+)
+
+rust_library(
+    name = "out",
+    srcs = [
+        "out.rs",
+    ],
+    crate_name = "rust_components_std_stream_out",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:stream",
+    ],
+)

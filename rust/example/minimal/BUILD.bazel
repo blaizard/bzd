@@ -1,0 +1,8 @@
+load("@bzd_bdl//:defs.bzl", "bdl_system")
+
+bdl_system(
+    name = "minimal",
+    targets = {
+        "std": "//rust/targets/std:auto",
+    },
+)

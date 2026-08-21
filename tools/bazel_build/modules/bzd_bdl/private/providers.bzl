@@ -17,6 +17,7 @@ BdlTargetInfo = provider(
     fields = {
         "binary": "Binary target.",
         "composition": "List of composition files for this target.",
+        "data": "Dictionary of files or bazel targets associated with target.",
         "deps": "List of dependencies for this target.",
         "language": "Language used for this target.",
     },

@@ -1,3 +1,4 @@
+load("@bzd_bdl//:defs.bzl", "bdl_target")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
@@ -11,14 +12,20 @@ rust_library(
     ],
 )
 
-rust_library(
-    name = "embassy",
-    srcs = [
-        "embassy.rs",
+bdl_target(
+    name = "auto",
+    composition = [
+        "composition.bdl",
     ],
+    data = {
+        "deps": [
+            "@crates//:embassy-executor",
+            "@crates//:static_cell",
+        ],
+        "main": [
+            "embassy.rs",
+        ],
+    },
+    language = "rust",
     visibility = ["//visibility:public"],
-    deps = [
-        "@crates//:embassy-executor",
-        "@crates//:static_cell",
-    ],
 )

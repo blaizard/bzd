@@ -1,18 +1,26 @@
 use embassy_executor::{Executor, Spawner};
 use static_cell::StaticCell;
 
-unsafe extern "Rust" {
-    fn run_embassy(spawner: Spawner);
-}
+use composition::executor;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
+
+#[embassy_executor::task]
+async fn main_task() {
+    let result = executor().await;
+    println!("executor() completed with {result}");
+    exit(0);
+}
 
 pub fn exit(code: i32) -> ! {
     std::process::exit(code)
 }
 
-#[unsafe(no_mangle)]
+fn run_executor(spawner: Spawner) {
+    spawner.spawn(main_task().unwrap());
+}
+
 fn main() {
     let executor = EXECUTOR.init(Executor::new());
-    executor.run(|spawner| unsafe { run_embassy(spawner) });
+    executor.run(|spawner| run_executor(spawner));
 }
