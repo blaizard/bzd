@@ -58,7 +58,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "pathlib",
     srcs = [
-        "pathlib.js",
+        "pathlib.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
