@@ -89,3 +89,13 @@ bzd_nodejs_test(
         "//nodejs/utils:run",
     ],
 )
+
+bzd_nodejs_test(
+    name = "timestamp",
+    srcs = ["timestamp_test.js"],
+    main = "timestamp_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:timestamp",
+    ],
+)

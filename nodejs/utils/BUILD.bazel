@@ -121,7 +121,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "timestamp",
     srcs = [
-        "timestamp.js",
+        "timestamp.ts",
     ],
     visibility = ["//visibility:public"],
 )
