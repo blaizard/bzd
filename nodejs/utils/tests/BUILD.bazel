@@ -31,6 +31,16 @@ bzd_nodejs_test(
 )
 
 bzd_nodejs_test(
+    name = "object",
+    srcs = ["object_test.js"],
+    main = "object_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/utils:object",
+    ],
+)
+
+bzd_nodejs_test(
     name = "pathlib",
     srcs = ["pathlib_test.js"],
     main = "pathlib_test.js",

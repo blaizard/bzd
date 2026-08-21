@@ -31,7 +31,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "object",
     srcs = [
-        "object.js",
+        "object.ts",
     ],
     visibility = ["//visibility:public"],
 )
