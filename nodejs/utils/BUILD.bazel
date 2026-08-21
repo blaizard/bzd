@@ -81,7 +81,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "to_string",
     srcs = [
-        "to_string.js",
+        "to_string.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
