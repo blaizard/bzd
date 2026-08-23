@@ -1,4 +1,5 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 
 function _getStatus(item) {
 	if (item.conclusion == "success") {
@@ -44,7 +45,7 @@ export default class Github {
 	static register(cache) {
 		cache.register(
 			"github.builds",
-			async function (username, repository, workflowId, token) {
+			async (key, context, { username, repository, workflowId, token }) => {
 				// Build the URL
 				const baseUrl =
 					"https://api.github.com/repos/" + encodeURIComponent(username) + "/" + encodeURIComponent(repository);
@@ -58,7 +59,7 @@ export default class Github {
 				for (const item of result.workflow_runs || []) {
 					promises.push(
 						(async () => {
-							const result = await this.get("github.jobs", item.jobs_url, username, token);
+							const result = await cache.get("github.jobs", item.jobs_url, { username, token });
 							if ("status" in result) {
 								builds.push(result);
 							}
@@ -69,11 +70,11 @@ export default class Github {
 				await Promise.all(promises);
 				return builds;
 			},
-			{ timeout: 60 * 1000 },
+			{ timeoutMs: 60 * 1000 },
 		);
 
-		cache.register("github.jobs", async (url, username, token, prevValue, cacheOptions) => {
-			const resultJobs = await HttpClient.get(url, getFetchOptions(username, token));
+		cache.register("github.jobs", async (key, context, { username, token }) => {
+			const resultJobs = await HttpClient.get(key, getFetchOptions(username, token));
 
 			// Filter out empty jobs
 			if (resultJobs.jobs.length == 0) {
@@ -101,7 +102,7 @@ export default class Github {
 			}
 
 			if (status == "in-progress") {
-				cacheOptions.timeout = 60 * 1000; // Refresh every minutes
+				context.timeoutMs = 60 * 1000; // Refresh every minutes
 			}
 
 			return {
@@ -114,12 +115,14 @@ export default class Github {
 	}
 
 	async fetch(cache) {
+		const username = this.config["github.username"];
+		const repository = this.config["github.repository"];
+		const workflowId = this.config["github.workflowid"];
+		const token = this.config["github.token"];
 		const builds = await cache.get(
 			"github.builds",
-			this.config["github.username"],
-			this.config["github.repository"],
-			this.config["github.workflowid"],
-			this.config["github.token"],
+			Cache2.arrayOfStringToKey([username, repository, workflowId]),
+			{ username: username, repository: repository, workflowId: workflowId, token: token },
 		);
 		return {
 			builds: builds,

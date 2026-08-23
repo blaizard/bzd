@@ -35,7 +35,7 @@ bzd_nodejs_binary(
     ],
     deps = [
         "//apps/dashboard/plugins:plugins.backend",
-        "//nodejs/core:cache",
+        "//nodejs/core:cache2",
         "//nodejs/core:filesystem",
         "//nodejs/core/http:client",
         "//nodejs/utils:uid",

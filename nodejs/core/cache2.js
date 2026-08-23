@@ -39,8 +39,9 @@ class CacheCollectionAccessor {
 	/// Access a value or fetch a new value.
 	///
 	/// \param key The key for this value.
-	async get(key) {
-		return this.cache.get(this.collection, key);
+	/// \param data The data to pass to the fetch function.
+	async get(key, data = null) {
+		return this.cache.get(this.collection, key, data);
 	}
 
 	/// Get the value instantly if available.
@@ -236,8 +237,9 @@ export default class Cache2 {
 	///
 	/// \param collection The name of the collection.
 	/// \param key The key for this value.
-	async get(collection, key) {
-		const data = this.data[collection];
+	/// \param data The data to pass to the fetch function.
+	async get(collection, key, data = null) {
+		const collectionData = this.data[collection];
 		while (true) {
 			// Check if the value is already available.
 			const maybeValue = this.getInstant(collection, key, Cache2.empty);
@@ -247,14 +249,14 @@ export default class Cache2 {
 
 			// Handle the case of concurrency, if the value is being fetched and another caller issues a get(...).
 			// Check if the value is being fetched.
-			const isFetching = (data.values.get(key) ?? { status: null }).status === Cache2.Status.fetching;
+			const isFetching = (collectionData.values.get(key) ?? { status: null }).status === Cache2.Status.fetching;
 			if (!isFetching) {
 				break;
 			}
 
 			const wait = async () => {
 				return new Promise((resolve) => {
-					data.values.get(key).data.push(resolve);
+					collectionData.values.get(key).data.push(resolve);
 				});
 			};
 			await wait();
@@ -263,12 +265,12 @@ export default class Cache2 {
 		// We are the first async thread to fetch this entry.
 		// Mark this entry as fetching.
 		let resolveList = [];
-		data.values.set(key, {
+		collectionData.values.set(key, {
 			// Setting the timeout to -1, will tell that this entry is invalid and needs refetch.
 			timeout: -1,
 			data: resolveList, // contains the resolve callback of all promises waiting.
 			status: Cache2.Status.fetching,
-			size: (data.values.get(key) ?? { size: 0 }).size,
+			size: (collectionData.values.get(key) ?? { size: 0 }).size,
 		});
 
 		// The fetch function can use this context to override the timeout of the entry.
@@ -277,7 +279,7 @@ export default class Cache2 {
 		};
 
 		try {
-			const value = await data.fetch(key, context);
+			const value = await collectionData.fetch(key, context, data);
 			this.set(collection, key, value, Cache2.Status.value, context.timeoutMs);
 			return value;
 		} catch (e) {

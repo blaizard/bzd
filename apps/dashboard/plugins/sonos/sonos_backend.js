@@ -13,8 +13,10 @@ function _getState(state) {
 	return "unknown";
 }
 
+let lastDevice = null;
+
 async function _next(cache, increment) {
-	const device = await cache.get("sonos.device");
+	const device = await cache.get("sonos.device", "default");
 	let counter = device.playlist.length;
 
 	while (counter--) {
@@ -42,12 +44,12 @@ export default class SonosBackend {
 	constructor(config, events) {
 		this.config = config;
 		events.register("play", async (cache) => {
-			let device = await cache.get("sonos.device");
+			let device = await cache.get("sonos.device", "default");
 			await device.instance.play();
 			device.track.state = "play";
 		});
 		events.register("pause", async (cache) => {
-			let device = await cache.get("sonos.device");
+			let device = await cache.get("sonos.device", "default");
 			await device.instance.pause();
 			device.track.state = "pause";
 		});
@@ -62,7 +64,7 @@ export default class SonosBackend {
 	static register(cache) {
 		cache.register(
 			"sonos.device",
-			async (previous) => {
+			async (key, context) => {
 				let discovery = new Sonos.AsyncDeviceDiscovery();
 				let instance = null;
 				try {
@@ -90,7 +92,7 @@ export default class SonosBackend {
 						art: null,
 						state: "pause",
 					},
-					(previous || {}).track,
+					(lastDevice || {}).track,
 				);
 
 				// Hook on track change event
@@ -109,19 +111,21 @@ export default class SonosBackend {
 					track.state = _getState(state);
 				});
 
-				return {
+				const device = {
 					track: track,
 					instance: instance,
 					name: description.displayName + " - " + description.roomName,
 					playlist: playlist,
 				};
+				lastDevice = device;
+				return device;
 			},
-			{ timeout: 60 * 1000 * 30 },
+			{ timeoutMs: 60 * 1000 * 30 },
 		);
 	}
 
 	async fetch(cache) {
-		const device = await cache.get("sonos.device");
+		const device = await cache.get("sonos.device", "default");
 		return {
 			title: device.track.title,
 			artist: device.track.artist,

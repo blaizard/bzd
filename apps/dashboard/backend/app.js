@@ -1,4 +1,4 @@
-import Cache from "#bzd/nodejs/core/cache.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import { assertUrlSafe } from "#bzd/nodejs/core/http/client/ssrf.js";
@@ -37,7 +37,7 @@ class EventsFactory {
 		.useLoggerMemory()
 		.setup();
 
-	let cache = new Cache();
+	let cache = new Cache2("dashboard");
 	let plugins = {};
 	let pluginClasses = {};
 	let events = {};
@@ -71,7 +71,7 @@ class EventsFactory {
 			// Register cache for the plugins.
 			let options = {};
 			if ("timeout" in data.metadata) {
-				options.timeout = data.metadata.timeout;
+				options.timeoutMs = data.metadata.timeout;
 			}
 			cache.register(
 				type,
@@ -147,7 +147,7 @@ class EventsFactory {
 			}
 		},
 		{
-			timeout: 1000,
+			timeoutMs: 1000,
 		},
 	);
 

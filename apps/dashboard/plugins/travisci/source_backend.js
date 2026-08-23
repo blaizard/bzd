@@ -1,4 +1,5 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 
 function _getStatus(item) {
 	if (item.state == "passed") {
@@ -24,7 +25,7 @@ export default class TravisCI {
 	static register(cache) {
 		cache.register(
 			"travisci.builds",
-			async (endpoint, repositorySlug, token) => {
+			async (key, context, { endpoint, repositorySlug, token }) => {
 				// Build the URL
 				const url = "https://api." + endpoint + "/repo/" + encodeURIComponent(repositorySlug) + "/builds?limit=50";
 				let options = {
@@ -52,17 +53,19 @@ export default class TravisCI {
 					};
 				});
 			},
-			{ timeout: 10 * 1000 },
+			{ timeoutMs: 10 * 1000 },
 		);
 	}
 
 	async fetch(cache) {
-		const builds = await cache.get(
-			"travisci.builds",
-			this.config["travisci.endpoint"],
-			this.config["travisci.repository"],
-			this.config["travisci.token"],
-		);
+		const endpoint = this.config["travisci.endpoint"];
+		const repositorySlug = this.config["travisci.repository"];
+		const token = this.config["travisci.token"];
+		const builds = await cache.get("travisci.builds", Cache2.arrayOfStringToKey([endpoint, repositorySlug]), {
+			endpoint: endpoint,
+			repositorySlug: repositorySlug,
+			token: token,
+		});
 		return {
 			builds: builds,
 		};

@@ -32,13 +32,16 @@ export default class StorageGoogleDrive extends Storage {
 
 		this.cache.register(
 			"id",
-			async (key) => {
-				const pathList = Cache2.keyToArrayOfString(key);
+			async (key, context, pathList) => {
 				if (pathList.length == 0) {
 					return this.folderId;
 				}
 
-				const parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList.slice(0, -1)));
+				const parentId = await this.cache.get(
+					"id",
+					Cache2.arrayOfStringToKey(pathList.slice(0, -1)),
+					pathList.slice(0, -1),
+				);
 				const escapedFolderName = pathList.at(-1).replace(/'/g, "''");
 				const query = "'" + parentId + "' in parents and name='" + escapedFolderName + "' and trashed=false";
 
@@ -98,7 +101,7 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _metadataImpl(pathList) {
-		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList), pathList);
 		const response = await this.drive.files.get({
 			fileId: id,
 			supportsAllDrives: true,
@@ -109,7 +112,7 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
-		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList), pathList);
 		const paging = CollectionPaging.pagingFromParam(maxOrPaging);
 		const result = await this.drive.files.list({
 			q: "'" + id + "' in parents and trashed=false",
@@ -137,7 +140,7 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _readImpl(pathList) {
-		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList), pathList);
 		const bridge = new PassThrough();
 
 		(async () => {
@@ -208,7 +211,11 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _createFile(pathList, readStream) {
-		const parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList.slice(0, -1)));
+		const parentId = await this.cache.get(
+			"id",
+			Cache2.arrayOfStringToKey(pathList.slice(0, -1)),
+			pathList.slice(0, -1),
+		);
 		const fileName = pathList[pathList.length - 1];
 
 		const response = await this.drive.files.create({
@@ -230,7 +237,7 @@ export default class StorageGoogleDrive extends Storage {
 
 	async _writeImpl(pathList, readStream) {
 		try {
-			const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+			const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList), pathList);
 			await this.drive.files.update({
 				fileId: id,
 				media: {
@@ -255,7 +262,7 @@ export default class StorageGoogleDrive extends Storage {
 		for (const part of pathList) {
 			currentPath.push(part);
 			try {
-				parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(currentPath));
+				parentId = await this.cache.get("id", Cache2.arrayOfStringToKey(currentPath), currentPath);
 			} catch (e) {
 				if (e instanceof FileNotFoundError) {
 					// Create the directory.
@@ -279,7 +286,7 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _deleteImpl(pathList) {
-		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList));
+		const id = await this.cache.get("id", Cache2.arrayOfStringToKey(pathList), pathList);
 
 		// We need to delete recursively all children before we can delete the folder.
 		const listAndDeleteChildren = async (id, nextPageToken = null) => {

@@ -247,4 +247,19 @@ describe("Cache2", () => {
 		// The entry with the default timeout has expired.
 		Exception.assertEqual(cache.getInstant("test", "short", Cache2.empty), Cache2.empty);
 	});
+
+	it("Pass data to the fetch function", async () => {
+		let cache = new Cache2();
+		let fetchCount = 0;
+		cache.register("test", (key, context, data) => {
+			++fetchCount;
+			return key + data.a + data.b + data.c;
+		});
+
+		Exception.assertEqual(await cache.get("test", "default", { a: "foo", b: "bar", c: "baz" }), "defaultfoobarbaz");
+		Exception.assertEqual(fetchCount, 1);
+		// Cached: the fetch function is not called again.
+		Exception.assertEqual(await cache.get("test", "default", { a: "foo", b: "bar", c: "baz" }), "defaultfoobarbaz");
+		Exception.assertEqual(fetchCount, 1);
+	});
 });

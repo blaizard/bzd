@@ -11,7 +11,7 @@ export default class Coverage {
 	static register(cache) {
 		cache.register(
 			"coverage.report",
-			async (reportUrl, authentication) => {
+			async (key, context, { reportUrl, authentication }) => {
 				try {
 					return await HttpClient.get(reportUrl, {
 						expect: "json",
@@ -21,16 +21,20 @@ export default class Coverage {
 					Exception.errorPrecondition(e);
 				}
 			},
-			{ timeout: 60 * 1000 },
+			{ timeoutMs: 60 * 1000 },
 		);
 	}
 
 	async fetch(cache) {
+		const reportUrl = this.config["coverage.url"];
 		const authentication = {
 			type: this.config["coverage.authentication"],
 			username: this.config["coverage.user"],
 			password: this.config["coverage.token"],
 		};
-		return await cache.get("coverage.report", this.config["coverage.url"], authentication);
+		return await cache.get("coverage.report", reportUrl, {
+			reportUrl: reportUrl,
+			authentication: authentication,
+		});
 	}
 }

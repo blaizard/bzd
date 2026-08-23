@@ -5,6 +5,7 @@ bzd_plugin(
     backend_deps = [
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/core:cache2",
     ],
     backend_entry_point = "snmp_backend.js",
     backend_packages = [

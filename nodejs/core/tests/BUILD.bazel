@@ -9,7 +9,6 @@ test_srcs = glob([
     srcs = [src],
     main = src,
     deps = [
-        "//nodejs/core:cache",
         "//nodejs/core:cache2",
         "//nodejs/core:format",
         "//nodejs/core:lock_file",

@@ -52,19 +52,6 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "cache",
-    srcs = [
-        "cache.js",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":event",
-        ":exception",
-        ":log",
-    ],
-)
-
-bzd_nodejs_library(
     name = "cache2",
     srcs = [
         "cache2.js",

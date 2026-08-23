@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
 const Exception = ExceptionFactory("plugin", "nodes");
@@ -15,15 +16,15 @@ export default class Nodes {
 
 		cache.register(
 			"nodes.list",
-			async function (url, token, volume) {
+			async (key, context, { url, token, volume }) => {
 				return await node.list({ remote: url, volume: volume, token: token });
 			},
-			{ timeout: 60 * 1000 },
+			{ timeoutMs: 60 * 1000 },
 		);
 
 		cache.register(
 			"nodes.data",
-			async (url, token, volume, uid) => {
+			async (key, context, { url, token, volume, uid }) => {
 				const result = await node.get({
 					remote: url,
 					uid: uid,
@@ -57,7 +58,7 @@ export default class Nodes {
 					data: result.data,
 				};
 			},
-			{ timeout: 1000 },
+			{ timeoutMs: 1000 },
 		);
 	}
 
@@ -66,9 +67,16 @@ export default class Nodes {
 	/// \return An array of dictionary which looks like:
 	///         { nodes: [node1, node2, ...], url: ..., volume: ... }
 	async fetchList(cache) {
-		const promises = this.config["nodes.remotes"].map((remote) =>
-			cache.get("nodes.list", remote.url, remote.token, remote.volume),
-		);
+		const promises = this.config["nodes.remotes"].map((remote) => {
+			const url = remote.url;
+			const token = remote.token;
+			const volume = remote.volume;
+			return cache.get("nodes.list", Cache2.arrayOfStringToKey([url, volume]), {
+				url: url,
+				token: token,
+				volume: volume,
+			});
+		});
 		const listOfNodes = await Promise.all(promises);
 		return listOfNodes.map((nodes, index) => {
 			return Object.assign(
@@ -99,7 +107,18 @@ export default class Nodes {
 	async fetch(cache) {
 		const listOfNodes = await this.fetchList(cache);
 		const listOfPromises = listOfNodes.map((data) =>
-			data.nodes.map((node) => cache.get("nodes.data", data.url, data.token, data.volume, node)),
+			data.nodes.map((node) => {
+				const url = data.url;
+				const token = data.token;
+				const volume = data.volume;
+				const uid = node;
+				return cache.get("nodes.data", Cache2.arrayOfStringToKey([url, volume, uid]), {
+					url: url,
+					token: token,
+					volume: volume,
+					uid: uid,
+				});
+			}),
 		);
 		const results = await Promise.all(
 			listOfPromises.reduce((accumulator, currentValue) => accumulator.concat(currentValue), []),

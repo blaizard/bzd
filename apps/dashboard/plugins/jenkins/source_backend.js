@@ -1,5 +1,6 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 
 const Exception = ExceptionFactory("plugin", "jenkins");
 
@@ -27,7 +28,7 @@ export default class Jenkins {
 	static register(cache) {
 		cache.register(
 			"jenkins.builds",
-			async (url, build, branch, user, token) => {
+			async (key, context, { url, build, branch, user, token }) => {
 				// Build the URL
 				const baseUrl = url + "/job/" + build + "/job/" + branch;
 				let options = {
@@ -63,19 +64,23 @@ export default class Jenkins {
 					};
 				});
 			},
-			{ timeout: 10 * 1000 },
+			{ timeoutMs: 10 * 1000 },
 		);
 	}
 
 	async fetch(cache) {
-		const builds = await cache.get(
-			"jenkins.builds",
-			this.config["jenkins.url"],
-			this.config["jenkins.build"],
-			this.config["jenkins.branch"] || "master",
-			this.config["jenkins.user"],
-			this.config["jenkins.token"],
-		);
+		const url = this.config["jenkins.url"];
+		const build = this.config["jenkins.build"];
+		const branch = this.config["jenkins.branch"] || "master";
+		const user = this.config["jenkins.user"];
+		const token = this.config["jenkins.token"];
+		const builds = await cache.get("jenkins.builds", Cache2.arrayOfStringToKey([url, build, branch, user]), {
+			url: url,
+			build: build,
+			branch: branch,
+			user: user,
+			token: token,
+		});
 		return {
 			builds: builds,
 		};

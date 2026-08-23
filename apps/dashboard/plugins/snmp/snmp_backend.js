@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 import SnmpNative from "net-snmp";
 
 const Exception = ExceptionFactory("snmp");
@@ -105,9 +106,9 @@ export default class SNMP {
 	}
 
 	static register(cache) {
-		cache.register("snmp.oid", async (host, version, community, oids, ttl, previous, options) => {
+		cache.register("snmp.oid", async (key, context, { host, version, community, oids, ttl }) => {
 			// Update the time in ms.
-			options.timeout = ttl * 1000;
+			context.timeoutMs = ttl * 1000;
 
 			// Get the data
 			const snmp = new Snmp(host, version, community);
@@ -116,7 +117,7 @@ export default class SNMP {
 
 		cache.register(
 			"snmp.oidsByTtl",
-			async (snmpArray) => {
+			async (key, context, snmpArray) => {
 				const updateObj = (obj, oid, ttl) => {
 					oid = Snmp.normalizeOid(oid);
 					obj[oid] = Math.min(obj[oid] || Number.MAX_VALUE, ttl);
@@ -141,7 +142,7 @@ export default class SNMP {
 					return obj;
 				}, {});
 			},
-			{ timeout: 60 * 60 * 1000 }, // 1h
+			{ timeoutMs: 60 * 60 * 1000 }, // 1h
 		);
 	}
 
@@ -203,18 +204,22 @@ export default class SNMP {
 	}
 
 	async fetch(cache) {
-		const oidsByTtl = await cache.get("snmp.oidsByTtl", this.config["snmp.array"] || []);
+		const oidsByTtl = await cache.get(
+			"snmp.oidsByTtl",
+			JSON.stringify(this.config["snmp.array"] || []),
+			this.config["snmp.array"] || [],
+		);
 
 		let promises = [];
 		for (const ttl in oidsByTtl) {
 			const oids = oidsByTtl[ttl];
+			const host = this.config["snmp.host"];
+			const version = this.config["snmp.version"];
+			const community = this.config["snmp.community"];
 			const promise = cache.get(
 				"snmp.oid",
-				this.config["snmp.host"],
-				this.config["snmp.version"],
-				this.config["snmp.community"],
-				oids,
-				ttl,
+				Cache2.arrayOfStringToKey([host, version, community, oids.join(","), ttl]),
+				{ host: host, version: version, community: community, oids: oids, ttl: ttl },
 			);
 			promises.push(promise);
 		}
