@@ -3,6 +3,10 @@ crates_esp32s3.from_specs(
     name = "crates_esp32s3",
 )
 crates_esp32s3.spec(
+    package = "esp32s3",
+    version = "=0.35.2",  # 0.35.3 breaks.
+)
+crates_esp32s3.spec(
     package = "xtensa-lx",
     version = "0.13.0",
 )
@@ -17,7 +21,7 @@ crates_esp32s3.spec(
         "unstable",
     ],
     package = "esp-hal",
-    version = "1.1.0",
+    version = "1.1.2",
 )
 crates_esp32s3.spec(
     features = [
