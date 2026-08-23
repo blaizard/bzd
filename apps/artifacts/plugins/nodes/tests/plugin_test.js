@@ -746,6 +746,67 @@ describe("Plugin", () => {
 		}).timeout(10000);
 	});
 
+	describe("Export", () => {
+		const tester = new PluginTester();
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records-export",
+				clean: true,
+			},
+		});
+
+		it("start", async () => {
+			await tester.start();
+		});
+
+		it("write dangerous values", async () => {
+			// Store spreadsheet formula payloads (CWE-1236) plus normal values at a fixed timestamp.
+			await tester.send("nodes", "post", "/uid", {
+				query: { bulk: 1 },
+				headers: { "Content-Type": "application/json" },
+				data: JSON.stringify({
+					data: [
+						[["value1"], [[1234, '=HYPERLINK("http://evil.example/","Click")']]],
+						[["value2"], [[1234, "+SUM(1,1)"]]],
+						[["value3"], [[1234, "-2+3"]]],
+						[["value4"], [[1234, "@cmd"]]],
+						[["value5"], [[1234, "\tcommand"]]],
+						[["value6"], [[1234, "hello"]]],
+						[["value7"], [[1234, 42]]],
+						// Exercise the header escaping with a key starting with '='.
+						[["=evil"], [[1234, "=evil-value"]]],
+					],
+				}),
+			});
+		});
+
+		it("export csv", async () => {
+			const response = await tester.send("nodes", "get", "/@export/uid?format=csv&children=99");
+			Exception.assertEqual(response.status, 200);
+			const csv = response.data;
+			// No raw formula prefix at the start of any cell.
+			Exception.assert(!csv.includes(";="), "CSV contains a raw '=' formula prefix: {}", csv);
+			Exception.assert(!csv.includes(";+"), "CSV contains a raw '+' formula prefix: {}", csv);
+			Exception.assert(!csv.includes(";-"), "CSV contains a raw '-' formula prefix: {}", csv);
+			Exception.assert(!csv.includes(";@"), "CSV contains a raw '@' formula prefix: {}", csv);
+			// Escaped forms are present.
+			Exception.assert(csv.includes("'=evil"), "CSV header '=evil' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'+SUM(1,1)"), "CSV value '+SUM(1,1)' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'-2+3"), "CSV value '-2+3' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'@cmd"), "CSV value '@cmd' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'\tcommand"), "CSV tab-prefixed value is not escaped: {}", csv);
+			Exception.assert(csv.includes("'=HYPERLINK"), "CSV value '=HYPERLINK' is not escaped: {}", csv);
+			Exception.assert(csv.includes('""http://evil.example/""'), "CSV embedded quotes are not doubled: {}", csv);
+			// Normal values are preserved.
+			Exception.assert(csv.includes(";hello;"), "CSV normal string is not preserved: {}", csv);
+			Exception.assert(csv.includes(";42"), "CSV normal number is not preserved: {}", csv);
+		});
+
+		it("stop", async () => {
+			await tester.stop();
+		});
+	});
+
 	describe("Plugin reload a second time", () => {
 		const tester = new PluginTester();
 		tester.register("nodes", Plugin, {

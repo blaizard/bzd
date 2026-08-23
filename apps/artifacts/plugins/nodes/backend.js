@@ -339,30 +339,47 @@ export default class Plugin extends PluginBase {
 				case "csv":
 					context.setHeader("Content-Type", "text/csv");
 					context.setHeader("Content-Disposition", 'attachment; filename="' + name + '.csv"');
+					context.setStatus(200);
 					const stream = new Readable({ read() {} });
-					context.sendStream(stream);
-
-					const columns = await generator.getColumns();
-					stream.push("date;timestamp;" + columns.join(";") + "\n");
+					const sending = context.sendStream(stream);
 
 					const valueToCell = (value) => {
+						let cell;
 						switch (typeof value) {
 							case "undefined":
-								return "";
+								cell = "";
+								break;
 							case "object":
-								return JSON.stringify(value);
+								cell = JSON.stringify(value);
+								break;
 							case "boolean":
-								return value ? "true" : "false";
+								cell = value ? "true" : "false";
+								break;
 							default:
-								return String(value);
+								cell = String(value);
 						}
+						// Neutralize spreadsheet formula injection (CWE-1236) by prefixing any
+						// cell starting with a formula indicator with a single quote.
+						if (/^[=+\-@\t\r]/.exec(cell)) {
+							cell = "'" + cell;
+						}
+						// Preserve the CSV structure by quoting cells with special characters.
+						if (/[;"\n\r]/.exec(cell)) {
+							cell = '"' + cell.replaceAll('"', '""') + '"';
+						}
+						return cell;
 					};
+
+					const columns = await generator.getColumns();
+					const headers = columns.map(valueToCell);
+					stream.push("date;timestamp;" + headers.join(";") + "\n");
 
 					for await (const [timestamp, values] of generator.byTimestamp()) {
 						const row = columns.map((column) => valueToCell(values[column]));
 						stream.push(new Date(timestamp).toUTCString() + ";" + timestamp + ";" + row.join(";") + "\n");
 					}
 					stream.push(null);
+					await sending;
 					break;
 				default:
 					Exception.assertPrecondition(false, "Unsupported format '{}'.", format);
