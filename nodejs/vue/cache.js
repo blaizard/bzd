@@ -1,51 +1,44 @@
 import { reactive } from "vue";
-import Cache from "../core/cache.js";
+import Cache2 from "../core/cache2.js";
 import ExceptionFactory from "../core/exception.js";
 
 const Exception = ExceptionFactory("cache");
 
-function idsToId(...ids) {
-	return ids.map((id) => String(id)).join("/") || "default";
-}
-
 export default {
 	install(app, options = {}) {
-		let cache = new Cache();
+		let cache = new Cache2("vue-cache");
 		for (const collection in options) {
 			const option = options[collection];
 			Exception.assert("cache" in option, "Missing 'cache' key");
-			cache.register(collection, option.cache, option.options || {});
+			cache.register(collection, option.cache, option.options);
 		}
 
 		const content = reactive({});
 
-		const getReactive = (collection, ...ids) => {
-			const id = idsToId(...ids);
-
+		const getReactive = (collection, key) => {
 			// If data does not exists, create it
 			if (!(collection in content)) {
 				content[collection] = {};
 			}
-			if (!(id in content[collection])) {
-				content[collection][id] = options[collection].default || "";
+			if (!(key in content[collection])) {
+				content[collection][key] = options[collection].default || "";
 			}
 
-			cache.get(collection, ...ids).then((value) => {
-				content[collection][id] = value;
+			cache.get(collection, key).then((value) => {
+				content[collection][key] = value;
 			});
 
-			return content[collection][id];
+			return content[collection][key];
 		};
 
-		const get = async (collection, ...ids) => {
-			return await cache.get(collection, ...ids);
+		const get = async (collection, key) => {
+			return await cache.get(collection, key);
 		};
 
-		const invalid = (collection, ...ids) => {
-			const id = idsToId(...ids);
-			cache.setDirty(collection, ...ids);
+		const invalid = (collection, key) => {
+			cache.setDirty(collection, key);
 			if (collection in content) {
-				content[collection][id] = options[collection].loading || "";
+				content[collection][key] = options[collection].loading || "";
 			}
 		};
 

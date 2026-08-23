@@ -39,6 +39,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/artifacts/common:utils",
+        "//nodejs/core:cache2",
         "//nodejs/utils:to_string",
         "//nodejs/vue/directives:tooltip",
     ],

@@ -21,6 +21,7 @@
 <script>
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
 	import Application from "#bzd/nodejs/vue/apps/application.vue";
+	import Cache2 from "#bzd/nodejs/core/cache2.js";
 	import FileExplorer from "#bzd/nodejs/vue/components/file_explorer/file_explorer.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
@@ -59,7 +60,7 @@
 		},
 		methods: {
 			async fetchPath(path) {
-				return await this.$cache.get("list", ...path);
+				return await this.$cache.get("list", Cache2.arrayOfStringToKey(path));
 			},
 			handleItem(item) {
 				const key = item.path.concat([item.item.name]);

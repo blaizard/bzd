@@ -1,5 +1,6 @@
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Frontend from "#bzd/nodejs/vue/apps/frontend.js";
+import Cache2 from "#bzd/nodejs/core/cache2.js";
 import Permissions from "#bzd/nodejs/db/storage/permissions.js";
 import CachePlugin from "#bzd/nodejs/vue/cache.js";
 import icon from "#bzd/apps/artifacts/frontend/svg/artifact.svg?url";
@@ -23,16 +24,8 @@ const frontend = Frontend.make(App)
 frontend.app.use(AsyncComputed);
 frontend.app.use(CachePlugin, {
 	list: {
-		cache: async (...pathList) => {
-			// The following 3 statements need to be fixed, not clean
-
-			pathList.pop(); // options
-			pathList.pop(); // previous value
-
-			if (pathList.length == 1 && pathList[0] == "default") {
-				pathList.pop();
-			}
-
+		cache: async (key) => {
+			const pathList = Cache2.keyToArrayOfString(key);
 			let next = 1000;
 			let list = [];
 
@@ -56,7 +49,7 @@ frontend.app.use(CachePlugin, {
 		default: [],
 		loading: [],
 		options: {
-			timeout: 5000, // ms
+			timeoutMs: 5000,
 		},
 	},
 });

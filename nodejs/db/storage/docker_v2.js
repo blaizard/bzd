@@ -1,4 +1,4 @@
-import Cache from "../../core/cache.js";
+import Cache2 from "../../core/cache2.js";
 import ExceptionFactory from "../../core/exception.js";
 import { HttpClientFactory } from "../../core/http/client.js";
 import LogFactory from "../../core/log.js";
@@ -25,17 +25,17 @@ export default class StorageDockerV2 extends Storage {
 		);
 
 		this.url = url;
-		this.cache = new Cache();
+		this.cache = new Cache2("docker-v2-cache");
 
 		// Handle authentication, this function will call a callback to generate the token
-		this.cache.register("token", async (scope, prevToken, options) => {
+		this.cache.register("token", async (scope, context) => {
 			const startTime = new Date();
 			const result = await this.options.authentication.call(this, scope);
 			const elpasedTimeS = (new Date() - startTime) / 1000;
 
 			// Default to 60s if omitted: https://docs.docker.com/registry/spec/auth/token/
 			const expiresInS = "expires_in" in result ? result.expires_in : 60;
-			options.timeout = (expiresInS - elpasedTimeS * 2) * 1000;
+			context.timeoutMs = (expiresInS - elpasedTimeS * 2) * 1000;
 
 			return result.token;
 		});

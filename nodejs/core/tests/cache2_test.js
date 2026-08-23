@@ -204,4 +204,47 @@ describe("Cache2", () => {
 
 		await services.stop();
 	});
+
+	it("Infinite timeout never expires", async () => {
+		let cache = new Cache2();
+		let value = 1;
+		cache.register(
+			"test",
+			() => {
+				return value++;
+			},
+			{ timeoutMs: Infinity },
+		);
+
+		Exception.assertEqual(await cache.get("test", "a"), 1);
+		Exception.assertEqual(value, 2);
+
+		// Refetching immediately returns the cached value, the fetch function is not called again.
+		Exception.assertEqual(await cache.get("test", "a"), 1);
+		Exception.assertEqual(value, 2);
+	});
+
+	it("Dynamic timeout via context", async () => {
+		let cache = new Cache2("cache2", {
+			timeoutMs: 50,
+		});
+		cache.register("test", (key, context) => {
+			if (key == "short") {
+				return 0;
+			}
+			context.timeoutMs = 60 * 1000;
+			return 1;
+		});
+
+		Exception.assertEqual(await cache.get("test", "long"), 1);
+		Exception.assertEqual(await cache.get("test", "short"), 0);
+
+		// Wait for the default timeout (50ms) to pass.
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
+		// The entry with the overridden timeout is still valid.
+		Exception.assertEqual(cache.getInstant("test", "long", Cache2.empty), 1);
+		// The entry with the default timeout has expired.
+		Exception.assertEqual(cache.getInstant("test", "short", Cache2.empty), Cache2.empty);
+	});
 });

@@ -193,7 +193,9 @@ export default class Cache2 {
 	/// \param key The key for this value.
 	/// \param value The value to be set.
 	/// \param type The data type to be set.
-	set(collection, key, value, type = Cache2.Status.value) {
+	/// \param timeoutMs The validity time of the data in milliseconds, overrides the default
+	///        timeout of the collection if set.
+	set(collection, key, value, type = Cache2.Status.value, timeoutMs = null) {
 		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
 		const data = this.data[collection];
 
@@ -216,7 +218,7 @@ export default class Cache2 {
 			data: value,
 			status: type,
 			size: size,
-			timeout: Cache2.getTimestampMs() + data.options.timeoutMs,
+			timeout: Cache2.getTimestampMs() + (timeoutMs ?? data.options.timeoutMs),
 		});
 		sizeDiff += size;
 		data.size += sizeDiff;
@@ -269,9 +271,14 @@ export default class Cache2 {
 			size: (data.values.get(key) ?? { size: 0 }).size,
 		});
 
+		// The fetch function can use this context to override the timeout of the entry.
+		const context = {
+			timeoutMs: null,
+		};
+
 		try {
-			const value = await data.fetch(key);
-			this.set(collection, key, value, Cache2.Status.value);
+			const value = await data.fetch(key, context);
+			this.set(collection, key, value, Cache2.Status.value, context.timeoutMs);
 			return value;
 		} catch (e) {
 			this.set(collection, key, e, Cache2.Status.error);

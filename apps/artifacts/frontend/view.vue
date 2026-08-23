@@ -15,6 +15,7 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import Cache2 from "#bzd/nodejs/core/cache2.js";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 	import { defineAsyncComponent } from "vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
@@ -74,7 +75,7 @@
 		methods: {
 			async fetchConfig() {
 				await this.handleSubmit(async () => {
-					this.volumes = await this.$cache.get("list");
+					this.volumes = await this.$cache.get("list", Cache2.arrayOfStringToKey([]));
 				});
 			},
 			getLink(index) {
