@@ -19,7 +19,7 @@ bzd_nodejs_web_binary(
     deps = [
         "//apps/artifacts/common:utils",
         "//apps/artifacts/plugins:frontend",
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
         "//nodejs/db/storage:permissions",
         "//nodejs/vue:cache",
         "//nodejs/vue/apps:frontend",

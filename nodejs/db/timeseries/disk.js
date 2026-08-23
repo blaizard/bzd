@@ -1,6 +1,6 @@
 import Path from "path";
 
-import Cache2 from "../../core/cache2.js";
+import Cache from "../../core/cache.js";
 import FileSystem from "../../core/filesystem.js";
 import LogFactory from "../../core/log.js";
 import PersistenceTimeseries from "../../core/persistence/timeseries.js";
@@ -39,7 +39,7 @@ export default class TimeseriesDisk extends Timeseries {
 	async _initialize() {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
-		this.cache = new Cache2("timeseries-disk-cache");
+		this.cache = new Cache("timeseries-disk-cache");
 	}
 
 	/**

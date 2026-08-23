@@ -1,6 +1,6 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 
 const Exception = ExceptionFactory("plugin", "jenkins");
 
@@ -74,7 +74,7 @@ export default class Jenkins {
 		const branch = this.config["jenkins.branch"] || "master";
 		const user = this.config["jenkins.user"];
 		const token = this.config["jenkins.token"];
-		const builds = await cache.get("jenkins.builds", Cache2.arrayOfStringToKey([url, build, branch, user]), {
+		const builds = await cache.get("jenkins.builds", Cache.arrayOfStringToKey([url, build, branch, user]), {
 			url: url,
 			build: build,
 			branch: branch,

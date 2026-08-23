@@ -8,7 +8,7 @@ import MockHttpServer from "#bzd/nodejs/core/http/mock/server.js";
 import Authentication from "#bzd/apps/accounts/authentication/server.js";
 import AuthenticationBase from "#bzd/nodejs/core/authentication/server.js";
 import Services from "#bzd/nodejs/core/services/services.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
 import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.js";
@@ -185,7 +185,7 @@ export default class Backend {
 	useCache() {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.cache, "Cache already set-up.");
-		this.instances.cache = new Cache2("cache");
+		this.instances.cache = new Cache("cache");
 		return this;
 	}
 

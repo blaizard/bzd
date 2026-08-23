@@ -1,5 +1,5 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 
 function _getStatus(item) {
 	if (item.state == "passed") {
@@ -61,7 +61,7 @@ export default class TravisCI {
 		const endpoint = this.config["travisci.endpoint"];
 		const repositorySlug = this.config["travisci.repository"];
 		const token = this.config["travisci.token"];
-		const builds = await cache.get("travisci.builds", Cache2.arrayOfStringToKey([endpoint, repositorySlug]), {
+		const builds = await cache.get("travisci.builds", Cache.arrayOfStringToKey([endpoint, repositorySlug]), {
 			endpoint: endpoint,
 			repositorySlug: repositorySlug,
 			token: token,

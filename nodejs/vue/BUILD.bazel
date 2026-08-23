@@ -44,7 +44,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         "//nodejs:vue",
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
     ],
 )

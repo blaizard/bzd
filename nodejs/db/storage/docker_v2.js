@@ -1,4 +1,4 @@
-import Cache2 from "../../core/cache2.js";
+import Cache from "../../core/cache.js";
 import ExceptionFactory from "../../core/exception.js";
 import { HttpClientFactory } from "../../core/http/client.js";
 import LogFactory from "../../core/log.js";
@@ -25,7 +25,7 @@ export default class StorageDockerV2 extends Storage {
 		);
 
 		this.url = url;
-		this.cache = new Cache2("docker-v2-cache");
+		this.cache = new Cache("docker-v2-cache");
 
 		// Handle authentication, this function will call a callback to generate the token
 		this.cache.register("token", async (scope, context) => {

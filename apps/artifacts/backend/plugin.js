@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { Storage } from "#bzd/nodejs/db/storage/storage.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import StatisticsProvider from "#bzd/nodejs/core/statistics/provider.js";
 
 const Exception = ExceptionFactory("plugin");
@@ -10,7 +10,7 @@ export default class PluginBase {
 		this.volume = volume;
 		this.options = options;
 		this.storage = null;
-		this.cache = (options["cache"] || new Cache2("cache")).getAccessor(volume);
+		this.cache = (options["cache"] || new Cache("cache")).getAccessor(volume);
 		this.statistics = options["statistics"] || new StatisticsProvider();
 		this.locks = options["locks"] || null;
 

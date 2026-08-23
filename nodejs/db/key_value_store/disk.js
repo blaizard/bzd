@@ -1,6 +1,6 @@
 import Path from "path";
 
-import Cache2 from "../../core/cache2.js";
+import Cache from "../../core/cache.js";
 import FileSystem from "../../core/filesystem.js";
 import LogFactory from "../../core/log.js";
 import PersistenceDisk from "../../core/persistence/disk.js";
@@ -38,7 +38,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 	async _initialize() {
 		// Create the directory if it does not exists
 		await FileSystem.mkdir(this.path);
-		this.cache = new Cache2("kvs-disk-cache");
+		this.cache = new Cache("kvs-disk-cache");
 	}
 
 	/// Return the persistence associated with a specific bucket and, if needed, create it and load it.

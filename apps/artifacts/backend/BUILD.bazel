@@ -31,7 +31,7 @@ bzd_nodejs_library(
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core/services",
         "//nodejs/core/statistics:provider",

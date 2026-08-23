@@ -1,13 +1,13 @@
-import Cache2 from "../cache2.js";
+import Cache from "../cache.js";
 import ExceptionFactory from "../exception.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 
-const Exception = ExceptionFactory("test", "cache2");
+const Exception = ExceptionFactory("test", "cache");
 
-describe("Cache2", () => {
+describe("Cache", () => {
 	describe("Simple", () => {
 		it("Base", async () => {
-			let cache = new Cache2();
+			let cache = new Cache();
 			let argRead = 0;
 			cache.register("test", (arg) => {
 				if (arg === false) {
@@ -56,29 +56,29 @@ describe("Cache2", () => {
 		});
 
 		it("Array Of String", async () => {
-			let cache = new Cache2();
+			let cache = new Cache();
 			let value = 0;
 			cache.register("test", (arg) => {
 				return value++;
 			});
 
 			{
-				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
+				const result = await cache.get("test", Cache.arrayOfStringToKey([]));
 				Exception.assertEqual(result, 0);
 				Exception.assertEqual(cache.getSize("test"), 8);
 			}
 			{
-				const result = await cache.get("test", Cache2.arrayOfStringToKey([""]));
+				const result = await cache.get("test", Cache.arrayOfStringToKey([""]));
 				Exception.assertEqual(result, 1);
 				Exception.assertEqual(cache.getSize("test"), 16);
 			}
 			{
-				const result = await cache.get("test", Cache2.arrayOfStringToKey(["", ""]));
+				const result = await cache.get("test", Cache.arrayOfStringToKey(["", ""]));
 				Exception.assertEqual(result, 2);
 				Exception.assertEqual(cache.getSize("test"), 24);
 			}
 			{
-				const result = await cache.get("test", Cache2.arrayOfStringToKey([]));
+				const result = await cache.get("test", Cache.arrayOfStringToKey([]));
 				Exception.assertEqual(result, 0);
 				Exception.assertEqual(cache.getSize("test"), 24);
 			}
@@ -86,7 +86,7 @@ describe("Cache2", () => {
 	});
 
 	it("Concurrency", async () => {
-		let cache = new Cache2("cache2", {
+		let cache = new Cache("cache", {
 			timeoutMs: 20 * 1000,
 		});
 		let value = 1;
@@ -120,7 +120,7 @@ describe("Cache2", () => {
 	});
 
 	it("Order", async () => {
-		const cache = new Cache2();
+		const cache = new Cache();
 		cache.register("test", (key) => key);
 		const getKeys = () => [...cache.data["test"].values.keys()];
 		Exception.assertEqual(getKeys(), []);
@@ -138,7 +138,7 @@ describe("Cache2", () => {
 	});
 
 	it("Stress", async () => {
-		let cache = new Cache2("cache2", {
+		let cache = new Cache("cache", {
 			timeoutMs: 20 * 1000,
 		});
 
@@ -184,7 +184,7 @@ describe("Cache2", () => {
 	}).timeout(10000);
 
 	it("Garbage Collector - maxSize enforcement", async () => {
-		const cache = new Cache2("cache2", {
+		const cache = new Cache("cache", {
 			maxSize: 20,
 			timeoutMs: 60 * 1000,
 		});
@@ -206,7 +206,7 @@ describe("Cache2", () => {
 	});
 
 	it("Infinite timeout never expires", async () => {
-		let cache = new Cache2();
+		let cache = new Cache();
 		let value = 1;
 		cache.register(
 			"test",
@@ -225,7 +225,7 @@ describe("Cache2", () => {
 	});
 
 	it("Dynamic timeout via context", async () => {
-		let cache = new Cache2("cache2", {
+		let cache = new Cache("cache", {
 			timeoutMs: 50,
 		});
 		cache.register("test", (key, context) => {
@@ -243,13 +243,13 @@ describe("Cache2", () => {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 
 		// The entry with the overridden timeout is still valid.
-		Exception.assertEqual(cache.getInstant("test", "long", Cache2.empty), 1);
+		Exception.assertEqual(cache.getInstant("test", "long", Cache.empty), 1);
 		// The entry with the default timeout has expired.
-		Exception.assertEqual(cache.getInstant("test", "short", Cache2.empty), Cache2.empty);
+		Exception.assertEqual(cache.getInstant("test", "short", Cache.empty), Cache.empty);
 	});
 
 	it("Pass data to the fetch function", async () => {
-		let cache = new Cache2();
+		let cache = new Cache();
 		let fetchCount = 0;
 		cache.register("test", (key, context, data) => {
 			++fetchCount;

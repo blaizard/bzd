@@ -1,6 +1,6 @@
 <script>
 	import { HttpClient } from "#bzd/nodejs/core/http/client.js";
-	import Cache2 from "#bzd/nodejs/core/cache2.js";
+	import Cache from "#bzd/nodejs/core/cache.js";
 
 	export default {
 		props: {
@@ -9,7 +9,7 @@
 		computed: {
 			itemList() {
 				const containingPath = this.pathList.slice(0, -1);
-				return this.$cache.getReactive("list", Cache2.arrayOfStringToKey(containingPath));
+				return this.$cache.getReactive("list", Cache.arrayOfStringToKey(containingPath));
 			},
 			isExpandable() {
 				if (this.item) {
@@ -19,7 +19,7 @@
 			},
 			innerItemList() {
 				if (this.isExpandable) {
-					return this.$cache.getReactive("list", Cache2.arrayOfStringToKey(this.pathList));
+					return this.$cache.getReactive("list", Cache.arrayOfStringToKey(this.pathList));
 				}
 				return null;
 			},

@@ -1,4 +1,4 @@
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import { assertUrlSafe } from "#bzd/nodejs/core/http/client/ssrf.js";
@@ -37,7 +37,7 @@ class EventsFactory {
 		.useLoggerMemory()
 		.setup();
 
-	let cache = new Cache2("dashboard");
+	let cache = new Cache("dashboard");
 	let plugins = {};
 	let pluginClasses = {};
 	let events = {};

@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
 const Exception = ExceptionFactory("plugin", "nodes");
@@ -71,7 +71,7 @@ export default class Nodes {
 			const url = remote.url;
 			const token = remote.token;
 			const volume = remote.volume;
-			return cache.get("nodes.list", Cache2.arrayOfStringToKey([url, volume]), {
+			return cache.get("nodes.list", Cache.arrayOfStringToKey([url, volume]), {
 				url: url,
 				token: token,
 				volume: volume,
@@ -112,7 +112,7 @@ export default class Nodes {
 				const token = data.token;
 				const volume = data.volume;
 				const uid = node;
-				return cache.get("nodes.data", Cache2.arrayOfStringToKey([url, volume, uid]), {
+				return cache.get("nodes.data", Cache.arrayOfStringToKey([url, volume, uid]), {
 					url: url,
 					token: token,
 					volume: volume,

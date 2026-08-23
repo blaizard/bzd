@@ -1,12 +1,12 @@
 import { reactive } from "vue";
-import Cache2 from "../core/cache2.js";
+import Cache from "../core/cache.js";
 import ExceptionFactory from "../core/exception.js";
 
 const Exception = ExceptionFactory("cache");
 
 export default {
 	install(app, options = {}) {
-		let cache = new Cache2("vue-cache");
+		let cache = new Cache("vue-cache");
 		for (const collection in options) {
 			const option = options[collection];
 			Exception.assert("cache" in option, "Missing 'cache' key");

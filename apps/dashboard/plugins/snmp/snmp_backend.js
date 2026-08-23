@@ -1,6 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import SnmpNative from "net-snmp";
 
 const Exception = ExceptionFactory("snmp");
@@ -216,11 +216,13 @@ export default class SNMP {
 			const host = this.config["snmp.host"];
 			const version = this.config["snmp.version"];
 			const community = this.config["snmp.community"];
-			const promise = cache.get(
-				"snmp.oid",
-				Cache2.arrayOfStringToKey([host, version, community, oids.join(","), ttl]),
-				{ host: host, version: version, community: community, oids: oids, ttl: ttl },
-			);
+			const promise = cache.get("snmp.oid", Cache.arrayOfStringToKey([host, version, community, oids.join(","), ttl]), {
+				host: host,
+				version: version,
+				community: community,
+				oids: oids,
+				ttl: ttl,
+			});
 			promises.push(promise);
 		}
 

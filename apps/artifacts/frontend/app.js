@@ -1,6 +1,6 @@
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Frontend from "#bzd/nodejs/vue/apps/frontend.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import Permissions from "#bzd/nodejs/db/storage/permissions.js";
 import CachePlugin from "#bzd/nodejs/vue/cache.js";
 import icon from "#bzd/apps/artifacts/frontend/svg/artifact.svg?url";
@@ -25,7 +25,7 @@ frontend.app.use(AsyncComputed);
 frontend.app.use(CachePlugin, {
 	list: {
 		cache: async (key) => {
-			const pathList = Cache2.keyToArrayOfString(key);
+			const pathList = Cache.keyToArrayOfString(key);
 			let next = 1000;
 			let list = [];
 

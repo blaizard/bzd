@@ -45,7 +45,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/artifacts/common:utils",
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db/data",

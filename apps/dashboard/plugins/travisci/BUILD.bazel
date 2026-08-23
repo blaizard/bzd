@@ -4,7 +4,7 @@ bzd_plugin(
     name = "travisci",
     backend_deps = [
         "//nodejs/core/http:client",
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
     ],
     backend_entry_point = "source_backend.js",
     frontend_entry_point = "source_frontend.vue",

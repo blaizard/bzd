@@ -32,7 +32,7 @@ class CacheCollectionAccessor {
 	/// \param key The key for this value.
 	/// \param value The value to be set.
 	/// \param type The data type to be set.
-	set(key, value, type = Cache2.Status.value) {
+	set(key, value, type = Cache.Status.value) {
 		this.cache.set(this.collection, key, value, type);
 	}
 
@@ -67,15 +67,15 @@ class CacheCollectionAccessor {
 	}
 }
 
-export default class Cache2 {
-	constructor(name = "cache2", options = {}) {
+export default class Cache {
+	constructor(name = "cache", options = {}) {
 		this.name = name;
 		this.options = Object.assign(
 			{
 				// Default timeout for the validity of an entry.
 				timeoutMs: 30 * 1000,
 				// Default function to compute the size of the value.
-				getSize: Cache2.defaultGetSize,
+				getSize: Cache.defaultGetSize,
 				// Max size allowed for the cache.
 				maxSize: 1024 * 1024,
 			},
@@ -196,7 +196,7 @@ export default class Cache2 {
 	/// \param type The data type to be set.
 	/// \param timeoutMs The validity time of the data in milliseconds, overrides the default
 	///        timeout of the collection if set.
-	set(collection, key, value, type = Cache2.Status.value, timeoutMs = null) {
+	set(collection, key, value, type = Cache.Status.value, timeoutMs = null) {
 		Exception.assert(collection in this.data, "Collection '{}' doesn't exist.", collection);
 		const data = this.data[collection];
 
@@ -206,10 +206,10 @@ export default class Cache2 {
 
 		let size = 0;
 		switch (type) {
-			case Cache2.Status.value:
+			case Cache.Status.value:
 				size = data.options.getSize(value);
 				break;
-			case Cache2.Status.error:
+			case Cache.Status.error:
 				size = 8;
 				break;
 			default:
@@ -219,7 +219,7 @@ export default class Cache2 {
 			data: value,
 			status: type,
 			size: size,
-			timeout: Cache2.getTimestampMs() + (timeoutMs ?? data.options.timeoutMs),
+			timeout: Cache.getTimestampMs() + (timeoutMs ?? data.options.timeoutMs),
 		});
 		sizeDiff += size;
 		data.size += sizeDiff;
@@ -242,14 +242,14 @@ export default class Cache2 {
 		const collectionData = this.data[collection];
 		while (true) {
 			// Check if the value is already available.
-			const maybeValue = this.getInstant(collection, key, Cache2.empty);
-			if (maybeValue !== Cache2.empty) {
+			const maybeValue = this.getInstant(collection, key, Cache.empty);
+			if (maybeValue !== Cache.empty) {
 				return maybeValue;
 			}
 
 			// Handle the case of concurrency, if the value is being fetched and another caller issues a get(...).
 			// Check if the value is being fetched.
-			const isFetching = (collectionData.values.get(key) ?? { status: null }).status === Cache2.Status.fetching;
+			const isFetching = (collectionData.values.get(key) ?? { status: null }).status === Cache.Status.fetching;
 			if (!isFetching) {
 				break;
 			}
@@ -269,7 +269,7 @@ export default class Cache2 {
 			// Setting the timeout to -1, will tell that this entry is invalid and needs refetch.
 			timeout: -1,
 			data: resolveList, // contains the resolve callback of all promises waiting.
-			status: Cache2.Status.fetching,
+			status: Cache.Status.fetching,
 			size: (collectionData.values.get(key) ?? { size: 0 }).size,
 		});
 
@@ -280,10 +280,10 @@ export default class Cache2 {
 
 		try {
 			const value = await collectionData.fetch(key, context, data);
-			this.set(collection, key, value, Cache2.Status.value, context.timeoutMs);
+			this.set(collection, key, value, Cache.Status.value, context.timeoutMs);
 			return value;
 		} catch (e) {
-			this.set(collection, key, e, Cache2.Status.error);
+			this.set(collection, key, e, Cache.Status.error);
 			throw e;
 		} finally {
 			resolveList.forEach((resolve) => resolve());
@@ -302,10 +302,10 @@ export default class Cache2 {
 			return defaultValue;
 		}
 		const entry = data.values.get(key);
-		if (entry.timeout < Cache2.getTimestampMs()) {
+		if (entry.timeout < Cache.getTimestampMs()) {
 			return defaultValue;
 		}
-		if (entry.status === Cache2.Status.error) {
+		if (entry.status === Cache.Status.error) {
 			throw entry.data;
 		}
 
@@ -348,7 +348,7 @@ export default class Cache2 {
 		Exception.assert(this.trigger === null, "Garbage collector is already registered.");
 		const provider = new ServiceProvider(...namespaces);
 		this.trigger = provider.addEventTriggeredProcess("garbage.collector", async () => {
-			const now = Cache2.getTimestampMs();
+			const now = Cache.getTimestampMs();
 			let evictedCount = 0;
 			let evictedSize = 0;
 

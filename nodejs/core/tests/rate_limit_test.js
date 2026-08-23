@@ -1,6 +1,6 @@
 import ExceptionFactory from "../exception.js";
 import RateLimiter from "../rate_limit.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import ClockMock from "#bzd/nodejs/core/clock/mock.js";
 
 const Exception = ExceptionFactory("test", "rateLimit");
@@ -15,7 +15,7 @@ describe("RateLimiter", () => {
 	let limiter;
 
 	beforeEach(() => {
-		cache = new Cache2("test-rate");
+		cache = new Cache("test-rate");
 		clock = new ClockMock();
 		limiter = new RateLimiter(cache, {
 			bucket,

@@ -1,7 +1,7 @@
-/// Sliding-window rate limiter backed by a Cache2 collection.
+/// Sliding-window rate limiter backed by a Cache collection.
 ///
 /// Each key maps to a list of timestamps for the sliding window. The collection TTL equals
-/// the window so Cache2's garbage collector bounds the memory used. Keys are stored raw.
+/// the window so Cache's garbage collector bounds the memory used. Keys are stored raw.
 export default class RateLimiter {
 	constructor(cache, config) {
 		this.config = Object.assign(
@@ -16,7 +16,7 @@ export default class RateLimiter {
 			config,
 		);
 		this.cache = cache;
-		// Register the collection so `set`/`getInstant` pass Cache2's collection assertion;
+		// Register the collection so `set`/`getInstant` pass Cache's collection assertion;
 		// the fetch function is never invoked as entries are always set manually.
 		cache.register(this.config.bucket, () => ({ timestamps: [] }), { timeoutMs: this.config.windowMs });
 	}
@@ -50,7 +50,7 @@ export default class RateLimiter {
 
 	/// Reset the rate limit for the given key.
 	///
-	/// Cache2 has no per-key delete, so an empty entry is stored instead; it expires after
+	/// Cache has no per-key delete, so an empty entry is stored instead; it expires after
 	/// the window and is reclaimed by the garbage collector.
 	reset(key) {
 		this.cache.set(this.config.bucket, key, { timestamps: [] });

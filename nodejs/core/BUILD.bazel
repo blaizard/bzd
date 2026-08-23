@@ -52,9 +52,9 @@ bzd_nodejs_library(
 )
 
 bzd_nodejs_library(
-    name = "cache2",
+    name = "cache",
     srcs = [
-        "cache2.js",
+        "cache.js",
     ],
     visibility = ["//visibility:public"],
     deps = [

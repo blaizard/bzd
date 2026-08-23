@@ -1,4 +1,4 @@
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
 import Optional from "#bzd/nodejs/utils/optional.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
@@ -18,7 +18,7 @@ export default class Data {
 		this.options = Object.assign(
 			{
 				/// The cache instance to be used.
-				cache: new Cache2(),
+				cache: new Cache(),
 				/// The external source to fetch if data is missing locally.
 				external: (uid, key, count, after, before) => {
 					return null;

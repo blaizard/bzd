@@ -28,7 +28,7 @@ bzd_nodejs_library(
     ],
     deps = [
         "//apps/accounts/authentication:server",
-        "//nodejs/core:cache2",
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/authentication:server",

@@ -1,5 +1,5 @@
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
-import Cache2 from "#bzd/nodejs/core/cache2.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 
 function _getStatus(item) {
 	if (item.conclusion == "success") {
@@ -119,11 +119,12 @@ export default class Github {
 		const repository = this.config["github.repository"];
 		const workflowId = this.config["github.workflowid"];
 		const token = this.config["github.token"];
-		const builds = await cache.get(
-			"github.builds",
-			Cache2.arrayOfStringToKey([username, repository, workflowId]),
-			{ username: username, repository: repository, workflowId: workflowId, token: token },
-		);
+		const builds = await cache.get("github.builds", Cache.arrayOfStringToKey([username, repository, workflowId]), {
+			username: username,
+			repository: repository,
+			workflowId: workflowId,
+			token: token,
+		});
 		return {
 			builds: builds,
 		};
