@@ -115,17 +115,20 @@
 				let tooltips = {};
 				let warnings = {};
 				for (const [name, memory] of Object.entries(this.metadata.memory || {})) {
-					const { used, total } = memory;
-					tooltips[name] =
-						bytesToString(used) + " used / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
-					ratios[name] = [
-						{
-							ratio: used / total,
-							weight: used,
-						},
-					];
-					if (used / total > 0.9) {
-						warnings[name] = "Memory almost full";
+					const used = memory.used;
+					const total = memory.total;
+					tooltips[name] = bytesToString(used) + " used";
+					if (total) {
+						tooltips[name] += " / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
+						ratios[name] = [
+							{
+								ratio: used / total,
+								weight: used,
+							},
+						];
+						if (used / total > 0.9) {
+							warnings[name] = "Memory almost full";
+						}
 					}
 				}
 				return {
@@ -139,17 +142,20 @@
 				let tooltips = {};
 				let warnings = {};
 				for (const [name, disk] of Object.entries(this.metadata.disk || {})) {
-					const { used, total } = disk;
-					tooltips[name] =
-						bytesToString(used) + " used / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
-					ratios[name] = [
-						{
-							ratio: used / total,
-							weight: used,
-						},
-					];
-					if (used / total > 0.9) {
-						warnings[name] = "Memory almost full";
+					const used = disk.used;
+					const total = disk.total;
+					tooltips[name] = bytesToString(used) + " used";
+					if (total) {
+						tooltips[name] += " / " + bytesToString(total) + " (" + ((used / total) * 100).toFixed(1) + "%)";
+						ratios[name] = [
+							{
+								ratio: used / total,
+								weight: used,
+							},
+						];
+						if (used / total > 0.9) {
+							warnings[name] = "Memory almost full";
+						}
 					}
 				}
 				return {
