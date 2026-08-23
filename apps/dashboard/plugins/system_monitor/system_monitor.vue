@@ -281,7 +281,7 @@
 				if (this.metadata.leases) {
 					let tooltip = [];
 					for (const [leaseId, lease] of Object.entries(this.metadata.leases)) {
-						tooltip.push(" - " + (lease.name || leaseId) + ": " + timeToString(lease.ttl / 1000));
+						tooltip.push(" - " + (lease.name || leaseId) + ": " + timeToString(lease.ttl));
 					}
 					tooltips.push("Leases:<br/>" + tooltip.join("<br/>"));
 				}
