@@ -1,6 +1,7 @@
 import Cache from "#bzd/nodejs/core/cache.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
+import { assertUrlSafe } from "#bzd/nodejs/core/http/client/ssrf.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.js";
@@ -130,12 +131,15 @@ class EventsFactory {
 		}
 	}
 
+	const checkUrlAllowList = config["checkUrl"]?.["allowList"] ?? [];
+
 	cache.register(
 		"check-url",
 		async (url) => {
 			try {
 				await HttpClient.request(url, {
 					method: "get",
+					onFetch: (fetchUrl) => assertUrlSafe(fetchUrl, { allowList: checkUrlAllowList }),
 				});
 				return true;
 			} catch (e) {
@@ -184,6 +188,7 @@ class EventsFactory {
 	await backend.start();
 
 	if (backend.test) {
+		Exception.assert(config.tests?.length, "No tests defined in the config while running in test mode.");
 		await backend.web.test(config.tests || []);
 		await backend.stop();
 	}
