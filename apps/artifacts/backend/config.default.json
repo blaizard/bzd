@@ -135,6 +135,24 @@
                     }
                 }
             ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/x/cache/@caching-proxy/http/127.0.0.1:8081/"
+            ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/x/cache/@caching-proxy/unix//var/run/docker.sock"
+            ]
         }
     ],
     "tokens": {
@@ -156,6 +174,7 @@
     "volumes": {
         "cache": {
             "cachingProxy": {
+                "allowList": [],
                 "maxStorageSize": 1073741824
             },
             "storage": {

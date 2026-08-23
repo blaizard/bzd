@@ -20,3 +20,14 @@ bzd_nodejs_test(
         "//nodejs/core:exception",
     ],
 )
+
+bzd_nodejs_test(
+    name = "caching_proxy",
+    srcs = ["caching_proxy_test.js"],
+    main = "caching_proxy_test.js",
+    deps = [
+        "//apps/artifacts/backend:plugin_tester",
+        "//apps/artifacts/plugins/storage:backend",
+        "//nodejs/core:exception",
+    ],
+)

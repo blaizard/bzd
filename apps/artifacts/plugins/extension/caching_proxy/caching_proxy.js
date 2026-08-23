@@ -3,6 +3,7 @@ import LoggerFactory from "#bzd/nodejs/core/log.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
+import { assertUrlSafe } from "#bzd/nodejs/core/http/client/ssrf.js";
 import {
 	buildCacheEntryStream,
 	CacheEntryReader,
@@ -73,7 +74,7 @@ function sendMetadata(context, metadata) {
 	}
 }
 
-async function fetchFile(context, url, headers) {
+async function fetchFile(context, url, headers, allowList) {
 	const headersRequest = Object.fromEntries(
 		Object.entries(headers).filter(([headerName]) => {
 			return !HEADERS_REQUEST_BLACKLIST.has(headerName);
@@ -86,6 +87,7 @@ async function fetchFile(context, url, headers) {
 		expect: "stream",
 		includeAll: true,
 		throwOnResponseError: false,
+		onFetch: (url) => assertUrlSafe(url, { allowList }),
 	});
 	const metadata = {
 		headers: Object.fromEntries(
@@ -143,6 +145,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 	}
 
 	const maxStorageSize = options["cachingProxy"]["maxStorageSize"];
+	const allowList = options["cachingProxy"]["allowList"] ?? [];
 
 	// Contains update on the access metadata of all files.
 	let globalMetadataUpdate = {};
@@ -167,7 +170,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 		} catch (e) {
 			// If the file does not exists.
 			if (e instanceof FileNotFoundError) {
-				const [metadata, readStream] = await fetchFile(context, url, headersRequest);
+				const [metadata, readStream] = await fetchFile(context, url, headersRequest, allowList);
 				if (metadata.status < 200 || metadata.status >= 300) {
 					Log.warning("Fetching {} failed with HTTP code {}, ignoring.", url, metadata.status);
 					try {

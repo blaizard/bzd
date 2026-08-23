@@ -100,6 +100,10 @@ export default async function request(url, options) {
 	let updatedOptions = { ...options };
 
 	while (true) {
+		// Notify that an actual fetch is about to happen (initial request and every redirect hop).
+		if (options.onFetch) {
+			await options.onFetch(url + updatedOptions.path);
+		}
 		response = await requestResponse(url, updatedOptions);
 		if (response.statusCode < 300 || response.statusCode >= 400) {
 			break;

@@ -4,6 +4,7 @@ bzd_nodejs_library(
     name = "client",
     srcs = [
         "client.js",
+        "client/ssrf.js",
         "//nodejs/core/http/client/http:backend.js",
     ],
     visibility = ["//visibility:public"],

@@ -152,6 +152,7 @@ export class HttpClient {
 			path: path,
 			expect: options.expect,
 			timeoutMs: options.timeoutMs,
+			onFetch: options.onFetch,
 		});
 
 		if (options.throwOnResponseError && (result.code < 200 || result.code > 299)) {

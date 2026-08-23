@@ -3,6 +3,10 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 const Exception = ExceptionFactory("http", "client", "window.fetch");
 
 export default async function request(url, options) {
+	if (options.onFetch) {
+		await options.onFetch(url + options.path);
+	}
+
 	const promiseFetch = window.fetch(url + options.path, {
 		method: options.method,
 		body: options.data,
