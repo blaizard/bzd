@@ -34,7 +34,9 @@ jobs:
                       THEN
                       ${{ inputs.prompt }}
 
-                      IMPORTANT: Stop IMMEDIATELY after finding the FIRST vulnerability.
+                      IMPORTANT:
+                        - Prioritize highest severity vulnerability first.
+                        - Stop IMMEDIATELY after finding the FIRST vulnerability.
 
                       Output your final answer as a single JSON object and NOTHING else, in this exact format:
 
