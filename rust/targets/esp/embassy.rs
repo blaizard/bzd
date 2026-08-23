@@ -37,5 +37,4 @@ pub fn exit(code: i32) -> ! {
 async fn main(_spawner: Spawner) -> ! {
     let result = executor().await;
     println!("executor() completed with {result}");
-    exit(0);
 }
