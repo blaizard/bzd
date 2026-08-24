@@ -37,6 +37,7 @@ bzd_nodejs_library(
         "//nodejs/core:log",
         "//nodejs/core:stream",
         "//nodejs/db:utils",
+        "//nodejs/utils:pathlib",
     ],
 )
 

@@ -1,11 +1,24 @@
 import Fs from "fs";
 
 import ExceptionFactory from "../../core/exception.js";
+import pathlib from "../../utils/pathlib.js";
 import { fromChunk, toBuffer, toString } from "../../core/stream.js";
 import { AsyncInitialize, CollectionPaging } from "../utils.js";
 import Permissions from "./permissions.js";
 
 const Exception = ExceptionFactory("db", "storage");
+
+/// Convert the given path (string, array of segments or Path) into a list of segments.
+function toPathList(path) {
+	if (path instanceof pathlib.PathType) {
+		return path.parts.slice(path.isAbsolute() ? 1 : 0);
+	}
+	if (Array.isArray(path)) {
+		return path;
+		PathType;
+	}
+	return [path];
+}
 
 export class FileNotFoundError extends Error {}
 
@@ -30,18 +43,18 @@ export class Storage extends AsyncInitialize {
 
 	/// Tell whether a key exists or not
 	async is(path) {
-		return this._isImpl(Array.isArray(path) ? path : [path]);
+		return this._isImpl(toPathList(path));
 	}
 
 	/// List all files under this path at a given chunk size
 	async list(path, maxOrPaging = 20, includeMetadata = false) {
-		return this._listImpl(Array.isArray(path) ? path : [path], maxOrPaging, includeMetadata);
+		return this._listImpl(toPathList(path), maxOrPaging, includeMetadata);
 	}
 
 	/// List all files under this path
 	async listAll(path, maxOrPaging = 100, includeMetadata = false) {
 		let all = [];
-		const pathAsArray = Array.isArray(path) ? path : [path];
+		const pathAsArray = toPathList(path);
 		for await (const [_, data] of CollectionPaging.makeIterator(async (maxOrPaging) => {
 			return await this._listImpl(pathAsArray, maxOrPaging, includeMetadata);
 		}, maxOrPaging)) {
@@ -52,20 +65,20 @@ export class Storage extends AsyncInitialize {
 
 	/// Print all files/directories at a given path
 	async *walk(path, maxOrPaging = 100, includeMetadata = false) {
-		const pathAsArray = Array.isArray(path) ? path : [path];
+		const pathAsArray = toPathList(path);
 		for await (const [_, entry] of CollectionPaging.makeIterator(async (maxOrPaging) => {
 			return await this._listImpl(pathAsArray, maxOrPaging, /*includeMetadata*/ true);
 		}, maxOrPaging)) {
-			yield [path, includeMetadata ? entry : entry.name];
+			yield [pathAsArray, includeMetadata ? entry : entry.name];
 			if (Permissions.makeFromEntry(entry).isList()) {
-				yield* this.walk([...path, entry.name], maxOrPaging, includeMetadata);
+				yield* this.walk([...pathAsArray, entry.name], maxOrPaging, includeMetadata);
 			}
 		}
 	}
 
 	/// Return a file read stream from a specific key
 	async read(path) {
-		return this._readImpl(Array.isArray(path) ? path : [path]);
+		return this._readImpl(toPathList(path));
 	}
 
 	/// Return the content of a file as a buffer.
@@ -96,7 +109,7 @@ export class Storage extends AsyncInitialize {
 	/// Store a file to a specific path
 	async write(path, readStream, mkdir = false) {
 		Exception.assert(this.writeAccess === true, "This storage doesn't have write access.");
-		const pathList = Array.isArray(path) ? path : [path];
+		const pathList = toPathList(path);
 		if (mkdir) {
 			await this.mkdir(pathList.slice(0, -1));
 		}
@@ -108,7 +121,7 @@ export class Storage extends AsyncInitialize {
 	/// \throws FileNotFoundError if the file or directory does not exists.
 	async delete(path) {
 		Exception.assert(this.writeAccess === true, "This storage doesn't have write access.");
-		return this._deleteImpl(Array.isArray(path) ? path : [path]);
+		return this._deleteImpl(toPathList(path));
 	}
 
 	/// Try to delete a file or directory from a path, do nothing if the file does not exists.
@@ -145,7 +158,7 @@ export class Storage extends AsyncInitialize {
 	/// \throws only if the path already exists AND is a file.
 	async mkdir(path) {
 		Exception.assert(this.writeAccess === true, "This storage doesn't have write access.");
-		return this._mkdirImpl(Array.isArray(path) ? path : [path]);
+		return this._mkdirImpl(toPathList(path));
 	}
 
 	/// Get metadata of a specific file
@@ -157,7 +170,7 @@ export class Storage extends AsyncInitialize {
 	/// - modified: The modification date (Date type).
 	/// - permissions: The permissions of the file.
 	async metadata(path) {
-		const pathList = Array.isArray(path) ? path : [path];
+		const pathList = toPathList(path);
 		if (typeof this._metadataImpl == "function") {
 			return this._metadataImpl(pathList);
 		}
@@ -169,7 +182,7 @@ export class Storage extends AsyncInitialize {
 	/// Set the permissions of a file
 	async setPermission(path, permissions) {
 		Exception.assert(this.writeAccess === true, "This storage doesn't have write access.");
-		return this._setPermissionImpl(Array.isArray(path) ? path : [path], permissions);
+		return this._setPermissionImpl(toPathList(path), permissions);
 	}
 
 	/// Run a set of validation tests
