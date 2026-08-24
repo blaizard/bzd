@@ -158,6 +158,116 @@ describe("Webdav", () => {
 			});
 		});
 
+		it("propfind on root directory with depth=infinity", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav", {
+				headers: {
+					depth: "infinity",
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"": {
+					"D:displayname": "webdav",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/a.txt": {
+					"D:displayname": "a.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/b.txt": {
+					"D:displayname": "b.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/with%20space.txt": {
+					"D:displayname": "with space.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 23,
+				},
+				"/empty": {
+					"D:displayname": "empty",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested": {
+					"D:displayname": "nested",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper": {
+					"D:displayname": "deeper",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper/c.txt": {
+					"D:displayname": "c.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/nested/e.txt": {
+					"D:displayname": "e.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/nested/f.txt": {
+					"D:displayname": "f.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		it("propfind on nested directory with depth=infinity", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/nested", {
+				headers: {
+					depth: "infinity",
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"/nested": {
+					"D:displayname": "nested",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper": {
+					"D:displayname": "deeper",
+					"D:resourcetype": { "D:collection": "" },
+				},
+				"/nested/deeper/c.txt": {
+					"D:displayname": "c.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/nested/e.txt": {
+					"D:displayname": "e.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+				"/nested/f.txt": {
+					"D:displayname": "f.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
+		it("propfind on file with depth=infinity", async () => {
+			const response = await tester.send("memory", "propfind", "/webdav/a.txt", {
+				headers: {
+					depth: "infinity",
+				},
+			});
+			Exception.assertEqual(response.status, 207);
+			const data = new XMLParser().parse(response.data);
+			assertEqualResponses(data, {
+				"/a.txt": {
+					"D:displayname": "a.txt",
+					"D:resourcetype": "",
+					"D:getcontentlength": 13,
+				},
+			});
+		});
+
 		// webdav4: cat
 		it("propfind on file", async () => {
 			const response = await tester.send("memory", "propfind", "/webdav/a.txt");

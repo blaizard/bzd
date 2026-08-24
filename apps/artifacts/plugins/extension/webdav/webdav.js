@@ -130,10 +130,22 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			const path = getPathFromContext(context);
 			const storage = plugin.getStorage();
 
-			if (depth != "0" && depth != "1") {
+			if (depth != "0" && depth != "1" && depth != "infinity") {
 				context.sendStatus(403);
 				return;
 			}
+
+			const publicPath = pathlib.path(context.getPath()).normalize;
+			Exception.assert(publicPath.isAbsolute(), "The public path must be absolute: {}", publicPath.asPosix());
+
+			/// Build the public path of a resource from its storage path parts.
+			const pathFromParts = (parts) => {
+				let result = publicPath;
+				for (const segment of parts.slice(path.parts.length)) {
+					result = result.joinPath(encodeURIComponent(segment));
+				}
+				return result;
+			};
 
 			const entryToResponse = (path, entry) => {
 				let props = {
@@ -158,21 +170,22 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 				};
 			};
 
-			const publicPath = pathlib.path(context.getPath()).normalize;
-			Exception.assert(publicPath.isAbsolute(), "The public path must be absolute: {}", publicPath.asPosix());
-
 			const entry = await storage.metadata(path.parts);
 
 			let responses = [entryToResponse(publicPath, entry)];
-			if (depth == "1") {
-				try {
+			try {
+				if (depth == "1") {
 					const children = await storage.list(path.parts, 100, /*includeMetadata*/ true);
 					responses = responses.concat(
-						children.data().map((entry) => entryToResponse(publicPath.joinPath(encodeURIComponent(entry.name)), entry)),
+						children.data().map((entry) => entryToResponse(pathFromParts([...path.parts, entry.name]), entry)),
 					);
-				} catch (e) {
-					// ignore errors, it means that the list was performed on a file most likely.
+				} else if (depth == "infinity") {
+					for await (const [parentPath, child] of storage.walk(path.parts, 100, /*includeMetadata*/ true)) {
+						responses.push(entryToResponse(pathFromParts([...parentPath, child.name]), child));
+					}
 				}
+			} catch (e) {
+				// ignore errors, it means that the list was performed on a file most likely.
 			}
 
 			const builder = new XMLBuilder({
