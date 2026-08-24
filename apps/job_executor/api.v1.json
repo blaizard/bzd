@@ -2,6 +2,7 @@
     "rest": {
         "/file/{id}": {
             "get": {
+                "authentication": [],
                 "documentation": "Retrieve the content of a specific file.",
                 "request": {
                     "type": "query",
@@ -17,6 +18,7 @@
         },
         "/files/{id}": {
             "post": {
+                "authentication": [],
                 "documentation": "Get the file/directory list from a specific path.",
                 "request": {
                     "type": "json",
@@ -37,6 +39,7 @@
         },
         "/job/send": {
             "post": {
+                "authentication": [],
                 "documentation": "Send a job to be processed.",
                 "request": {
                     "type": "form"
@@ -51,6 +54,7 @@
         },
         "/job/{id}/cancel": {
             "delete": {
+                "authentication": [],
                 "documentation": "Kill a running job.",
                 "response": {
                     "type": "json",
@@ -62,11 +66,13 @@
         },
         "/job/{id}/delete": {
             "delete": {
+                "authentication": [],
                 "documentation": "Delete a job and its sandbox."
             }
         },
         "/job/{id}/start": {
             "post": {
+                "authentication": [],
                 "documentation": "Start a job.",
                 "response": {
                     "type": "json",
@@ -78,6 +84,7 @@
         },
         "/jobs": {
             "get": {
+                "authentication": [],
                 "documentation": "Get the list of jobs.",
                 "response": {
                     "type": "json",
@@ -90,6 +97,7 @@
         },
         "/jobs-schema": {
             "get": {
+                "authentication": [],
                 "documentation": "Get the list of jobs schema available.",
                 "response": {
                     "type": "json"
