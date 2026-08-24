@@ -131,7 +131,13 @@ class EventsFactory {
 		}
 	}
 
-	const checkUrlAllowList = config["checkUrl"]?.["allowList"] ?? [];
+	const checkUrlAllowList = config.layout
+		.map((data) => data.link)
+		.filter((url) => url !== undefined)
+		.map((urlString) => {
+			const url = new URL(urlString);
+			return url.hostname + (url.port ? ":" + url.port : "");
+		});
 
 	cache.register(
 		"check-url",
