@@ -18,6 +18,19 @@ export default class WebsocketClient extends Base {
 	async handle(endpoint, callback) {
 		const updatedEndpoint = this.endpoints.match(endpoint);
 		this._sanityCheck(updatedEndpoint);
-		return await WebsocketClientImpl.handle(this.getEndpoint(endpoint), callback);
+
+		let url = this.getEndpoint(endpoint);
+		const authenticationSchema = this.schema[updatedEndpoint].authentication;
+		if (authenticationSchema) {
+			const authentication = this.options.authentication;
+			Exception.assert(
+				authentication,
+				"This websocket has authentication requirement but no authentication object was specified.",
+			);
+			Exception.assert(await authentication.isAuthenticated(), "A user must be authenticated for this websocket.");
+			url = await authentication.updateAuthenticationURL(url);
+		}
+
+		return await WebsocketClientImpl.handle(url, callback);
 	}
 }

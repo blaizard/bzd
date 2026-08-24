@@ -16,8 +16,12 @@ export default class WebsocketServer extends Base {
 		Exception.assert(this.options.channel, "Channel is missing");
 		this._sanityCheck(endpoint);
 
-		this.options.channel.addRouteWebsocket(this.getEndpoint(endpoint), (ws) => {
-			callback(ws);
-		});
+		const webOptions = {};
+		// Set authentication.
+		if (this.schema[endpoint].authentication) {
+			webOptions.authentication = this.schema[endpoint].authentication;
+		}
+
+		this.options.channel.addRouteWebsocket(this.getEndpoint(endpoint), callback, webOptions);
 	}
 }

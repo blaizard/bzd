@@ -101,9 +101,18 @@ export default class HttpServer {
 	async startWebsocketServer(server) {
 		this.wss = new WebSocketServer({ noServer: true });
 		this.wss.on("connection", async (ws, request, options) => {
-			const context = new WebsocketServerContext(ws, options.params);
+			const context = new WebsocketServerContext(ws, options.params, request);
 
 			try {
+				// Check if this websocket needs authentication.
+				if (options.authentication) {
+					context.session = await this.config.authentication.verify(context, options.authentication);
+					if (!context.session) {
+						ws.close(1008, "Unauthorized");
+						return;
+					}
+				}
+
 				await options.handler(context);
 			} catch (e) {
 				if (e instanceof ExceptionPrecondition) {
@@ -137,7 +146,8 @@ export default class HttpServer {
 			}
 
 			const options = {
-				handler: result.args,
+				handler: result.args.handler,
+				authentication: result.args.authentication || null,
 				params: result.vars,
 				/// Add guards to unhandled exceptions. This adds a callstack layer.
 				exceptionGuard: true,
@@ -315,8 +325,29 @@ export default class HttpServer {
 	/// \param uri The endpoint to which the request should match.
 	/// \param callback A callback that will be called if the uri and type matches
 	///                 the request.
-	addRouteWebsocket(uri, callback) {
-		this.routerWebsockets.add(uri, null, callback);
+	/// \param options (optional) Extra options to be passed to the handler.
+	addRouteWebsocket(uri, callback, options) {
+		// Update the options
+		options = Object.assign(
+			{
+				/// Authentication constraints/scopes.
+				authentication: null,
+			},
+			options,
+		);
+
+		if (options.authentication !== null) {
+			Exception.assert(
+				this.config.authentication,
+				"The websocket route {} has authentication requirement but no authentication object was specified.",
+				uri,
+			);
+		}
+
+		this.routerWebsockets.add(uri, null, {
+			handler: callback,
+			authentication: options.authentication,
+		});
 	}
 
 	/// \brief Add one or multiple custom route to the web server.

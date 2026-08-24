@@ -149,6 +149,7 @@ export default class Frontend {
 			Log.info("Setting up websocket client");
 			this.instances.app.use(WebsocketPlugin, {
 				schema: this.websocketSchema,
+				authentication: this.instances.authentication || null,
 				plugins: plugins,
 			});
 		}

@@ -99,6 +99,7 @@
     },
     "websocket": {
         "/job/{id}": {
+            "authentication": [],
             "documentation": "Get information about a given job."
         }
     }

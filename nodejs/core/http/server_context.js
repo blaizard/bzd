@@ -243,9 +243,11 @@ export class HttpServerContext extends HttpServerContextCommon {
 
 /// Websocket context.
 export class WebsocketServerContext {
-	constructor(ws, params) {
+	constructor(ws, params, request) {
 		this.ws = ws;
 		this.params = params;
+		this.request = request;
+		this.session = null;
 	}
 
 	getParams() {
@@ -254,6 +256,26 @@ export class WebsocketServerContext {
 
 	getParam(name, defaultValue = null) {
 		return name in this.params ? this.params[name] : defaultValue;
+	}
+
+	getHeader(name, defaultValue = null) {
+		return this.request.headers[name] ?? defaultValue;
+	}
+
+	getQuery(name, defaultValue = null, cast = (v) => v) {
+		const queries = new URL(this.request.url, "http://dummy").searchParams;
+		return queries.has(name) ? cast(queries.get(name)) : defaultValue;
+	}
+
+	getCookie(name, defaultValue = null) {
+		const cookies = this.request.headers.cookie ?? "";
+		for (const entry of cookies.split(";")) {
+			const [key, ...value] = entry.trim().split("=");
+			if (key === name) {
+				return value.join("=");
+			}
+		}
+		return defaultValue;
 	}
 
 	send(data) {
