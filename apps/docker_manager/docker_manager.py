@@ -379,11 +379,7 @@ if __name__ == "__main__":
 	def monitorWorkload() -> None:
 		data = docker.getDockerData()
 		updatedData = {f"{args.uid}.{key}": value for key, value in data.items()}
-		try:
-			node.publishMultiNodes(data=updatedData)
-		except Exception:
-			# Ignore any errors, we don't want to crash if something is wrong on the server side.
-			pass
+		node.publishMultiNodes(data=updatedData)
 
 	scheduler = Scheduler(blocking=True)
 	scheduler.add("monitor", args.report_rate, monitorWorkload)
