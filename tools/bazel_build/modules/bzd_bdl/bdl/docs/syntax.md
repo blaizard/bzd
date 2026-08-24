@@ -98,7 +98,7 @@ where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`
 
 ## Methods
 
-A function is defined as follows:
+A method is defined as follows:
 
 ```
 method <name>(<expression1>, ...) [-> <type>] [[<contracts>...]];

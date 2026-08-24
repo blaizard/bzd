@@ -1,6 +1,6 @@
 # Template
 
-Bzd templating language (`btl`) library that supports:
+Bzd templating language (`btl`) library with the following features:
 
 ## Syntax
 

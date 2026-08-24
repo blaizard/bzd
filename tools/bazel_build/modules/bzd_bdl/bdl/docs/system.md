@@ -1,7 +1,7 @@
 # System
 
 A system is a group of targets. It constitutes one or multiple binaries that are ready for deployment.
-It is the most top level view of the composition.
+It is the top-level view of the composition.
 
 ## Definition
 

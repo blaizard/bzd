@@ -6,7 +6,7 @@ Resolving symbols within a `bdl` file is done at different build stages to allow
 
 The build process consists of 3 main stages, the `preprocess`, the `composition` and the `generators` stages.
 
-Both stages output artifacts, and the `composition` process consumes the `preprocess` artifact; this gives the possibility to cache and reuse outputs for various composition processes.
+The `preprocess` and `composition` stages output artifacts, and the `composition` process consumes the `preprocess` artifact; this gives the possibility to cache and reuse outputs for various composition processes.
 
 ## Preprocess
 
@@ -28,7 +28,7 @@ A `Symbol Map` links symbols with their actual definition. It consists of a dict
 A `Symbol Tree` is a hierarchical view of the file, it can be used to recreate a given file and should contain all the necessary
 information. It only uses symbols defined in the `Symbol Map`. In short it is a hierarchical view of a `Symbol Map`.
 
-A bdl file is serialized into a `.o` file for caching purposes. Each `.bdl` should have its corresponding `.o` file after the build process.
+A bdl file is serialized into a `.bdl.o` file for caching purposes. Each `.bdl` should have its corresponding `.bdl.o` file after the build process.
 
 ### Symbol Resolution
 

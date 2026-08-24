@@ -9,13 +9,13 @@ BDL or (Bzd Description Language) is a DSL (Domain Specific Language) for the bz
 | Application | A runnable, typically a method. Its lifetime dictates the lifetime of the overall application.            |
 | Service     | Similar to an application but its lifetime does not affect the rest of the application.                   |
 | Workload    | An application or a service.                                                                              |
-| Core        | A unit of execution, one or multiple cores that share the same memory compose an executor.                |
+| Core        | A unit of execution. One or multiple cores that share the same memory compose an executor.                |
 | Executor    | This is the minimal scheduling unit, it may contain multiple workloads and may execute on multiple cores. |
 | Platform    | Implicit dependencies that a binary relies on.                                                            |
 | Target      | A group of executors and a single platform aimed at creating a single binary.                             |
 | System      | A group of targets that constitute a complete deployable system.                                          |
 | Gateway     | Ports or connection endpoints for an executor, which aim at linking executors together.                   |
-| Buses       | Connection between executors.                                                                             |
+| Buses       | Connections between executors.                                                                            |
 
 ## Use Cases
 
