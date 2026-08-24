@@ -23,7 +23,7 @@ export default function extensionUpload(plugin, options, provider, endpoints) {
 					fullPath = fullPath.parent.joinPath(renamed);
 				}
 
-				await storage.writeFromChunk(fullPath.asPosix(), body);
+				await storage.writeFromChunk(fullPath, body);
 
 				// If only the last X files should be kept.
 				if ("rolling" in uploadOptions) {

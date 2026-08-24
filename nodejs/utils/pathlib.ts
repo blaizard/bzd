@@ -3,31 +3,31 @@ import * as Os from "os";
 
 const Exception = ExceptionFactory("pathlib");
 
-function _pathToArray(path: string | string[] | Path): string[] {
-    if (path instanceof Path) {
-        return path.path;
-    }
-    if (Array.isArray(path)) {
-        for (const segment of path) {
-            Exception.assertPrecondition(
-                typeof segment === "string" && !segment.includes("/"),
-                "Path segment '{}' is invalid: a segment cannot contain a path separator.",
-                segment,
-            );
-        }
-        return path.filter(Boolean);
-    }
-    return path.split("/").filter(Boolean);
-}
-
 class Path {
-    constructor(maybeRoot: string | null, path: string[]) {
+    constructor(maybeRoot: string | null, path: string | string[]) {
         this.maybeRoot = maybeRoot;
-        this.path = path;
+        this.path = Path._pathToArray(path);
     }
 
-    maybeRoot: string | null;
-    path: string[];
+    private maybeRoot: string | null;
+    private path: string[];
+
+    private static _pathToArray(path: string | string[] | Path): string[] {
+        if (path instanceof Path) {
+            return path.path;
+        }
+        if (Array.isArray(path)) {
+            for (const segment of path) {
+                Exception.assertPrecondition(
+                    typeof segment === "string" && !segment.includes("/"),
+                    "Path segment '{}' is invalid: a segment cannot contain a path separator.",
+                    segment,
+                );
+            }
+            return path.filter(Boolean);
+        }
+        return path.split("/").filter(Boolean);
+    }
 
     /// A string representing the final path component, excluding the drive and root, if any.
     get name(): string | undefined {
@@ -104,19 +104,20 @@ class Path {
     joinPath(...segments: (string | string[] | Path)[]): Path {
         const clone = this.clone();
         for (const segment of segments) {
-            clone.path = clone.path.concat(_pathToArray(segment));
+            clone.path = clone.path.concat(Path._pathToArray(segment));
         }
         return clone;
     }
 }
 
 const accessors = {
+    PathType: Path,
     path: (path: string | string[] | Path): Path => {
         if (path instanceof Path) {
             return path;
         }
         const maybeRoot = path[0] == "/" ? "/" : null;
-        return new Path(maybeRoot, _pathToArray(path));
+        return new Path(maybeRoot, path);
     },
     /// Return the current working directory as a Path object.
     cwd(): Path {

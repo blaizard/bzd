@@ -1,0 +1,12 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "plugin",
+    srcs = ["plugin_test.js"],
+    main = "plugin_test.js",
+    deps = [
+        "//apps/artifacts/backend:plugin_tester",
+        "//apps/artifacts/plugins/storage:backend",
+        "//nodejs/core:exception",
+    ],
+)
