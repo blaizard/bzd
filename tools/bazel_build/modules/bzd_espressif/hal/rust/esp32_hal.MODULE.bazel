@@ -3,6 +3,14 @@ crates_esp32.from_specs(
     name = "crates_esp32",
 )
 crates_esp32.spec(
+    package = "esp32",
+    version = "=0.40.2",  # 0.41.0 requires esp-rom-sys 0.1.5 which needs unstable cfg_select.
+)
+crates_esp32.spec(
+    package = "esp-rom-sys",
+    version = "=0.1.4",  # 0.1.5 needs unstable cfg_select.
+)
+crates_esp32.spec(
     package = "xtensa-lx",
     version = "0.13.0",
 )

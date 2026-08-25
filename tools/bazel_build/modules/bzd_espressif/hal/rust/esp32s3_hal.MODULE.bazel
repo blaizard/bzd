@@ -7,6 +7,10 @@ crates_esp32s3.spec(
     version = "=0.35.2",  # 0.35.3 breaks.
 )
 crates_esp32s3.spec(
+    package = "esp-rom-sys",
+    version = "=0.1.4",  # 0.1.5 needs unstable cfg_select.
+)
+crates_esp32s3.spec(
     package = "xtensa-lx",
     version = "0.13.0",
 )
