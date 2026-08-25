@@ -96,7 +96,7 @@ mkdir -p "\\$HOME/.dtach"
 name="\\${1:-main}"
 sock="\\$HOME/.dtach/\\$name"
 export BZD_SESSION="\\$name"
-exec dtach -zA "\\$sock" bash
+exec dtach -A "\\$sock" bash
 EOF""",
 			"RUN sudo chmod +x /usr/local/bin/session",
 		]
@@ -165,11 +165,10 @@ class FeatureOpenCode(Feature):
 
 	def process(self, context: "SandboxContainer") -> None:
 		# Add generic agents/commands/skills.
-		self.includes(".opencode/agents", f"{context.home}/.opencode_config/agents", context)
-		self.includes(".opencode/commands", f"{context.home}/.opencode_config/commands", context)
-		self.includes(
-			".opencode/skills/software-architecture", f"{context.home}/.opencode_config/skills/software-architecture", context
-		)
+		self.includes(".opencode/agents", f"{context.home}/.bzd/opencode/agents", context)
+		self.includes(".opencode/commands", f"{context.home}/.bzd/opencode/commands", context)
+		for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture"]:
+			self.includes(f".opencode/skills/{skill}", f"{context.home}/.bzd/opencode/skills/{skill}", context)
 		# Add Linux essential tools
 		llmEssentials = [
 			"jq",
@@ -187,13 +186,12 @@ class FeatureOpenCode(Feature):
 		self.dockerFile += [
 			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
 			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
-			f"ENV OPENCODE_CONFIG_DIR={context.home}/.opencode_config",
-			# Note: ripgrep (rp) is often used by agents.
+			f"ENV OPENCODE_CONFIG_DIR={context.home}/.bzd/opencode",
 			f"RUN sudo apt install -y nodejs npm {' '.join(llmEssentials)}",
 			"RUN sudo npm install -g opencode-ai@latest",
 			f"RUN echo '{
 				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
-			}' > {context.home}/.opencode_config/opencode.json",
+			}' > {context.home}/.bzd/opencode/opencode.json",
 		]
 		hostHome = pathlib.Path.home()
 		self.volumes += [
@@ -207,7 +205,7 @@ class FeatureOpenCode(Feature):
 		]
 
 		if not self.args.opencode or "playwright" in self.args.opencode:
-			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.opencode_config/skills/playwright-cli", context)
+			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.bzd/opencode/skills/playwright-cli", context)
 			self.dockerFile += [
 				# Newer version require node v20+ (which conflicts with ubuntu stock node version).
 				"RUN sudo npm install -g @playwright/cli@v0.1.15",
