@@ -216,6 +216,14 @@
 			handleNewTile(key) {
 				if (this.description.link) {
 					this.handleLink(key, this.description.link);
+					// Check if the link is valid.
+					this.$rest
+						.request("get", "/check-url", {
+							uid: this.uid,
+						})
+						.then((data) => {
+							this.handleActive(key, data.valid);
+						});
 				}
 			},
 			/// Format a tooltip into a printable tooltip.
@@ -295,15 +303,6 @@
 			},
 			handleLink(key, link) {
 				this.tiles[key].link = link;
-				// Check if the link is valid.
-				// Due to CORS this method doesn't work, I should use a proxy via the server.
-				this.$rest
-					.request("get", "/check-url", {
-						url: link,
-					})
-					.then((data) => {
-						this.handleActive(key, data.valid);
-					});
 			},
 			handleName(key, name) {
 				this.tiles[key].name = name;

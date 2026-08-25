@@ -2,11 +2,11 @@
     "rest": {
         "/check-url": {
             "get": {
-                "documentation": "Check that a URL is reachable.",
+                "documentation": "Check that the link of a tile is reachable.",
                 "request": {
                     "type": "query",
                     "validation": {
-                        "url": "mandatory"
+                        "uid": "mandatory"
                     }
                 },
                 "response": {

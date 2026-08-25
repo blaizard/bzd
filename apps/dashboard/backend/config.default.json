@@ -27,26 +27,11 @@
     "tests": [
         {
             "expects": {
-                "data": {
-                    "valid": false
-                },
                 "status": 200
             },
             "request": [
                 "get",
-                "/api/v1/check-url?url=http%3A%2F%2F127.0.0.1%3A22"
-            ]
-        },
-        {
-            "expects": {
-                "data": {
-                    "valid": false
-                },
-                "status": 200
-            },
-            "request": [
-                "get",
-                "/api/v1/check-url?url=unix%3A%2F%2F%2Fvar%2Frun%2Fdocker.sock"
+                "/api/v1/layout"
             ]
         }
     ]

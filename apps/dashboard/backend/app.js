@@ -1,7 +1,6 @@
 import Cache from "#bzd/nodejs/core/cache.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
-import { assertUrlSafe } from "#bzd/nodejs/core/http/client/ssrf.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
 import { makeUid } from "#bzd/nodejs/utils/uid.js";
@@ -131,21 +130,14 @@ class EventsFactory {
 		}
 	}
 
-	const checkUrlAllowList = config.layout
-		.map((data) => data.link)
-		.filter((url) => url !== undefined)
-		.map((urlString) => {
-			const url = new URL(urlString);
-			return url.hostname + (url.port ? ":" + url.port : "");
-		});
-
 	cache.register(
 		"check-url",
-		async (url) => {
+		async (uid) => {
 			try {
-				await HttpClient.request(url, {
+				const link = plugins[uid].config.link;
+				Exception.assert(link !== undefined, "The plugin '{}' has no link.", uid);
+				await HttpClient.request(link, {
 					method: "get",
-					onFetch: (fetchUrl) => assertUrlSafe(fetchUrl, { allowList: checkUrlAllowList }),
 				});
 				return true;
 			} catch (e) {
@@ -160,7 +152,7 @@ class EventsFactory {
 	// Install the REST APIs.
 
 	backend.rest.handle("get", "/check-url", async (inputs) => {
-		return { valid: await cache.get("check-url", inputs.url) };
+		return { valid: await cache.get("check-url", inputs.uid) };
 	});
 	backend.rest.handle("get", "/layout", async () => {
 		return {
