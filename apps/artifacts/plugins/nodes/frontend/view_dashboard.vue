@@ -28,7 +28,7 @@
 	import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
-	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
+	import { dateToDefaultString, timeToString } from "#bzd/nodejs/utils/to_string.js";
 	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.js";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
 	import Lock from "#bzd/nodejs/core/lock.js";
@@ -55,6 +55,8 @@
 				timestampDiff: 0,
 				// Cached information for the getTimestamp function.
 				getTimestampCache: null,
+				// The server timestamp, as provided by the last data fetch.
+				timestampServer: null,
 				inputs: new TimeseriesCollection(),
 				options: {
 					interval: "Last 15 minutes",
@@ -166,7 +168,15 @@
 					timestampOldest ? dateToDefaultString(timestampOldest) : "?",
 					timestampNewest ? dateToDefaultString(timestampNewest) : "?",
 				];
-				return result.join(" - ");
+				return result.join(" - ") + this.timeRangeAgoString;
+			},
+			timeRangeAgoString() {
+				const timestampNewest = this.timeRange[1];
+				if (timestampNewest === null) {
+					return "";
+				}
+				const durationS = Math.max(timestampMs() + this.timestampDiff - timestampNewest, 0) / 1000;
+				return ` (updated ${timeToString(durationS, 0)} ago)`;
 			},
 			formDescription() {
 				return [
@@ -222,15 +232,9 @@
 					const timestampAfter = timestampMs();
 					const timestampClient = (timestampAfter + timestampBefore) / 2;
 
-					// Get the newest timestamp.
-					const inputs = new TimeseriesCollection();
-					inputs.add(data);
-					const timestampNewest = inputs.timeRange[1];
-					inputs.close();
-
 					this.getTimestampCache = {
 						client: timestampClient,
-						server: timestampNewest,
+						server: this.timestampServer,
 					};
 				}
 
@@ -388,6 +392,10 @@
 							);
 						}
 						const results = await Promise.all(promises);
+
+						if (results.length) {
+							this.timestampServer = Math.max(...results.map((result) => result.timestamp));
+						}
 
 						let inputs = {};
 						for (const result of results) {
