@@ -1,0 +1,14 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "server",
+    srcs = [
+        "server_test.js",
+    ],
+    main = "server_test.js",
+    deps = [
+        "//nodejs/core:exception",
+        "//nodejs/core/http/mock:server",
+        "//nodejs/core/rest:server",
+    ],
+)

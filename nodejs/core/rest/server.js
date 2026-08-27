@@ -108,6 +108,7 @@ export default class RestServer extends Base {
 						break;
 					case "json":
 						data = context.getBody();
+						Exception.assertPrecondition(data !== null && typeof data === "object", "Invalid JSON body.");
 						break;
 					case "query":
 						data = context.getQueries();
