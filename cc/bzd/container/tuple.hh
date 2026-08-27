@@ -145,9 +145,9 @@ public: // API
 		return Elem<M>::get();
 	}
 
-	/// Get the number of entry of this tuple.
+	/// Get the number of entries of this tuple.
 	///
-	/// \return The number of entry.
+	/// \return The number of entries.
 	static constexpr Size size() noexcept { return sizeof...(Ts); }
 
 public: // Iterator.

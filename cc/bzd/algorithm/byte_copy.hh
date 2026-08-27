@@ -51,7 +51,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 /// \param[in] input The range of elements to copy from.
 /// \param[out] output The range of the destination range.
 ///
-/// \return The remainder of the output range.
+/// \return The number of elements copied.
 template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr bzd::Size byteCopyReturnSize(InputRange&& input, OutputRange&& output)
 {

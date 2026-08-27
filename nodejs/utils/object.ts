@@ -8,7 +8,7 @@ export function objectDifference(object1: Record<string, unknown>, object2: Reco
         } else if (!(key in object1) && key in object2) {
             difference[key] = object2[key];
         }
-        // The key is in both but they hhave different types
+        // The key is in both but they have different types
         else if (typeof object1[key] !== typeof object2[key]) {
             difference[key] = object2[key];
         }

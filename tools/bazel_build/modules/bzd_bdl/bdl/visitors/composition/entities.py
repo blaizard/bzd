@@ -320,13 +320,13 @@ class Entities:
 		"""Create a new entity for nested compositions.
 
 		Args:
-		        element: The element to be used as a based to create the entity.
+		        element: The element to be used as a basis to create the entity.
 		        this: The expression used to create the component containing the composition.
 		        resolveNamespace: The namespace to be used for resolving the new entity.
 		        resolver: The resolver associated with the creator.
 		        name: The name to give to the new entry.
 
-		Return:
+		Returns:
 		        The newly created entity.
 		"""
 

@@ -39,7 +39,7 @@ class Config:
 		self.preprocessed: typing.Dict[str, typing.Any] = {}
 
 		# Preprocess the mapping for the disks. Ensure the order
-		# is reproductible by sorting the keys.
+		# is reproducible by sorting the keys.
 		mapping = self.config.get("disks", {}).get("mappings", {})
 		newMapping = []
 		for regexpr, identifier in sorted(mapping.items()):
@@ -75,5 +75,5 @@ class Config:
 		"""Get all the ups clients."""
 
 		ups = {name: UPSClient(**data) for name, data in self.config.get("ups", {}).items()}
-		# If not client is explicitly set, look if there is a default NUT server.
+		# If no client is explicitly set, look if there is a default NUT server.
 		return ups if ups else {"": UPSClient()}

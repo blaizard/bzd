@@ -273,7 +273,8 @@ class SymbolMap:
 		"""
 		Insert a new element into the symbol map.
 		Args:
-		        fqn: Full qualified name.
+		        name: The name of the element.
+		        namespace: The namespace associated with the element.
 		        path: Path associated with the element.
 		        element: Element to be registered.
 		        group: Group associated with the element, will be used for filtering.

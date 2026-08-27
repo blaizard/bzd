@@ -278,7 +278,7 @@ export default class PersistenceDisk {
 
 			Log.debug("Data successfully {}", typeof data === "undefined" ? "reset" : "set");
 
-			// Increase the savepoitn version at the end to ensure that if a savepoint
+			// Increase the savepoint version at the end to ensure that if a savepoint
 			// is currently running with the old data, it will be discarded.
 			this.savepointVersion++;
 			// Only if everything went well, set the ready flag

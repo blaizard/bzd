@@ -15,7 +15,7 @@ export default class KeyValueStoreMemory extends KeyValueStore {
 		this.buckets = {};
 		this.options = options;
 
-		// Initialize ansynchronously the rest of the data
+		// Initialize asynchronously the rest of the data
 		Log.info("Using memory key value store DB with name '{}'.", this.name);
 	}
 

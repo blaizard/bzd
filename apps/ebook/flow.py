@@ -41,7 +41,7 @@ class ActionInterface(typing.Protocol):
 
 @dataclasses.dataclass
 class FlowState:
-	"""Describte the status of a the flow for a single document."""
+	"""Describe the status of the flow for a single document."""
 
 	provider: Provider
 	flow: FlowSchemaType

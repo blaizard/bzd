@@ -97,7 +97,7 @@ class VisitorPrint:
 		"""Convert a diff into its text representation.
 
 		Args:
-		        diff: The diff to convert.
+		        diffContent: The diff to convert.
 		        padding: The padding in term of characters.
 
 		Returns:

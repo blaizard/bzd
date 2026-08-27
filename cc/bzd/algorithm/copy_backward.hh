@@ -13,7 +13,7 @@ namespace bzd::algorithm {
 /// \param[in] last The ending of the range of elements to copy from.
 /// \param[out] result The end of the destination range.
 ///
-/// \return Output iterator to the element in the destination range, one past the last element copied.
+/// \return Output iterator in the destination range, pointing at the last element copied.
 template <concepts::bidirectionalIterator InputIt, concepts::sentinelFor<InputIt> InputSentinel, concepts::bidirectionalIterator OutputIt>
 constexpr OutputIt copyBackward(InputIt first, InputSentinel last, OutputIt result) noexcept
 {

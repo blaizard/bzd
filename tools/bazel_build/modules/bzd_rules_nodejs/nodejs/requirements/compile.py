@@ -145,7 +145,7 @@ class RequirementsFactory:
 			)
 			packagesByName[name][package] = []
 			# We take optional dependencies because of `rollup` which declares some of the things as optional.
-			# It is fine, be we should filter everything by platform/cpu as well.
+			# It is fine, but we should filter everything by platform/cpu as well.
 			dependencies = (
 				data.get("dependencies", {}) | data.get("optionalDependencies", {}) | (data.get("peerDependencies") or {})
 			)

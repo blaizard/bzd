@@ -71,7 +71,7 @@ function autoResize(el) {
 function registerObserver(el) {
 	const uid = setElementId(el);
 
-	// Hide the element the fist time
+	// Hide the element the first time
 	el.style.opacity = 0;
 
 	if (typeof ResizeObserver !== "undefined") {

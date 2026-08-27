@@ -80,7 +80,7 @@ public:
 	constexpr T operator++() noexcept { return ++this->get(); }
 	constexpr T operator++(int) noexcept { return this->get()++; }
 
-	/// Atomically replaces the underlying value with \b value. The operation is read-modify-write operation.
+	/// Atomically replaces the underlying value with \b value. The operation is a read-modify-write operation.
 	/// Memory is affected according to the value of order.
 	/// \param value The value to assign.
 	/// \param order The memory order constraints to enforce.

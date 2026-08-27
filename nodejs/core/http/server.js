@@ -281,7 +281,7 @@ export default class HttpServer {
 			options,
 		);
 
-		// Create the Epxress options
+		// Create the Express options
 		const indexAbsolute = Path.join(absolutePath, options.index);
 		const optionsExpress = {
 			maxAge: options.maxAge,
@@ -495,7 +495,7 @@ function resetErrorHandler(reject) {
 }
 
 // It is important that the signature of this function contains the "next" argument,
-// oterhwise it will not be handled correctly. From Express documentation:
+// otherwise it will not be handled correctly. From Express documentation:
 // "error-handling functions have four arguments instead of three: (err, req, res, next)"
 // eslint-disable-next-line no-unused-vars
 function middlewareErrorHandler(e, req, res, next) {

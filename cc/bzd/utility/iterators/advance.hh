@@ -10,7 +10,7 @@
 
 namespace bzd {
 
-/// Increments given iterator `it` for `n` times.
+/// Increments the given iterator `it` for `n` times.
 template <concepts::inputOrOutputIterator Iterator>
 requires(concepts::syncIterator<Iterator>)
 constexpr void advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n) noexcept
@@ -40,7 +40,7 @@ constexpr void advance(Iterator& it, const typeTraits::IteratorDifference<Iterat
 	}
 }
 
-/// Increments given iterator `it` until `it` == `bound`.
+/// Increments the given iterator `it` until `it` == `bound`.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 requires(concepts::syncIterator<Iterator>)
 constexpr void advance(Iterator& it, Sentinel bound) noexcept
@@ -62,7 +62,7 @@ constexpr void advance(Iterator& it, Sentinel bound) noexcept
 	}
 }
 
-/// Increments given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
+/// Increments the given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 requires(concepts::syncIterator<Iterator>)
 constexpr auto advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n, Sentinel bound) noexcept

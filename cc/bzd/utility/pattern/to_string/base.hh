@@ -28,7 +28,7 @@ struct ToString : ::bzd::ToString<typeTraits::RemoveCVRef<T>>
 
 /// Format the value of a data type into a byte stream.
 ///
-/// \param range The input range to be written to.
+/// \param range The output range to be written to.
 /// \param args The value(s) to be written.
 /// \return The number of bytes written in case of success, otherwise an empty result.
 template <concepts::outputByteCopyableRange Range, class... Args>

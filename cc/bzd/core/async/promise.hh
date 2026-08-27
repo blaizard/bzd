@@ -45,8 +45,8 @@ public:
 			executable = executable->continuation_.get<PromiseBase*>();
 		}
 
-		// All cancellation must terminate with a callback, if this fails it means that
-		// this cancellation async does not have a parent which should never happen.
+		// All cancellations must terminate with a callback; if this fails, it means that
+		// this cancellation async does not have a parent, which should never happen.
 		bzd::assert::isTrue(executable->continuation_.is<OnTerminateCallback>());
 
 		context_ = &context;

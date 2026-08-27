@@ -42,7 +42,7 @@ struct ResultStaticString
 	StringView str;
 };
 
-/// Parse a static string and returns when there is data to be processed.
+/// Parse a static string and return when there is data to be processed.
 ///
 /// Returns isMetadata = true when it reaches a single '{' character.
 /// Double '{{' or '}}' are returned as a unique character.

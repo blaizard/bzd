@@ -58,7 +58,7 @@ public: // Constructors/assignments.
 public:
 	/// \brief Returns the number of elements that the array can hold.
 	///
-	/// \return Maximum number of element this array can hold.
+	/// \return Maximum number of elements this array can hold.
 	static constexpr Size capacity() noexcept { return maxCapacity; }
 	static constexpr Size size() noexcept { return maxCapacity; }
 };

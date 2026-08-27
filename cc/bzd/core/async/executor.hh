@@ -37,7 +37,7 @@ public:
 	[[nodiscard]] constexpr IdType getCoreUId() const noexcept { return coreUId_; }
 	/// Get the current tick for this executor.
 	[[nodiscard]] constexpr TickType getTick() const noexcept { return tick_; }
-	/// Provide an executable to be enqued sequentially, after the execution of the current executable.
+	/// Provide an executable to be enqueued sequentially, after the execution of the current executable.
 	constexpr void setContinuation(Continuation&& continuation) noexcept
 	{
 		bzd::assert::isTrue(continuation_.template is<bzd::Monostate>());

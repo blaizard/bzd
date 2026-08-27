@@ -89,7 +89,7 @@ public:
 
 	/// \brief Returns the maximum number of elements the map can hold.
 	///
-	/// \return Maximum number of element this map can hold.
+	/// \return Maximum number of elements this map can hold.
 	[[nodiscard]] constexpr Size capacity() const noexcept { return data_.capacity(); }
 
 	/// Insert a new element or replace the existing one

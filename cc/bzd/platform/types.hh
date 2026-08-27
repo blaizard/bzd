@@ -59,7 +59,7 @@ static_assert(sizeof(Float64) == 8, "float must be 64-bit long.");
 /// https://en.cppreference.com/w/cpp/language/reinterpret_cast#Type_aliasing
 using Byte = ::std::byte;
 
-/// Constant representing non-position value.
+/// Constant representing the absence of a position.
 static constexpr const Size npos = static_cast<Size>(-1);
 
 } // namespace bzd

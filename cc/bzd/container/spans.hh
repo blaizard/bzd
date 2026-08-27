@@ -55,8 +55,8 @@ public:
 
 	/// Create a sub view of this spans.
 	///
-	/// \param[in] offset From where to start to copy.
-	/// \param[in] count The number of elements to copy.
+	/// \param[in] offset The offset from which to start.
+	/// \param[in] count The number of elements to include.
 	/// \return A sub view of the current object.
 	constexpr auto subSpans(const Size offset, const Size count = npos) const noexcept
 	{

@@ -17,7 +17,7 @@ struct EqualAnyOfRangeValueAdapter
 	constexpr const typeTraits::RangeValue<Range>& operator()(const typeTraits::RangeValue<Range>& value) const noexcept { return value; }
 };
 
-/// Given a sorted range of range, check if any of them equals the tested range.
+/// Given a sorted range of ranges, check if any of them is a prefix of the tested range.
 template <concepts::forwardIterator Iterator,
 		  concepts::sentinelFor<Iterator> Sentinel,
 		  concepts::forwardRange Range,
@@ -62,7 +62,7 @@ auto startsWithAnyOf(Iterator first, Sentinel last, Range range, RangeValueAdapt
 	return bzd::end(range);
 }
 
-/// Given a sorted range of range, check if any of them equals the tested range.
+/// Given a sorted range of ranges, check if any of them is a prefix of the tested range.
 template <concepts::forwardRange Range1, concepts::forwardRange Range2>
 auto startsWithAnyOf(Range1&& range1, Range2&& range2) noexcept
 {

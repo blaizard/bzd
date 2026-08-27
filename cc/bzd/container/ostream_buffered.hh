@@ -16,7 +16,7 @@ template <Size capacityBytes>
 class OStreamBuffered : public bzd::OStream
 {
 public:
-	/// Create an output stream buffered object from an existing string.
+	/// Create an output stream buffered object from an existing output stream.
 	constexpr explicit OStreamBuffered(bzd::OStream& stream) noexcept : stream_{stream} {}
 
 	/// Write new data to the buffer, if full the data is automatically flushed.

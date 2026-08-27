@@ -36,7 +36,7 @@ public: // API.
 
 	constexpr void lockShared() noexcept { while (!tryLockShared()); }
 
-	/// Tries to lock the mutex. Returns immediately.
+	/// Tries to lock the mutex in shared mode. Returns immediately.
 	/// On successful lock acquisition returns true, otherwise returns false.
 	constexpr Bool tryLockShared() noexcept
 	{

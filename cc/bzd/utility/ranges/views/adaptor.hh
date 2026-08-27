@@ -20,7 +20,7 @@ struct Adaptor
 
 } // namespace bzd::ranges
 
-/// No need to require the borroedRange here as it is already enforced by the adaptor.
+/// No need to require the borrowedRange here as it is already enforced by the adaptor.
 template <bzd::concepts::range Range, class Adaptor>
 constexpr auto operator|(Range&& range, Adaptor&& adaptor) noexcept
 {

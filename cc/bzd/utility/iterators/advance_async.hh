@@ -5,7 +5,7 @@
 
 namespace bzd {
 
-/// Increments given iterator `it` for `n` times.
+/// Increments the given iterator `it` for `n` times.
 template <concepts::inputOrOutputIterator Iterator>
 requires(concepts::asyncIterator<Iterator>)
 bzd::Async<> advance(Iterator& it, const typeTraits::IteratorDifference<Iterator> n) noexcept
@@ -36,7 +36,7 @@ bzd::Async<> advance(Iterator& it, const typeTraits::IteratorDifference<Iterator
 	co_return {};
 }
 
-/// Increments given iterator `it` until `it` == `bound`.
+/// Increments the given iterator `it` until `it` == `bound`.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 requires(concepts::asyncIterator<Iterator>)
 bzd::Async<> advance(Iterator& it, Sentinel bound) noexcept
@@ -59,7 +59,7 @@ bzd::Async<> advance(Iterator& it, Sentinel bound) noexcept
 	co_return {};
 }
 
-/// Increments given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
+/// Increments the given iterator `it` for `n` times, or until `it` == `bound`, whichever comes first.
 template <concepts::inputOrOutputIterator Iterator, concepts::sentinelFor<Iterator> Sentinel>
 requires(concepts::asyncIterator<Iterator>)
 bzd::Async<typeTraits::IteratorDifference<Iterator>> advance(Iterator& it,

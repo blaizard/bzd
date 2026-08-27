@@ -19,7 +19,7 @@ public:
 	// Start a workload on the core and return immediately.
 	[[nodiscard]] virtual bzd::Result<void, bzd::Error> start(const bzd::FunctionRef<void(Core&)> workload) noexcept = 0;
 
-	// Initialize the core.
+	// Stop the core.
 	[[nodiscard]] virtual bzd::Result<void, bzd::Error> stop() noexcept = 0;
 
 	// Get the current stack usage.

@@ -61,7 +61,7 @@ export async function handleDataGet(
 
 	keys = keys ?? false;
 
-	// Sanitiy checks.
+	// Sanity checks.
 	if (keys) {
 		Exception.assertPrecondition(metadata === undefined, "'metadata' cannot be set with 'keys'");
 		Exception.assertPrecondition(count === undefined, "'count' cannot be set with 'keys'");

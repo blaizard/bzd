@@ -248,7 +248,7 @@ async function dragStart(e) {
 			dragElt.classList.add(DRAG_ELEMENT);
 			curConfig.dragEltClass && dragElt.classList.add(curConfig.dragEltClass);
 
-			// Happened it to the dom
+			// Append it to the DOM
 			document.body.appendChild(dragElt);
 		}
 

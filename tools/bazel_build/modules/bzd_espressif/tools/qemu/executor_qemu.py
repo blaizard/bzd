@@ -41,7 +41,6 @@ def tryReadExitCode(output: str) -> typing.Optional[int]:
 	"""Identify the exit code if any.
 
 	Args:
-	        binary: The binary to get the symbol from.
 	        output: The output string.
 	"""
 

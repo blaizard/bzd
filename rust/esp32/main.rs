@@ -6,7 +6,7 @@ use esp_hal::{
     gpio::{Level, Output, OutputConfig},
     main,
     time::{Duration, Instant},
-}; // Forces the create to be linked
+}; // Forces the crate to be linked
 
 esp_bootloader_esp_idf::esp_app_desc!();
 

@@ -50,7 +50,7 @@ public:
 	}
 
 private:
-	// When this counter is non-null it means that discarding is not possible.
+	// When this counter is non-zero it means that discarding is not possible.
 	mutable bzd::Atomic<bzd::Size> discardCounter_{0};
 };
 

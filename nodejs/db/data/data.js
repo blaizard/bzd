@@ -39,7 +39,7 @@ export default class Data {
 			//    b: { c: { SPECIAL_KEY_FOR_VALUE: "b.c", "d": { SPECIAL_KEY_FOR_VALUE: "b.c.d" } }},
 			//    a.average: {SPECIAL_KEY_FOR_VALUE: "a.average"},
 			// }
-			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys form leaf nodes.
+			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys from leaf nodes.
 			//
 			let tree = {};
 			if (uid in this.storage) {
@@ -166,17 +166,17 @@ export default class Data {
 	/// The value might correspond to a time series, where the newest values come first.
 	///
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
-	///         Or null, if there is reference to this data (wrong uid/internal).
+	///         Or null, if there is no reference to this data (wrong uid/internal).
 	async getExternal_({ uid, key, count, after = null, before = null }) {
 		return await this.options.external(uid, key, count, after, before);
 	}
 
-	/// Get a single key/value paur with its metadata.
+	/// Get a single key/value pair with its metadata.
 	///
 	/// The value might correspond to a time series, where the newest values come first.
 	///
 	/// \return An array of tuple, containing the timestamps and their corresponding value.
-	///         Or null, if there is reference to this data (wrong uid/internal).
+	///         Or null, if there is no reference to this data (wrong uid/internal).
 	async getWithMetadata_({ uid, key, value, count, after = null, before = null, sampling = null }) {
 		// If there is data locally.
 		if (value && value.length) {
@@ -208,8 +208,8 @@ export default class Data {
 					const countLocal = Math.round((count * durationLocal) / (before - after)) || 1;
 					const countExternal = count - countLocal;
 
-					// Downsample the local data (we don't want to upsample, create artifial data).
-					// This simple algorithm do not alter the samples and dowsample to the exact number
+					// Downsample the local data (we don't want to upsample, create artificial data).
+					// This simple algorithm does not alter the samples and downsample to the exact number
 					// of samples as the factor is guaranteed to be > 1.
 					if (countLocal < result.length) {
 						const downsamplingFactor = result.length / countLocal;

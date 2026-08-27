@@ -77,7 +77,7 @@ public:
 	///
 	/// \param pos The iterator pointing to the element before which the new element should be inserted.
 	/// \param element The element to be added.
-	///	\return A reference to the element added in case of success, empty optional otherwise.
+	/// \return A reference to the element added in case of success, empty optional otherwise.
 	[[nodiscard]] constexpr Optional<T&> insert(Iterator pos, NonOwningListElement& element) noexcept
 	{
 		if (element.next_ != nullptr)

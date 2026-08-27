@@ -86,7 +86,7 @@ public: // constructor/destructor/assignments
 	}
 
 public:
-	/// Notifies if the async is completed.
+	/// Indicates whether the async is completed.
 	[[nodiscard]] constexpr bool hasResult() const noexcept { return (handle_) ? handle_.promise().hasResult() : false; }
 
 	[[nodiscard]] constexpr bool isCanceled() const noexcept { return (handle_) ? handle_.promise().isCanceled() : false; }
@@ -112,7 +112,7 @@ public:
 	constexpr auto assertHasValue() noexcept
 	{
 		// Not compatible with re-entrant function because this moves the asynchronous into a wrapper,
-		// therefore the original async looses the ownership.
+		// therefore the original async loses the ownership.
 		static_assert(!Traits<T>::isReentrant, "Error propagation is not compatible with re-entrant asyncs.");
 		this->handle_.promise().setPropagate(
 			PromiseType::PropagateErrorCallback::template toMember<Self, &Self::hasErrorToPropagate<index>>(*this));
@@ -434,7 +434,7 @@ constexpr auto suspend(Args&&... args) noexcept
 	return bzd::async::awaitable::Suspend{bzd::forward<Args>(args)...};
 }
 
-/// Executes multiple asynchronous function according to the executor policy and return once all are completed.
+/// Executes multiple asynchronous functions according to the executor policy and returns once all are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -443,7 +443,7 @@ all(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous function according to the executor policy and return once all are completed.
+/// Executes multiple asynchronous functions according to the executor policy and returns once all are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -452,7 +452,7 @@ allParallel(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ true, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
+/// Executes multiple asynchronous functions according to the executor policy and returns once at least one of them is completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -461,7 +461,7 @@ any(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous function according to the executor policy and return once at least one of them is completed.
+/// Executes multiple asynchronous functions according to the executor policy and returns once at least one of them is completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>

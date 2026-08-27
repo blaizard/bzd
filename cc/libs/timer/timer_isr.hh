@@ -103,7 +103,7 @@ public:
 
 		bzd::ignore = list_.erase(element);
 
-		// Start the timer.
+		// Re-arm the timer.
 		alarmUpdate();
 	}
 

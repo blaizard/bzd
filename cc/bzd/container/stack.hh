@@ -9,9 +9,9 @@ namespace bzd {
 /// Describes the direction to which the stack grows.
 enum class StackDirection : UInt8
 {
-	/// The stack grows from lower address to higher
+	/// The stack grows from lower address to higher.
 	upward = 0,
-	/// The stack grows from higher address to lower
+	/// The stack grows from higher address to lower.
 	downward = 1
 };
 

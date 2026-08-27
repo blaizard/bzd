@@ -58,7 +58,7 @@ function eltOutOfScreen(elt) {
 	);
 }
 
-/// This function will watch an element and if it disepear,
+/// This function will watch an element and if it disappear,
 /// it will hide the tooltip.
 function setWatcher(elt) {
 	// Clear current watcher first
