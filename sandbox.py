@@ -455,6 +455,7 @@ RUN git clone --depth 1 https://github.com/blaizard/bzd.git /tmp/bzd
 FROM {imageBase}
 RUN apt update && apt upgrade -y && apt install -y \
 	ca-certificates \
+	software-properties-common \
 	python3 \
 	git \
 	wget \
