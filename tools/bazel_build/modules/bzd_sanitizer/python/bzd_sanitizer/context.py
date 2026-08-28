@@ -65,7 +65,6 @@ class Context:
 			"section2": "\033[0;34m",
 			"passed": "\033[0;32m",
 			"failed": "\033[0;31m",
-			"time": "\033[0;30m",
 			"command": "\033[0;33m",
 			"end": "\033[0m",
 		}
@@ -99,29 +98,40 @@ class Context:
 		self,
 		endswith: typing.Optional[typing.Sequence[str]] = None,
 		include: typing.Optional[typing.Sequence[str]] = None,
+		includeFiles: typing.Optional[typing.Set[pathlib.Path]] = None,
 		excludeFile: typing.Optional[str] = None,
 	) -> typing.Iterable[pathlib.Path]:
+		"""Enumerate the data.
+
+		Args:
+			endswith: Any file that ends with the given string.
+			include: List of filters to be included.
+			includeFiles: INclude the given set of files, must be relative to workspace.
+			excludeFile: THe exclude file to be used (similar to .gitignore).
+		"""
+
 		endswith = tuple(s.lower() for s in endswith) if endswith else None
 		includeFilter = Filter(include) if include else None
 		excludeFileCache: typing.Dict[pathlib.Path, typing.Optional[Filter]] = {}
 
-		for path in self.fileList:
+		for pathStr in self.fileList:
+			path = pathlib.Path(pathStr)
+
 			# Inclusions
-			isIncluded = not bool(endswith or includeFilter)
-			isIncluded = isIncluded or bool(endswith and path.lower().endswith(endswith))
-			isIncluded = isIncluded or bool(includeFilter and includeFilter.match(path))
+			isIncluded = not bool(endswith is not None or includeFilter is not None or includeFiles is not None)
+			isIncluded = isIncluded or bool(endswith and pathStr.lower().endswith(endswith))
+			isIncluded = isIncluded or bool(includeFilter and includeFilter.match(pathStr))
+			isIncluded = isIncluded or bool(includeFiles and (path in includeFiles))
 
 			# Exclusions
-			isIncluded = isIncluded and not (
-				excludeFile and self._excludeFile(pathlib.Path(path), excludeFile, excludeFileCache)
-			)
+			isIncluded = isIncluded and not (excludeFile and self._excludeFile(path, excludeFile, excludeFileCache))
 
 			if isIncluded:
-				yield pathlib.Path(path)
+				yield path
 
 	def printAction(self, action: str) -> _ContextPrintAction:
 		currentTime = datetime.datetime.now().strftime("%H:%M:%S")
-		lineString = f"{self.color('time')}[{currentTime}]{self.color()} {action}..."
+		lineString = f"[{currentTime}] {action}..."
 		print(lineString, end="", flush=True)
 
 		return _ContextPrintAction(self, self.lineWidth - len(lineString) + self.colorSize())

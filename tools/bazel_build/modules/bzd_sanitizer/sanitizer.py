@@ -95,6 +95,9 @@ if __name__ == "__main__":
 	parser.add_argument(
 		"--use-tag", type=str, action="append", default=[], help="Actions that match a specific tag will to be used."
 	)
+	parser.add_argument(
+		"--env", type=str, action="append", default=[], help="Propagate environment variable to the actions."
+	)
 	parser.add_argument("--all", action="store_true", help="Sanitize all files in the workspace.")
 	parser.add_argument(
 		"--check",
@@ -136,6 +139,8 @@ if __name__ == "__main__":
 	for tag in args.use_tag:
 		useActions += getTargetFromTag(workspace=args.workspace, tag=tag)
 
+	env = {env: os.environ.get(env) for env in args.env if env in os.environ}
+
 	success = True
 	try:
 		print(f"{'Checking' if context.check else 'Sanitizing'} {context.size()} file(s) in {args.workspace / args.path}:")
@@ -149,6 +154,7 @@ if __name__ == "__main__":
 				ignoreFailure=True,
 				timeoutS=600,
 				cwd=args.workspace,
+				env=env,
 			)
 
 			passed = result.getReturnCode() == 0

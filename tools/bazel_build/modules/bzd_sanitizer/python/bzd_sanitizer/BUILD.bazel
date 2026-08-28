@@ -17,8 +17,9 @@ py_library(
     srcs = [
         "worker.py",
     ],
+    imports = [".."],
     visibility = [
-        "//:__subpackages__",
+        "//visibility:public",
     ],
     deps = [
         ":context",
