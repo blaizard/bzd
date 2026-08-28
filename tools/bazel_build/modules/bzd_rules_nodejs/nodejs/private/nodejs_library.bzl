@@ -61,9 +61,9 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
     node_modules = ctx.actions.declare_directory("{}/node_modules".format(base_dir_name))
 
     package_json_content = {
-        "imports": {
+        "imports": {"#bzd/*": "./*"} | {
             "#{}/*".format(name): "./{}/*".format(path)
-            for name, path in ({"bzd": "."} | imports).items()
+            for name, path in imports.items()
         },
         "license": "UNLICENSED",
         "name": "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
