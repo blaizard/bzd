@@ -29,6 +29,7 @@ def _bzd_nodejs_install_impl(ctx):
         file_locations = provider.file_locations,
         packages = packages,
         apis = provider.apis,
+        imports = provider.imports,
         base_dir_name = base_dir_name,
     )
 

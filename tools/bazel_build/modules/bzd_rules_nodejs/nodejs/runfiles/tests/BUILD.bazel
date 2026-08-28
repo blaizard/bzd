@@ -1,0 +1,19 @@
+load("//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "runfiles",
+    srcs = [
+        "runfiles.js",
+    ],
+    args = [
+        "--data",
+        "$(rlocationpath :data.txt)",
+    ],
+    data = [
+        ":data.txt",
+    ],
+    main = "runfiles.js",
+    deps = [
+        "//nodejs/runfiles",
+    ],
+)

@@ -5,7 +5,7 @@ load("//nodejs:private/nodejs_library.bzl", "bzd_nodejs_make_node_modules")
 load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 def _bzd_nodejs_extern_binary_impl(ctx):
-    _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, base_dir_name = ctx.label.name + ".install")
+    _package_json, node_modules = bzd_nodejs_make_node_modules(ctx, ctx.attr.packages, imports = {}, base_dir_name = ctx.label.name + ".install")
 
     # Gather toolchain manager
     toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable

@@ -119,7 +119,7 @@ _vite_bundle = rule(
     toolchains = ["//nodejs:toolchain_type"],
 )
 
-def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, tools, tags, **kwargs):
+def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, tools, imports, tags, **kwargs):
     """Create a web application with NodeJs."""
 
     bzd_nodejs_library(
@@ -135,6 +135,7 @@ def _bzd_nodejs_web_binary_impl(name, visibility, srcs, packages, deps, apis, to
         ] + packages,
         deps = deps,
         tools = tools,
+        imports = imports,
         tags = ["manual", "nodejs"],
     )
 

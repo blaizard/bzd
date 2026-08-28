@@ -1,5 +1,6 @@
 """NodeJs library rule."""
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//nodejs:private/nodejs_package.bzl", "BzdNodeJsPackageInfo")
 
 # ---- Providers
@@ -10,22 +11,12 @@ BzdNodeJsDepsInfo = provider(
         "apis": "APIs files that these deps implements.",
         "data": "Data to be added at runtime.",
         "file_locations": "Tuple of 3 entries: (original file, transpiled file, virtual path when installed).",
+        "imports": "Dictionary of imports (name to path).",
         "packages": "Packages to be used.",
     },
 )
 
 # ---- Utils
-
-def bzd_nodejs_make_provider(ctx):
-    """Create a provider from a rule context."""
-
-    tool_depsets = [tool[DefaultInfo].default_runfiles.files for tool in ctx.attr.tools]
-    return BzdNodeJsDepsInfo(
-        data = depset(ctx.files.data, transitive = tool_depsets),
-        packages = depset(ctx.attr.packages),
-        apis = depset(ctx.files.apis),
-        file_locations = depset([]),
-    )
 
 def bzd_nodejs_merge(*providers):
     """Merge providers of types BzdNodeJsDepsInfo together.
@@ -37,21 +28,28 @@ def bzd_nodejs_merge(*providers):
         A BzdNodeJsDepsInfo provider containing the merged providers.
     """
 
+    imports = {}
+    for p in providers:
+        for name, path in p.imports.items():
+            _add_import(imports, name, path)
+
     provider = BzdNodeJsDepsInfo(
         data = depset(transitive = [p.data for p in providers]),
         apis = depset(transitive = [p.apis for p in providers]),
         packages = depset(transitive = [p.packages for p in providers]),
         file_locations = depset(transitive = [p.file_locations for p in providers]),
+        imports = imports,
     )
 
     return provider
 
-def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
+def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
     """Generate a node_modules and a package.json file at the root of `base_dir_name`.
 
     Args:
         ctx: The context of the rule.
         packages: The packages to be installed.
+        imports: Dictionary of imports to be added(name to path).
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
@@ -64,7 +62,8 @@ def bzd_nodejs_make_node_modules(ctx, packages, base_dir_name):
 
     package_json_content = {
         "imports": {
-            "#bzd/*": "./*",
+            "#{}/*".format(name): "./{}/*".format(path)
+            for name, path in ({"bzd": "."} | imports).items()
         },
         "license": "UNLICENSED",
         "name": "{}.{}".format(ctx.label.package.replace("/", "."), ctx.attr.name),
@@ -147,13 +146,14 @@ def bzd_nodejs_create_apis(ctx, apis, base_dir_name):
     )
     return api
 
-def bzd_nodejs_setup(ctx, file_locations, packages, apis, base_dir_name):
+def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name):
     """Setup a nodejs environment.
 
     Args:
         ctx: The context of the rule.
         file_locations: The files to be layed out.
         packages: The packages to be installed.
+        imports: Dictionary of imports to be added(name to path).
         apis: All the APIs to be merged.
         base_dir_name: The name of the directory where the node_modules should be located.
 
@@ -161,7 +161,7 @@ def bzd_nodejs_setup(ctx, file_locations, packages, apis, base_dir_name):
         A result containing all the files created and some additional accessors.
     """
 
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, packages, base_dir_name)
+    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name)
     api = bzd_nodejs_create_apis(ctx, apis, base_dir_name)
     file_mapping = bzd_nodejs_layout_files(ctx, file_locations, base_dir_name)
 
@@ -175,6 +175,22 @@ def bzd_nodejs_setup(ctx, file_locations, packages, apis, base_dir_name):
 
 def _file_to_path(file):
     return file.short_path.replace("../", "external/")
+
+def _label_to_path(label):
+    """Convert a label into a path."""
+
+    parts = ["external", label.workspace_name] if label.workspace_name else []
+    if label.package:
+        parts.append(label.package)
+    parts.append(label.name)
+    return "/".join(parts)
+
+def _add_import(imports, name, path):
+    """Safely add a new import into an existing imports dictionary."""
+
+    if name in imports and imports[name] != path:
+        fail("Duplicate import name '{}' for {} and {}".format(name, imports[name], path))
+    imports[name] = path
 
 # ---- Attributes
 
@@ -192,6 +208,9 @@ LIBRARY_ATTRS = {
         doc = "Dependencies of this rule.",
         providers = [BzdNodeJsDepsInfo],
     ),
+    "imports": attr.string_dict(
+        doc = "Import name to relative path, make the import available at #<name>/<path>",
+    ),
     "packages": attr.label_list(
         doc = "Package dependencies.",
         providers = [BzdNodeJsPackageInfo],
@@ -208,10 +227,6 @@ LIBRARY_ATTRS = {
 
 # ---- Rule
 
-def bzd_nodejs_library_get_provider(ctx):
-    rule_provider = bzd_nodejs_make_provider(ctx)
-    return bzd_nodejs_merge(rule_provider, *[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
-
 def _bzd_nodejs_library_impl(ctx):
     """Build a file tree at the root of `base_dir` and transpile the files if needed."""
 
@@ -224,11 +239,17 @@ def _bzd_nodejs_library_impl(ctx):
     apis = depset(ctx.files.apis, transitive = [deps_providers.apis])
     file_locations = deps_providers.file_locations
     file_locations_srcs = [(f, f, _file_to_path(f)) for f in ctx.files.srcs]
+    imports = deps_providers.imports
+
+    for name, path in ctx.attr.imports.items():
+        actual = paths.normalize("{}/../{}".format(_label_to_path(ctx.label), path))
+        _add_import(imports, name, actual)
 
     setup = bzd_nodejs_setup(
         ctx = ctx,
         file_locations = depset(file_locations_srcs, transitive = [file_locations]),
         packages = packages.to_list(),
+        imports = imports,
         apis = apis,
         base_dir_name = base_dir_name,
     )
@@ -271,12 +292,16 @@ def _bzd_nodejs_library_impl(ctx):
             executable = ctx.executable._tsc,
         )
 
-    return BzdNodeJsDepsInfo(
-        data = data,
-        packages = packages,
-        apis = apis,
-        file_locations = depset(transpiled_file_locations, transitive = [file_locations]),
-    )
+    return [
+        DefaultInfo(files = depset([js for js, _ in typescript.values()])),
+        BzdNodeJsDepsInfo(
+            data = data,
+            packages = packages,
+            apis = apis,
+            file_locations = depset(transpiled_file_locations, transitive = [file_locations]),
+            imports = imports,
+        ),
+    ]
 
 bzd_nodejs_library = rule(
     doc = "A library contains all dependencies used for this target.",

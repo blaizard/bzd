@@ -131,7 +131,7 @@ _bzd_nodejs_test = rule(
     cfg = _bzd_nodejs_transition,
 )
 
-def _bzd_nodejs_binary_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+def _bzd_nodejs_binary_macro_impl(name, visibility, data, tools, imports, deps, packages, srcs, apis, tags, **kwargs):
     bzd_nodejs_library(
         name = name + ".library",
         apis = apis,
@@ -139,6 +139,7 @@ def _bzd_nodejs_binary_macro_impl(name, visibility, data, tools, deps, packages,
         deps = deps,
         data = data,
         tools = tools,
+        imports = imports,
         packages = packages,
         tags = ["nodejs", "manual"],
     )
@@ -167,7 +168,7 @@ bzd_nodejs_binary = macro(
     } | LIBRARY_ATTRS,
 )
 
-def _bzd_nodejs_test_macro_impl(name, visibility, data, tools, deps, packages, srcs, apis, tags, **kwargs):
+def _bzd_nodejs_test_macro_impl(name, visibility, data, tools, imports, deps, packages, srcs, apis, tags, **kwargs):
     bzd_nodejs_library(
         name = name + ".library",
         apis = apis,
@@ -175,6 +176,7 @@ def _bzd_nodejs_test_macro_impl(name, visibility, data, tools, deps, packages, s
         deps = deps,
         data = data,
         tools = tools,
+        imports = imports,
         packages = packages,
         tags = ["nodejs", "manual"],
     )
