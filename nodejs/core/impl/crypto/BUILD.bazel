@@ -1,11 +1,20 @@
 load("@bzd_lib//:symlink.bzl", "bzd_symlink")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 
 bzd_symlink(
-    name = "backend",
+    name = "generated",
     input = select({
-        "@bzd_rules_nodejs//:nodejs": "buffer.base64.js",
-        "@bzd_rules_nodejs//:nodejs_web": "window.btoa.js",
+        "@bzd_rules_nodejs//:nodejs": "buffer.base64.ts",
+        "@bzd_rules_nodejs//:nodejs_web": "window.btoa.ts",
     }),
-    output = "backend.js",
+    output = "backend.ts",
+)
+
+bzd_nodejs_library(
+    name = "backend",
+    srcs = [
+        "backend.ts",
+        "types.ts",
+    ],
     visibility = ["//nodejs/core:__pkg__"],
 )

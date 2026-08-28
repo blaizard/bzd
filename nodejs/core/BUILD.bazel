@@ -76,12 +76,12 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "crypto",
     srcs = [
-        "crypto.js",
-        "//nodejs/core/impl/crypto:backend.js",
+        "crypto.ts",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":exception",
+        "//nodejs/core/impl/crypto:backend",
     ],
 )
 
