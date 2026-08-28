@@ -19,6 +19,8 @@ sh_binary_wrapper(
     name = "sanitizer",
     args = [
         "--use",
+        "@bzd_lib//actions/secret",
+        "--use",
         "@bzd_sanitizer//actions/bdl",
         "--use",
         "@bzd_sanitizer//actions/markdown",
@@ -46,6 +48,8 @@ sh_binary_wrapper(
         "//tools/shell:generate",
         "--use-tag",
         "sanitizer",
+        "--env",
+        "BZD_KEY_FILE",
     ],
     binary = "@bzd_sanitizer//:sanitizer",
 )
