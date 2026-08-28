@@ -15,7 +15,7 @@ This mono-repository enables the following technologies:
 ## Overview
 
 This framework is built to run on all sorts of embedded platforms, from bare-metal 8-bit microcontrollers to high-performance compute units.
-It is made to remove any dependencies from STL, but provide a similar set of components and utilities to develop applications in an
+It is made to remove any dependencies from STL, but to provide a similar set of components and utilities to develop applications in an
 efficient and safe manner.
 
 It features the following:
@@ -112,7 +112,7 @@ bazel run @rules_rust//tools/rust_analyzer:gen_rust_project -- //rust/...
 
 The code in this repository follows several principles regarding naming conventions. The following rules are applied cross languages.
 
-- Files and directories are named lower case `snake_case` using only the characters matching the regexpr: `[a-z0-9_/.]`. This is enforced by tools/bazel_build/modules/bzd_sanitizer/actions/structure.
+- Files and directories are named lower case `snake_case` using only the characters matching the regex: `[a-z0-9_/.]`. This is enforced by tools/bazel_build/modules/bzd_sanitizer/actions/structure.
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.
 - All types are named in `PascalCase`.
 - Non-public members (variables, functions...) are appended with a `_` character.
