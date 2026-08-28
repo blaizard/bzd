@@ -110,7 +110,7 @@ bzd_nodejs_library(
 bzd_nodejs_library(
     name = "filesystem",
     srcs = [
-        "filesystem.js",
+        "filesystem.ts",
     ],
     visibility = ["//visibility:public"],
 )
