@@ -139,7 +139,7 @@ if __name__ == "__main__":
 	for tag in args.use_tag:
 		useActions += getTargetFromTag(workspace=args.workspace, tag=tag)
 
-	env = {env: os.environ.get(env) for env in args.env if env in os.environ}
+	env = {env: os.environ[env] for env in args.env if env in os.environ}
 
 	success = True
 	try:
