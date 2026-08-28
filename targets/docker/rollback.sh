@@ -8,6 +8,9 @@ cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
 DIRECTORY="./docker-compose"
 DOCKER_COMPOSE="./docker-compose.yml"
 
+# Timeout in seconds for the docker compose up command, to prevent indefinite hangs.
+TIMEOUT_S=600
+
 # Check if the directory exists.
 if [ ! -d "$DIRECTORY" ]; then
     echo "Error: Directory '$DIRECTORY' not found."
@@ -31,14 +34,14 @@ previous="${files[$((file_count - 2))]}"
 # Revert the current file to the previous one
 # and rollback the containers.
 cp "$previous" "$DOCKER_COMPOSE"
-if ! docker compose --file "$DOCKER_COMPOSE" up -d; then
+if ! timeout "$TIMEOUT_S" docker compose --file "$DOCKER_COMPOSE" up -d; then
 
     # On failure, restore the current file.
     echo "Error: Failed to roll back to $previous"
     echo "Restoring $current..."
 
     cp "$current" "$DOCKER_COMPOSE"
-    docker compose --file "$DOCKER_COMPOSE" up -d
+    timeout "$TIMEOUT_S" docker compose --file "$DOCKER_COMPOSE" up -d
 
     exit 1
 fi

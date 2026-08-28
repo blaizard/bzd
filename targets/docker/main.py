@@ -21,6 +21,9 @@ from targets.docker.registry import DockerRegistry
 from targets.docker.docker_compose import DockerCompose
 from targets.docker.config import STABLE_VERSION
 
+# Maximum time in seconds to wait for a deploy or rollback command to complete before failing.
+COMMAND_TIMEOUT_S = 600
+
 
 class CommonParameters:
 	def __init__(self, port: int, version: str) -> None:
@@ -72,12 +75,14 @@ class ContainerState:
 	inspect: typing.Dict[str, typing.Any]
 
 	def isHealthy(self) -> typing.Optional[Result[bool, str]]:
-		"""Check if the container is healthy."""
+		"""Check if the container is healthy.
 
-		# If it restarted, it is not healthy.
-		if self.inspect.get("RestartCount", 0) > 0:
-			return Result.makeError("Container restarted")
+		A container is considered healthy if it is currently running, regardless of past restarts.
+		"""
+
 		state = self.inspect.get("State", {})
+		if state.get("Running", False):
+			return None
 		if state.get("ExitCode", 0) != 0:
 			return Result.makeError(f"Exit code == {state.get('ExitCode')}")
 		if state.get("Error", "") != "":
@@ -86,11 +91,15 @@ class ContainerState:
 			return Result.makeError("Dead")
 		if state.get("OOMKilled", False):
 			return Result.makeError("OOMKilled")
-		return None
+		return Result.makeError("Container is not running")
 
 	def getId(self) -> str:
 		"""Get the name of the container."""
 		return str(self.inspect["Id"])
+
+	def getRestartCount(self) -> int:
+		"""Get the number of times the container has been restarted."""
+		return int(self.inspect.get("RestartCount", 0))
 
 	def printLogs(self, handle: typing.Any) -> None:
 		"""Get the logs of the container."""
@@ -193,7 +202,25 @@ def rollback(handle: typing.Any, directory: pathlib.Path) -> None:
 
 	print(f"Rolling back {directory}...", flush=True)
 	rollbackScript = directory / "rollback.sh"
-	handle.command([str(rollbackScript)])
+	handle.command([str(rollbackScript)], timeoutS=COMMAND_TIMEOUT_S)
+
+
+def rollbackUnhealthyContainer(
+	handle: typing.Any,
+	directory: pathlib.Path,
+	name: str,
+	state: ContainerState,
+	error: typing.Optional[str] = None,
+) -> None:
+	"""Report an unhealthy container, roll back the application and exit."""
+
+	print(f"- ERROR: {name} is not healthy, rolling back to previous version.", flush=True)
+	if error is not None:
+		print(f"Reported error: {error}", flush=True)
+	print(f"Logs of {name}:", flush=True)
+	state.printLogs(handle)
+	rollback(handle, directory)
+	sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -354,7 +381,10 @@ if __name__ == "__main__":
 					]
 				)
 				print("Restarting containers.", flush=True)
-				handle.command(["docker", "compose", "--file", str(dockerComposeFile), "up", "-d"])
+				handle.command(
+					["docker", "compose", "--file", str(dockerComposeFile), "up", "-d"],
+					timeoutS=COMMAND_TIMEOUT_S,
+				)
 
 				# Gather all the docker compose files from existing and previous versions and delete the too old ones.
 				dockerComposeFiles = sorted(
@@ -381,22 +411,24 @@ if __name__ == "__main__":
 					f"Waiting maximum {args.health_check_time} seconds for the application to start.",
 					flush=True,
 				)
+				# Capture the restart counts to detect containers that restarted during the health check.
+				restartCountsBefore = {
+					name: state.getRestartCount() for name, state in getStatesFromDockerCompose(handle, dockerComposeFile).items()
+				}
 				started = time.time()
-				while time.time() - started < args.health_check_time:
+				while time.time() - started <= args.health_check_time + 1:
 					time.sleep(1)
 					statuses = getStatesFromDockerCompose(handle, dockerComposeFile)
+					# Roll back immediately if a single container is unhealthy.
 					for name, state in statuses.items():
 						maybeResult = state.isHealthy()
 						if maybeResult is not None and maybeResult.hasError():
-							print(
-								f"- ERROR: {name} is not healthy, rolling back to previous version.",
-								flush=True,
-							)
-							print(f"Reported error: {maybeResult.error}", flush=True)
-							print(f"Logs of {name}:", flush=True)
-							state.printLogs(handle)
-							rollback(handle, directory)
-							sys.exit(1)
+							rollbackUnhealthyContainer(handle, directory, name, state, maybeResult.error)
+				# Roll back if a container restarted during the health check.
+				statuses = getStatesFromDockerCompose(handle, dockerComposeFile)
+				for name, state in statuses.items():
+					if state.getRestartCount() > restartCountsBefore.get(name, 0):
+						rollbackUnhealthyContainer(handle, directory, name, state)
 				print("Applications seem healthy, continuing.", flush=True)
 
 			# Garbage collect some of the images if needed.

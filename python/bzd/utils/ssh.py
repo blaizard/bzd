@@ -28,8 +28,18 @@ class _SSHInteractiveHandle:
 		stderr: bool = False,
 		ignoreFailure: bool = False,
 		maxOutputSize: int = 1000000,
+		timeoutS: typing.Optional[float] = 600.0,
 	) -> ExecuteResult:
-		"""Execute a command on a remote host."""
+		"""Execute a command on a remote host.
+
+		Args:
+			cmds: The command and its arguments to execute.
+			stdout: Whether to stream the standard output.
+			stderr: Whether to stream the standard error.
+			ignoreFailure: If True, do not assert on a non-zero return code.
+			maxOutputSize: The maximum amount of buffered output.
+			timeoutS: The timeout in seconds until when the command terminates. A value of None gives an unlimited timeout.
+		"""
 
 		session = self.transport.open_session()
 		session.exec_command(shlex.join(cmds))
@@ -43,15 +53,23 @@ class _SSHInteractiveHandle:
 			while session.recv_stderr_ready():
 				stream.addStderr(session.recv_stderr(4096))
 
-		while True:
-			populateStreamer()
-			if session.exit_status_ready():
+		deadline = None if timeoutS is None else time.monotonic() + timeoutS
+		isTimeout = False
+		try:
+			while True:
 				populateStreamer()
-				break
+				if session.exit_status_ready():
+					populateStreamer()
+					break
+				if deadline is not None and time.monotonic() >= deadline:
+					stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s.\n".encode())
+					isTimeout = True
+					break
+				time.sleep(0.1)
+		finally:
+			session.close()
 
-		session.close()
-
-		result = ExecuteResult(stream=stream, returncode=session.recv_exit_status())
+		result = ExecuteResult(stream=stream, returncode=1 if isTimeout else session.recv_exit_status())
 		assert ignoreFailure or result.isSuccess(), (
 			f"While executing {' '.join(cmds)}\nReturn code {result.getReturnCode()}\n{result.getOutput()}"
 		)
@@ -132,10 +150,11 @@ class SSH:
 		client = paramiko.SSHClient()  # type: ignore
 		client.load_system_host_keys()  # type: ignore
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # type: ignore
-		client.connect(hostname=self.host, port=self.port, username=self.username)  # type: ignore
+		client.connect(hostname=self.host, port=self.port, username=self.username, timeout=30)  # type: ignore
 
 		transport = client.get_transport()  # type: ignore
 		if transport.is_active():
+			transport.set_keepalive(30)
 			try:
 				transport.send_ignore()
 			except Exception as _e:
