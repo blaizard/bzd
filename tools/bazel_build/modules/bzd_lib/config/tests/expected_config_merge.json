@@ -12,15 +12,6 @@
         "value": 42
     },
     "b": 42,
-    "c": {
-        "nested": {
-            "b": 42,
-            "c": true
-        },
-        "nested2": {
-            "c": true
-        }
-    },
     "d": {
         "value": "hello"
     },

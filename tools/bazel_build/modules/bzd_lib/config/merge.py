@@ -182,15 +182,6 @@ if __name__ == "__main__":
 		metavar=("<KEY>", "<VALUE>"),
 		help="Value to be merged at a given key.",
 	)
-	parser.add_argument(
-		"--src-at",
-		dest="srcs_at",
-		default=[],
-		action="append",
-		nargs=2,
-		metavar=("<KEY>", "<FILE>"),
-		help="JSON input files to be merged at a given key.",
-	)
 
 	args = parser.parse_args()
 
@@ -222,11 +213,6 @@ if __name__ == "__main__":
 	for f in args.srcs:
 		for _, value, source in dataFromPath(f):
 			output.addDict(value, source=source, failOnConflict=True)
-
-	# - From files at a specified key.
-	for keyStr, f in args.srcs_at:
-		for _, value, source in dataFromPath(pathlib.Path(f)):
-			output.addKey(keyStr, value, source=source, failOnConflict=True)
 
 	# - From values at a specified key.
 	for keyStr, value in args.values_at:

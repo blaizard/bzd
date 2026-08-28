@@ -1,0 +1,15 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "decrypt",
+    srcs = [
+        "decrypt.py",
+    ],
+    data = [
+        ":test_key.txt",
+        ":test_secret.txt",
+    ],
+    deps = [
+        "//python/bzd_lib:secret",
+    ],
+)

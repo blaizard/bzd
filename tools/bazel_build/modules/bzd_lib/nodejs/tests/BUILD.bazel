@@ -1,0 +1,23 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "decrypt",
+    srcs = [
+        "decrypt.js",
+    ],
+    args = [
+        "--key-file",
+        "$(rlocationpath :test_key.txt)",
+        "--secret",
+        "$(rlocationpath :test_secret.txt)",
+    ],
+    data = [
+        ":test_key.txt",
+        ":test_secret.txt",
+    ],
+    main = "decrypt.js",
+    deps = [
+        "//nodejs:secret",
+        "@bzd_rules_nodejs//nodejs/runfiles",
+    ],
+)

@@ -1,0 +1,19 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+
+bzd_nodejs_library(
+    name = "secret",
+    srcs = [
+        "secret.ts",
+        "//private/secret:config.json",
+    ],
+    data = [
+        "//private/secret:config",
+    ],
+    imports = {
+        "bzd_lib": "..",
+    },
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_rules_nodejs//nodejs/runfiles",
+    ],
+)

@@ -7,6 +7,7 @@ load("//private/repository_maker:repository_maker.bzl", _bzd_http_archive = "bzd
 load("//private/repository_maker:repository_multiplatform_maker.bzl", _bzd_repository_multiplatform_maker = "bzd_repository_multiplatform_maker")
 load("//private/runner:runner.bzl", _bzd_runner_binary = "bzd_runner_binary", _bzd_runner_factory = "bzd_runner_factory", _bzd_runner_test = "bzd_runner_test")
 load("//private/runner:toolchain.bzl", _bzd_make_runner_toolchain = "bzd_make_runner_toolchain")
+load("//private/secret:secret.bzl", _bzd_secret = "bzd_secret")
 
 bzd_diff_test = _bzd_diff_test
 
@@ -23,3 +24,5 @@ bzd_repository_maker = _bzd_repository_maker
 bzd_repository_multiplatform_maker = _bzd_repository_multiplatform_maker
 bzd_http_archive = _bzd_http_archive
 bzd_http_file = _bzd_http_file
+
+bzd_secret = _bzd_secret

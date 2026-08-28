@@ -6,8 +6,11 @@ module(
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "rules_cc", version = "0.1.2")
-bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "bzd_python", version = "1.0")
+bazel_dep(name = "bzd_platforms", version = "1.0")
+bazel_dep(name = "bzd_sanitizer", version = "1.0")
+bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
@@ -20,3 +23,6 @@ use_repo(pip, pip = "bzd_lib_pip")
 # Register the passthrough runner toolchain, which doesn't use a runner and just runs the binary directly.
 # This is used by default for all runner rules, but can be overridden by specifying a different toolchain.r
 register_toolchains("//private/runner:host_toolchain")
+
+lib = use_extension("//:extensions.bzl", "lib")
+use_repo(lib, "age", "secrets")

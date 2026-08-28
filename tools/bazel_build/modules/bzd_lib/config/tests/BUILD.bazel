@@ -13,10 +13,6 @@ bzd_config_default(
     data = [
         "data.txt",
     ],
-    srcs_at = {
-        "b.json": "c.nested",
-        "c.json": "c.nested,c.nested2",
-    },
     values = {
         "d.value": "hello",
         "data": "$(location data.txt)",
@@ -48,9 +44,6 @@ bzd_diff_test(
 
 bzd_config(
     name = "config_override",
-    srcs_at = {
-        "b.json": "a",
-    },
     values = {
         "c.nested.c": "wrong",
         "d.value": "world",
