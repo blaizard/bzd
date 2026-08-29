@@ -6,4 +6,4 @@ a_nested_list = [ 0, 1, 2, 3 ]
 a_value = 42
 b = 42
 d_value = "hello"
-data = "external/bzd_lib+/config/tests/data.txt"
+data = "external/bzd_lib+/config/tests/override/data.txt"

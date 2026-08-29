@@ -1,0 +1,21 @@
+load("//:defs.bzl", "bzd_diff_test")
+load("//config:defs.bzl", "bzd_config")
+
+bzd_config(
+    name = "config_ref",
+    srcs = [
+        "ref.json",
+    ],
+    deps = [
+        "b.json",
+        "d.json",
+        "d_amend.json",
+    ],
+)
+
+bzd_diff_test(
+    name = "config_ref_test",
+    file1 = ":config_ref.json",
+    file2 = "expected_config_ref.json",
+    format = "json",
+)

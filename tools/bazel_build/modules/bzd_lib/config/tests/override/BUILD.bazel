@@ -1,8 +1,6 @@
 load("//:defs.bzl", "bzd_diff_test")
 load("//config:defs.bzl", "bzd_config", "bzd_config_default")
-load("//config/tests:defs.bzl", "bzd_config_apply_test")
-
-# ---- Simple ----
+load("//config/tests/override:defs.bzl", "bzd_config_apply_test")
 
 bzd_config_default(
     name = "config_merge",
@@ -64,25 +62,4 @@ bzd_config_apply_test(
         ":config_merge": ":config_override",
     },
     target = ":_config_merge_override_test",
-)
-
-# ---- Ref ----
-
-bzd_config_default(
-    name = "config_ref",
-    srcs = [
-        "ref.json",
-    ],
-    deps = [
-        "b.json",
-        "d.json",
-        "d_amend.json",
-    ],
-)
-
-bzd_diff_test(
-    name = "config_ref_test",
-    file1 = ":config_ref.json",
-    file2 = "expected_config_ref.json",
-    format = "json",
 )
