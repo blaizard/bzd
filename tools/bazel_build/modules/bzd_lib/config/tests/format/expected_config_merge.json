@@ -15,5 +15,5 @@
     "d": {
         "value": "hello"
     },
-    "data": "external/bzd_lib+/config/tests/override/data.txt"
+    "data": "external/bzd_lib+/config/tests/format/data.txt"
 }
