@@ -1,9 +1,9 @@
 """Configuration rules."""
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
-load("//config:private/common.bzl", "ConfigInfo")
+load("//config:private/common.bzl", "ConfigInfo", "ConfigSourceInfo")
 
-def _from_attr_to_config_info(ctx, attr):
+def _get_file_from_target(attr):
     """Read an input config attribute and convert it into a file, runfiles and data triplet."""
 
     if ConfigInfo in attr:
@@ -12,9 +12,17 @@ def _from_attr_to_config_info(ctx, attr):
         all_files = attr[DefaultInfo].files.to_list()
         if len(all_files) != 1:
             fail("There must be exactly 1 config: {}".format(attr.label))
-        return [all_files[0], ctx.runfiles(), depset()]
+        return [all_files[0], None, None]
     else:
         fail("Invalid config override target type: {}".format(attr.label))
+
+def _update_from_target(attr, runfiles, data):
+    [file, attr_runfiles, attr_data] = _get_file_from_target(attr)
+    if attr_runfiles:
+        runfiles = runfiles.merge(attr_runfiles)
+    if attr_data:
+        data = depset(transitive = [data, attr_data])
+    return [file, runfiles, data]
 
 def _bzd_config_flag_impl(ctx):
     return BuildSettingInfo(value = ctx.build_setting_value)
@@ -25,27 +33,38 @@ _bzd_config_flag = rule(
 )
 
 def _bzd_config_impl(ctx):
-    input_files = depset(ctx.files.deps)
+    input_files = []
     runfiles = ctx.runfiles().merge_all([target.default_runfiles for target in ctx.attr.data])
     data = depset(ctx.files.data)
 
     args = ctx.actions.args()
 
-    if ctx.attr.base:
-        [base, runfiles_base, data_base] = _from_attr_to_config_info(ctx, ctx.attr.base)
-        runfiles = runfiles.merge(runfiles_base)
-        data = depset(transitive = [data, data_base])
-        input_files = depset([base], transitive = [input_files])
-        args.add("--base", base)
+    # Handle files.
+    for attr in [ctx.attr.base] + ctx.attr.srcs:
+        if attr:
+            [file, runfiles, data] = _update_from_target(attr, runfiles, data)
+            input_files.append(file)
+            args.add("--src", file)
+
+    # Handle files at a given key.
+    if ctx.attr.srcs_at:
+        for key, target in ctx.attr.srcs_at.items():
+            if ConfigSourceInfo in target:
+                if target[ConfigSourceInfo].file:
+                    args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
+                    input_files.append(target[ConfigSourceInfo].file)
+                elif target[ConfigSourceInfo].content:
+                    args.add_all("--value", [key, target[ConfigSourceInfo].content])
+                else:
+                    fail("'ConfigSourceInfo' must have either 'file' or 'content' set.")
+            else:
+                [file, runfiles, data] = _update_from_target(target, runfiles, data)
+                args.add("--src-at", json.encode([key, file.path, []]))
+                input_files.append(file)
 
     # Handle inline values.
     for key, value in ctx.attr.values.items():
-        args.add_all("--value-at", [key, ctx.expand_location(value, targets = ctx.attr.data)])
-
-    # Handle files.
-    if ctx.attr.srcs:
-        args.add_all(ctx.files.srcs, before_each = "--src")
-        input_files = depset(ctx.files.srcs, transitive = [input_files])
+        args.add_all("--value", [key, ctx.expand_location(value, targets = ctx.attr.data)])
 
     if ctx.attr.include_workspace_status:
         workspace_status_files = [
@@ -54,13 +73,13 @@ def _bzd_config_impl(ctx):
         ]
         args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
         args.add_all(workspace_status_files, before_each = "--workspace-status-file")
-        input_files = depset(workspace_status_files, transitive = [input_files])
+        input_files += workspace_status_files
 
     # Build the default configuration.
     internal = ctx.actions.declare_file("{}.internal".format(ctx.label))
     args.add("--output", internal)
     ctx.actions.run(
-        inputs = input_files,
+        inputs = depset(input_files + ctx.files.deps),
         outputs = [internal],
         progress_message = "Generating default configuration for {}...".format(ctx.label),
         arguments = [args],
@@ -94,6 +113,10 @@ _bzd_config = rule(
             allow_files = [".json", ".yaml", ".yml"],
             doc = "Configuration files.",
         ),
+        "srcs_at": attr.string_keyed_label_dict(
+            allow_files = True,
+            doc = """Configuration files that will be merged at the specified key.""",
+        ),
         "values": attr.string_dict(
             doc = "Inline configuration values.",
         ),
@@ -108,10 +131,14 @@ _bzd_config = rule(
 
 def _bzd_config_update_impl(ctx):
     args = ctx.actions.args()
-    args.add_all([keyValue for keyValue in ctx.attr.set_flag[BuildSettingInfo].value if keyValue] if ctx.attr.set_flag else [], before_each = "--override-set")
 
-    [file, runfiles, data] = _from_attr_to_config_info(ctx, ctx.attr.base)
-    args.add("--base", file)
+    [file, runfiles, data] = _get_file_from_target(ctx.attr.base)
+    args.add("--src", file)
+
+    for keyValue in (ctx.attr.set_flag[BuildSettingInfo].value if ctx.attr.set_flag else []):
+        if not keyValue:
+            continue
+        args.add("--override-set", keyValue)
 
     # Build the default configuration.
     internal = ctx.actions.declare_file("{}.internal".format(ctx.label))

@@ -23,8 +23,11 @@ def isEqual(
 
 
 class UpdatePolicy(enum.Enum):
+	# Override any value if previously existing.
 	override = enum.auto()
+	# Raise an error if there is a value conflict.
 	raiseOnConflict = enum.auto()
+	# Raise an error if there was no conflict (no override).
 	raiseOnNonConflict = enum.auto()
 
 

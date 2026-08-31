@@ -7,10 +7,10 @@ import yaml
 
 from bzd.utils.dict import updateDeep, UpdatePolicy
 from config.reader import (
+	Metadata,
 	InternalFragmentList,
 	InternalFragment,
 	makeDictionary,
-	internalToDictionary,
 )
 
 
@@ -28,24 +28,21 @@ class Config:
 		self,
 		key: typing.Optional[str],
 		value: typing.Any,
+		metadata: Metadata,
 		source: str,
-		failOnConflict: bool,
+		policy: UpdatePolicy,
 	) -> None:
 		data = makeDictionary(key, value)
-		self._addData(data, source, failOnConflict)
-		self.data.append((key, value, source))
+		self._verifyData(data, source, policy)
+		self.data.append((key, value, metadata, source))
 
-	def addDict(self, data: typing.Dict[str, typing.Any], source: str, failOnConflict: bool) -> None:
-		self._addData(data, source, failOnConflict)
-		self.data.append((None, data, source))
+	def addDict(self, data: typing.Dict[str, typing.Any], metadata: Metadata, source: str, policy: UpdatePolicy) -> None:
+		self._verifyData(data, source, policy)
+		self.data.append((None, data, metadata, source))
 
-	def useBase(self, base: "Config") -> None:
-		self.data = [*base.data, *self.data]
-		self.dataAsDict = internalToDictionary(self.data)
+	def _verifyData(self, data: typing.Dict[str, typing.Any], source: str, policy: UpdatePolicy) -> None:
 
-	def _addData(self, data: typing.Dict[str, typing.Any], source: str, failOnConflict: bool) -> None:
-
-		def policy(originalValue: typing.Any, newValue: typing.Any, keys: typing.List[str]) -> None:
+		def policyOverride(originalValue: typing.Any, newValue: typing.Any, keys: typing.List[str]) -> None:
 			if originalValue is None or newValue is None:
 				return
 			if isinstance(originalValue, list) and not isinstance(newValue, list):
@@ -56,10 +53,14 @@ class Config:
 			updateDeep(
 				self.dataAsDict,
 				data,
-				policy=UpdatePolicy.raiseOnConflict if failOnConflict else policy,
+				policy=policyOverride if policy == UpdatePolicy.override else policy,
 			)
 		except KeyError as e:
-			fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
+			if policy == UpdatePolicy.raiseOnConflict:
+				fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
+			elif policy == UpdatePolicy.raiseOnNonConflict:
+				fatal(f"The key {e} from '{source}' is marked as 'override' but is not overwriting an existing key.")
+			raise
 
 
 def dataFromJson(path: pathlib.Path) -> typing.Any:
@@ -115,21 +116,24 @@ def dataFromSrc(path: pathlib.Path) -> typing.Optional[typing.Any]:
 	return None
 
 
-def dataFromPath(path: pathlib.Path) -> typing.Iterator[InternalFragment]:
+def dataFromPath(path: pathlib.Path, mustBeDictionary: bool) -> typing.Iterator[InternalFragment]:
 	"""Load the content of a file from its path."""
 
 	extension = path.suffix.lower()
 	maybeContent = dataFromSrc(path)
 	if maybeContent is not None:
-		yield (None, maybeContent, str(path))
+		yield (None, maybeContent, [], str(path))
 
 	elif extension == ".internal":
 		fragments: InternalFragmentList = json.loads(path.read_text())
-		for key, value, source in fragments:
-			yield (key, value, source)
+		for key, value, metadata, source in fragments:
+			yield (key, value, metadata, source)
+
+	elif mustBeDictionary:
+		fatal(f"File extension '{extension}' not supported: {str(path)}.")
 
 	else:
-		fatal(f"File extension '{extension}' not supported: {str(path)}.")
+		yield (None, path.read_text(), [], str(path))
 
 
 if __name__ == "__main__":
@@ -140,7 +144,6 @@ if __name__ == "__main__":
 		type=pathlib.Path,
 		help="The output path of the JSON file.",
 	)
-	parser.add_argument("--base", type=pathlib.Path, help="file to be used as a base.")
 	parser.add_argument(
 		"--override-set",
 		dest="overrideSets",
@@ -174,8 +177,16 @@ if __name__ == "__main__":
 		help="JSON input files to be merged.",
 	)
 	parser.add_argument(
-		"--value-at",
-		dest="values_at",
+		"--src-at",
+		dest="srcs_at",
+		default=[],
+		action="append",
+		help="JSON input files to be merged at a given key.",
+	)
+
+	parser.add_argument(
+		"--value",
+		dest="values",
 		default=[],
 		action="append",
 		nargs=2,
@@ -203,36 +214,45 @@ if __name__ == "__main__":
 		filteredWorkspaceStatus = {key: workspaceStatus[key] for key in args.workspaceStatusKeys if key in workspaceStatus}
 		output.addDict(
 			filteredWorkspaceStatus,
+			metadata=[],
 			source=str(workspaceStatusFile),
-			failOnConflict=True,
+			policy=UpdatePolicy.raiseOnConflict,
 		)
 		workspaceStatusKeysUsed.update(filteredWorkspaceStatus.keys())
 	assert len(workspaceStatusKeysUsed) == len(args.workspaceStatusKeys), "Some workspace status keys were not found."
 
 	# - From files.
 	for f in args.srcs:
-		for _, value, source in dataFromPath(f):
-			output.addDict(value, source=source, failOnConflict=True)
+		for key, value, metadata, source in dataFromPath(f, mustBeDictionary=True):
+			if key is None:
+				output.addDict(value, metadata=metadata, source=source, policy=UpdatePolicy.override)
+			else:
+				output.addKey(key, value, metadata=metadata, source=source, policy=UpdatePolicy.override)
+
+	# - From files at a specified key.
+	for value in args.srcs_at:
+		keyStr, f, metadata = json.loads(value)
+		for subKeyStr, value, subMetadata, source in dataFromPath(pathlib.Path(f), mustBeDictionary=False):
+			output.addKey(
+				f"{keyStr}.{subKeyStr}" if subKeyStr else keyStr,
+				value,
+				metadata=metadata + subMetadata,
+				source=source,
+				policy=UpdatePolicy.override,
+			)
 
 	# - From values at a specified key.
-	for keyStr, value in args.values_at:
-		output.addKey(keyStr, value, source="values_at", failOnConflict=True)
+	for keyStr, value in args.values:
+		output.addKey(keyStr, value, metadata=[], source="values", policy=UpdatePolicy.override)
 
 	# Base and overrides, can override existing keys.
-
-	# Apply the files.
-	if args.base:
-		base = Config()
-		for key, value, source in dataFromPath(args.base):
-			base.addKey(key, value, source=source, failOnConflict=False)
-		output.useBase(base)
 
 	# Apply the key value pairs.
 	for keyValue in args.overrideSets:
 		key, value = keyValue.strip().split("=", 1)
 		if value.startswith("[") and value.endswith("]"):
 			value = [value[1:-1]]
-		output.addKey(key, value, source="command line", failOnConflict=False)
+		output.addKey(key, value, metadata=[], source="command line", policy=UpdatePolicy.override)
 
 	outputJson = json.dumps(output.data)
 

@@ -1,0 +1,24 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "cli",
+    srcs = [
+        "cli.py",
+    ],
+    deps = [
+        "@bzd_python//bzd/utils:run",
+        "@bzd_sanitizer//python/bzd_sanitizer:context",
+        "@bzd_sanitizer//python/bzd_sanitizer:worker",
+    ],
+)
+
+sh_binary_wrapper(
+    name = "inline_secret",
+    command = "{binary} --secret {secret} \"$@\"",
+    locations = {
+        "//private/secret": "secret",
+        ":cli": "binary",
+    },
+    visibility = ["//visibility:public"],
+)

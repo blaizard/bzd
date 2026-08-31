@@ -15,10 +15,7 @@ def workload(
 	workspace, path, check, secret = args
 
 	params = ["--file", str(workspace / path)]
-	if check:
-		params += ["check"]
-	else:
-		params += ["--output", str(workspace / path), "encrypt"]
+	params += ["check"] if check else ["--output", str(workspace / path), "encrypt"]
 
 	result = localBazelBinary(
 		secret.as_posix(),

@@ -5,7 +5,7 @@ import json
 import re
 import yaml
 
-from config.reader import processKeyValues, internalToDictionary
+from config.reader import internalToDictionary, internalToKeyData
 
 
 def toJson(data: typing.Any) -> typing.Any:
@@ -48,20 +48,25 @@ if __name__ == "__main__":
 	)
 
 	args = parser.parse_args()
-	data = internalToDictionary(json.loads(args.internal.read_text()))
+	internal = json.loads(args.internal.read_text())
 
 	if args.format == "py":
 		content = """# This file was auto-generated.
 # mypy: ignore-errors
 
 """
-		for key, value in processKeyValues(data).items():
-			content += f"{toSubsetChar(key)} = {toPython(value)}\n"
+		for key, data in internalToKeyData(internal).items():
+			if isinstance(data.value, dict):
+				pass
+			else:
+				content += f"{toSubsetChar(key)} = {toPython(data.value)}\n"
 
 	elif args.format == "yaml":
+		data, _ = internalToDictionary(internal)
 		content = yaml.dump(data)
 
 	elif args.format == "json":
+		data, _ = internalToDictionary(internal)
 		content = json.dumps(data, indent=4)
 
 	else:

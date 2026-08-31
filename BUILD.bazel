@@ -19,6 +19,8 @@ sh_binary_wrapper(
     name = "sanitizer",
     args = [
         "--use",
+        "@bzd_lib//actions/inline_secret",
+        "--use",
         "@bzd_lib//actions/secret",
         "--use",
         "@bzd_sanitizer//actions/bdl",
