@@ -196,10 +196,8 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	# Keep only specific keys.
+	# Create the output configuration.
 	output = Config()
-
-	# Create the output, cannot override the same key twice.
 
 	# - From workspace status files.
 	workspaceStatusKeysUsed: typing.Set[str] = set()
@@ -245,9 +243,7 @@ if __name__ == "__main__":
 	for keyStr, value in args.values:
 		output.addKey(keyStr, value, metadata=[], source="values", policy=UpdatePolicy.override)
 
-	# Base and overrides, can override existing keys.
-
-	# Apply the key value pairs.
+	# Apply the key value pairs from the command line.
 	for keyValue in args.overrideSets:
 		key, value = keyValue.strip().split("=", 1)
 		if value.startswith("[") and value.endswith("]"):

@@ -26,7 +26,7 @@ def linux_x86_64(_module_ctx, name, use_fragment):
             "/usr/include",
         ],
         "compile_flags": [
-            # Standard includes, this is needed to avoid indefined include complain from Bazel.
+            # Standard includes, this is needed to avoid undefined include complaints from Bazel.
             "-nostdinc",
             "--no-standard-includes",
         ],

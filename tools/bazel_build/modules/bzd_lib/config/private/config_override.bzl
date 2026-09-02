@@ -89,7 +89,7 @@ def make_bzd_config_apply(target = None, providers = None, configs = None, execu
         implementation = _bzd_config_apply_impl,
         attrs = {
             "config_overrides": attr.label_list(
-                doc = "Configuration to be overritten.",
+                doc = "Configuration to be overwritten.",
                 mandatory = True,
             ),
             "config_values": attr.label_list(

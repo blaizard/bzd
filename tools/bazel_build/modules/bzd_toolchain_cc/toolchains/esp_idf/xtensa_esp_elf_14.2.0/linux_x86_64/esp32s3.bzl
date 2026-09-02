@@ -29,10 +29,10 @@ def esp32s3_linux_x86_64(_module_ctx, name, _use_fragment):
         "compile_flags": [
             # Allow long calls
             "-mlongcalls",
-            # Standard includes, this is needed to avoid indefined include complain from Bazel.
+            # Standard includes, this is needed to avoid undefined include complaints from Bazel.
             "-nostdinc",
             "--no-standard-includes",
-            # Needed for clang-tdy
+            # Needed for clang-tidy
             "-D__XTENSA__",
         ],
         "compiler": "gcc",

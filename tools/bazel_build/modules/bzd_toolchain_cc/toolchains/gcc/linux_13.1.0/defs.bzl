@@ -42,7 +42,7 @@ def linux_x86_64(_module_ctx, name, use_fragment):
             "-rdynamic",
             "-Wl,-z,relro,-z,now",
             # Link statically with the provided libstdc++.
-            # This is to avoid relying on a different libstdc++ at runtime, which improves reproductibility.
+            # This is to avoid relying on a different libstdc++ at runtime, which improves reproducibility.
             "-static-libstdc++",
             "-lm",
         ],

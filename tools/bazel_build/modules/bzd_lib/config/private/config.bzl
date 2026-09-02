@@ -4,7 +4,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//config:private/common.bzl", "ConfigInfo", "ConfigSourceInfo")
 
 def _get_file_from_target(attr):
-    """Read an input config attribute and convert it into a file, runfiles and data triplet."""
+    """Get the file from a target along with its associated runfiles and data."""
 
     if ConfigInfo in attr:
         return [attr[ConfigInfo].internal, attr[ConfigInfo].runfiles, attr[ConfigInfo].data]
@@ -140,7 +140,7 @@ def _bzd_config_update_impl(ctx):
             continue
         args.add("--override-set", keyValue)
 
-    # Build the default configuration.
+    # Build the updated configuration.
     internal = ctx.actions.declare_file("{}.internal".format(ctx.label))
     args.add("--output", internal)
     ctx.actions.run(

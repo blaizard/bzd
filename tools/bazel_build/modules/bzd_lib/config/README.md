@@ -91,7 +91,7 @@ bzd_config_default(
 
 ## Design Decisions
 
-The overwrite mechanism directly update the specific lable_flag that is registered through the extensions.
+The overwrite mechanism directly updates the specific label_flag that is registered through the extensions.
 
-This design is different from the original design, which was creating a directionary with keys equal to config default targets and values equals to config values.
+This design is different from the original design, which was creating a dictionary with keys equal to config default targets and values equal to config values.
 This dictionary was then passed to a global label flag, which all config defaults were depending on. This had the advantage to not needing the extensions, which is somewhat redundant. The big drawback is that every default config would depend on every config overwrite, which may lead to dependency loops in some cases.

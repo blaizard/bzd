@@ -5,7 +5,7 @@ load("@rules_python//python:defs.bzl", "PyInfo")
 
 _PYTHON_EXTENSIONS = ["py", "pyi"]
 _IGNORE_EXTENSIONS = [
-    "typing_extensions",  # Mypy already include 'typing_extensions', if included by another module, it will clash and mypy will complain.
+    "typing_extensions",  # Mypy already includes 'typing_extensions', if included by another module, it will clash and mypy will complain.
 ]
 
 MyPyInfo = provider(

@@ -46,7 +46,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	with args.archive.open(mode="rb") as fd:
-		# Compute the checksum, this ensure reproductibility over builds.
+		# Compute the checksum, this ensures reproducibility over builds.
 		stamp = hashlib.md5(fd.read()).hexdigest()
 		fd.seek(0)
 
