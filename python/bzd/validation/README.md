@@ -58,7 +58,7 @@ The new constraint must inherit from `Constraint`.
 The validation process is performed in 2 different steps:
 
 1. `install` the constraint. This step checks the format on the constraint itself, for example,
-   if we use `min` constraint, it ensures that it contains a single integer argument: `min(12)` for example.
+   if we use the `min` constraint, it ensures that it contains a single integer argument: `min(12)` for example.
    This step is executed during the object construction phase.
 2. `check` the constraint. This will do a check on the value itself, therefore this is performed during the
-   `validate` function call. In addition, during this step, the user can perform the following operations: - Introduce extra temporary constraint to this entry, that will be validated afterward. - Set the underlying value, this can be accessed from the result.
+   `validate` function call. In addition, during this step, the user can perform the following operations: - Introduce an extra temporary constraint to this entry, that will be validated afterward. - Set the underlying value, this can be accessed from the result.

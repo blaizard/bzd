@@ -51,24 +51,24 @@ be made available.
 To build everything, just run:
 
 ```bash
-bazel test //...
+./tools/bazel test //...
 ```
 
 This will build locally; it will fetch all tools needed to build on your machine.
 
 ### Remote
 
-To build Bazel targets, simply run Bazel with `--config=remote` appended.
+To build Bazel targets, simply run `./tools/bazel` with `--config=remote` appended.
 
 For debugging purposes, toolchains can be run locally in a docker sandbox which is very similar to what runs on remote execution.
-To enable this configuration, run bazel with `--config=docker`.
+To enable this configuration, run `./tools/bazel` with `--config=docker`.
 
 ## Documentation
 
 To build the full project documentation, run:
 
 ```bash
-bazel run //docs
+./tools/bazel run //docs
 ```
 
 ## Code Quality
@@ -77,7 +77,7 @@ All supported languages come with their set of code quality related tools.
 To run all static sanity checks, code formatters and documentation generators at once, run the following command:
 
 ```bash
-bazel run //:sanitizer
+./tools/bazel run //:sanitizer
 ```
 
 To run all tests, run the following command:
@@ -99,24 +99,24 @@ formatters and linters for YAML, JSON and Markdown are also available.
 Update `compile_commands.json`
 
 ```bash
-bazel run @bzd_sanitizer//aspects/compile_commands:build
+./tools/bazel run @bzd_sanitizer//aspects/compile_commands:build
 ```
 
 Update `rust-project.json`
 
 ```bash
-bazel run @rules_rust//tools/rust_analyzer:gen_rust_project -- //rust/...
+./tools/bazel run @rules_rust//tools/rust_analyzer:gen_rust_project -- //rust/...
 ```
 
 ## Naming Convention
 
-The code in this repository follows several principles regarding naming conventions. The following rules are applied cross languages.
+The code in this repository follows several principles regarding naming conventions. The following rules are applied across languages.
 
 - Files and directories are named lower case `snake_case` using only the characters matching the regex: `[a-z0-9_/.]`. This is enforced by tools/bazel_build/modules/bzd_sanitizer/actions/structure.
 - Variables, constants, functions, concepts, namespaces are named in `camelCase`.
 - All types are named in `PascalCase`.
 - Non-public members (variables, functions...) are appended with a `_` character.
-- All namings try to avoid abbreviations.
+- All names avoid abbreviations.
 
 ## Memory Footprint
 

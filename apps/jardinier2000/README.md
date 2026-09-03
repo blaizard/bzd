@@ -7,7 +7,7 @@
 ### Program
 
 ```bash
-bazel run //apps/jardinier2000:jardinier2000.platform --config=esp32s3 --run_under=@bzd_espressif//runner/esp32s3:uart --config=prod
+./tools/bazel run //apps/jardinier2000:jardinier2000.platform --config=esp32s3 --run_under=@bzd_espressif//runner/esp32s3:uart --config=prod
 ```
 
 ## Hardware
