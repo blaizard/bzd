@@ -1,6 +1,7 @@
 """Configuration rules."""
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("//:sh_binary_wrapper.bzl", "sh_binary_wrapper_impl")
 load("//config:private/common.bzl", "ConfigInfo", "ConfigSourceInfo")
 
 def _get_file_from_target(attr):
@@ -34,7 +35,7 @@ _bzd_config_flag = rule(
 
 def _bzd_config_impl(ctx):
     input_files = []
-    runfiles = ctx.runfiles().merge_all([target.default_runfiles for target in ctx.attr.data])
+    runfiles = ctx.runfiles(files = ctx.files.data).merge_all([target.default_runfiles for target in ctx.attr.data])
     data = depset(ctx.files.data)
 
     args = ctx.actions.args()
@@ -54,7 +55,7 @@ def _bzd_config_impl(ctx):
                     args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
                     input_files.append(target[ConfigSourceInfo].file)
                 elif target[ConfigSourceInfo].content:
-                    args.add_all("--value", [key, target[ConfigSourceInfo].content])
+                    args.add("--value", json.encode([key, target[ConfigSourceInfo].content, target[ConfigSourceInfo].metadata]))
                 else:
                     fail("'ConfigSourceInfo' must have either 'file' or 'content' set.")
             else:
@@ -64,7 +65,11 @@ def _bzd_config_impl(ctx):
 
     # Handle inline values.
     for key, value in ctx.attr.values.items():
-        args.add_all("--value", [key, ctx.expand_location(value, targets = ctx.attr.data)])
+        metadata = []
+        if value.startswith("$(path "):
+            value = value.replace("$(path ", "$(rlocationpath ", 1)
+            metadata.append("path")
+        args.add("--value", json.encode([key, ctx.expand_location(value, targets = ctx.attr.data), metadata]))
 
     if ctx.attr.include_workspace_status:
         workspace_status_files = [
@@ -182,7 +187,6 @@ def _bzd_config_convert_impl(ctx):
     # Create the additional outputs
     outputs = {
         "json": ctx.outputs.output_json,
-        "py": ctx.outputs.output_py,
         "yaml": ctx.outputs.output_yaml,
     }
     for format, file in outputs.items():
@@ -217,9 +221,6 @@ _bzd_config_convert = rule(
         "output_json": attr.output(
             doc = "Create a json configuration.",
         ),
-        "output_py": attr.output(
-            doc = "Create a python configuration.",
-        ),
         "output_yaml": attr.output(
             doc = "Create a yaml configuration.",
         ),
@@ -232,18 +233,52 @@ _bzd_config_convert = rule(
     provides = [DefaultInfo, ConfigInfo],
 )
 
-def _bzd_config_macro_impl(name, visibility, output_json, output_yaml, output_py, **kwargs):
+def _bzd_config_viewer_impl(ctx):
+    config_info = ctx.attr.config[ConfigInfo]
+    return sh_binary_wrapper_impl(
+        ctx = ctx,
+        locations = {
+            ctx.attr._config_viewer: "viewer",
+            config_info.internal: "internal",
+        },
+        output = ctx.outputs.executable,
+        command = "{viewer} --internal {internal}",
+    )
+
+_bzd_config_viewer = rule(
+    implementation = _bzd_config_viewer_impl,
+    doc = "Visualize the configuration.",
+    attrs = {
+        "config": attr.label(
+            providers = [ConfigInfo],
+            doc = "The base config to be used.",
+        ),
+        "_config_viewer": attr.label(
+            default = Label("//config:viewer"),
+            cfg = "target",
+            executable = True,
+        ),
+    },
+    executable = True,
+)
+
+def _bzd_config_macro_impl(name, visibility, output_json, output_yaml, **kwargs):
     _bzd_config(
         name = "{}.base".format(name),
         **kwargs
     )
+
     _bzd_config_convert(
         name = name,
         config = "{}.base".format(name),
         output_json = output_json if output_json else "{}.json".format(name),
         output_yaml = output_yaml if output_yaml else "{}.yaml".format(name),
-        output_py = output_py if output_py else "{}.py".format(name),
         visibility = visibility,
+    )
+
+    _bzd_config_viewer(
+        name = "{}.view".format(name),
+        config = "{}.base".format(name),
     )
 
 bzd_config = macro(
@@ -255,10 +290,6 @@ bzd_config = macro(
             doc = "Name of the generated json configuration.",
             configurable = False,
         ),
-        "output_py": attr.string(
-            doc = "Name of the generated python configuration.",
-            configurable = False,
-        ),
         "output_yaml": attr.string(
             doc = "Name of the generated yaml configuration.",
             configurable = False,
@@ -268,7 +299,7 @@ bzd_config = macro(
     },
 )
 
-def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, output_py, **kwargs):
+def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, **kwargs):
     _bzd_config(
         name = "{}.base".format(name),
         visibility = visibility,
@@ -298,8 +329,12 @@ def _bzd_config_default_macro_impl(name, visibility, output_json, output_yaml, o
         config = "{}.update".format(name),
         output_json = output_json if output_json else "{}.json".format(name),
         output_yaml = output_yaml if output_yaml else "{}.yaml".format(name),
-        output_py = output_py if output_py else "{}.py".format(name),
         visibility = visibility,
+    )
+
+    _bzd_config_viewer(
+        name = "{}.view".format(name),
+        config = "{}.base".format(name),
     )
 
 bzd_config_default = macro(
@@ -309,10 +344,6 @@ bzd_config_default = macro(
     attrs = {
         "output_json": attr.string(
             doc = "Name of the generated json configuration.",
-            configurable = False,
-        ),
-        "output_py": attr.string(
-            doc = "Name of the generated python configuration.",
             configurable = False,
         ),
         "output_yaml": attr.string(

@@ -2,7 +2,7 @@ import Cache from "#bzd/nodejs/core/cache.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import config from "#bzd/apps/dashboard/backend/config.json" with { type: "json" };
+import { configLayout, configTests } from "#bzd/apps/dashboard/backend/config_nodejs.js";
 import { makeUid } from "#bzd/nodejs/utils/uid.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.js";
@@ -85,7 +85,7 @@ class EventsFactory {
 	}
 
 	// Register plugin instances.
-	for (const data of config.layout) {
+	for (const data of configLayout()) {
 		switch (data.type || "tile") {
 			case "tile":
 				const uid = makeUid();
@@ -186,8 +186,8 @@ class EventsFactory {
 	await backend.start();
 
 	if (backend.test) {
-		Exception.assert(config.tests?.length, "No tests defined in the config while running in test mode.");
-		await backend.web.test(config.tests || []);
+		Exception.assert(configTests().length, "No tests defined in the config while running in test mode.");
+		await backend.web.test(configTests());
 		await backend.stop();
 	}
 })();

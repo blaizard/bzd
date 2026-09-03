@@ -1,5 +1,6 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 bzd_config_default(
     name = "config",
@@ -11,14 +12,19 @@ bzd_config_default(
     ],
 )
 
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "application": "configApplication",
+        "authentication": "configAuthentication",
+    },
+)
+
 bzd_nodejs_library(
     name = "backend",
     srcs = [
         "backend.js",
-        "config.json",
-    ],
-    data = [
-        ":config",
     ],
     packages = [
         "@nodejs_deps//:commander",
@@ -27,6 +33,7 @@ bzd_nodejs_library(
         "//visibility:public",
     ],
     deps = [
+        ":config_nodejs",
         "//apps/accounts/authentication:server",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
@@ -48,20 +55,17 @@ bzd_nodejs_library(
     name = "frontend",
     srcs = [
         "application.vue",
-        "config.json",
         "frontend.js",
         "views/404.vue",
         "views/logger.vue",
         "views/services.vue",
         "views/statistics.vue",
     ],
-    data = [
-        ":config",
-    ],
     visibility = [
         "//visibility:public",
     ],
     deps = [
+        ":config_nodejs",
         "//apps/accounts/authentication:client",
         "//nodejs:icons",
         "//nodejs:vue",

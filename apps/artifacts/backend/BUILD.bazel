@@ -1,6 +1,7 @@
 load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 exports_files([
     "config.nodes.compute.json",
@@ -20,6 +21,17 @@ bzd_config_default(
         "config.nodes.compute.json",
         "config.nodes.sensors.json",
     ],
+)
+
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "locks": "configLocks",
+        "tests": "configTests",
+        "tokens": "configTokens",
+        "volumes": "configVolumes",
+    },
 )
 
 bzd_nodejs_library(
@@ -80,7 +92,6 @@ bzd_nodejs_binary(
     srcs = [
         "app.js",
         "endpoints_factory.js",
-        ":config.json",
     ],
     apis = ["//apps/artifacts:api.v1.json"],
     args = [
@@ -90,7 +101,6 @@ bzd_nodejs_binary(
         "local-artifacts",
     ],
     data = [
-        ":config",
         "//apps/artifacts/frontend:frontend.bundle",
     ],
     main = "app.js",
@@ -99,6 +109,7 @@ bzd_nodejs_binary(
         "//deployment:__subpackages__",
     ],
     deps = [
+        ":config_nodejs",
         ":locks",
         ":plugin",
         "//apps/artifacts/common:utils",

@@ -1,13 +1,27 @@
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
+
+bzd_nodejs_config(
+    name = "config",
+    config = "//apps/artifacts/api:config",
+    expose = {
+        "defaultNodeVolume": "configDefaultNodeVolume",
+        "remotes": "configRemotes",
+        "token": "configToken",
+    },
+    visibility = [
+        "//apps/artifacts/api/nodejs/tests:__pkg__",
+    ],
+)
 
 bzd_nodejs_library(
     name = "common",
     srcs = [
         "common.js",
-        "//apps/artifacts/api:config.json",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":config",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",

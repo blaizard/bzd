@@ -1,4 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@bzd_python//:defs.bzl", "bzd_python_config")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 bzd_config_default(
@@ -8,6 +9,17 @@ bzd_config_default(
     ],
     include_workspace_status = ["STABLE_VERSION"],
     visibility = ["//visibility:public"],
+)
+
+bzd_python_config(
+    name = "config_python",
+    config = ":config",
+    expose = {
+        "STABLE_VERSION": "STABLE_VERSION",
+        "application": "application",
+        "updatePath": "updatePath",
+        "updatePolicy": "updatePolicy",
+    },
 )
 
 py_library(
@@ -23,16 +35,15 @@ py_binary(
     srcs = [
         "binary.py",
         "bootloader.py",
-        "config.py",
     ],
     data = [
-        ":config",
         "//apps/bootloader/tests:error",
         "//apps/bootloader/tests:noop",
         "//apps/bootloader/tests:sleep",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":config_python",
         ":utils",
         "//apps/artifacts/api/python/node",
         "//apps/artifacts/api/python/release",

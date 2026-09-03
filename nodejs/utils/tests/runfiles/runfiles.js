@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as assert from "assert";
 
-import { pathFromRLocation } from "#bzd_rules_nodejs/nodejs/runfiles/runfiles.js";
+import { pathFromRLocation } from "#bzd/nodejs/utils/runfiles.js";
 
 function getDataRLocation() {
 	const index = process.argv.indexOf("--data");

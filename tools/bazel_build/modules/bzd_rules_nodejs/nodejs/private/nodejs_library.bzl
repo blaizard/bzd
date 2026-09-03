@@ -9,16 +9,16 @@ BzdNodeJsDepsInfo = provider(
     "Provider for dependencies information",
     fields = {
         "apis": "APIs files that these deps implements.",
-        "data": "Data to be added at runtime.",
         "file_locations": "Tuple of 3 entries: (original file, transpiled file, virtual path when installed).",
         "imports": "Dictionary of imports (name to path).",
         "packages": "Packages to be used.",
+        "runfiles": "List of runfiles to be added to the runfiles of the target.",
     },
 )
 
 # ---- Utils
 
-def bzd_nodejs_merge(*providers):
+def _bzd_nodejs_merge(*providers):
     """Merge providers of types BzdNodeJsDepsInfo together.
 
     Args:
@@ -34,11 +34,11 @@ def bzd_nodejs_merge(*providers):
             _add_import(imports, name, path)
 
     provider = BzdNodeJsDepsInfo(
-        data = depset(transitive = [p.data for p in providers]),
         apis = depset(transitive = [p.apis for p in providers]),
         packages = depset(transitive = [p.packages for p in providers]),
         file_locations = depset(transitive = [p.file_locations for p in providers]),
         imports = imports,
+        runfiles = [runfile for p in providers for runfile in p.runfiles],
     )
 
     return provider
@@ -232,9 +232,8 @@ def _bzd_nodejs_library_impl(ctx):
 
     base_dir_name = ctx.label.name
 
-    deps_providers = bzd_nodejs_merge(*[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
-    tools = [tool[DefaultInfo].default_runfiles.files for tool in ctx.attr.tools]
-    data = depset(ctx.files.data, transitive = [deps_providers.data] + tools)
+    deps_providers = _bzd_nodejs_merge(*[d[BzdNodeJsDepsInfo] for d in ctx.attr.deps])
+    runfiles = deps_providers.runfiles + [ctx.runfiles(files = ctx.files.data)] + [target[DefaultInfo].default_runfiles for target in ctx.attr.tools + ctx.attr.data]
     packages = depset(ctx.attr.packages, transitive = [deps_providers.packages])
     apis = depset(ctx.files.apis, transitive = [deps_providers.apis])
     file_locations = deps_providers.file_locations
@@ -295,7 +294,7 @@ def _bzd_nodejs_library_impl(ctx):
     return [
         DefaultInfo(files = depset([js for js, _ in typescript.values()])),
         BzdNodeJsDepsInfo(
-            data = data,
+            runfiles = runfiles,
             packages = packages,
             apis = apis,
             file_locations = depset(transpiled_file_locations, transitive = [file_locations]),

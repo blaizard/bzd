@@ -5,7 +5,6 @@ bzd_nodejs_web_binary(
     srcs = [
         "app.js",
         "app.vue",
-        "//apps/accounts/example:config.json",
     ],
     apis = [
         "//apps/accounts/backend/users:api.json",
@@ -14,6 +13,7 @@ bzd_nodejs_web_binary(
     main = "app.js",
     deps = [
         "//apps/accounts/authentication:client",
+        "//apps/accounts/example:config_nodejs",
         "//nodejs/vue:authentication",
         "//nodejs/vue:rest",
     ],

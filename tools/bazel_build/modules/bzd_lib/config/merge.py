@@ -189,8 +189,6 @@ if __name__ == "__main__":
 		dest="values",
 		default=[],
 		action="append",
-		nargs=2,
-		metavar=("<KEY>", "<VALUE>"),
 		help="Value to be merged at a given key.",
 	)
 
@@ -240,8 +238,9 @@ if __name__ == "__main__":
 			)
 
 	# - From values at a specified key.
-	for keyStr, value in args.values:
-		output.addKey(keyStr, value, metadata=[], source="values", policy=UpdatePolicy.override)
+	for entry in args.values:
+		keyStr, value, metadata = json.loads(entry)
+		output.addKey(keyStr, value, metadata=metadata, source="values", policy=UpdatePolicy.override)
 
 	# Apply the key value pairs from the command line.
 	for keyValue in args.overrideSets:

@@ -29,10 +29,3 @@ bzd_diff_test(
     file2 = "expected_config_merge.yaml",
     format = "text",
 )
-
-bzd_diff_test(
-    name = "config_merge_py_test",
-    file1 = ":config_merge.py",
-    file2 = "expected_config_merge.py",
-    format = "text",
-)

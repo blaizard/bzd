@@ -1,4 +1,41 @@
+load("@bzd_lib//:defs.bzl", "bzd_write_file")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
+
+bzd_write_file(
+    name = "config.ts",
+    content = """
+export const age: string = "{age}";
+""",
+    data = [
+        "@age",
+    ],
+    substitutions = {
+        "{age}": "$(rlocationpath @age//:age)",
+    },
+)
+
+bzd_nodejs_library(
+    name = "secret",
+    srcs = [
+        "config.ts",
+        "secret.ts",
+    ],
+    data = [
+        "@age",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":runfiles",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "runfiles",
+    srcs = [
+        "runfiles.ts",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 bzd_nodejs_library(
     name = "array",

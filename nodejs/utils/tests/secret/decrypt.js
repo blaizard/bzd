@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as assert from "assert";
 
-import { decrypt } from "#bzd_lib/nodejs/secret.js";
-import { pathFromRLocation } from "#bzd_rules_nodejs/nodejs/runfiles/runfiles.js";
+import { decrypt } from "#bzd/nodejs/utils/secret.js";
+import { pathFromRLocation } from "#bzd/nodejs/utils/runfiles.js";
 
 function getKeyFile() {
 	const index = process.argv.indexOf("--key-file");

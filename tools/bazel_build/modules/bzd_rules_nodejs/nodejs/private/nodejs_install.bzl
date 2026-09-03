@@ -10,10 +10,11 @@ BzdNodeJsInstallInfo = provider(
     fields = {
         "api": "The interface metadata.",
         "file_mapping": "A mapping between the original file and the transpiled file.",
-        "files": "All the files of the installation.",
+        "files": "All the nodejs related files for the installation.",
         "modules": "Top level module names, will be used for deduplicating.",
         "node_modules": "The node_modules directory.",
         "package_json": "The package.json file located at the root.",
+        "runfiles": "The runfiles to be added to the runfiles of the target.",
     },
 )
 
@@ -53,7 +54,8 @@ def _bzd_nodejs_install_impl(ctx):
     return [
         BzdNodeJsInstallInfo(
             api = setup.api,
-            files = depset([setup.package_json, setup.api, setup.node_modules] + setup.file_mapping.values(), transitive = [provider.data]),
+            files = depset([setup.package_json, setup.api, setup.node_modules] + setup.file_mapping.values()),
+            runfiles = provider.runfiles,
             package_json = setup.package_json,
             node_modules = setup.node_modules,
             file_mapping = setup.file_mapping,

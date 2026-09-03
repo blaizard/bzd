@@ -73,7 +73,7 @@ bzd_config(
         "//apps/bootloader/tests:square",
     ],
     values = {
-        "application": "apps/bootloader/tests/square",
+        "application": "$(path //apps/bootloader/tests:square)",
     },
 )
 

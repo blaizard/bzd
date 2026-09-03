@@ -12,7 +12,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(result.getOutput().strip(), "123")
 
 	def testLocalCommandTimeout(self) -> None:
-		result = bzd.utils.run.localCommand(["sleep", "5"], ignoreFailure=True, timeoutS=0.1)
+		result = bzd.utils.run.localCommand(["sleep", "60"], ignoreFailure=True, timeoutS=0.1)
 		self.assertNotEqual(result.getReturnCode(), 0)
 		self.assertEqual(result.getStdout().strip(), "")
 		self.assertIn("timed out", result.getStderr())  # codespell:ignore

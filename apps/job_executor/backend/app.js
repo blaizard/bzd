@@ -5,7 +5,7 @@ import Args from "#bzd/apps/job_executor/backend/args.js";
 import Backend from "#bzd/nodejs/vue/apps/backend.js";
 import Commands from "#bzd/apps/job_executor/backend/commands.js";
 import pathlib from "#bzd/nodejs/utils/pathlib.js";
-import config from "#bzd/apps/job_executor/backend/config.json" with { type: "json" };
+import { configInstances, configJobs, configSandbox } from "#bzd/apps/job_executor/backend/config_nodejs.js";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.js";
 
 const Exception = ExceptionFactory("backend");
@@ -21,14 +21,14 @@ const Log = LogFactory("backend");
 		.useLoggerMemory()
 		.setup();
 
-	let commands = new Commands(pathlib.path(config.sandbox), {
+	let commands = new Commands(pathlib.path(configSandbox()), {
 		services: backend.services.makeProvider("commands"),
 	});
 	await commands.initialize();
 
 	// Filter jobs.
 	const jobs = Object.fromEntries(
-		Object.entries(config.jobs).filter(([name, job]) => {
+		Object.entries(configJobs()).filter(([name, job]) => {
 			if (!commands.getSupportedExecutorTypes().has(job.type)) {
 				Log.warning("Ignoring job '{}' with type '{}'.", name, job.type);
 				return false;
@@ -60,7 +60,7 @@ const Log = LogFactory("backend");
 	}
 
 	// Run preset instances.
-	for (const instance of config.instances) {
+	for (const instance of configInstances()) {
 		if (!(instance.type in jobs)) {
 			Log.warning("Ignoring instance with job type '{}'.", instance.type);
 			continue;

@@ -1,0 +1,37 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+load("//:defs.bzl", "bzd_python_config")
+
+py_binary(
+    name = "hello_world",
+    srcs = ["hello_world.py"],
+)
+
+bzd_config(
+    name = "config",
+    srcs = ["simple.json"],
+    data = [
+        ":hello_world",
+    ],
+    values = {
+        "bin.hello_world": "$(path :hello_world)",
+    },
+)
+
+bzd_python_config(
+    name = "config_python",
+    config = ":config",
+    expose = {
+        "a": "a",
+        "b": "b",
+        "b.c": "b_c",
+        "bin.hello_world": "bin_hello_world",
+    },
+)
+
+py_test(
+    name = "config_test",
+    srcs = ["config_test.py"],
+    imports = ["."],
+    deps = [":config_python"],
+)

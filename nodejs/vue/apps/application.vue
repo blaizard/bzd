@@ -37,7 +37,7 @@
 <script>
 	import Layout from "#bzd/nodejs/vue/components/layout/layout.vue";
 	import MenuEntry from "#bzd/nodejs/vue/components/menu/entry.vue";
-	import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
+	import { configApplication } from "#bzd/nodejs/vue/apps/config_nodejs.js";
 
 	export default {
 		components: {
@@ -59,7 +59,7 @@
 				routes.push({
 					path: "/login",
 					handler: async () => {
-						await this.$rest.invoke("login", config.application);
+						await this.$rest.invoke("login", configApplication());
 					},
 				});
 				routes.push({

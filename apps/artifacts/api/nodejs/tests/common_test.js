@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
+import { configDefaultNodeVolume, configRemotes, configToken } from "#bzd/apps/artifacts/api/nodejs/config.js";
 import { ArtifactsBase } from "#bzd/apps/artifacts/api/nodejs/common.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "common");
@@ -72,10 +72,10 @@ describe("ArtifactsBase", () => {
 		it("Defaults match config values", () => {
 			const instance = new ArtifactsBase();
 			Exception.assertEqual(instance.uid, null);
-			Exception.assertEqual(instance.remoteSources, config.remotes);
-			Exception.assertEqual(instance.volume, config.defaultNodeVolume);
+			Exception.assertEqual(instance.remoteSources, configRemotes());
+			Exception.assertEqual(instance.volume, configDefaultNodeVolume());
 			// Token should come from the env or config
-			Exception.assert(instance.token === (process.env.BZD_NODE_TOKEN ?? config.token), "Token mismatch");
+			Exception.assert(instance.token === (process.env.BZD_NODE_TOKEN ?? configToken()), "Token mismatch");
 			// httpClient should be a function/class
 			Exception.assert(typeof instance.httpClient === "function", "httpClient should be a function");
 		});

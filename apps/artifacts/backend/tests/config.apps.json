@@ -1,4 +1,5 @@
 {
+    "application": "artifacts",
     "authentication": {
         "scopes": [],
         "type": "stub"

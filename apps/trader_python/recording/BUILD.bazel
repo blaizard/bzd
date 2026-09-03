@@ -1,4 +1,5 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@bzd_python//:defs.bzl", "bzd_python_config")
 load("@pip//:requirements.bzl", "requirement")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
@@ -10,6 +11,14 @@ bzd_config_default(
     visibility = [
         "//deployment:__subpackages__",
     ],
+)
+
+bzd_python_config(
+    name = "config_polygon_python",
+    config = ":config_polygon",
+    expose = {
+        "apiKeys": "configApiKeys",
+    },
 )
 
 py_binary(
@@ -30,7 +39,6 @@ py_binary(
 py_binary(
     name = "generator_polygon",
     srcs = [
-        "config_polygon.py",
         "generator_polygon.py",
     ],
     tags = ["manual"],
@@ -39,6 +47,7 @@ py_binary(
         "//deployment:__subpackages__",
     ],
     deps = [
+        ":config_polygon_python",
         "//apps/artifacts/api/python/node",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/logging",

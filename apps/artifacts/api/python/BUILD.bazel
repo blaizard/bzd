@@ -1,13 +1,24 @@
+load("@bzd_python//:defs.bzl", "bzd_python_config")
 load("@rules_python//python:defs.bzl", "py_library")
+
+bzd_python_config(
+    name = "config",
+    config = "//apps/artifacts/api:config",
+    expose = {
+        "defaultNodeVolume": "configDefaultNodeVolume",
+        "remotes": "configRemotes",
+        "token": "configToken",
+    },
+)
 
 py_library(
     name = "common",
     srcs = [
         "common.py",
-        "//apps/artifacts/api:config.py",
     ],
     visibility = ["//apps/artifacts/api/python:__subpackages__"],
     deps = [
+        ":config",
         "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/logging",
     ],

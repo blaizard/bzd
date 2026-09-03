@@ -4,7 +4,6 @@ bzd_nodejs_test(
     name = "node",
     srcs = [
         "node_test.js",
-        "//apps/artifacts/api:config.json",
     ],
     main = "node_test.js",
     deps = [

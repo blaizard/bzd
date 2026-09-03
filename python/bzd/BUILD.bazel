@@ -1,8 +1,18 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("//:defs.bzl", "bzd_python_config")
 
 bzd_config_default(
     name = "bin",
     values = {
+        "scp": "scp",
+        "ssh": "ssh",
+    },
+)
+
+bzd_python_config(
+    name = "bin_python",
+    config = ":bin",
+    expose = {
         "scp": "scp",
         "ssh": "ssh",
     },

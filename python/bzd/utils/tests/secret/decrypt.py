@@ -1,7 +1,7 @@
 import unittest
 import pathlib
 
-from bzd_lib.secret import decrypt
+from bzd.utils.secret import decrypt
 
 
 class TestRun(unittest.TestCase):

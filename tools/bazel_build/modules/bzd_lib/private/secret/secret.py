@@ -7,7 +7,7 @@ import sys
 import os
 import subprocess
 
-from python.runfiles import runfiles
+from bzd.utils.runfiles import pathFromRLocation
 
 from private.secret.config import age as configAge, recipients as configRecipients
 
@@ -20,7 +20,7 @@ class Secret:
 	) -> None:
 		self.recipients = recipients if isinstance(recipients, list) else Secret.loadRecipientsFromFile(recipients)
 		self.recipientsHash = Secret.recipientsToHash(self.recipients)
-		self.age = pathlib.Path(runfiles.Create().Rlocation(configAge))  # type: ignore
+		self.age = pathFromRLocation(configAge)
 		self.keyFile = keyFile
 
 		assert self.age, "The path of the age tool is missing."
@@ -36,7 +36,7 @@ class Secret:
 		"""Load a list of recipients from the given or default file."""
 
 		if recipients is None:
-			recipients = pathlib.Path(runfiles.Create().Rlocation(configRecipients))  # type: ignore
+			recipients = pathFromRLocation(configRecipients)
 		return sorted(json.loads(recipients.read_text()).values())
 
 	@staticmethod

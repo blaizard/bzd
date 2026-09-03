@@ -1,6 +1,6 @@
 """Configuration rules."""
 
-load("//config:private/common.bzl", _ConfigSourceInfo = "ConfigSourceInfo")
+load("//config:private/common.bzl", _ConfigInfo = "ConfigInfo", _ConfigSourceInfo = "ConfigSourceInfo")
 load("//config:private/config.bzl", _bzd_config = "bzd_config", _bzd_config_default = "bzd_config_default")
 load(
     "//config:private/config_override.bzl",
@@ -10,4 +10,5 @@ load(
 bzd_config = _bzd_config
 bzd_config_default = _bzd_config_default
 make_bzd_config_apply = _make_bzd_config_apply
+ConfigInfo = _ConfigInfo
 ConfigSourceInfo = _ConfigSourceInfo

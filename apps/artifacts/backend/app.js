@@ -7,7 +7,7 @@ import EndpointsFactory from "#bzd/apps/artifacts/backend/endpoints_factory.js";
 import Plugin from "#bzd/apps/artifacts/backend/plugin.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/artifacts/plugins/backend.js";
-import config from "#bzd/apps/artifacts/backend/config.json" with { type: "json" };
+import { configLocks, configVolumes, configTests, configTokens } from "#bzd/apps/artifacts/backend/config_nodejs.js";
 import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import Locks from "#bzd/apps/artifacts/backend/locks.js";
@@ -34,18 +34,18 @@ const Exception = ExceptionFactory("backend");
 		.useLoggerMemory()
 		.setup();
 
-	for (const { token, scopes } of Object.values(config["tokens"] || {})) {
+	for (const { token, scopes } of Object.values(configTokens())) {
 		await backend.authentication.preloadApplicationToken(token, scopes);
 	}
-	Log.info("Preloaded {} application token(s).", Object.keys(config["tokens"] || {}).length);
+	Log.info("Preloaded {} application token(s).", Object.keys(configTokens()).length);
 
-	const locks = new Locks(config.locks.path, {
+	const locks = new Locks(configLocks().path, {
 		services: backend.services.makeProvider("locks"),
 	});
 	const statisticsPluginProvider = backend.statistics.makeProvider("plugins");
 
 	// Add initial volumes.
-	for (const [volume, options] of Object.entries(config.volumes)) {
+	for (const [volume, options] of Object.entries(configVolumes())) {
 		Exception.assert("type" in options, "The volume '{}' must have a 'type'.", volume);
 		const type = options.type;
 		Exception.assert(type in Plugins, "No plugins of type '{}', requested by '{}'.", type, volume);
@@ -266,7 +266,7 @@ const Exception = ExceptionFactory("backend");
 	await backend.start();
 
 	if (backend.test) {
-		await backend.web.test(config.tests || []);
+		await backend.web.test(configTests());
 		await backend.stop();
 	}
 })();

@@ -27,5 +27,5 @@ export function pathFromRLocation(rlocation: string): string {
 		}
 	}
 
-	throw new Error(`runfile not found: ${rlocation}.`);
+	throw new Error(`runfile not found: '${rlocation}'.`);
 }

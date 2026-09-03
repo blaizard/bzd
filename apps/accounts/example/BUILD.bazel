@@ -1,10 +1,19 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 bzd_config_default(
     name = "config",
     srcs = [
         "config.default.json",
     ],
+)
+
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "accounts": "configAccounts",
+    },
     visibility = [
         "//apps/accounts/example:__subpackages__",
     ],

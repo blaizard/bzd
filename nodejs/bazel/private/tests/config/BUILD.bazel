@@ -1,0 +1,38 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_test")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
+
+bzd_nodejs_binary(
+    name = "hello_world",
+    srcs = ["hello_world.js"],
+    main = "hello_world.js",
+)
+
+bzd_config(
+    name = "config",
+    srcs = ["simple.json"],
+    data = [
+        ":hello_world",
+    ],
+    values = {
+        "bin.hello_world": "$(path :hello_world)",
+    },
+)
+
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "a": "a",
+        "b": "b",
+        "b.c": "b_c",
+        "bin.hello_world": "bin_hello_world",
+    },
+)
+
+bzd_nodejs_test(
+    name = "config_test",
+    srcs = ["config_test.js"],
+    main = "config_test.js",
+    deps = [":config_nodejs"],
+)

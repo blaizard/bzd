@@ -7,7 +7,7 @@ import time
 import shutil
 
 from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
-from apps.bootloader.config import STABLE_VERSION, application, updatePath, updatePolicy
+from apps.bootloader.config_python import STABLE_VERSION, application, updatePath, updatePolicy
 from apps.bootloader.utils import RollingNamedTemporaryFile
 from apps.artifacts.api.python.release.release import Release
 from apps.artifacts.api.python.release.mock import ReleaseMock
@@ -57,7 +57,7 @@ class Context:
 		parser.add_argument(
 			"--bootloader-update-ignore",
 			type=str,
-			default=STABLE_VERSION,
+			default=STABLE_VERSION(),
 			help="The string to ignore from the update.",
 		)
 		parser.add_argument(
@@ -82,7 +82,7 @@ class Context:
 			"--bootloader-application",
 			type=pathlib.Path,
 			help="The application to be called by the bootloader.",
-			default=pathlib.Path(application) if application else (pathlib.Path(__file__).parent / "tests/noop"),
+			default=pathlib.Path(application()) if application() else (pathlib.Path(__file__).parent / "tests/noop"),
 		)
 
 		return parser.parse_known_args(args)
@@ -93,7 +93,7 @@ class Context:
 
 	@property
 	def updatePolicy(self) -> StablePolicy:
-		return StablePolicy(self.values.bootloader_update_policy or updatePolicy)
+		return StablePolicy(self.values.bootloader_update_policy or updatePolicy())
 
 	@property
 	def updateInterval(self) -> float:
@@ -101,7 +101,7 @@ class Context:
 
 	@property
 	def updatePath(self) -> typing.Optional[pathlib.Path]:
-		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_update_path) or pathlib.Path(updatePath)
+		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_update_path) or pathlib.Path(updatePath())
 
 	@property
 	def updateIgnore(self) -> typing.Optional[str]:
@@ -238,7 +238,7 @@ def updateInfo(node: Node) -> None:
 	"""Update long standing information."""
 
 	try:
-		node.publish(data={"version": {"bootloader": STABLE_VERSION}})
+		node.publish(data={"version": {"bootloader": STABLE_VERSION()}})
 	except Exception:
 		# Ignore any errors, we don't want to crash if something is wrong.
 		pass
@@ -253,7 +253,7 @@ def bootloader(context: Context) -> int:
 	scheduler = Scheduler()
 
 	context.logger.info(
-		f"Bootloader version {STABLE_VERSION} for application {context.application} with given args: {' '.join(context.args)}"
+		f"Bootloader version {STABLE_VERSION()} for application {context.application} with given args: {' '.join(context.args)}"
 	)
 
 	# Make sure only one instance of the bootloader is running at a time.

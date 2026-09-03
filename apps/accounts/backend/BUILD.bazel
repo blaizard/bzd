@@ -1,6 +1,7 @@
 load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 bzd_config_default(
     name = "config",
@@ -13,12 +14,24 @@ bzd_config_default(
     ],
 )
 
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "email": "configEmail",
+        "googleCaptchaSecretKey": "configGoogleCaptchaSecretKey",
+        "googleClientSecret": "configGoogleClientSecret",
+        "kvs": "configKvs",
+        "payment": "configPayment",
+        "supportURL": "configSupportURL",
+        "tests": "configTests",
+    },
+)
+
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
         "app.js",
-        ":config.json",
-        "//apps/accounts:config.json",
     ],
     apis = ["//apps/accounts:api.v1.json"],
     args = [
@@ -39,6 +52,8 @@ bzd_nodejs_binary(
         "//apps/accounts/backend:__subpackages__",
     ],
     deps = [
+        ":config_nodejs",
+        "//apps/accounts:config_nodejs",
         "//apps/accounts/backend/applications",
         "//apps/accounts/backend/email",
         "//apps/accounts/backend/test_data",

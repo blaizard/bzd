@@ -4,7 +4,6 @@ bzd_nodejs_library(
     name = "node",
     srcs = [
         "node.js",
-        "//apps/artifacts/api:config.json",
     ],
     visibility = ["//visibility:public"],
     deps = [

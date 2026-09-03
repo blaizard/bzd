@@ -1,6 +1,7 @@
 load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 bzd_config_default(
     name = "config",
@@ -12,11 +13,19 @@ bzd_config_default(
     ],
 )
 
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "layout": "configLayout",
+        "tests": "configTests",
+    },
+)
+
 bzd_nodejs_binary(
     name = "backend",
     srcs = [
         "app.js",
-        ":config.json",
     ],
     apis = ["//apps/dashboard:api.v1.json"],
     args = [
@@ -34,6 +43,7 @@ bzd_nodejs_binary(
         "//deployment:__subpackages__",
     ],
     deps = [
+        ":config_nodejs",
         "//apps/dashboard/plugins:plugins.backend",
         "//nodejs/core:cache",
         "//nodejs/core:filesystem",

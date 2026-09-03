@@ -11,7 +11,7 @@ import sys
 import stat
 
 from bzd.utils.run import localCommand, ExecuteResult, ExecuteResultStreamWriter
-from bzd.bin import ssh, scp
+from bzd.bin_python import ssh, scp
 from bzd.http.client import HttpClient
 
 
@@ -175,7 +175,7 @@ class SSH:
 	) -> ExecuteResult:
 		"""Execute a remote command via SSH."""
 
-		command = [ssh] + self.commonCommands + (sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
+		command = [ssh()] + self.commonCommands + (sshArgs or []) + ["-p", str(self.port), f"{self.username}@{self.host}"]
 		return localCommand(command + (args or []), **kwargs)
 
 	def uploadContent(self, content: str, destination: pathlib.Path) -> None:
@@ -190,7 +190,7 @@ class SSH:
 		"""Copy a file to the remote."""
 
 		command = (
-			[scp]
+			[scp()]
 			+ self.commonCommands
 			+ [
 				"-P",

@@ -1,5 +1,6 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_binary", "bzd_nodejs_library")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 bzd_config_default(
     name = "config",
@@ -22,6 +23,16 @@ bzd_config_default(
     ],
 )
 
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "instances": "configInstances",
+        "jobs": "configJobs",
+        "sandbox": "configSandbox",
+    },
+)
+
 bzd_nodejs_library(
     name = "status",
     srcs = [
@@ -42,7 +53,6 @@ bzd_nodejs_binary(
         "args.js",
         "commands.js",
         "context.js",
-        ":config.json",
     ],
     apis = ["//apps/job_executor:api.v1.json"],
     args = [
@@ -52,7 +62,6 @@ bzd_nodejs_binary(
         "local-job-executor",
     ],
     data = [
-        ":config",
         "//apps/job_executor/frontend:frontend.bundle",
     ],
     main = "app.js",
@@ -61,6 +70,7 @@ bzd_nodejs_binary(
         "//deployment:__subpackages__",
     ],
     deps = [
+        ":config_nodejs",
         ":status",
         "//apps/job_executor/backend/executor",
         "//apps/job_executor/backend/scheduler",

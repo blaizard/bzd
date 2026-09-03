@@ -10,7 +10,7 @@ import AuthenticationBase from "#bzd/nodejs/core/authentication/server.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import Cache from "#bzd/nodejs/core/cache.js";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
-import config from "#bzd/nodejs/vue/apps/config.json" with { type: "json" };
+import { configAuthentication } from "#bzd/nodejs/vue/apps/config_nodejs.js";
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.js";
 import ProviderProcess from "#bzd/nodejs/core/statistics/provider_process.js";
 
@@ -142,7 +142,7 @@ export default class Backend {
 	}
 
 	/// Set-up the authentication object.
-	useAuthentication(optionsOrAuthentication = config.authentication) {
+	useAuthentication(optionsOrAuthentication = configAuthentication()) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.authentication, "Authentication already set-up.");
 		if (optionsOrAuthentication instanceof AuthenticationBase) {

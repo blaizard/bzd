@@ -2,14 +2,14 @@ import typing
 import os
 
 from bzd.http.client import HttpClient
-from apps.artifacts.api.config import (
-	remotes as configRemotes,
-	token as configToken,
-	defaultNodeVolume,
+from apps.artifacts.api.python.config import (
+	configRemotes,
+	configToken,
+	configDefaultNodeVolume,
 )
 from bzd.logging import Logger
 
-assert len(configRemotes) > 0, "'remotes' from the API config cannot be empty."
+assert len(configRemotes()) > 0, "'remotes' from the API config cannot be empty."
 
 
 class ArtifactsBase:
@@ -18,9 +18,9 @@ class ArtifactsBase:
 	def __init__(
 		self,
 		uid: typing.Optional[str] = None,
-		remotes: typing.List[str] = configRemotes,
-		volume: str = defaultNodeVolume,
-		token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken),
+		remotes: typing.List[str] = configRemotes(),
+		volume: str = configDefaultNodeVolume(),
+		token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken()),
 		logger: Logger = Logger("artifacts.api"),
 		httpClient: typing.Any = HttpClient,
 	) -> None:

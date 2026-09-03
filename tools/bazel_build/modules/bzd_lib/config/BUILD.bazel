@@ -41,6 +41,18 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "viewer",
+    srcs = [
+        "viewer.py",
+    ],
+    deps = [
+        ":reader",
+        "@bzd_python//bzd/utils:runfiles",
+        "@bzd_python//bzd/utils:secret",
+    ],
+)
+
 bzl_library(
     name = "defs",
     srcs = [

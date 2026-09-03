@@ -16,7 +16,6 @@ py_library(
     name = "node",
     srcs = [
         "node.py",
-        "//apps/artifacts/api:config.py",
     ],
     visibility = ["//visibility:public"],
     deps = [

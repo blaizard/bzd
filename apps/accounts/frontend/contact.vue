@@ -8,7 +8,7 @@
 <script>
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Base from "#bzd/apps/accounts/frontend/base.vue";
-	import Config from "#bzd/apps/accounts/config.json" with { type: "json" };
+	import { configGoogleCaptchaSiteKey } from "#bzd/apps/accounts/config_nodejs.js";
 
 	export default {
 		mixins: [Base],
@@ -61,7 +61,7 @@
 						content: "Send",
 						height: "large",
 						align: "right",
-						googleCaptcha: Config.googleCaptchaSiteKey,
+						googleCaptcha: configGoogleCaptchaSiteKey(),
 						condition: () => !this.sent,
 					},
 				];

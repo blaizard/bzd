@@ -17,8 +17,16 @@ import Users from "#bzd/apps/accounts/backend/users/users.js";
 import Applications from "#bzd/apps/accounts/backend/applications/applications.js";
 import TokenInfo from "#bzd/apps/accounts/backend/users/token.js";
 import TestData from "#bzd/apps/accounts/backend/test_data/test_data.js";
-import config from "#bzd/apps/accounts/config.json" with { type: "json" };
-import configBackend from "#bzd/apps/accounts/backend/config.json" with { type: "json" };
+import { configUrl, configGoogleClientId } from "#bzd/apps/accounts/config_nodejs.js";
+import {
+	configKvs,
+	configEmail,
+	configGoogleClientSecret,
+	configGoogleCaptchaSecretKey,
+	configSupportURL,
+	configPayment,
+	configTests,
+} from "#bzd/apps/accounts/backend/config_nodejs.js";
 import paymentMakeFromConfig from "#bzd/nodejs/payment/make_from_config.js";
 import EmailManager from "#bzd/apps/accounts/backend/email/manager.js";
 import Subscription from "#bzd/apps/accounts/backend/users/subscription.js";
@@ -55,8 +63,8 @@ const Log = LogFactory("backend");
 		.useServices()
 		.useCache();
 
-	const keyValueStore = await kvsMakeFromConfig(configBackend.kvs.accounts);
-	const email = await emailMakeFromConfig(configBackend.email);
+	const keyValueStore = await kvsMakeFromConfig(configKvs().accounts);
+	const email = await emailMakeFromConfig(configEmail());
 
 	// Set-up the mail object
 	const emails = new EmailManager(email);
@@ -87,7 +95,7 @@ const Log = LogFactory("backend");
 		);
 
 		return (
-			config.url +
+			configUrl() +
 			"/" +
 			(newPassword ? "new" : "reset") +
 			"/" +
@@ -212,9 +220,9 @@ const Log = LogFactory("backend");
 	});
 
 	const authenticationGoogle = new AuthenticationGoogle(
-		config.googleClientId,
-		configBackend.googleClientSecret,
-		config.url,
+		configGoogleClientId(),
+		configGoogleClientSecret(),
+		configUrl(),
 	);
 	const authenticationFacebook = new AuthenticationFacebook();
 
@@ -239,7 +247,7 @@ const Log = LogFactory("backend");
 				Log.info("Welcome email sent to: {}.", email);
 				await emails.sendWelcome(email, {
 					email: email,
-					support: configBackend.supportURL,
+					support: configSupportURL(),
 					link: link,
 				});
 			}
@@ -303,7 +311,7 @@ const Log = LogFactory("backend");
 			});
 			return true;
 		},
-		configBackend.payment,
+		configPayment(),
 	);
 
 	// ---- REST ----
@@ -360,7 +368,7 @@ const Log = LogFactory("backend");
 		Log.info("Reset password email sent to: {}.", inputs.uid);
 		await emails.sendResetPassword(inputs.uid, {
 			email: inputs.uid,
-			support: configBackend.supportURL,
+			support: configSupportURL(),
 			link: link,
 		});
 	});
@@ -383,32 +391,28 @@ const Log = LogFactory("backend");
 	const sendContactMessage = async (captcha, from, subject, content) => {
 		const response = await HttpClient.post("https://www.google.com/recaptcha/api/siteverify", {
 			query: {
-				secret: configBackend.googleCaptchaSecretKey,
+				secret: configGoogleCaptchaSecretKey(),
 				response: captcha,
 			},
 		});
 		const data = JSON.parse(response);
 		Exception.assertPrecondition(data.success, "The captcha token is invalid: {:?}", data["error-codes"]);
-		await email.send(
-			[configBackend.email.from, from],
-			"[contact-" + Math.floor(Math.random() * 10000) + "] " + subject,
-			{
-				text:
-					"==== Contact form " +
-					config.url +
-					" ====\n" +
-					"Created: " +
-					new Date().toUTCString() +
-					"\n" +
-					"From: " +
-					from +
-					"\n" +
-					"Subject: " +
-					subject +
-					"\n\n" +
-					content,
-			},
-		);
+		await email.send([configEmail().from, from], "[contact-" + Math.floor(Math.random() * 10000) + "] " + subject, {
+			text:
+				"==== Contact form " +
+				configUrl() +
+				" ====\n" +
+				"Created: " +
+				new Date().toUTCString() +
+				"\n" +
+				"From: " +
+				from +
+				"\n" +
+				"Subject: " +
+				subject +
+				"\n\n" +
+				content,
+		});
 	};
 
 	backend.rest.handle("post", "/contact", async (inputs) => {
@@ -453,7 +457,7 @@ const Log = LogFactory("backend");
 	// ---- run tests ----
 
 	if (backend.test) {
-		await backend.web.test(config.tests || []);
+		await backend.web.test(configTests());
 		await backend.stop();
 	}
 })();

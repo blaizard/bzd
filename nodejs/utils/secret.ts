@@ -3,10 +3,10 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 
-import config from "#bzd_lib/private/secret/config.json" with {type: "json"}
-import { pathFromRLocation } from "#bzd_rules_nodejs/nodejs/runfiles/runfiles.js";
+import { age } from "#bzd/nodejs/utils/config.js";
+import { pathFromRLocation } from "#bzd/nodejs/utils/runfiles.js";
 
-const AGE_PATH = pathFromRLocation(config.age);
+const AGE_PATH = pathFromRLocation(age);
 
 /// Decrypt the given payload.
 ///

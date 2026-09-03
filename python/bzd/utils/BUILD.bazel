@@ -8,6 +8,17 @@ py_binary(
 )
 
 py_library(
+    name = "secret",
+    srcs = [
+        "secret.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_lib//private/secret",
+    ],
+)
+
+py_library(
     name = "run",
     srcs = ["run.py"],
     visibility = ["//visibility:public"],
@@ -23,11 +34,11 @@ py_library(
     name = "ssh",
     srcs = [
         "ssh.py",
-        "//bzd:bin.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":run",
+        "//bzd:bin_python",
         "//bzd/http:client",
         requirement("paramiko"),
     ],
@@ -39,6 +50,17 @@ py_library(
         "to_yaml.py",
     ],
     visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "runfiles",
+    srcs = [
+        "runfiles.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@rules_python//python/runfiles",
+    ],
 )
 
 py_library(

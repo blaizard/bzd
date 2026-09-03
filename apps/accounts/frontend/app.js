@@ -4,7 +4,7 @@ import AuthenticationGoogle from "#bzd/nodejs/core/authentication/google/client.
 import AuthenticationFacebook from "#bzd/nodejs/core/authentication/facebook/client.js";
 import Frontend from "#bzd/nodejs/vue/apps/frontend.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
-import config from "#bzd/apps/accounts/config.json" with { type: "json" };
+import { configUrl, configGoogleClientId, configFacebookAppId } from "#bzd/apps/accounts/config_nodejs.js";
 
 import App from "#bzd/apps/accounts/frontend/app.vue";
 
@@ -26,8 +26,8 @@ const authentication = new Authentication({
 	},
 });
 
-const authenticationGoogle = new AuthenticationGoogle(config.googleClientId, config.url);
-const authenticationFacebook = new AuthenticationFacebook(config.facebookAppId);
+const authenticationGoogle = new AuthenticationGoogle(configGoogleClientId(), configUrl());
+const authenticationFacebook = new AuthenticationFacebook(configFacebookAppId());
 
 // ---- Frontend ----
 

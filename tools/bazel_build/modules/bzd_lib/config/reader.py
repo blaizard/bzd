@@ -14,34 +14,54 @@ InternalFragmentList = typing.List[InternalFragment]
 
 @dataclasses.dataclass
 class Data:
+	# The value of the configuration key.
 	value: typing.Any
+	# The metadata associated with the configuration key.
 	metadata: Metadata
+	# The key of the configuration key (shallow).
+	key: str
+
+
+@dataclasses.dataclass
+class KeyData:
+	# Flat representation of the key/data.
+	flat: typing.Dict[str, Data]
+	# Nested representation of the key/data.
+	nested: typing.Dict[str, Data]
 
 
 def processKeyData(
 	data: typing.Dict[str, typing.Any],
 	metadata: typing.Dict[str, typing.Any],
-) -> typing.Dict[str, Data]:
+) -> KeyData:
 	"""Gather all the key/values."""
 
-	values = {}
-	for key, value in data.items():
-		if isinstance(value, dict):
-			value = processKeyData(value, metadata)
-			for nestedKey, nestedValue in value.items():
-				values[f"{key}.{nestedKey}"] = nestedValue
+	valuesFlat: typing.Dict[str, Data] = {}
 
-		values[key] = Data(
-			value=value,
-			metadata=metadata.get(key, []),
-		)
+	def recursive(
+		currentData: typing.Dict[str, typing.Any],
+		currentRoot: typing.Optional[str],
+	) -> typing.Dict[str, Data]:
+		values = {}
+		for key, value in currentData.items():
+			keyStr = key if currentRoot is None else f"{currentRoot}.{key}"
+			if isinstance(value, dict):
+				value = recursive(value, keyStr)
+			dataWithMetadata = Data(value=value, metadata=metadata.get(keyStr, []), key=key)
+			values[keyStr] = dataWithMetadata
+			valuesFlat[keyStr] = dataWithMetadata
+		return values
 
-	return values
+	values = recursive(data, None)
+	return KeyData(
+		flat=valuesFlat,
+		nested=values,
+	)
 
 
 def internalToKeyData(
 	internal: InternalFragmentList,
-) -> typing.Dict[str, Data]:
+) -> KeyData:
 	"""Convert the internal representation of the configuration into a key, value and metadata."""
 
 	values, metadata = internalToDictionary(internal)
@@ -98,7 +118,7 @@ if __name__ == "__main__":
 	values = processKeyData(config, {})
 
 	for key in args.keys:
-		assert key in values, f"Key: '{key}' is not valid within the configuration."
-		print(values[key].value)
+		assert key in values.flat, f"Key: '{key}' is not valid within the configuration."
+		print(values.flat[key].value)
 
 	sys.exit(0)

@@ -5,7 +5,6 @@ bzd_nodejs_web_binary(
     srcs = [
         "frontend.js",
         "frontend.vue",
-        "//apps/accounts/example:config.json",
     ],
     apis = [
         "//apps/accounts/backend/users:api.json",
@@ -14,6 +13,7 @@ bzd_nodejs_web_binary(
     main = "frontend.js",
     deps = [
         "//apps/accounts/authentication:client",
+        "//apps/accounts/example:config_nodejs",
         "//nodejs/vue:authentication",
         "//nodejs/vue:rest",
     ],
@@ -23,7 +23,6 @@ bzd_nodejs_binary(
     name = "server",
     srcs = [
         "backend.js",
-        "//apps/accounts/example:config.json",
     ],
     args = [
         "$(rootpath :frontend.bundle)",
@@ -34,6 +33,7 @@ bzd_nodejs_binary(
     main = "backend.js",
     deps = [
         "//apps/accounts/authentication:server",
+        "//apps/accounts/example:config_nodejs",
         "//nodejs/core/http:server",
         "//nodejs/core/rest:server",
     ],

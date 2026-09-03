@@ -14,5 +14,6 @@
     "payment": {
         "type": "mock"
     },
-    "supportURL": "mailto:support@dummy.com"
+    "supportURL": "mailto:support@dummy.com",
+    "tests": []
 }

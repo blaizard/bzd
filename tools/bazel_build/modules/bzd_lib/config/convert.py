@@ -1,34 +1,9 @@
 import argparse
 import pathlib
-import typing
 import json
-import re
 import yaml
 
-from config.reader import internalToDictionary, internalToKeyData
-
-
-def toJson(data: typing.Any) -> typing.Any:
-	return json.dumps(data)
-
-
-def toPython(data: typing.Any) -> typing.Any:
-	if data is None:
-		return "None"
-	if isinstance(data, str):
-		return f'"{data}"'
-	if isinstance(data, dict):
-		content = ", ".join([f'"{k}": {toPython(v)}' for k, v in data.items()])
-		return f"{{ {content} }}"
-	if isinstance(data, list):
-		content = ", ".join([toPython(v) for v in data])
-		return f"[ {content} ]"
-	return str(data)
-
-
-def toSubsetChar(name: str) -> str:
-	return re.sub(r"[^a-zA-Z0-9_]+", "_", name)
-
+from config.reader import internalToDictionary
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Substitute template values.")
@@ -41,7 +16,7 @@ if __name__ == "__main__":
 	)
 	parser.add_argument(
 		"--format",
-		choices=["yaml", "py", "json"],
+		choices=["yaml", "json"],
 		type=str,
 		help="The output format.",
 		required=True,
@@ -50,20 +25,9 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	internal = json.loads(args.internal.read_text())
 
-	if args.format == "py":
-		content = """# This file was auto-generated.
-# mypy: ignore-errors
-
-"""
-		for key, data in internalToKeyData(internal).items():
-			if isinstance(data.value, dict):
-				pass
-			else:
-				content += f"{toSubsetChar(key)} = {toPython(data.value)}\n"
-
-	elif args.format == "yaml":
+	if args.format == "yaml":
 		data, _ = internalToDictionary(internal)
-		content = yaml.dump(data)
+		content = yaml.dump(data)  # type: ignore
 
 	elif args.format == "json":
 		data, _ = internalToDictionary(internal)

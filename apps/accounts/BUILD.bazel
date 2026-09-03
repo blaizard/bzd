@@ -1,5 +1,6 @@
 load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_oci_binary")
+load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 exports_files([
     "api.v1.json",
@@ -11,8 +12,21 @@ bzd_config_default(
         "config.default.json",
     ],
     visibility = [
-        ":__subpackages__",
         "//deployment:__subpackages__",
+    ],
+)
+
+bzd_nodejs_config(
+    name = "config_nodejs",
+    config = ":config",
+    expose = {
+        "facebookAppId": "configFacebookAppId",
+        "googleCaptchaSiteKey": "configGoogleCaptchaSiteKey",
+        "googleClientId": "configGoogleClientId",
+        "url": "configUrl",
+    },
+    visibility = [
+        ":__subpackages__",
     ],
 )
 

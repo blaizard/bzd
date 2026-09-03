@@ -7,13 +7,13 @@ bzd_config(
     srcs = [
         "config.apps.json",
     ],
-    base = "//apps/accounts:config.base",
+    base = "//apps/accounts/backend:config.base",
 )
 
 bzd_accounts_binary(
     name = "rate_limit_test_backend",
     configs = {
-        "//apps/accounts:config": ":config_apps",
+        "//apps/accounts/backend:config": ":config_apps",
     },
 )
 

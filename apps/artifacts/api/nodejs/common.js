@@ -2,19 +2,19 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import pathlib from "#bzd/nodejs/utils/pathlib.js";
-import config from "#bzd/apps/artifacts/api/config.json" with { type: "json" };
+import { configDefaultNodeVolume, configRemotes, configToken } from "#bzd/apps/artifacts/api/nodejs/config.js";
 
 const Exception = ExceptionFactory("artifacts", "api");
 const Log = LogFactory("artifacts", "api");
 
-Exception.assert(config.remotes.length > 0, "'remotes' from the API config cannot be empty.");
+Exception.assert(configRemotes().length > 0, "'remotes' from the API config cannot be empty.");
 
 export class ArtifactsBase {
 	constructor({
 		uid = null,
-		remotes = config.remotes,
-		volume = config.defaultNodeVolume,
-		token = process.env.BZD_NODE_TOKEN ?? config.token,
+		remotes = configRemotes(),
+		volume = configDefaultNodeVolume(),
+		token = process.env.BZD_NODE_TOKEN ?? configToken(),
 		logger = Log,
 		httpClient = HttpClient,
 	} = {}) {

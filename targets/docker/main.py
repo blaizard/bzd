@@ -19,7 +19,7 @@ from targets.docker.deployment.traefik import DeploymentDockerTraefik
 from targets.docker.transport.ssh import TransportSSH
 from targets.docker.registry import DockerRegistry
 from targets.docker.docker_compose import DockerCompose
-from targets.docker.config import STABLE_VERSION
+from targets.docker.config_nodejs import STABLE_VERSION
 
 # Maximum time in seconds to wait for a deploy or rollback command to complete before failing.
 COMMAND_TIMEOUT_S = 600
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 	parser.add_argument(
 		"--version",
 		type=str,
-		default=STABLE_VERSION,
+		default=STABLE_VERSION(),
 		help="The version of this deployment.",
 	)
 	parser.add_argument(

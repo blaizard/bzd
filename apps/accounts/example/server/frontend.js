@@ -5,14 +5,14 @@ import RestPlugin from "#bzd/nodejs/vue/rest.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Authentication from "#bzd/apps/accounts/authentication/client.js";
 import AuthenticationPlugin from "#bzd/nodejs/vue/authentication.js";
-import Config from "#bzd/apps/accounts/example/config.json" with { type: "json" };
+import { configAccounts } from "#bzd/apps/accounts/example/config_nodejs.js";
 
 const app = createApp(App);
 
 // ---- Authentication ----
 
 const authentication = new Authentication({
-	accounts: Config.accounts,
+	accounts: configAccounts(),
 	unauthorizedCallback: async (needAuthentication) => {
 		console.log("Unauthorized!", needAuthentication);
 	},

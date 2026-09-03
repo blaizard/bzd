@@ -8,7 +8,7 @@ import threading
 from bzd.http.client import HttpClient, HttpClientException
 from bzd.logging import Logger
 from apps.artifacts.api.python.node.node import Node
-from apps.trader_python.recording.config_polygon import apiKeys
+from apps.trader_python.recording.config_polygon_python import configApiKeys
 
 logger = Logger("polygon.io")
 
@@ -420,7 +420,7 @@ if __name__ == "__main__":
 				generatorArgs,
 			),
 		)
-		for apiKey in apiKeys
+		for apiKey in configApiKeys()
 	]
 	for thread in threads:
 		thread.start()
