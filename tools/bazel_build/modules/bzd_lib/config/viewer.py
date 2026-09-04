@@ -5,35 +5,58 @@ import typing
 
 from config.reader import internalToKeyData, Data
 
+from bzd.utils.runfiles import pathFromRLocation
+from bzd.utils.secret import decrypt
 
-def keyDayaToStr(values: typing.Any, indent: int = 0) -> str:
 
-	lines = []
-	pad = "   " * indent
+def keyDayaToStr(data: typing.Any) -> str:
 
-	if isinstance(values, dict):
-		for key, data in values.items():
-			value = data.value if isinstance(data, Data) else data
-			key = data.key if isinstance(data, Data) else key
+	def mergeLinesWithPrefix(prefix, lines, hasNewLine) -> None:
+		if not hasNewLine and len(lines) == 1:
+			return [f"{prefix} {lines[0].lstrip()}"]
+		else:
+			return [prefix, *lines]
 
-			if isinstance(value, (dict, list)):
-				lines.append(f"{pad}{key}:")
-				lines.append(keyDayaToStr(values=value, indent=indent + 1))
-			else:
-				lines.append(f"{pad}{key}: {json.dumps(value)}")
+	def recursive(value: typing.Any, indent: int) -> typing.Tuple[typing.List[str], bool]:
+		lines = []
+		pad = "   " * indent
 
-	elif isinstance(values, list):
-		for item in values:
-			if isinstance(item, dict):
-				subLines = keyDayaToStr(values=item, indent=indent + 1).split("\n")
-				subLines[0] = f"{pad} - {subLines[0].lstrip()}"
-				lines.append("\n".join(subLines))
-			elif isinstance(item, list):
-				lines.append(f"{pad} -")
-				lines.append(keyDayaToStr(values=item, indent=indent + 1))
-			else:
-				lines.append(f"{pad} - {json.dumps(item)}")
+		metadata = value.metadata if isinstance(value, Data) else []
+		rawValue = value.value if isinstance(value, Data) else value
+		requiresNewLine = False
 
+		if "secret" in metadata:
+			rawValue = decrypt(rawValue)
+
+		if "path" in metadata:
+			rawValue = pathFromRLocation(rawValue)
+
+		if isinstance(rawValue, dict):
+			for key, data in rawValue.items():
+				key = data.key if isinstance(data, Data) else key
+				content, hasNewLine = recursive(value=data, indent=indent + 1)
+				lines.extend(mergeLinesWithPrefix(f"{pad}{key}:", content, hasNewLine))
+			requiresNewLine = True
+
+		elif isinstance(rawValue, list):
+			for item in rawValue:
+				content, _hasNewLine = recursive(value=item, indent=indent + 1)
+				lines.append(f"{pad} - {content[0].lstrip()}")
+				lines.extend(content[1:])
+			requiresNewLine = True
+
+		elif isinstance(rawValue, (int, float, bool, str)):
+			lines.append(f"{pad}{json.dumps(rawValue)}")
+
+		else:
+			lines.append(f"{pad} <{type(rawValue).__name__}> {str(rawValue)}")
+
+		if metadata:
+			lines = mergeLinesWithPrefix(f"{pad}[{', '.join(metadata)}]", lines, requiresNewLine)
+
+		return lines, requiresNewLine
+
+	lines, _ = recursive(value=data, indent=0)
 	return "\n".join(lines)
 
 
