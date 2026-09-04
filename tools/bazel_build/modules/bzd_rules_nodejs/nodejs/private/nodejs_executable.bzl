@@ -71,8 +71,9 @@ def _bzd_nodejs_executable_impl(ctx):
     else:
         command = "export NODE_ENV=development"
 
-    # Handle coverage.
-    if ctx.configuration.coverage_enabled:
+    # Handle coverage. Only test targets are coverage targets, binaries are
+    # used as data and should not pollute their stdout with a coverage report.
+    if ctx.configuration.coverage_enabled and ctx.attr._collect_coverage:
         locations = {
             ctx.attr._coverage_executor: "coverage",
             executor: "executor",
@@ -115,7 +116,9 @@ cp \"coverage/lcov.info\" \"$COVERAGE_OUTPUT_FILE\"
 _bzd_nodejs_binary = rule(
     doc = "NodeJs binary executor.",
     implementation = _bzd_nodejs_executable_impl,
-    attrs = _COMMON_EXEC_ATTRS,
+    attrs = _COMMON_EXEC_ATTRS | {
+        "_collect_coverage": attr.bool(default = False),
+    },
     executable = True,
     toolchains = ["//nodejs:toolchain_type"],
     cfg = _bzd_nodejs_transition,
@@ -124,7 +127,9 @@ _bzd_nodejs_binary = rule(
 _bzd_nodejs_test = rule(
     doc = "NodeJs test executor.",
     implementation = _bzd_nodejs_executable_impl,
-    attrs = _COMMON_EXEC_ATTRS,
+    attrs = _COMMON_EXEC_ATTRS | {
+        "_collect_coverage": attr.bool(default = True),
+    },
     executable = True,
     test = True,
     toolchains = ["//nodejs:toolchain_type"],

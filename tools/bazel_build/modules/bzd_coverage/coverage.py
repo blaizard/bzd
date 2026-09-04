@@ -57,12 +57,12 @@ if __name__ == "__main__":
 			ignore = False
 			for line in fin:
 				if line.startswith("SF:"):
-					data["files"] += 1
 					path = pathlib.Path(line[3:].strip())
 					maybePath = resolvePath(path, workspace=args.workspace)
 					if maybePath:
 						line = f"SF:{maybePath}\n"
 						ignore = False
+						data["files"] += 1
 					else:
 						ignore = True
 						print(f"Ignoring file {path}")
