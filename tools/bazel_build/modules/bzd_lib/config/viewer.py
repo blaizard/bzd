@@ -11,7 +11,7 @@ from bzd.utils.secret import decrypt
 
 def keyDayaToStr(data: typing.Any) -> str:
 
-	def mergeLinesWithPrefix(prefix, lines, hasNewLine) -> None:
+	def mergeLinesWithPrefix(prefix: str, lines: typing.List[str], hasNewLine: bool) -> typing.List[str]:
 		if not hasNewLine and len(lines) == 1:
 			return [f"{prefix} {lines[0].lstrip()}"]
 		else:
