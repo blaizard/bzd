@@ -1,5 +1,6 @@
 import typing
 import os
+import time
 
 from bzd.http.client import HttpClient
 from apps.artifacts.api.python.config import (
@@ -10,6 +11,12 @@ from apps.artifacts.api.python.config import (
 from bzd.logging import Logger
 
 assert len(configRemotes()) > 0, "'remotes' from the API config cannot be empty."
+
+T = typing.TypeVar("T")
+
+
+class NodePublishNoRemote(RuntimeError):
+	pass
 
 
 class ArtifactsBase:
@@ -62,6 +69,39 @@ class ArtifactsBase:
 
 		# No remote was valid.
 		self.remote = None
+
+	def _tryRemotes(
+		self,
+		callback: typing.Callable[[str], T],
+		errorMessage: str,
+		retryForS: typing.Optional[float] = None,
+	) -> T:
+		"""Run the callback against each remote until one succeeds.
+
+		Any exception raised by the callback is logged, with the remote and retry information, and the next remote is tried.
+		If retryForS is set, all the remotes are retried every 30 s at most until the given deadline.
+		If nothing succeeded, raise NodePublishNoRemote.
+
+		Args:
+		        callback: The function to be called with the remote as argument.
+		        errorMessage: The error message of the raised NodePublishNoRemote.
+		        retryForS: The maximal number of seconds to retry before giving up.
+		"""
+
+		timestampStart = time.time()
+		while True:
+			for remote, retry, nbRetries in self.remotes:
+				try:
+					return callback(remote)
+				except Exception as e:
+					self.logger.error(f"Remote '{remote}' failed (attempt {retry + 1}/{nbRetries + 1}): {str(e)}")
+			if retryForS is None:
+				break
+			timestampElapsed = time.time() - timestampStart
+			if timestampElapsed > retryForS:
+				break
+			time.sleep(min(retryForS - timestampElapsed, 30))
+		raise NodePublishNoRemote(errorMessage)
 
 	@staticmethod
 	def pathToKey(path: str) -> typing.List[str]:

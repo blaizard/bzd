@@ -229,7 +229,7 @@ export const ExceptionFactory = (...topics: string[]) => {
 
         /// Ensures that a specific block of code throws an exception.
         static async assertThrows(block: () => unknown, message: string = "", ...args: unknown[]): Promise<void> {
-            Exception.assertThrowsWithMatch(block, "", message, ...args);
+            return Exception.assertThrowsWithMatch(block, "", message, ...args);
         }
 
         /// Throw an error with the given message.

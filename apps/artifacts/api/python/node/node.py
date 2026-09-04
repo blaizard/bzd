@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
-from apps.artifacts.api.python.common import ArtifactsBase
+from apps.artifacts.api.python.common import ArtifactsBase, NodePublishNoRemote
 
 # The bulk payload.
 BulkData = typing.List[typing.Any]
@@ -17,10 +17,6 @@ BulkEntry = typing.List[typing.Union[typing.List[str], typing.List[BulkData]]]
 BulkEntries = typing.List[BulkEntry]
 # The bulk payload for a multi-node request: {uid: BulkEntries}.
 BulkMulti = typing.Dict[str, BulkEntries]
-
-
-class NodePublishNoRemote(RuntimeError):
-	pass
 
 
 class PublisherProtocol(typing.Protocol):
@@ -55,7 +51,7 @@ class Node(ArtifactsBase):
 		self,
 		path: typing.Optional[typing.List[str]] = None,
 		maxBufferSize: int = 0,
-		blockForS: typing.Optional[int] = None,
+		blockForS: typing.Optional[float] = None,
 		**kwargs: typing.Any,
 	) -> None:
 		"""Initialize the Node object.
@@ -110,43 +106,22 @@ class Node(ArtifactsBase):
 			if self.token:
 				headers["authorization"] = f"basic {self.token}"
 
+			# Bound the buffer: if it is full, drop the oldest entry.
+			if self.maxBufferSize > 0 and len(self.buffer) >= self.maxBufferSize:
+				self.buffer.pop(0)
 			self.buffer.append(entry)
-			timestampStart = time.time()
 
-			while True:
-				for remote, retry, nbRetries in self.remotes:
-					try:
-						while len(self.buffer):
-							entry = self.buffer[0]
-							content: typing.Dict[str, typing.Any] = {"data": entry.data}
-							url = remote + entry.uri
-							if entry.isClientTimestamp:
-								content["timestamp"] = time.time() * 1000
-							self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
-							self.buffer.pop(0)
-						return
+			def publishOnRemote(remote: str) -> None:
+				while len(self.buffer):
+					entry = self.buffer[0]
+					content: typing.Dict[str, typing.Any] = {"data": entry.data}
+					url = remote + entry.uri
+					if entry.isClientTimestamp:
+						content["timestamp"] = time.time() * 1000
+					self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+					self.buffer.pop(0)
 
-					except Exception:
-						# ignore.
-						pass
-
-				# The buffer can contain maxBufferSize + 1 element.
-				if len(self.buffer) < self.maxBufferSize + 1:
-					return
-
-				# If blockForS is not set or expired, exit the loop.
-				if self.blockForS is None:
-					break
-				timestampElapsed = time.time() - timestampStart
-				if timestampElapsed > self.blockForS:
-					break
-
-				# Else wait for 30s max before retrying.
-				timestampRemaining = max(self.blockForS - timestampElapsed, 0)
-				time.sleep(min(timestampRemaining, 30))
-
-			self.buffer = self.buffer[-self.maxBufferSize :]
-			raise NodePublishNoRemote("Unable to publish to any of the remotes.")
+			self._tryRemotes(publishOnRemote, "Unable to publish to any of the remotes.", retryForS=self.blockForS)
 
 	def _makeURI(
 		self,
@@ -311,12 +286,12 @@ class Node(ArtifactsBase):
 		if before is not None:
 			query["before"] = str(before)
 
-		for remote, retry, nbRetries in self.remotes:
+		def exportOnRemote(remote: str) -> bytes:
 			url = remote + uri
 			response = self.httpClient.get(url, headers=headers, query=query)
 			return response.content  # type: ignore
 
-		raise NodePublishNoRemote("Unable to export from any of the remotes.")
+		return self._tryRemotes(exportOnRemote, "Unable to export from any of the remotes.")
 
 	def get(
 		self,
@@ -345,12 +320,12 @@ class Node(ArtifactsBase):
 		if keys is not None:
 			query["keys"] = str(1 if keys else 0)
 
-		for remote, retry, nbRetries in self.remotes:
+		def getOnRemote(remote: str) -> typing.Any:
 			url = remote + uri
 			response = self.httpClient.get(url, headers=headers, query=query)
 			return response.json
 
-		raise NodePublishNoRemote("Unable to export from any of the remotes.")
+		return self._tryRemotes(getOnRemote, "Unable to get from any of the remotes.")
 
 
 class LoggerHandlerNode(LoggerHandler):

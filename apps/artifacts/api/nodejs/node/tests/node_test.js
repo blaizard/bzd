@@ -165,6 +165,75 @@ describe("Node", () => {
 				await node.publish({ data: 1, uid: "testuid" });
 			});
 		});
+
+		it("Retries the next remote when the first fails", async () => {
+			const calls = [];
+			const node = new Node({
+				remotes: ["http://remote1", "http://remote2"],
+				volume: "nodes",
+				token: null,
+				httpClient: {
+					post: async (url) => {
+						calls.push(url);
+						if (url.startsWith("http://remote1")) {
+							throw new Error("Unreachable");
+						}
+						return {};
+					},
+					get: async () => ({}),
+				},
+			});
+			await node.publish({ data: 1, uid: "u" });
+			Exception.assertEqual(calls, ["http://remote1/x/nodes/u/data/", "http://remote2/x/nodes/u/data/"]);
+		});
+
+		it("Retries the cached remote 3 times", async () => {
+			let raise = false;
+			let calls = 0;
+			const node = new Node({
+				remotes: ["http://test"],
+				volume: "nodes",
+				token: null,
+				httpClient: {
+					post: async () => {
+						calls += 1;
+						if (raise) {
+							throw new Error("Network is down");
+						}
+						return {};
+					},
+					get: async () => ({}),
+				},
+			});
+			// First publish succeeds, caching the remote.
+			await node.publish({ data: 1, uid: "u" });
+			Exception.assertEqual(calls, 1);
+
+			// The cached remote is now retried 3 times before trying the sources.
+			raise = true;
+			await Exception.assertThrows(async () => {
+				await node.publish({ data: 2, uid: "u" });
+			});
+			Exception.assertEqual(calls, 5);
+		});
+	});
+
+	describe("tryRemotes", () => {
+		it("Retries all remotes within retryForS", async () => {
+			let calls = 0;
+			const node = makeNode();
+			await Exception.assertThrows(async () => {
+				await node.tryRemotes(
+					async () => {
+						calls += 1;
+						throw new Error("boom");
+					},
+					"Unable to publish to any of the remotes.",
+					0.05,
+				);
+			});
+			Exception.assert(calls >= 2, "The callback should be retried within retryForS");
+		});
 	});
 
 	describe("publishBulk", () => {

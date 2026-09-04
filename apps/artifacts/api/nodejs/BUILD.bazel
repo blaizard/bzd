@@ -25,6 +25,7 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/http:client",
+        "//nodejs/utils:delay",
         "//nodejs/utils:pathlib",
     ],
 )

@@ -78,20 +78,14 @@ export class Node extends ArtifactsBase {
 		if (this.token) {
 			headers.authorization = "basic " + this.token;
 		}
-		for (const [remote, retry, nbRetries] of this.remotes()) {
-			try {
-				const content = { data: entry.data };
-				if (entry.isClientTimestamp) {
-					content.timestamp = timestampMs();
-				}
-				const url = remote + entry.uri;
-				await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
-				return;
-			} catch (e) {
-				// ignore.
+		await this.tryRemotes(async (remote) => {
+			const content = { data: entry.data };
+			if (entry.isClientTimestamp) {
+				content.timestamp = timestampMs();
 			}
-		}
-		throw Exception.error("Unable to publish to any of the remotes.");
+			const url = remote + entry.uri;
+			await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
+		}, "Unable to publish to any of the remotes.");
 	}
 
 	/// List all nodes from a remote.

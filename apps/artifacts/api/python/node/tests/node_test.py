@@ -2,8 +2,9 @@ import unittest
 import typing
 import json
 
-from apps.artifacts.api.python.node.node import Node, NodePublishNoRemote
-from bzd.http.client_mock import HttpClientMock
+from apps.artifacts.api.python.common import NodePublishNoRemote
+from apps.artifacts.api.python.node.node import Node
+from bzd.http.client_mock import HttpClientMock, HttpResponseMock
 
 
 class TestRun(unittest.TestCase):
@@ -100,15 +101,89 @@ class TestRun(unittest.TestCase):
 			values.append(data["data"][0][1][0][1])
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback), maxBufferSize=2)
-		node.publish(2)
-		node.publish(3)
-		self.assertEqual(self.calledCounter, 0)
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(2))
+		self.assertEqual(len(node.buffer), 1)
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(3))
 		self.assertEqual(len(node.buffer), 2)
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(4))
+		# The buffer is capped at maxBufferSize, the oldest entry is dropped.
+		self.assertEqual(len(node.buffer), 2)
+		self.assertEqual(self.calledCounter, 0)
 
 		self.callbackRaise = False
-		node.publish(4)
-		self.assertEqual(self.calledCounter, 3)
-		self.assertEqual(values, [2, 3, 4])
+		node.publish(5)
+		self.assertEqual(self.calledCounter, 2)
+		self.assertEqual(values, [4, 5])
+
+	def testPublishErrorNextRemote(self) -> None:
+		self.calledCounter = 0
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+			if url.startswith("http://remote1"):
+				raise Exception("Unreachable")
+			self.calledCounter += 1
+
+		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
+		node.publish("hello")
+		self.assertEqual(self.calledCounter, 1)
+
+	def testPublishErrorAllRemotes(self) -> None:
+
+		def callback(**kwargs: typing.Any) -> None:
+			raise Exception("Unreachable")
+
+		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
+
+	def testPublishCachedRemoteRetries(self) -> None:
+		self.calledCounter = 0
+		self.callbackRaise = True
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+			self.calledCounter += 1
+			if self.callbackRaise:
+				raise Exception("Network is down")
+			return "ok"
+
+		node = Node(uid="testuid", remotes=["http://remote1"], httpClient=HttpClientMock(callback=callback))
+
+		# First publish succeeds, caching the remote.
+		self.callbackRaise = False
+		node.publish(1)
+		self.assertEqual(self.calledCounter, 1)
+
+		# The cached remote is now retried 3 times before trying the sources.
+		self.callbackRaise = True
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(2))
+		self.assertEqual(self.calledCounter, 5)
+
+	def testPublishBlockForSRetries(self) -> None:
+		self.calledCounter = 0
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+			self.calledCounter += 1
+			raise Exception("Unreachable")
+
+		node = Node(uid="testuid", remotes=["http://remote1"], httpClient=HttpClientMock(callback=callback), blockForS=0.05)
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
+		self.assertGreaterEqual(self.calledCounter, 2)
+
+	def testExportGetErrorContinues(self) -> None:
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+			if url.startswith("http://remote1"):
+				raise Exception("Unreachable")
+			if method == "GET":
+				return HttpResponseMock(status=200, content=b'{"key": "value"}', headers={})
+			raise Exception("Unexpected method")
+
+		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
+
+		data = node.get(path=["a"])
+		self.assertEqual(data, {"key": "value"})
+
+		content = node.export(path=["a"])
+		self.assertEqual(content, b'{"key": "value"}')
 
 	def testPublishBulkEmpty(self) -> None:
 		self.calledCounter = 0

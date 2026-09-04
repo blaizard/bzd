@@ -7,7 +7,8 @@ import subprocess
 import os
 import sys
 
-from apps.artifacts.api.python.node.node import Node, NodePublishNoRemote
+from apps.artifacts.api.python.common import NodePublishNoRemote
+from apps.artifacts.api.python.node.node import Node
 from bzd.logging import Logger
 
 
