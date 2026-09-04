@@ -24,5 +24,5 @@ use_repo(pip, pip = "bzd_lib_pip")
 # This is used by default for all runner rules, but can be overridden by specifying a different toolchain.r
 register_toolchains("//private/runner:host_toolchain")
 
-lib = use_extension("//:extensions.bzl", "lib")
-use_repo(lib, "age", "secrets")
+secrets = use_extension("//:extensions.bzl", "secrets")
+use_repo(secrets, "age", "secrets")

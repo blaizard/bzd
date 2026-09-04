@@ -15,10 +15,10 @@ from private.secret.config import age as configAge, recipients as configRecipien
 class Secret:
 	def __init__(
 		self,
-		recipients: typing.Optional[typing.Union[typing.List[str], pathlib.Path]] = None,
+		recipients: typing.Optional[typing.List[str]] = None,
 		keyFile: typing.Optional[pathlib.Path] = None,
 	) -> None:
-		self.recipients = recipients if isinstance(recipients, list) else Secret.loadRecipientsFromFile(recipients)
+		self.recipients = Secret.loadRecipients(recipients or [])
 		self.recipientsHash = Secret.recipientsToHash(self.recipients)
 		self.age = pathFromRLocation(configAge)
 		self.keyFile = keyFile
@@ -32,12 +32,17 @@ class Secret:
 		return 1
 
 	@staticmethod
-	def loadRecipientsFromFile(recipients: typing.Optional[pathlib.Path]) -> typing.List[str]:
+	def loadRecipients(recipients: typing.List[str]) -> typing.List[str]:
 		"""Load a list of recipients from the given or default file."""
 
-		if recipients is None:
-			recipients = pathFromRLocation(configRecipients)
-		return sorted(json.loads(recipients.read_text()).values())
+		data = json.loads(pathFromRLocation(configRecipients).read_text())
+		recipientNames = set([*data["required"], *recipients])
+		recipientKeys = []
+		for name in recipientNames:
+			if name not in data["recipients"]:
+				raise KeyError(f"Recipient '{name}' doesn't exist.")
+			recipientKeys.append(data["recipients"][name])
+		return sorted(recipientKeys)
 
 	@staticmethod
 	def recipientsToHash(recipients: typing.Sequence[str]) -> str:
@@ -150,16 +155,17 @@ class Secret:
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Secret utility")
 
-	groupRecipient = parser.add_mutually_exclusive_group()
-	groupRecipient.add_argument(
-		"--recipients", type=pathlib.Path, help="The path of the file containing the recipients public keys."
-	)
-	groupRecipient.add_argument("--recipient", type=str, action="append", help="Public to be used as recipient.")
-
 	groupInput = parser.add_mutually_exclusive_group(required=True)
 	groupInput.add_argument("--file", type=pathlib.Path, help="The path of the input file containing the secret/payload.")
 	groupInput.add_argument("--payload", nargs=2, metavar=("KEY", "PAYLOAD"), help="The key and the payload.")
 
+	parser.add_argument(
+		"--recipient",
+		dest="recipients",
+		type=str,
+		action="append",
+		help="Recipient name to be used in addition to the 'always' ones.",
+	)
 	parser.add_argument(
 		"--output", type=pathlib.Path, help="If set, writes the output to this path, otherwise write to stdout."
 	)
@@ -167,7 +173,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	secret = Secret(recipients=args.recipients or args.recipient)
+	secret = Secret(recipients=args.recipients)
 	payload = args.file.read_text() if args.file else args.payload[1]
 
 	output = ""
