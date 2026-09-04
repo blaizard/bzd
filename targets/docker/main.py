@@ -195,9 +195,13 @@ def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> 
 
 	try:
 		yield
+
 	except Exception:
 		print("==== ERROR ====", flush=True)
 		traceback.print_exc()
+		sys.stderr.flush()
+		sys.exit(1)
+
 	finally:
 		# Cleanup docker register and docker
 		print("==== Cleaning up dangling images ====", flush=True)
