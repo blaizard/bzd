@@ -6,5 +6,9 @@ bzd_nodejs_extern_binary(
     packages = [
         "@nodejs_deps//:mocha",
     ],
+    params = [
+        "--timeout",
+        "0",
+    ],
     visibility = ["//visibility:public"],
 )
