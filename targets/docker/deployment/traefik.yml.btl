@@ -57,6 +57,7 @@ services:
         environment:
             - BZD_NODE_UID={{ docker.host }}
             - BZD_TRUSTED_PROXIES=172.18.0.254
+            - BZD_KEY_FILE=/run/secrets/key_file
             {% if docker.node_token %}
             - BZD_NODE_TOKEN={{ docker.node_token }}
             {% end %}
@@ -74,6 +75,8 @@ services:
             traefik.http.services.{{ hostToName(docker.host) }}.loadbalancer.server.port: {{ docker.port }}
         networks:
             - traefik
+        secrets:
+            - key_file
 
     {% end %}
 networks:
@@ -81,3 +84,6 @@ networks:
         ipam:
             config:
                 - subnet: 172.18.0.0/24
+secrets:
+    key_file:
+        file: {{ getKeyFile() }}

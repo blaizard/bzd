@@ -5,7 +5,7 @@ set -o pipefail -o errexit
 # Move to the directory of this script.
 cd -- "$( dirname -- "${BASH_SOURCE[0]}" )"
 
-DIRECTORY="./docker-compose"
+DIRECTORY="./versions"
 DOCKER_COMPOSE="./docker-compose.yml"
 
 # Timeout in seconds for the docker compose up command, to prevent indefinite hangs.
@@ -17,36 +17,42 @@ if [ ! -d "$DIRECTORY" ]; then
     exit 1
 fi
 
-# Get the all files in the directory that match the pattern.
-readarray -t files < <(command ls -1F "$DIRECTORY/"*.yml)
+# Get all the version directories that contain a docker compose file.
+versions=()
+while IFS= read -r entry; do
+    version="${entry%/}"
+    if [ -f "$DIRECTORY/$version/docker-compose.yml" ]; then
+        versions+=("$version")
+    fi
+done < <(command ls -1F "$DIRECTORY/")
 
-# Ensure that there are at least two files to roll back.
-file_count="${#files[@]}"
+# Ensure that there are at least two versions to roll back.
+file_count="${#versions[@]}"
 if [ "$file_count" -lt 2 ]; then
-    echo "Error: Directory '$DIRECTORY' contains less than 2 files. Found $file_count."
+    echo "Error: Directory '$DIRECTORY' contains less than 2 versions. Found $file_count."
     exit 1
 fi
 
-# Get the last two files.
-current="${files[$((file_count - 1))]}"
-previous="${files[$((file_count - 2))]}"
+# Get the last two versions.
+current="${versions[$((file_count - 1))]}"
+previous="${versions[$((file_count - 2))]}"
 
-# Revert the current file to the previous one
+# Revert the current version to the previous one
 # and rollback the containers.
-cp "$previous" "$DOCKER_COMPOSE"
+cp "$DIRECTORY/$previous/docker-compose.yml" "$DOCKER_COMPOSE"
 if ! timeout "$TIMEOUT_S" docker compose --file "$DOCKER_COMPOSE" up -d; then
 
-    # On failure, restore the current file.
+    # On failure, restore the current version.
     echo "Error: Failed to roll back to $previous"
     echo "Restoring $current..."
 
-    cp "$current" "$DOCKER_COMPOSE"
+    cp "$DIRECTORY/$current/docker-compose.yml" "$DOCKER_COMPOSE"
     timeout "$TIMEOUT_S" docker compose --file "$DOCKER_COMPOSE" up -d
 
     exit 1
 fi
 
 
-# Delete the current file.
-rm "$current"
+# Delete the current version.
+rm -rf "$DIRECTORY/$current"
 echo "Rolled back to $previous"

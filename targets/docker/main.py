@@ -5,6 +5,7 @@ import typing
 import sys
 import re
 import time
+import traceback
 from contextlib import contextmanager
 from dataclasses import dataclass
 
@@ -19,7 +20,7 @@ from targets.docker.deployment.traefik import DeploymentDockerTraefik
 from targets.docker.transport.ssh import TransportSSH
 from targets.docker.registry import DockerRegistry
 from targets.docker.docker_compose import DockerCompose
-from targets.docker.config_nodejs import STABLE_VERSION
+from targets.docker.config_nodejs import STABLE_VERSION, configKey
 
 # Maximum time in seconds to wait for a deploy or rollback command to complete before failing.
 COMMAND_TIMEOUT_S = 600
@@ -33,6 +34,10 @@ class CommonParameters:
 	def imageResolve(self, image: str) -> str:
 		"""Convert an image name into its resolve url pointing to the registry."""
 		return f"localhost:{self.port}/{image}:{self.version}"
+
+	def getKeyFile(self) -> str:
+		"""Get the path of the current key file."""
+		return f"./versions/{self.version}/key.txt"
 
 	@staticmethod
 	def hostToName(host: str) -> str:
@@ -190,6 +195,9 @@ def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> 
 
 	try:
 		yield
+	except Exception:
+		print("==== ERROR ====", flush=True)
+		traceback.print_exc()
 	finally:
 		# Cleanup docker register and docker
 		print("==== Cleaning up dangling images ====", flush=True)
@@ -342,26 +350,28 @@ if __name__ == "__main__":
 				directory = applicationsDirectory / application
 				handle.command(["mkdir", "-p", str(directory)])
 
-				dockerComposeDirectory = directory / "docker-compose"
+				dockerVersions = directory / "versions"
+				dockerCurrentVersion = dockerVersions / args.version
 				dockerComposeFile = directory / "docker-compose.yml"
 				print(
-					f"Copying and using '{dockerComposeDirectory}/{args.version}.yml'.",
+					f"Creating version directory '{dockerCurrentVersion}'.",
 					flush=True,
 				)
-				handle.command(["mkdir", "-p", str(dockerComposeDirectory)])
-				handle.uploadContent(content, f"{dockerComposeDirectory / args.version}.yml")
+				handle.command(["mkdir", "-p", str(dockerCurrentVersion)])
+				handle.uploadContent(content, f"{dockerCurrentVersion}/docker-compose.yml")
+				handle.uploadContent(configKey(), f"{dockerCurrentVersion}/key.txt")
 				# Note, it is important to copy instead of symlink, otherwise docker compose up might lead to orphan
 				# containers if some are deleted as docker will consider it as a new project.
 				handle.command(
 					[
 						"cp",
 						"-f",
-						f"{dockerComposeDirectory / args.version}.yml",
+						f"{dockerCurrentVersion}/docker-compose.yml",
 						str(dockerComposeFile),
 					]
 				)
 
-				# Copy the rollback script.
+				print("Copying rollback script.", flush=True)
 				handle.upload(
 					pathlib.Path(__file__).parent / "rollback.sh",
 					str(directory / "rollback.sh"),
@@ -386,25 +396,23 @@ if __name__ == "__main__":
 					timeoutS=COMMAND_TIMEOUT_S,
 				)
 
-				# Gather all the docker compose files from existing and previous versions and delete the too old ones.
-				dockerComposeFiles = sorted(
-					[
-						s for s in handle.command(["ls", "-1", str(dockerComposeDirectory)]).getOutput().split("\n") if s.endswith(".yml")
-					],
+				# Gather all the versions and delete the too old ones.
+				versionDirectories = sorted(
+					[s for s in handle.command(["ls", "-1", str(dockerVersions)]).getOutput().split("\n") if len(s) > 3],
 					reverse=True,
 				)
 				print(
-					f"Identified {len(dockerComposeFiles)} version(s): {', '.join(dockerComposeFiles)}",
+					f"Identified {len(versionDirectories)} version(s): {', '.join(versionDirectories)}",
 					flush=True,
 				)
-				keepDockerComposeFiles = dockerComposeFiles[:2]
-				removeDockerComposeFiles = dockerComposeFiles[2:]
-				for name in removeDockerComposeFiles:
-					print(f"- Removing {dockerComposeDirectory / name}", flush=True)
-					handle.command(["rm", str(dockerComposeDirectory / name)])
+				keepVersions = versionDirectories[:2]
+				removeVersions = versionDirectories[2:]
+				for name in removeVersions:
+					print(f"- Removing {dockerVersions / name}", flush=True)
+					handle.command(["rm", "-rfd", str(dockerVersions / name)])
 
 				# Keep track of all current docker compose files.
-				allDockerComposeFiles += [dockerComposeDirectory / name for name in keepDockerComposeFiles]
+				allDockerComposeFiles += [dockerVersions / name / "docker-compose.yml" for name in keepVersions]
 
 				# Health check.
 				print(
