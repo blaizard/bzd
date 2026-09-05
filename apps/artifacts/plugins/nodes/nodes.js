@@ -162,14 +162,13 @@ export class Nodes {
 	/// \return The original record.
 	static recordFromDisk(record) {
 		let fromDiskRecord = [];
-		const traverse = (fragment, key = [], depth = 0) => {
+		const traverse = (fragment, key = [], depth = 0, paths = []) => {
 			Exception.assert(depth < 32, "Recursive function depth exceeded: {}", depth);
-			let paths = [];
 			for (const [part, data] of Object.entries(fragment)) {
 				if (part == "_") {
 					paths.push([key, ...data]);
 				} else {
-					paths = paths.concat(traverse(data, [...key, part], depth + 1));
+					traverse(data, [...key, part], depth + 1, paths);
 				}
 			}
 			return paths;

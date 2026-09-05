@@ -218,9 +218,12 @@ export default class Plugin extends PluginBase {
 
 			this.setStorage(await StorageBzd.make(this.nodes));
 
+			const timestampStart = timestampMs();
 			const output = await this.records.init(provider, async (record) => {
 				this.nodes.insertFromRecord(Nodes.recordFromDisk(record));
 			});
+			const files = Object.values(output.storages).reduce((total, storage) => total + storage.files, 0);
+			Log.info("Replayed {} record file(s) in {} ms (tick: {}).", files, timestampMs() - timestampStart, output.tick);
 
 			return output;
 		});

@@ -93,7 +93,7 @@ export default class RecordsDistributed {
 			}),
 		);
 
-		await this.records.init(callback);
+		return await this.records.init(callback);
 	}
 
 	async write(...args) {
