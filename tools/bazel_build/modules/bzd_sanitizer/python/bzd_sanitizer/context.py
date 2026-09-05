@@ -106,7 +106,7 @@ class Context:
 		Args:
 			endswith: Any file that ends with the given string.
 			include: List of filters to be included.
-			includeFiles: INclude the given set of files, must be relative to workspace.
+			includeFiles: Include the given set of files, must be relative to workspace.
 			excludeFile: THe exclude file to be used (similar to .gitignore).
 		"""
 

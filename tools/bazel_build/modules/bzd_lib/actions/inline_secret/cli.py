@@ -11,19 +11,24 @@ from bzd.utils.run import localBazelBinary
 
 class SecretLocationFinder(ast.NodeVisitor):
 	def __init__(self) -> None:
-		self.nodes: typing.List[ast.Constant] = []
+		self.nodes: typing.List[typing.Dict[str, typing.Any]] = []
 
 	def visit_Call(self, node: ast.Call) -> None:
 		"""Find any bzd_secret with inline secret."""
 
 		# Match `bzd_secret(...)` calls
 		if isinstance(node.func, ast.Name) and node.func.id == "bzd_secret":
+			attributes = {}
 			for keyword in node.keywords:
 				# Match keyword argument `content = "..."`
-				if keyword.arg == "content" and isinstance(keyword.value, ast.Constant):
-					value = keyword.value.value
-					if isinstance(value, str):
-						self.nodes.append(keyword.value)
+				if keyword.arg == "content":
+					attributes["content"] = keyword.value
+				elif keyword.arg == "recipients":
+					attributes["recipients"] = ast.literal_eval(keyword.value)
+
+			# Keep only the entry with 'content'.
+			if "content" in attributes:
+				self.nodes.append(attributes)
 
 		self.generic_visit(node)
 
@@ -49,8 +54,11 @@ def workload(
 	isSuccess = True
 	replacements = []
 	for node in finder.nodes:
-		value = node.value
-		params = ["--payload", f"{path}:{node.lineno}", str(value)]
+		nodeContent = node["content"]
+		value = nodeContent.value
+		params = ["--payload", f"{path}:{nodeContent.lineno}", str(value)]
+		for recipient in node.get("recipients", []):
+			params += ["--recipient", recipient]
 		params += ["check"] if check else ["encrypt"]
 
 		result = localBazelBinary(
@@ -61,7 +69,7 @@ def workload(
 			stderr=stdout,
 		)
 		isSuccess = isSuccess and result.isSuccess()
-		if check:
+		if check or not result.isSuccess():
 			continue
 
 		output = result.getStdout().strip()
@@ -69,12 +77,12 @@ def workload(
 			continue
 
 		# Update the secret within the file.
-		assert node.lineno is not None
-		assert node.col_offset is not None
-		assert node.end_lineno is not None
-		assert node.end_col_offset is not None
-		indexStart = lineColToIndex(content, node.lineno, node.col_offset)
-		indexEnd = lineColToIndex(content, node.end_lineno, node.end_col_offset)
+		assert nodeContent.lineno is not None
+		assert nodeContent.col_offset is not None
+		assert nodeContent.end_lineno is not None
+		assert nodeContent.end_col_offset is not None
+		indexStart = lineColToIndex(content, nodeContent.lineno, nodeContent.col_offset)
+		indexEnd = lineColToIndex(content, nodeContent.end_lineno, nodeContent.end_col_offset)
 		replacements.append((indexStart, indexEnd, json.dumps(output)))
 
 	# Apply changes in REVERSE order to preserve text indices

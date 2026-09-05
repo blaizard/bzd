@@ -11,10 +11,13 @@ def _bzd_secret_impl(ctx):
     if ctx.attr.content:
         if args:
             fail("'src' or 'content' must be set, not both.")
-        args = ["--payload", "hello", ctx.attr.content]
+        args = ["--payload", "content", ctx.attr.content]
 
     if not args:
         fail("'src' or 'content' must be set.")
+
+    for recipient in ctx.attr.recipients:
+        args += ["--recipient", recipient]
 
     file = ctx.actions.declare_file("{}.check".format(ctx.label.name))
     ctx.actions.run(
@@ -43,6 +46,9 @@ bzd_secret = rule(
     attrs = {
         "content": attr.string(
             doc = "The content of the secret.",
+        ),
+        "recipients": attr.string_list(
+            doc = "List of recipients to be added to encrypt this secret. These are additional recipients to the ones in the 'always' attribute from the extension.",
         ),
         "src": attr.label(
             doc = "The secret to be held.",
