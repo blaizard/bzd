@@ -34,34 +34,44 @@ export default class Locks {
 		this.options.services.addTimeTriggeredProcess(
 			"garbage.collector",
 			async () => {
-				// Update the locks map.
-				const files = await this.options.fs.readdir(this.path.asPosix(), /*withFileTypes*/ true);
-				this.locks = Object.fromEntries(
-					files
-						.filter((dirent) => dirent.isDirectory())
-						.map((dirent) => {
-							const name = dirent.name;
-							return [
-								name,
-								name in this.locks
-									? this.locks[name]
-									: new LockFile(this.path.joinPath(name).asPosix(), { fs: this.options.fs }),
-							];
-						}),
-				);
-
-				for (const [name, lock] of Object.entries(this.locks)) {
-					const status = await lock.getStatus();
-					if (status == LockFile.Status.expired) {
-						await lock.unlock(/*force*/ true);
-						Log.warning("Dangling lock with status expired: '{}', removed.", name);
-					}
-				}
+				await this._garbageCollect();
 			},
 			{
 				periodS: 60,
 			},
 		);
+	}
+
+	async initialize() {
+		// Clear stalled locks before use, otherwise resources may be created while their locks were actually abandoned.
+		await this._garbageCollect();
+	}
+
+	/// Remove all the expired locks.
+	async _garbageCollect() {
+		// Update the locks map.
+		const files = await this.options.fs.readdir(this.path.asPosix(), /*withFileTypes*/ true);
+		this.locks = Object.fromEntries(
+			files
+				.filter((dirent) => dirent.isDirectory())
+				.map((dirent) => {
+					const name = dirent.name;
+					return [
+						name,
+						name in this.locks
+							? this.locks[name]
+							: new LockFile(this.path.joinPath(name).asPosix(), { fs: this.options.fs }),
+					];
+				}),
+		);
+
+		for (const [name, lock] of Object.entries(this.locks)) {
+			const status = await lock.getStatus();
+			if (status == LockFile.Status.expired) {
+				await lock.unlock(/*force*/ true);
+				Log.warning("Dangling lock with status expired: '{}', removed.", name);
+			}
+		}
 	}
 
 	/// Get a unique hash for the given path.

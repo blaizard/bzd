@@ -42,6 +42,8 @@ const Exception = ExceptionFactory("backend");
 	const locks = new Locks(configLocks().path, {
 		services: backend.services.makeProvider("locks"),
 	});
+	await locks.initialize();
+
 	const statisticsPluginProvider = backend.statistics.makeProvider("plugins");
 
 	// Add initial volumes.
