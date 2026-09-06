@@ -7,7 +7,7 @@ const Exception = ExceptionFactory("lock-file");
 
 /// Simple file based lock.
 ///
-/// This lock is meant to work across processes.
+/// This lock is meant to work across processes and with unsynchronized clock between the file system and the current process.
 export default class LockFile {
 	static Status = Object.freeze({
 		// It is unlocked.
@@ -83,6 +83,11 @@ export default class LockFile {
 	}
 
 	/// Check the status of the lock.
+	///
+	/// Expiry compares the lock mtime (filesystem clock) with the Node clock, which are not
+	/// guaranteed to be synchronized. To avoid trusting that cross-clock difference, 'expired'
+	/// requires two checks: if on a later check the mtime is unchanged (no heartbeat) and enough
+	/// Node time elapsed since the first check, the lock is expired.
 	///
 	/// \return the status of the lock.
 	async getStatus() {
