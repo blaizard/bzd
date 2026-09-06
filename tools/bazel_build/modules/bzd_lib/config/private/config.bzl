@@ -50,14 +50,12 @@ def _bzd_config_impl(ctx):
     # Handle files at a given key.
     if ctx.attr.srcs_at:
         for key, target in ctx.attr.srcs_at.items():
+            # Handle secrets.
             if ConfigSourceInfo in target:
-                if target[ConfigSourceInfo].content:
-                    args.add("--value", json.encode([key, target[ConfigSourceInfo].content, target[ConfigSourceInfo].metadata]))
-                elif target[ConfigSourceInfo].file:
-                    args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
-                    input_files.append(target[ConfigSourceInfo].file)
-                else:
-                    fail("'ConfigSourceInfo' must have either 'file' or 'content' set.")
+                args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
+                input_files.append(target[ConfigSourceInfo].file)
+
+                # Handle other targets.
             else:
                 [file, runfiles, data] = _update_from_target(target, runfiles, data)
                 args.add("--src-at", json.encode([key, file.path, []]))
