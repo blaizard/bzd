@@ -51,11 +51,11 @@ def _bzd_config_impl(ctx):
     if ctx.attr.srcs_at:
         for key, target in ctx.attr.srcs_at.items():
             if ConfigSourceInfo in target:
-                if target[ConfigSourceInfo].file:
+                if target[ConfigSourceInfo].content:
+                    args.add("--value", json.encode([key, target[ConfigSourceInfo].content, target[ConfigSourceInfo].metadata]))
+                elif target[ConfigSourceInfo].file:
                     args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
                     input_files.append(target[ConfigSourceInfo].file)
-                elif target[ConfigSourceInfo].content:
-                    args.add("--value", json.encode([key, target[ConfigSourceInfo].content, target[ConfigSourceInfo].metadata]))
                 else:
                     fail("'ConfigSourceInfo' must have either 'file' or 'content' set.")
             else:

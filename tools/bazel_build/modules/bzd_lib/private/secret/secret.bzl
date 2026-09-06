@@ -34,7 +34,7 @@ def _bzd_secret_impl(ctx):
     return [
         DefaultInfo(files = depset([file])),
         ConfigSourceInfo(
-            file = ctx.file.src,
+            file = file,
             content = ctx.attr.content,
             metadata = ["secret"],
         ),

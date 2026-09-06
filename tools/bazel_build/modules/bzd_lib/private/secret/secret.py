@@ -176,7 +176,6 @@ if __name__ == "__main__":
 	secret = Secret(recipients=args.recipients)
 	payload = args.file.read_text() if args.file else args.payload[1]
 
-	output = ""
 	if args.command == "check":
 		_, maybeError = secret.tryReadSecret(payload=payload)
 		if maybeError:
@@ -185,6 +184,7 @@ if __name__ == "__main__":
 			else:
 				print(f"{args.payload[0]}: {maybeError}")
 			sys.exit(1)
+		output = payload
 
 	elif args.command == "decrypt":
 		output = secret.decrypt(payload=payload)
