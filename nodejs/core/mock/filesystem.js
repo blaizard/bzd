@@ -288,7 +288,11 @@ export default class FileSystem {
 		if (!force) {
 			const p = Pathlib.path(path);
 			const directory = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
-			Exception.assert(!(p.name in directory.children), "Directory '{}' already exists.", p.asPosix());
+			if (p.name in directory.children) {
+				const exception = new Exception("Directory '{}' already exists.", p.asPosix());
+				exception.code = "EEXIST";
+				throw exception;
+			}
 		}
 
 		this._toEntry(path, _Policy.create | _Policy.directory);

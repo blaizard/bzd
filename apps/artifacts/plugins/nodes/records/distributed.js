@@ -61,6 +61,8 @@ export default class RecordsDistributed {
 		// Look if there are available records directory.
 		await this.options.fs.mkdir(this.options.path, { force: true });
 		const files = await this.options.fs.readdir(this.options.path, /*withFileTypes*/ true);
+		// Sort by name so the selection is deterministic across restarts.
+		files.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 		for (const dirent of files) {
 			if (dirent.isDirectory()) {
 				const potentialPath = this.options.path + "/" + dirent.name;
