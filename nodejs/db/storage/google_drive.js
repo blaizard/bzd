@@ -20,8 +20,10 @@ export default class StorageGoogleDrive extends Storage {
 		super(
 			Object.assign(
 				{
-					/// The path of the keyFile for the service account to access the google drive.
+					/// Either: The path of the keyFile for the service account to access the google drive.
 					keyFile: null,
+					/// Or: The key for the service account to access the google drive.
+					key: null,
 				},
 				options,
 			),
@@ -66,12 +68,24 @@ export default class StorageGoogleDrive extends Storage {
 	}
 
 	async _initialize() {
-		const auth = new google.auth.GoogleAuth({
-			keyFile: this.options.keyFile,
+		// See: https://googleapis.dev/nodejs/google-auth-library/latest/interfaces/GoogleAuthOptions.html
+		let config = {
 			scopes: [
 				this.writeAccess ? "https://www.googleapis.com/auth/drive" : "https://www.googleapis.com/auth/drive.readonly",
 			],
-		});
+		};
+		if (this.options.keyFile) {
+			config.keyFile = this.options.keyFile;
+		}
+		if (this.options.key) {
+			if (typeof this.options.key == "string") {
+				config.credentials = JSON.parse(this.options.key);
+			} else {
+				config.credentials = this.options.key;
+			}
+		}
+
+		const auth = new google.auth.GoogleAuth(config);
 
 		const client = await auth.getClient();
 		this.drive = google.drive({ version: "v3", auth: client });
