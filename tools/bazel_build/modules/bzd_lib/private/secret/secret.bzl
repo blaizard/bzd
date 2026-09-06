@@ -19,7 +19,7 @@ def _bzd_secret_impl(ctx):
     for recipient in ctx.attr.recipients:
         args += ["--recipient", recipient]
 
-    file = ctx.actions.declare_file("{}.check".format(ctx.label.name))
+    file = ctx.actions.declare_file("{}.secret".format(ctx.label.name))
     ctx.actions.run(
         inputs = inputs,
         outputs = [file],
