@@ -89,6 +89,10 @@ bzd_config_default(
 )
 ```
 
+## Visualization
+
+The configuration can be visualized running the target appended with '.view'.
+
 ## Design Decisions
 
 The overwrite mechanism directly updates the specific label_flag that is registered through the extensions.
