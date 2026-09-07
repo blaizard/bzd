@@ -9,6 +9,7 @@ jobs:
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
+                  key: ${{ secrets.BZD_KEY }}
                   git_token: ${{ secrets.BZD_AGENT_TOKEN }}
 
             - name: "Create PR description from comment"

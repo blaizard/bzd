@@ -32,7 +32,9 @@ jobs:
         runs-on: linux
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              id: setup
               with:
+                  key: ${{ secrets.BZD_KEY }}
                   lease: "true"
 
             - name: "Info"
@@ -42,7 +44,7 @@ jobs:
             - name: "Set the SSH key"
               uses: https://git.blaizard.com/blaise/bzd/.gitea/actions/ssh_key@master
               with:
-                  ssh_private_key: ${{ secrets.BZD_NIXOS_CACHE_SSH_KEY }}
+                  ssh_private_key: ${{ steps.setup.outputs.nixos_ssh_key }}
 
             - name: "Build beast-buildbarn"
               if: inputs.target_node == 'all' || inputs.target_node == 'beast-buildbarn'

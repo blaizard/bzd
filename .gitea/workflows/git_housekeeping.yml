@@ -15,15 +15,16 @@ jobs:
                   name: "ci"
                   ttl: "300"
 
-    documentation:
+    housekeeping:
         needs: [lease_linux]
         runs-on: linux
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
+                  key: ${{ secrets.BZD_KEY }}
                   lease: "true"
+                  opencode: "true"
                   git_token: ${{ secrets.BZD_AGENT_TOKEN }}
-                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
 
             - name: "Remove stale git branches"
               id: parse

@@ -19,8 +19,9 @@ jobs:
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
+                  key: ${{ secrets.BZD_KEY }}
                   lease: "true"
-                  opencode_token: ${{ secrets.BZD_OPENCODE_TOKEN }}
+                  opencode: "true"
 
             - name: "Maintain documentation"
               uses: ./.gitea/actions/opencode

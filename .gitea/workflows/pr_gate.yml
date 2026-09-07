@@ -20,6 +20,7 @@ jobs:
         steps:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
+                  key: ${{ secrets.BZD_KEY }}
                   lease: "true"
                   node: "true"
 
