@@ -1,0 +1,34 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@bzd_python//:defs.bzl", "bzd_python_config")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+bzd_config_default(
+    name = "config",
+    srcs = [
+        "config.default.json",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+)
+
+bzd_python_config(
+    name = "config_python",
+    config = ":config",
+    expose = {
+        "secrets": "secrets",
+    },
+)
+
+py_binary(
+    name = "config_to_env",
+    srcs = [
+        "config_to_env.py",
+    ],
+    visibility = [
+        "//deployment:__subpackages__",
+    ],
+    deps = [
+        ":config_python",
+    ],
+)
