@@ -6,6 +6,7 @@ import zlib
 import sys
 import os
 import subprocess
+import contextlib
 
 from bzd.utils.runfiles import pathFromRLocation
 
@@ -92,33 +93,49 @@ class Secret:
 	def _decrypt(self, secret: str) -> str:
 		"""Decrypt a secret."""
 
-		keyFile = self.getKeyFile()
-		result = subprocess.run(
-			[self.age, "--decrypt", "--identity", keyFile.as_posix()],
-			input=secret.encode(),
-			capture_output=True,
-			check=True,
-		)
+		with self._getKeyFile() as (keyFile, passFds):
+			result = subprocess.run(
+				[self.age, "--decrypt", "--identity", keyFile.as_posix()],
+				input=secret.encode(),
+				capture_output=True,
+				check=True,
+				pass_fds=passFds,
+			)
 		return result.stdout.decode()
 
-	def getKeyFile(self) -> pathlib.Path:
+	@contextlib.contextmanager
+	def _getKeyFile(self) -> typing.Generator[typing.Tuple[pathlib.Path, typing.List[int]], None, None]:
 		"""Retrieve the current key file from the system or raise an exception."""
 
 		if self.keyFile is not None:
-			return self.keyFile
+			yield self.keyFile, []
+			return
+
+		maybeKey = os.environ.get("BZD_KEY")
+		if maybeKey:
+			readFd, writeFd = os.pipe()
+			with os.fdopen(writeFd, "w") as fd:
+				fd.write(maybeKey)
+			try:
+				yield pathlib.Path(f"/dev/fd/{readFd}"), [readFd]
+			finally:
+				os.close(readFd)
+			return
 
 		maybeKeyFile = os.environ.get("BZD_KEY_FILE")
 		if maybeKeyFile:
 			keyFile = pathlib.Path(maybeKeyFile)
 			assert keyFile.is_file(), f"The key file pointed by BZD_KEY_FILE environment variable (={keyFile}), does not exists."
-			return keyFile
+			yield keyFile, []
+			return
 
 		maybeKeyFileFromHome = pathlib.Path.home() / ".bzd" / "key.txt"
 		if maybeKeyFileFromHome.is_file():
-			return maybeKeyFileFromHome
+			yield maybeKeyFileFromHome, []
+			return
 
 		raise Exception(
-			f"No key file found, searched in:\n - Environment variable 'BZD_KEY_FILE'.\n - Path at '{maybeKeyFileFromHome}'."
+			f"No key found, searched in:\n - Environment variable 'BZD_KEY'.\n - Environment variable 'BZD_KEY_FILE'.\n - Path at '{maybeKeyFileFromHome}'."
 		)
 
 	def tryReadSecret(self, payload: str) -> typing.Tuple[typing.Optional[str], typing.Optional[str]]:
