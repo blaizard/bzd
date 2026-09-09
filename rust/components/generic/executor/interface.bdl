@@ -1,0 +1,11 @@
+use "rust/interfaces/executor.bdl"
+
+namespace bzd.components.generic;
+
+
+component GenericExecutor : bzd.Executor {
+interface:
+	
+}
+
+

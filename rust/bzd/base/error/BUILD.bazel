@@ -6,7 +6,7 @@ rust_library(
     srcs = [
         "error.rs",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//rust/bzd/base:__pkg__"],
 )
 
 rust_test(

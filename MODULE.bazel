@@ -194,6 +194,10 @@ crates.spec(
     version = "0.10.0",
 )
 crates.spec(
+    package = "embassy-futures",
+    version = "0.1.2",
+)
+crates.spec(
     package = "static_cell",
     version = "2.1.1",
 )

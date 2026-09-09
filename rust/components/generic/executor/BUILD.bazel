@@ -1,0 +1,32 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//rust/interfaces:executor",
+    ],
+)
+
+rust_library(
+    name = "executor",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_generic_executor",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/interfaces:executor",
+        "@crates//:embassy-futures",
+    ],
+)
+
+rust_test(
+    name = "executor_test",
+    crate = ":executor",
+)

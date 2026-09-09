@@ -1,6 +1,17 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
+    name = "composition",
+    srcs = [
+        "composition.py",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bdl/generator/impl:visitor",
+    ],
+)
+
+py_binary(
     name = "library",
     srcs = [
         "library.py",

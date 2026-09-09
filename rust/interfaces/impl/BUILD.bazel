@@ -8,3 +8,11 @@ rust_library(
     crate_name = "bzd_stream_impl",
     visibility = ["//interfaces:__pkg__"],
 )
+
+rust_library(
+    name = "executor",
+    srcs = [
+        "executor.rs",
+    ],
+    visibility = ["//rust/interfaces:__pkg__"],
+)

@@ -61,14 +61,19 @@ def _rust_generate_composition_impl(ctx):
     all_deps = ctx.attr.deps + info.deps[ctx.attr.target_name]
     crate_group_info = _merge_crate_info(all_deps)
 
-    ctx.actions.write(
-        output = ctx.outputs.output,
-        content = """#![no_std]
+    args = ctx.actions.args()
+    args.add("--output", ctx.outputs.output)
+    args.add("--target", ctx.attr.target_name)
 
-pub async fn executor() -> i32 {
-    42
-}
-""",
+    sources = [source[1] for provider in info.bdls for source in provider.sources.to_list()]
+    args.add_all(sources)
+
+    ctx.actions.run(
+        inputs = sources,
+        outputs = [ctx.outputs.output],
+        progress_message = "Composing Rust from BDL for {} in {}".format(ctx.attr.target_name, ctx.label),
+        arguments = [args],
+        executable = ctx.executable._tool,
     )
 
     return [DefaultInfo(files = depset([ctx.outputs.output])), crate_group_info]
@@ -99,7 +104,7 @@ _rust_generate_composition = rule(
             doc = "The name of the target in the system.",
         ),
         "_tool": attr.label(
-            default = Label("//cc/bdl/generator:composition"),
+            default = Label("//rust/bdl/generator:composition"),
             cfg = "exec",
             executable = True,
         ),
@@ -126,6 +131,9 @@ def _generator_rust_composition_impl(name, visibility, target_name, target, comp
             "{}.composition.rs".format(name),
         ],
         deps = [
+            Label("//rust/interfaces:executor"),
+            # TODO: remove this dependency, it should come from the composition.
+            Label("//rust/components/generic/executor"),
             "{}.composition".format(name),
         ],
         tags = ["manual"],

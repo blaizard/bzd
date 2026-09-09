@@ -8,6 +8,7 @@ py_library(
         "visitor.py",
     ],
     data = [
+        "template/composition.rs.btl",
         "template/file.rs.btl",
     ],
     visibility = [

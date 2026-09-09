@@ -1,0 +1,16 @@
+#![no_std]
+
+#[allow(unused_imports)]
+use rust_interfaces_executor::Executor;
+#[allow(unused_imports)]
+use rust_components_generic_executor::GenericExecutor;
+
+pub async fn executor() -> i32
+{
+	let result = 0;
+{% for context in contexts %}
+	let executor = GenericExecutor::new();
+	result = executor{{ contextToExecutorPushCalls(context) }}.join().await;
+{% end %}
+	result
+}

@@ -5,5 +5,5 @@ rust_library(
     srcs = [
         "panic.rs",
     ],
-    visibility = ["//visibility:public"],
+    visibility = ["//rust/bzd/base:__pkg__"],
 )
