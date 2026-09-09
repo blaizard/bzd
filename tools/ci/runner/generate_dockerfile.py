@@ -31,8 +31,6 @@ class FeatureLinux(Feature):
 class FeatureOpencode(Feature):
 	def process(self, context: SandboxContainer) -> None:
 		self.dockerFile += [
-			# This ensure the migration of the database.
-			"RUN opencode db path",
 			# Setup git.
 			"RUN git config --global user.name 'agent'",
 			"RUN git config --global user.email 'agent@blaizard.com'",
@@ -48,7 +46,7 @@ if __name__ == "__main__":
 	commonArgs = [
 		"--dry",
 		"--no-tty",
-		"--no-user-namespace-remapping",
+		"--mode=remote",
 		"--user=testuser",
 		"--home=/home/testuser",
 		"--uid=1000",
@@ -65,6 +63,7 @@ if __name__ == "__main__":
 			commonArgs
 			+ [
 				"--enable=opencode",
+				"--opencode=playwright",
 			],
 			additionalFeatures=[FeatureLinux, FeatureOpencode],
 		)

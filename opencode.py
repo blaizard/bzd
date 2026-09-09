@@ -26,5 +26,17 @@ if __name__ == "__main__":
 	if args.no_isolate:
 		sandboxArgs += ["--no-isolate"]
 	SandboxContainer.fromCLI(
-		["--preset", f"agent{args.id}", "--prefix", f"opencode{args.id}", *sandboxArgs, "opencode", *remaining]
+		[
+			"--enable=opencode",
+			"--opencode=playwright",
+			"--opencode=host-config",
+			"--enable=session",
+			"--enable=isolation",
+			"--enable=volume",
+			"--isolate",
+			f"--prefix=opencode{args.id}",
+			*sandboxArgs,
+			"opencode",
+			*remaining,
+		]
 	)

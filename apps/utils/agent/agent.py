@@ -19,7 +19,7 @@ def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) 
 		[
 			"opencode",
 			"run",
-			"--dangerously-skip-permissions",
+			"--auto",
 			"--agent",
 			agent,
 			*(["--continue"] if continueSession else []),

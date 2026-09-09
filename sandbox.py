@@ -42,7 +42,7 @@ class Feature:
 		"""Helper function to include a local code file/directory from bzd into the container."""
 		self.dockerFile.append(f"RUN mkdir -p {pathlib.Path(destination).parent}")
 		root = pathlib.Path(__file__).parent.resolve()
-		if (root / source).exists():
+		if (root / source).exists() and self.args.mode != "remote":
 			self.volumes.append(f"{root / source}:{destination}")
 		else:
 			self.dockerFile.append(f"COPY --from=bzd --chown={context.uid}:{context.gid} /tmp/bzd/{source} {destination}")
@@ -96,7 +96,7 @@ mkdir -p "\\$HOME/.dtach"
 name="\\${1:-main}"
 sock="\\$HOME/.dtach/\\$name"
 export BZD_SESSION="\\$name"
-exec dtach -A "\\$sock" bash
+exec dtach -A "\\$sock" -r ctrl_l bash
 EOF""",
 			"RUN sudo chmod +x /usr/local/bin/session",
 		]
@@ -158,17 +158,12 @@ class FeatureOpenCode(Feature):
 			"opencode": {
 				"action": "append",
 				"default": [],
-				"choices": ["none", "playwright"],
-				"help": "Opencode tools to be made available.",
+				"choices": ["playwright", "host-config"],
+				"help": "Options for the opencode feature.",
 			}
 		}
 
 	def process(self, context: "SandboxContainer") -> None:
-		# Add generic agents/commands/skills.
-		self.includes(".opencode/agents", f"{context.home}/.bzd/opencode/agents", context)
-		self.includes(".opencode/commands", f"{context.home}/.bzd/opencode/commands", context)
-		for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture"]:
-			self.includes(f".opencode/skills/{skill}", f"{context.home}/.bzd/opencode/skills/{skill}", context)
 		# Add Linux essential tools
 		llmEssentials = [
 			"jq",
@@ -184,28 +179,38 @@ class FeatureOpenCode(Feature):
 			"findutils",
 		]
 		self.dockerFile += [
-			# Important! If not set, docker will create synthetic directory and write access will not be permitted.
-			f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
-			f"ENV OPENCODE_CONFIG_DIR={context.home}/.bzd/opencode",
 			f"RUN sudo apt install -y nodejs npm {' '.join(llmEssentials)}",
 			"RUN sudo npm install -g opencode-ai@latest",
-			f"RUN echo '{
-				json.dumps({'$schema': 'https://opencode.ai/config.json', 'permission': {'external_directory': 'allow'}})
-			}' > {context.home}/.bzd/opencode/opencode.json",
-		]
-		hostHome = pathlib.Path.home()
-		self.volumes += [
-			f"{hostHome / path}:{context.home / path}"
-			for path in [
-				".config/opencode",
-				".local/share/opencode",
-				".local/state/opencode",
-			]
-			if (hostHome / path).exists()
 		]
 
-		if not self.args.opencode or "playwright" in self.args.opencode:
-			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.bzd/opencode/skills/playwright-cli", context)
+		if "host-config" in self.args.opencode:
+			self.dockerFile += [
+				# Important! If not set, docker will create synthetic directory and write access will not be permitted.
+				f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
+			]
+			hostHome = pathlib.Path.home()
+			self.volumes += [
+				f"{hostHome / path}:{context.home / path}"
+				for path in [
+					".config/opencode",
+					".local/share/opencode",
+					".local/state/opencode",
+				]
+				if (hostHome / path).exists()
+			]
+		else:
+			# Add generic agents/commands/skills.
+			self.includes(".opencode/agents", f"{context.home}/.config/opencode/agents", context)
+			self.includes(".opencode/commands", f"{context.home}/.config/opencode/commands", context)
+			for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture"]:
+				self.includes(f".opencode/skills/{skill}", f"{context.home}/.config/opencode/skills/{skill}", context)
+			self.dockerFile += [
+				# This ensure the migration of the database.
+				"RUN opencode db path",
+			]
+
+		if "playwright" in self.args.opencode:
+			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.config/opencode/skills/playwright-cli", context)
 			self.dockerFile += [
 				# Newer version require node v20+ (which conflicts with ubuntu stock node version).
 				"RUN sudo npm install -g @playwright/cli@v0.1.15",
@@ -318,7 +323,7 @@ class SandboxContainer:
 		self.uid = args.uid
 		self.gid = args.gids[0]
 		self.gids = sorted(set(args.gids) - {self.gid})
-		self.userNamespaceRemapping = args.user_namespace_remapping
+		self.userNamespaceRemapping = args.mode == "user-namespace-remapping"
 		self.isInteractive = False if args.no_tty else (sys.stdin.isatty() and sys.stdout.isatty())
 		self.home = pathlib.Path("/root") if self.userNamespaceRemapping else args.home
 		self.user = "root" if self.userNamespaceRemapping else args.user
@@ -441,6 +446,8 @@ class SandboxContainer:
 			f'ENV USER="{self.user}"',
 			f'ENV HOME="{self.home}"',
 			"ENV SHELL=/bin/bash",
+			f"COPY --from=bzd --chown={self.uid}:{self.gid} /tmp/bzd/tools/shell/sh/bashrc.sh {self.home}/.bashrc",
+			f"RUN echo '__session_names+=(sandbox)' >> {self.home}/.bashrc",
 		]
 
 		instructions += [instruction for feature in self.features for instruction in feature.dockerFile]
@@ -473,9 +480,6 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 RUN mkdir /bzd && echo "#!/usr/bin/env bash" > /bzd/startup.sh && chmod +x /bzd/startup.sh
 
 {instructionsStr}
-
-COPY --from=bzd --chown={self.uid}:{self.gid} /tmp/bzd/tools/shell/sh/bashrc.sh {self.home}/.bashrc
-RUN echo "__session_names+=(sandbox)" >> {self.home}/.bashrc
 """
 
 	@cached_property
@@ -719,23 +723,6 @@ services:
 
 		defaultFeatures = ["docker", "platform", "volume", "isolation", "session"]
 
-		allPresets = {
-			f"agent{i}": [
-				"--enable",
-				"opencode",
-				"--enable",
-				"session",
-				"--enable",
-				"isolation",
-				"--enable",
-				"volume",
-				"--isolate",
-				"--prefix",
-				f"agent{i}",
-			]
-			for i in range(1, 10)
-		}
-
 		additionalCommands = {
 			"ls": SandboxContainer.ls,
 			"prune": SandboxContainer.prune,
@@ -786,10 +773,10 @@ services:
 			help="The user group identifier for this container.",
 		)
 		parser.add_argument(
-			"--user-namespace-remapping",
-			action=argparse.BooleanOptionalAction,
-			default=SandboxContainer.isUserNamespaceRemapping(),
-			help="Enable or disable verbose output.",
+			"--mode",
+			choices=["user-namespace-remapping", "remote", "local"],
+			default="user-namespace-remapping" if SandboxContainer.isUserNamespaceRemapping() else "local",
+			help="Defines where/how this container will run.",
 		)
 		parser.add_argument(
 			"--env",
@@ -832,12 +819,6 @@ services:
 			help="Add a prefix in name of the container, note that this might create a new container, each container is uniquely identified by its name.",
 		)
 		parser.add_argument(
-			"-p",
-			"--preset",
-			choices=allPresets.keys(),
-			help="Use a predefined argument set.",
-		)
-		parser.add_argument(
 			"rest",
 			nargs=argparse.REMAINDER,
 			help="Additional arguments to pass to the container.",
@@ -850,8 +831,6 @@ services:
 		# Read the arguments.
 		argvStrSequence = [str(arg) for arg in argv]
 		args = parser.parse_args(argvStrSequence)
-		if args.preset:
-			args = parser.parse_args([*allPresets[args.preset], *argvStrSequence])
 		if args.rest:
 			if args.rest[0] in additionalCommands:
 				additionalCommands[args.rest[0]](args.rest[1:])
