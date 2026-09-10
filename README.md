@@ -83,7 +83,7 @@ To run all static sanity checks, code formatters and documentation generators at
 To run all tests, run the following command:
 
 ```bash
-./quality_gate.sh
+./quality_gate
 ```
 
 This is a non-exhaustive list of languages and their supported tools. In addition to that,

@@ -20,7 +20,7 @@ config:
 }
 ```
 
-A square is defined by its border width. Such component is instantiated from a composable scope:
+A square is defined by its width. Such component is instantiated from a composable scope:
 
 ```bdl
 composition
