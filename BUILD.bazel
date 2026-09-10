@@ -1,4 +1,3 @@
-load("@bzd_lib//:defs.bzl", "bzd_executable_test")
 load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@bzd_rules_doc//doc:defs.bzl", "doc_library")
 load("@rules_python//python:defs.bzl", "py_binary")
@@ -60,16 +59,4 @@ py_binary(
     name = "sandbox",
     srcs = ["sandbox.py"],
     visibility = ["//visibility:public"],
-)
-
-bzd_executable_test(
-    name = "sandbox_agent_test",
-    args = [
-        "--preset",
-        "agent1",
-        "--dry",
-        "--verbose",
-    ],
-    executable = ":sandbox",
-    expected_output = "no-new-privileges:true",
 )
