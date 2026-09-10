@@ -21,6 +21,19 @@ bzd_config_default(
 )
 ```
 
+## Key escaping
+
+A key element is a segment of the doted path, separated by '.' (e.g. `nested.key` has the elements `nested` and `key`). To represent a literal '.' or '\' within a single key element, escape it with a backslash (e.g. `a\.b` is the single element `a.b`). Since '\.' is not a valid escape sequence in Starlark string literals, BUILD files must double the backslash: `"a\\.b"`.
+
+```py
+bzd_config_default(
+    name = "config",
+    values = {
+      "a\\.b": "1" # The single key `a.b`.
+    },
+)
+```
+
 To update the configuration from a file, use the following syntax:
 
 ```sh

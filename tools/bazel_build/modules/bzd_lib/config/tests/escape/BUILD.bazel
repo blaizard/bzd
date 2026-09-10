@@ -1,0 +1,22 @@
+load("//:defs.bzl", "bzd_diff_test")
+load("//config:defs.bzl", "bzd_config")
+
+bzd_config(
+    name = "config_escape",
+    srcs = [
+        "dotted.json",
+    ],
+    srcs_at = {
+        "c\\.d": "extra.json",
+    },
+    values = {
+        "a\\.b": "hello",
+    },
+)
+
+bzd_diff_test(
+    name = "config_escape_test",
+    file1 = ":config_escape.json",
+    file2 = "expected_config_escape.json",
+    format = "json",
+)

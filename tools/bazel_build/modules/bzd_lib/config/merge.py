@@ -26,12 +26,18 @@ class Config:
 
 	def addKey(
 		self,
-		key: typing.Optional[str],
+		key: str,
 		value: typing.Any,
 		metadata: Metadata,
 		source: str,
 		policy: UpdatePolicy,
 	) -> None:
+
+		# Explicit override.
+		if key.startswith("!"):
+			key = key[1:]
+			policy = UpdatePolicy.raiseOnNonConflict
+
 		data = makeDictionary(key, value)
 		self._verifyData(data, source, policy)
 		self.data.append((key, value, metadata, source))
@@ -56,10 +62,14 @@ class Config:
 				policy=policyOverride if policy == UpdatePolicy.override else policy,
 			)
 		except KeyError as e:
+			valueStr = str(data)
+			valueStr = f"{valueStr[:100]}[...]" if len(valueStr) > 100 else valueStr
 			if policy == UpdatePolicy.raiseOnConflict:
-				fatal(f"The key {e} from '{source}' was already defined by another base configuration.")
+				fatal(f"The key {e} from '{source}' was already defined by another base configuration (new value: {valueStr}).")
 			elif policy == UpdatePolicy.raiseOnNonConflict:
-				fatal(f"The key {e} from '{source}' is marked as 'override' but is not overwriting an existing key.")
+				fatal(
+					f"The key {e} from '{source}' is marked as 'override' but is not overwriting an existing key (new value: {valueStr})."
+				)
 			raise
 
 
@@ -234,13 +244,13 @@ if __name__ == "__main__":
 				value,
 				metadata=metadata + subMetadata,
 				source=source,
-				policy=UpdatePolicy.override,
+				policy=UpdatePolicy.raiseOnConflict,
 			)
 
 	# - From values at a specified key.
 	for entry in args.values:
 		keyStr, value, metadata = json.loads(entry)
-		output.addKey(keyStr, value, metadata=metadata, source="values", policy=UpdatePolicy.override)
+		output.addKey(keyStr, value, metadata=metadata, source="values", policy=UpdatePolicy.raiseOnConflict)
 
 	# Apply the key value pairs from the command line.
 	for keyValue in args.overrideSets:

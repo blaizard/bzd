@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 import json
+import re
 import typing
 import sys
 import dataclasses
@@ -10,6 +11,23 @@ from bzd.utils.dict import updateDeep, UpdatePolicy
 Metadata = typing.List[str]
 InternalFragment = typing.Tuple[typing.Optional[str], typing.Any, Metadata, str]
 InternalFragmentList = typing.List[InternalFragment]
+
+# Escape character used within flat key strings to represent a literal '.' or '\'.
+_ESCAPE_CHAR = "\\"
+
+
+def _splitKey(keyStr: str) -> typing.List[str]:
+	"""Split a flat key into its elements, unescaping escaped dots and backslashes."""
+
+	# Protect escaped characters from the split, so only unescaped dots separate the elements.
+	protected = re.sub(r"\\.", lambda m: m.group(0).replace(".", "\x00"), keyStr)
+	return [re.sub(r"\\(.)", r"\1", element.replace("\x00", ".")) for element in protected.split(".")]
+
+
+def _escapeKeyElement(key: str) -> str:
+	"""Escape a key element so that it can be safely joined into a flat key string."""
+
+	return key.replace(_ESCAPE_CHAR, _ESCAPE_CHAR * 2).replace(".", _ESCAPE_CHAR + ".")
 
 
 @dataclasses.dataclass
@@ -44,7 +62,7 @@ def processKeyData(
 	) -> typing.Dict[str, Data]:
 		values = {}
 		for key, value in currentData.items():
-			keyStr = key if currentRoot is None else f"{currentRoot}.{key}"
+			keyStr = _escapeKeyElement(key) if currentRoot is None else f"{currentRoot}.{_escapeKeyElement(key)}"
 			if isinstance(value, dict):
 				value = recursive(value, keyStr)
 			dataWithMetadata = Data(value=value, metadata=metadata.get(keyStr, []), key=key)
@@ -95,7 +113,7 @@ def makeDictionary(keyStr: typing.Optional[str], value: typing.Any) -> typing.Di
 
 	root: typing.Dict[str, typing.Any] = {}
 	data = root
-	[*keys, key] = keyStr.split(".")
+	[*keys, key] = _splitKey(keyStr)
 	for k in keys:
 		data = data.setdefault(k, {})
 	data[key] = value
