@@ -1,6 +1,9 @@
 import typing
 import enum
 
+# Sentinel to distinguish a missing key from a key whose value is None.
+_MISSING: object = object()
+
 
 def isEqual(
 	d1: typing.MutableMapping[typing.Any, typing.Any],
@@ -59,12 +62,12 @@ def updateDeep(
 	elif policy == UpdatePolicy.raiseOnConflict:
 
 		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
-			if d is not None:
+			if d is not _MISSING:
 				raise KeyError(".".join(keys))
 	elif policy == UpdatePolicy.raiseOnNonConflict:
 
 		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
-			if d is None:
+			if d is _MISSING:
 				raise KeyError(".".join(keys))
 	elif callable(policy):
 		policyCallback = policy  # type: ignore
@@ -85,7 +88,7 @@ def _updateDeep(
 	for k, v in u.items():
 		keys.append(k)
 		if k not in d:
-			policyCallback(None, v, keys)
+			policyCallback(_MISSING, v, keys)
 		if isinstance(v, dict):
 			d.setdefault(k, {})
 			if isinstance(d[k], dict):

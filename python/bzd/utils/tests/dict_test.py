@@ -84,6 +84,17 @@ class TestRun(unittest.TestCase):
 				policy=UpdatePolicy.raiseOnConflict,
 			)
 
+		# A key present with a None value is still a conflict.
+		with self.assertRaisesRegex(KeyError, "'a'"):
+			updateDeep({"a": None}, {"a": 1}, policy=UpdatePolicy.raiseOnConflict)
+
+		with self.assertRaisesRegex(KeyError, "'a.b'"):
+			updateDeep(
+				{"a": {"b": None}},
+				{"a": {"b": 1}},
+				policy=UpdatePolicy.raiseOnConflict,
+			)
+
 	def testUpdateDeepRaiseNonConflict(self) -> None:
 		output = updateDeep({"a": 1}, {"a": 2}, policy=UpdatePolicy.raiseOnNonConflict)
 		self.assertEqual(output, {"a": 2})
@@ -93,6 +104,10 @@ class TestRun(unittest.TestCase):
 
 		output = updateDeep({"a": 1}, {"a": {"c": 2}}, policy=UpdatePolicy.raiseOnNonConflict)
 		self.assertEqual(output, {"a": {"c": 2}})
+
+		# A key present with a None value is a conflict, not a non-conflict.
+		output = updateDeep({"a": None}, {"a": 1}, policy=UpdatePolicy.raiseOnNonConflict)
+		self.assertEqual(output, {"a": 1})
 
 
 if __name__ == "__main__":
