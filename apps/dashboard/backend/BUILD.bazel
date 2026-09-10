@@ -19,6 +19,7 @@ bzd_nodejs_config(
     expose = {
         "layout": "configLayout",
         "tests": "configTests",
+        "tiles": "configTiles",
     },
 )
 

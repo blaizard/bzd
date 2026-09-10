@@ -58,9 +58,9 @@ export default class TravisCI {
 	}
 
 	async fetch(cache) {
-		const endpoint = this.config["travisci.endpoint"];
-		const repositorySlug = this.config["travisci.repository"];
-		const token = this.config["travisci.token"];
+		const endpoint = this.config.endpoint;
+		const repositorySlug = this.config.repository;
+		const token = this.config.token;
 		const builds = await cache.get("travisci.builds", Cache.arrayOfStringToKey([endpoint, repositorySlug]), {
 			endpoint: endpoint,
 			repositorySlug: repositorySlug,

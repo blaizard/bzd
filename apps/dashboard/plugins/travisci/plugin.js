@@ -6,20 +6,20 @@ export default {
 	form: [
 		{
 			type: "Dropdown",
-			name: "travisci.endpoint",
+			name: "endpoint",
 			caption: "Endpoint",
 			validation: "mandatory",
 			list: ["travis-ci.org", "travis-ci.com"],
 		},
 		{
 			type: "Input",
-			name: "travisci.repository",
+			name: "repository",
 			caption: "Repository",
 			validation: "mandatory",
 			placeholder: "For example, blaizard/cpp-async",
 			width: 0.5,
 		},
-		{ type: "Input", name: "travisci.token", caption: "Token", width: 0.5 },
+		{ type: "Input", name: "token", caption: "Token", width: 0.5 },
 	],
 	timeout: 60 * 1000, // ms
 };

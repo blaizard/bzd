@@ -6,28 +6,28 @@ export default {
 	form: [
 		{
 			type: "Input",
-			name: "github.username",
+			name: "username",
 			caption: "Username",
 			placeholder: "For example, blaizard",
 			width: 0.5,
 		},
 		{
 			type: "Input",
-			name: "github.repository",
+			name: "repository",
 			caption: "Repository",
 			placeholder: "For example, cpp-async",
 			width: 0.5,
 		},
 		{
 			type: "Input",
-			name: "github.workflowid",
+			name: "workflowId",
 			caption: "Workflow ID (optional)",
 			placeholder: "For example, ci.yml",
 			width: 0.5,
 		},
 		{
 			type: "Input",
-			name: "github.token",
+			name: "token",
 			caption: "Token (optional)",
 			width: 0.5,
 		},

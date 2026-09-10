@@ -2,7 +2,7 @@ import Cache from "#bzd/nodejs/core/cache.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import { configLayout, configTests } from "#bzd/apps/dashboard/backend/config_nodejs.js";
+import { configLayout, configTiles, configTests } from "#bzd/apps/dashboard/backend/config_nodejs.js";
 import { makeUid } from "#bzd/nodejs/utils/uid.js";
 import APIv1 from "#bzd/api.json" with { type: "json" };
 import Plugins from "#bzd/apps/dashboard/plugins/plugins.backend.index.js";
@@ -85,7 +85,11 @@ class EventsFactory {
 	}
 
 	// Register plugin instances.
-	for (const data of configLayout()) {
+	const tiles = configTiles();
+	for (const entry of configLayout()) {
+		const data = typeof entry === "string" ? tiles[entry] : entry;
+		Exception.assert(data !== undefined, "The tile '{}' does not exist in the configuration.", entry);
+
 		switch (data.type || "tile") {
 			case "tile":
 				const uid = makeUid();

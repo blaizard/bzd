@@ -62,8 +62,8 @@ bzd_config(
         ":node_manager",
     ],
     values = {
-        "application": "$(path :node_manager)",
-        "updatePath": "bzd/apps/node_manager",
+        "!application": "$(path :node_manager)",
+        "!updatePath": "bzd/apps/node_manager",
     },
 )
 

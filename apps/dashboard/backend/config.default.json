@@ -1,28 +1,8 @@
 {
     "layout": [
-        {
-            "name": "",
-            "nodes.remotes": [
-                {
-                    "url": "http://localhost:8081",
-                    "volume": "nodes"
-                }
-            ],
-            "source.type": "nodes",
-            "visualization.color": "auto",
-            "visualization.type": "system_monitor"
-        },
-        {
-            "link": "http://www.google.com",
-            "name": "Google",
-            "tooltip": "Access Google search engine.",
-            "visualization.type": "link"
-        },
-        {
-            "link": "http://averyverybutveryinvalidurl.com",
-            "name": "Invalid URL",
-            "visualization.type": "link"
-        }
+        "nodes",
+        "google",
+        "invalid_url"
     ],
     "tests": [
         {
@@ -34,5 +14,30 @@
                 "/api/v1/layout"
             ]
         }
-    ]
+    ],
+    "tiles": {
+        "google": {
+            "link": "http://www.google.com",
+            "name": "Google",
+            "tooltip": "Access Google search engine.",
+            "visualization.type": "link"
+        },
+        "invalid_url": {
+            "link": "http://averyverybutveryinvalidurl.com",
+            "name": "Invalid URL",
+            "visualization.type": "link"
+        },
+        "nodes": {
+            "name": "",
+            "remotes": {
+                "local": {
+                    "url": "http://localhost:8081",
+                    "volume": "nodes"
+                }
+            },
+            "source.type": "nodes",
+            "visualization.color": "auto",
+            "visualization.type": "system_monitor"
+        }
+    }
 }

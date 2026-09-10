@@ -115,10 +115,10 @@ export default class Github {
 	}
 
 	async fetch(cache) {
-		const username = this.config["github.username"];
-		const repository = this.config["github.repository"];
-		const workflowId = this.config["github.workflowid"];
-		const token = this.config["github.token"];
+		const username = this.config.username;
+		const repository = this.config.repository;
+		const workflowId = this.config.workflowId;
+		const token = this.config.token;
 		const builds = await cache.get("github.builds", Cache.arrayOfStringToKey([username, repository, workflowId]), {
 			username: username,
 			repository: repository,

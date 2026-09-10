@@ -67,7 +67,8 @@ export default class Nodes {
 	/// \return An array of dictionary which looks like:
 	///         { nodes: [node1, node2, ...], url: ..., volume: ... }
 	async fetchList(cache) {
-		const promises = this.config["nodes.remotes"].map((remote) => {
+		const remotes = Object.values(this.config.remotes);
+		const promises = remotes.map((remote) => {
 			const url = remote.url;
 			const token = remote.token;
 			const volume = remote.volume;
@@ -83,7 +84,7 @@ export default class Nodes {
 				{
 					nodes: nodes,
 				},
-				this.config["nodes.remotes"][index],
+				remotes[index],
 			);
 		});
 	}
