@@ -362,8 +362,9 @@ export default class Plugin extends PluginBase {
 								cell = String(value);
 						}
 						// Neutralize spreadsheet formula injection (CWE-1236) by prefixing any
-						// cell starting with a formula indicator with a single quote.
-						if (/^[=+\-@\t\r]/.exec(cell)) {
+						// cell starting with optional leading whitespace followed by a formula
+						// indicator with a single quote.
+						if (/^\s*[=+\-@\t\r]/.exec(cell)) {
 							cell = "'" + cell;
 						}
 						// Preserve the CSV structure by quoting cells with special characters.

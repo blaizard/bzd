@@ -773,8 +773,16 @@ describe("Plugin", () => {
 						[["value5"], [[1234, "\tcommand"]]],
 						[["value6"], [[1234, "hello"]]],
 						[["value7"], [[1234, 42]]],
+						// Leading-whitespace formula payloads bypass the first-character check.
+						[["value8"], [[1234, " =2+2"]]],
+						[["value9"], [[1234, "  +SUM(1,1)"]]],
+						[["value10"], [[1234, " @cmd"]]],
+						[["value11"], [[1234, "\t=cmd"]]],
+						[["value12"], [[1234, "\n=2+2"]]],
 						// Exercise the header escaping with a key starting with '='.
 						[["=evil"], [[1234, "=evil-value"]]],
+						// Exercise the header escaping with a key starting with a leading space.
+						[[" =evil"], [[1234, " =evil-value"]]],
 					],
 				}),
 			});
@@ -795,6 +803,17 @@ describe("Plugin", () => {
 			Exception.assert(csv.includes("'-2+3"), "CSV value '-2+3' is not escaped: {}", csv);
 			Exception.assert(csv.includes("'@cmd"), "CSV value '@cmd' is not escaped: {}", csv);
 			Exception.assert(csv.includes("'\tcommand"), "CSV tab-prefixed value is not escaped: {}", csv);
+			// Leading-whitespace payloads must be neutralized with a single-quote prefix.
+			Exception.assert(csv.includes("' =2+2"), "CSV leading-space ' =2+2' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'  +SUM(1,1)"), "CSV leading-space '+SUM(1,1)' is not escaped: {}", csv);
+			Exception.assert(csv.includes("' @cmd"), "CSV leading-space '@cmd' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'\t=cmd"), "CSV tab-leading '=cmd' is not escaped: {}", csv);
+			Exception.assert(csv.includes("'\n=2+2"), "CSV newline-leading '=2+2' is not escaped: {}", csv);
+			Exception.assert(csv.includes("' =evil"), "CSV header ' =evil' is not escaped: {}", csv);
+			// No raw (unescaped) leading-whitespace formula prefix must remain.
+			Exception.assert(!csv.includes("; =2+2"), "CSV contains a raw ' =2+2' formula prefix: {}", csv);
+			Exception.assert(!csv.includes(";  +SUM(1,1)"), "CSV contains a raw '  +SUM(1,1)' formula prefix: {}", csv);
+			Exception.assert(!csv.includes("; @cmd"), "CSV contains a raw ' @cmd' formula prefix: {}", csv);
 			Exception.assert(csv.includes("'=HYPERLINK"), "CSV value '=HYPERLINK' is not escaped: {}", csv);
 			Exception.assert(csv.includes('""http://evil.example/""'), "CSV embedded quotes are not doubled: {}", csv);
 			// Normal values are preserved.
