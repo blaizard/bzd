@@ -116,7 +116,7 @@ export default class Router {
 				// - /hello/{:*} will match:
 				//   - /hello  -> capture: ""
 				//   - /hello/ -> capture: ""
-				//   - /hello/manythigs/including/slashes -> capture: "manythigs/including/slashes"
+				//   - /hello/manythings/including/slashes -> capture: "manythings/including/slashes"
 				case "*":
 					// No decodeURIComponent here, a raw string should be used here to differentiate between slashes and components.
 					castType = (str) => str.substring(1);

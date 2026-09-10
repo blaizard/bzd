@@ -81,7 +81,7 @@
 			alignSelection() {
 				return this.getOption("alignSelection", "center");
 			},
-			/// Maximum number of slides visible at a time. If set to 0, all the slides will be collapsed.
+			/// Maximum number of slides visible at a time. If set to 0, all the slides are displayed.
 			maxVisible() {
 				return this.getOption("maxVisible", 0);
 			},
@@ -89,8 +89,8 @@
 			margin() {
 				return this.getOption("margin", 0);
 			},
-			/// Print controls. If auto, it will be print them only if necessary, it "none", it will nto print them,
-			/// if "always", it will always print them.
+			/// Print controls. If "auto", they will be printed only if necessary, if "none", they will not be
+			/// printed, if "always", they will always be printed.
 			controls() {
 				return this.getOption("controls", "auto");
 			},
@@ -261,8 +261,8 @@
 								this.slidePosition = Math.round(rectBase.left - rect.right + rectContainer.width);
 							} else {
 								// Add the current offset to the slide position as this will be reset right after.
-								// This needs to be done here are we do not want to affect the slidePosition when
-								// it reaches corners cases (see above).
+								// This needs to be done here as we do not want to affect the slidePosition when
+								// it reaches corner cases (see above).
 								this.slidePosition += this.offsetX;
 							}
 							// Do not let the slides too much on the right (useless)

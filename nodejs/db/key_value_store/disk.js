@@ -36,7 +36,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 
 	/// Initialization of the class
 	async _initialize() {
-		// Create the directory if it does not exists
+		// Create the directory if it does not exist
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache("kvs-disk-cache");
 	}

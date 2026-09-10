@@ -23,7 +23,7 @@ function toPathList(path) {
 export class FileNotFoundError extends Error {}
 
 /// File storage module.
-/// Path are addressed by a path list, as some implementation allow slashes as a name.
+/// Paths are addressed by a path list, as some implementations allow slashes as a name.
 export class Storage extends AsyncInitialize {
 	constructor(options = {}) {
 		super();
@@ -118,13 +118,13 @@ export class Storage extends AsyncInitialize {
 
 	/// Delete a file or directory from a path
 	///
-	/// \throws FileNotFoundError if the file or directory does not exists.
+	/// \throws FileNotFoundError if the file or directory does not exist.
 	async delete(path) {
 		Exception.assert(this.writeAccess === true, "This storage doesn't have write access.");
 		return this._deleteImpl(toPathList(path));
 	}
 
-	/// Try to delete a file or directory from a path, do nothing if the file does not exists.
+	/// Try to delete a file or directory from a path, do nothing if the file does not exist.
 	///
 	/// \return true if the file was deleted, false if the file did not exists.
 	async tryDelete(path) {
@@ -153,7 +153,7 @@ export class Storage extends AsyncInitialize {
 
 	/// Create a directory at a given path.
 	///
-	/// If the parent directory also does not exists, create it as well.
+	/// If the parent directory also does not exist, create it as well.
 	///
 	/// \throws only if the path already exists AND is a file.
 	async mkdir(path) {

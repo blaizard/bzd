@@ -18,7 +18,7 @@ const Log = LogFactory("apps", "plugin", "nodes");
 ///     - <another source>
 ///          - 7.rec
 ///
-/// The format of each entry is as follow:
+/// The format of each entry is as follows:
 /// [tick, payload]
 export default class Records {
 	/// Construct on-disk iterable records.
@@ -147,7 +147,7 @@ export default class Records {
 		const index = storage.records.findLastIndex((entry) => entry.tick <= tick);
 		Exception.assert(index === -1 || storage.records[index].tick < tick, "2 ticks cannot have the same value.");
 
-		// Create the file if it does not exists.
+		// Create the file if it does not exist.
 		if (path === null) {
 			path = storage.path + "/" + tick + ".rec";
 			await this.options.fs.touch(path);
@@ -271,7 +271,7 @@ export default class Records {
 	/// Also remove invalid records if any.
 	///
 	/// Things that are checked.
-	/// - All records files name have increasing ticks and are sorted.
+	/// - All record file names have increasing ticks and are sorted.
 	/// - All records ticks are increasing.
 	/// - The size of each file doesn't exceed the maximum size (unless it contains a single record).
 	/// - The size of all records doesn't exceed the maximum size (unless all entries are single).

@@ -240,7 +240,7 @@ export default class FileSystem {
 				segment,
 			);
 
-			// If the entry does not exists.
+			// If the entry does not exist.
 			if (!(segment in entry.children)) {
 				Exception.assert(policy & _Policy.create, "The path '{}' does not exists (directory '{}').", path, segment);
 				if (isLast && policy & _Policy.file) {
@@ -344,7 +344,7 @@ export default class FileSystem {
 		delete dir.children[p.name];
 	}
 
-	/// Touch a file (create it if it does not exists) and
+	/// Touch a file (create it if it does not exist) and
 	/// updates its last modification date.
 	async touch(path) {
 		await this.options.wait();

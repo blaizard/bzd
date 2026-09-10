@@ -53,7 +53,7 @@ const Log = LogFactory("backend");
 		"Cross-Origin-Opener-Policy": "same-origin-allow-popups",
 	};
 	if (program.opts().testData) {
-		// This allow http and https interoperability.
+		// This allows http and https interoperability.
 		headers["Referrer-Policy"] = "no-referrer-when-downgrade";
 	}
 	backend
@@ -81,7 +81,7 @@ const Log = LogFactory("backend");
 
 	// ---- Helpers ----
 
-	/// Generate a reset password like for a specific user.
+	/// Generate a reset password link for a specific user.
 	async function createResetPasswordLink(user, newPassword = false) {
 		// Create a single-use, expiring reset token and persist only its hash.
 		let token;
@@ -434,7 +434,7 @@ const Log = LogFactory("backend");
 		const testData = new TestData(users, applications, payment);
 		await testData.install();
 		await testData.run();
-		// This allow http and https interoperability.
+		// This allows http and https interoperability.
 		headers["Referrer-Policy"] = "no-referrer-when-downgrade";
 	}
 

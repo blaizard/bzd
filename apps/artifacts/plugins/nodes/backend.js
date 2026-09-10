@@ -282,7 +282,7 @@ export default class Plugin extends PluginBase {
 		///
 		/// This is used to get the time from the server and measure the time
 		/// delay between the client and the server clock.
-		/// It can be measured as follow:
+		/// It can be measured as follows:
 		/// ~ ((timestamp - t1) + (t4 - timestamp)) / 2
 		endpoints.register("get", "/@time", async (context) => {
 			context.setStatus(200);
@@ -430,7 +430,7 @@ export default class Plugin extends PluginBase {
 				}
 			});
 
-			// Updated some fields with the actual ones and return the dashboards.
+			// Update some fields with the actual ones and return the dashboards.
 			const dashboards = Object.values(dashboardsByUid).map((entry) => {
 				return Object.assign({}, entry.dashboard, {
 					inputs: entry.inputs,

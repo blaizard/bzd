@@ -229,7 +229,7 @@ class RouterManager {
 	/// Return meta-information about this route.
 	///
 	/// \param path The path to be checked.
-	/// \return The information associated to the path, null if the path does not exists.
+	/// \return The information associated to the path, null if the path does not exist.
 	getInfoFromPath(path) {
 		for (const router of Object.values(this.routers)) {
 			const match = router.match(path);

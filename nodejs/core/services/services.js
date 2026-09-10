@@ -392,7 +392,7 @@ export default class Services {
 		}
 	}
 
-	/// Get a specific service given it's UID.
+	/// Get a specific service given its UID.
 	///
 	/// \param uid The service UID.
 	/// \return The service state.

@@ -20,7 +20,7 @@ export default class FileSystem {
     /// Create a directory recursively.
     //
     // \param path The path of the directory.
-    // \param force If false, it will throw if a directory already exists or if the parent path does not exists.
+    // \param force If false, it will throw if a directory already exists or if the parent path does not exist.
     static async mkdir(path: string, { force = true }: { force?: boolean } = {}): Promise<void> {
         await Fs.promises.mkdir(path, {
             recursive: force,
@@ -120,7 +120,7 @@ export default class FileSystem {
         await Fs.promises.truncate(path, fileSize);
     }
 
-    /// Touch a file (create it if it does not exists) and
+    /// Touch a file (create it if it does not exist) and
     /// updates its last modification date.
     static async touch(path: string): Promise<void> {
         const fd = await FileSystem.open(path, "a");

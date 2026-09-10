@@ -192,7 +192,7 @@
 				// Normalize the result and make the result exponential to add importance on full matches
 				weight /= word.length;
 
-				// Add a penalty on word size to ensure that an exact match always get more weight than a substring match
+				// Add a penalty on word size to ensure that an exact match always gets more weight than a substring match
 				weight = word.length == sentence.length ? weight : weight * 0.9;
 
 				return !minMatch || weight > minMatch ? weight : 0;
@@ -217,7 +217,7 @@
 			select(item) {
 				if (!this.isSelected(item)) {
 					// Copy the value before it got altered by the input element losing its focus,
-					// and after all event have been processed, set the new value.
+					// and after all events have been processed, set the new value.
 					setTimeout(() => {
 						if (this.multi) {
 							const curValue = this.curValue.splice(0);

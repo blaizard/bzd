@@ -50,7 +50,7 @@
 				async handler() {
 					// Wait until the editor is up.
 					await this.$nextTick();
-					// If the path are different and an update is requested.
+					// If the path is different and an update is requested.
 					if (this.currentPath != this.path) {
 						this.caretPosition = null;
 						if (this.updateRequested) {

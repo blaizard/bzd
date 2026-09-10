@@ -18,7 +18,7 @@ template <class Callback, typename tag = void>
 class ExecPoint
 {
 private:
-	/// A singleton is need to ensure the definition of the template variable during
+	/// A singleton is needed to ensure the definition of the template variable during
 	/// compilation time, this prevents a linker issue.
 	struct Wrapper
 	{

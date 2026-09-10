@@ -37,7 +37,7 @@ export default class TimeseriesDisk extends Timeseries {
 	 * Initialize the timeseries module
 	 */
 	async _initialize() {
-		// Create the directory if it does not exists
+		// Create the directory if it does not exist
 		await FileSystem.mkdir(this.path);
 		this.cache = new Cache("timeseries-disk-cache");
 	}

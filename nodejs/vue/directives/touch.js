@@ -118,7 +118,7 @@ function removeAllClass(className) {
 }
 
 function activateTouch(e, el, config) {
-	// Do nothing if the event if not correct
+	// Do nothing if the event is not correct
 	if (!config.enable || !isPrimaryButtonOrTouch(e)) {
 		return;
 	}
@@ -335,7 +335,7 @@ function detectDropZone() {
 	};
 
 	if (receiverEltList) {
-		// Check if drag an active element
+		// Check if dragging an active element
 		let newActiveReveiverElt = null;
 		let newActiveReceiverEltWithTolerance = null;
 
@@ -420,7 +420,7 @@ function detectDropZone() {
 					coordViewPort.x <= coordChildViewPort.left + coordChildViewPort.width;
 
 				if (isOverChild) {
-					// If the children is actually the placeholder, do nothing
+					// If the child is actually the placeholder, do nothing
 					if (child.classList.contains(DRAG_PLACEHOLDER)) {
 						return;
 					}
@@ -627,7 +627,7 @@ function reset() {
 	document.removeEventListener("mouseup", dragStop, eventListenerOptions);
 	document.removeEventListener("mousemove", dragMove, eventListenerOptions);
 
-	// Those event are fired after, hence we need a short delay
+	// Those events are fired after, hence we need a short delay
 	setTimeout(() => {
 		document.removeEventListener("click", stopEventPropagation, eventListenerOptions);
 		document.removeEventListener("touch", stopEventPropagation, eventListenerOptions);

@@ -44,7 +44,7 @@ bzd::Async<bzd::Span<const bzd::Byte>> Proactor::read(const posix::FileDescripto
 		}, sleepMode*/);
 		// In the interface.bdl of the component, you can define multiple sleep modes.
 		// These sleep modes will be aggregated during composition to create a big enum class.
-		// each sleep modes must be handled in the executor idle task.
+		// each sleep mode must be handled in the executor idle task.
 		// - what if some sleep modes are valid for a variant but not for another?
 		// - Should this be dealt at executor level?
 		// Concepts:

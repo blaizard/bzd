@@ -13,7 +13,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		super(callbackPayment, callbackCancelRecurrency);
 		this.options = Object.assign(
 			{
-				/// You API secret Key.
+				/// Your API secret key.
 				secretKey: null,
 				/// The endpoint secret.
 				secretEndpoint: null,
@@ -28,7 +28,7 @@ export default class StripePaymentWebhook extends PaymentInterface {
 		this.products = {};
 		// Map containing the matching between customer identifier and their email.
 		this.customers = {};
-		// Contain all already processed uids .
+		// Contains all already processed uids.
 		this.processedPayments = new Set();
 		this.processedDeletedSubscriptions = new Set();
 	}

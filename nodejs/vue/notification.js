@@ -31,7 +31,7 @@ export default {
 				notifySingle(null, type, message, options, callback);
 			}
 		};
-		// Find en entry with this key
+		// Find an entry with this key
 		const entryFind = (key) => {
 			for (let index in data.entries) {
 				if (data.entries[index].key == key) {
@@ -46,13 +46,13 @@ export default {
 				key = hashCode(messageStr);
 			}
 
-			// If the entry does not exists, create it
+			// If the entry does not exist, create it
 			let index = entryFind(key);
 			if (index == -1) {
 				data.entries.push({
 					// Time to display this item on the screen (in seconds)
 					timeOnScreen: 5,
-					// Number of occurrences this notification happen.
+					// Number of occurrences this notification happens.
 					occurrences: 0,
 					// Actions associated with this action, if empty no action will be shown.
 					// An action is an html key (which represents the text associated with this action)

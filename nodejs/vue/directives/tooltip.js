@@ -138,7 +138,7 @@ export function tooltip(elt, options) {
 		return;
 	}
 
-	// Save the current object. Do this event if it is not shown, this is used
+	// Save the current object. Do this even if it is not shown, this is used
 	// by the asynchronous function if it needs to be updated.
 	current.elt = elt;
 

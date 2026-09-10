@@ -5,7 +5,7 @@
 namespace bzd::test {
 
 /// Type that implements only a copy constructor and copy assignment operator.
-/// In other word, the move constructor and move assignment operator is deleted.
+/// In other words, the move constructor and move assignment operator are deleted.
 class CopyOnly
 {
 protected:

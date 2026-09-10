@@ -39,7 +39,7 @@
 		watch: {
 			"$authentication.isAuthenticated": {
 				async handler(isAuthenticated) {
-					// Do this only if loading is not active to avoid a race when login.
+					// Do this only if loading is not active to avoid a race when logging in.
 					if (isAuthenticated && !this.loading) {
 						await this.afterLogin();
 					}

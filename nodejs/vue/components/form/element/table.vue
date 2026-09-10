@@ -52,7 +52,7 @@
 		},
 		data: function () {
 			return {
-				/// Sort the table by the columns name
+				/// Sort the table by the column names
 				sort: this.getOption("sort", []),
 			};
 		},

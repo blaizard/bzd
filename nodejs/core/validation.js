@@ -195,7 +195,7 @@ export default class Validation {
 			{
 				/// Output type, can be either "throw", "throw_precondition", "result" or "return"
 				output: "throw",
-				/// Callback deciding whether or not a valid is conisdered as existent
+				/// Callback deciding whether or not a value is considered as existing
 				valueExists: (key, value) => {
 					return value !== undefined;
 				},

@@ -31,7 +31,7 @@ export default class Rest {
 		return (this.options.host ? this.options.host : "") + "/websocket/v" + this.options.version + endpoint;
 	}
 
-	/// Install all given plugins..
+	/// Install all given plugins.
 	installPlugins(...plugins) {
 		for (const plugin of plugins) {
 			if (typeof plugin.installWebsocket == "function") {

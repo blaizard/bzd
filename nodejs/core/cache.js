@@ -92,7 +92,7 @@ export default class Cache {
 		//      },
 		//      values: { [key]: {
 		//          data: undefined,
-		//          status: <Statue>,
+		//          status: <Status>,
 		//          timeout: <int>,
 		//          size: undefined,
 		//      }}
@@ -106,7 +106,7 @@ export default class Cache {
 	/// Defines an empty state.
 	static empty = Symbol();
 
-	/// Status of a entry.
+	/// Status of an entry.
 	static Status = Object.freeze({
 		value: Symbol("value"),
 		error: Symbol("error"),
@@ -128,11 +128,11 @@ export default class Cache {
 		return payload.split("\0").slice(1);
 	}
 
-	/// Default function to get a very rought estimate of the size of an object.
+	/// Default function to get a very rough estimate of the size of an object.
 	///
-	/// This function advantages speed of accuracy.
+	/// This function advantages speed over accuracy.
 	/// It is not exact at all but gives a sense of whether a value takes a large
-	/// memory chunk or not and this is all what we need for the eviciton mechanism
+	/// memory chunk or not and this is all what we need for the eviction mechanism
 	/// with the cache.
 	static defaultGetSize(value) {
 		const objectToSize = (value) => {

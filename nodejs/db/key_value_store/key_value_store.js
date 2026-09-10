@@ -17,7 +17,7 @@ class KeyValueStoreBucketAccessor {
 		return this.storage._setImpl(this.bucket, key, value);
 	}
 
-	/// Retrieve a value from a given key, or return the default value if it does not exists.
+	/// Retrieve a value from a given key, or return the default value if it does not exist.
 	async get(key, defaultValue = undefined) {
 		return this.storage._getImpl(this.bucket, key, defaultValue);
 	}
@@ -71,7 +71,7 @@ export default class KeyValueStore extends AsyncInitialize {
 		return this._setImpl(bucket, key, value);
 	}
 
-	/// Retrieve a value from a given key, or return the default value if it does not exists.
+	/// Retrieve a value from a given key, or return the default value if it does not exist.
 	async get(bucket, key, defaultValue = undefined) {
 		return this._getImpl(bucket, key, defaultValue);
 	}

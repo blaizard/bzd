@@ -6,7 +6,7 @@ import Task from "./task.js";
 const Log = LogFactory("task", "manager");
 const Exception = ExceptionFactory("task", "manager");
 
-// Task size approximation, used for to estimate the size of the data structure (in bytes).
+// Task size approximation, used to estimate the size of the data structure (in bytes).
 const TASK_SIZE = 128; // sizeof(Task);
 
 /**

@@ -1,6 +1,6 @@
 /// Simple async lock implementation
 ///
-/// Should be use like this:
+/// Should be used like this:
 /// ```js
 /// const lock = new Lock();
 /// await lock.acquire(async () => {

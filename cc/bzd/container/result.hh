@@ -121,7 +121,7 @@ public: // API
 
 	/// Returns the contained value if the result has a value, otherwise returns defaultValue.
 	///
-	/// \param defaultValue The value to use in case *this is empty.
+	/// \param defaultValue The value to use in case *this contains an error.
 	/// \return The current value if *this has a value, or defaultValue otherwise.
 	template <class DefaultValue>
 	[[nodiscard]] constexpr const Value& valueOr(DefaultValue&& defaultValue) const noexcept
@@ -133,7 +133,7 @@ public: // API
 
 	/// Returns a copy of the contained value if the result has a value, otherwise returns defaultValue.
 	///
-	/// \param defaultValue The value to use in case *this is empty.
+	/// \param defaultValue The value to use in case *this contains an error.
 	/// \return The current value if *this has a value, or defaultValue otherwise.
 	[[nodiscard]] constexpr Value valueOrAsCopy(const Value& defaultValue) const noexcept { return valueOr(defaultValue); }
 

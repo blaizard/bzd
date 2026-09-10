@@ -5,7 +5,7 @@
 	const Exception = ExceptionFactory("form");
 	let uidCounter = 0;
 
-	/// The following must be implement for all elements:
+	/// The following must be implemented for all elements:
 	/// Events:
 	/// - @active: when the element has the focus
 	/// - @update:model-value: when the element has a new value

@@ -16,7 +16,7 @@ export default {
 		const content = reactive({});
 
 		const getReactive = (collection, key) => {
-			// If data does not exists, create it
+			// If data does not exist, create it
 			if (!(collection in content)) {
 				content[collection] = {};
 			}

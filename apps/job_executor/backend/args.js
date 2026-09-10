@@ -4,7 +4,7 @@ const Exception = ExceptionFactory("backend", "args");
 
 /// Convert an argument pattern to a list.
 ///
-/// A pattern might looks like this:
+/// A pattern might look like this:
 ///   [["--key", "{key}"], "{hello}"]
 /// This implies that ["--key", "{key}"] is conditional and will be repeated for as many "key" as there is.
 export default class Args {

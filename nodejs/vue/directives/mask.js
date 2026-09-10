@@ -13,7 +13,7 @@ export function mask(el, className = "") {
 	// Remove any existing mask
 	maskRemove(el);
 
-	// Set position of not already explicitly set
+	// Set position if not already explicitly set
 	if (!el.style.position) {
 		el.style.position = "relative";
 	}

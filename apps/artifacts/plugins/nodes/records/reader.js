@@ -94,7 +94,7 @@ export default class RecordsReader {
 					}),
 				);
 			} catch (e) {
-				// If it fails it means that a file have been deleted meanwhile.
+				// If it fails it means that a file has been deleted meanwhile.
 				continue;
 			}
 
@@ -128,7 +128,7 @@ export default class RecordsReader {
 
 	/// Read a record from a specific storage at a given tick to its end.
 	///
-	/// \param storage The storage to read from.
+	/// \param storageName The storage to read from.
 	/// \param tick Initial tick.
 	///
 	/// \return A tuple, containing the list of payload previously stored, and the next tick.
@@ -183,7 +183,7 @@ export default class RecordsReader {
 							return payloads.slice(indexPayload);
 						}
 					} catch (e) {
-						// An exception means that the file might have been written or doesn't exists anymore.
+						// An exception means that the file might have been written or doesn't exist anymore.
 						break;
 					}
 

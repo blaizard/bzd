@@ -168,7 +168,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 			});
 			await context.sendStream(readStream, transform);
 		} catch (e) {
-			// If the file does not exists.
+			// If the file does not exist.
 			if (e instanceof FileNotFoundError) {
 				const [metadata, readStream] = await fetchFile(context, url, headersRequest, allowList);
 				if (metadata.status < 200 || metadata.status >= 300) {

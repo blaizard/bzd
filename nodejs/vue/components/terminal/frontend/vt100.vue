@@ -294,11 +294,11 @@
 					++this.y;
 					this.content[this.y] ??= [];
 				};
-				// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
+				// If the row does not exist, create it. The loop needs to cover this.y, hence the <= sign.
 				for (let y = this.content.length; y <= this.y; ++y) {
 					this.content[y] = [];
 				}
-				// If the column does not exists, create it. The loop does cover this.x, it is needed for displaying the cursor.
+				// If the column does not exist, create it. The loop does cover this.x, it is needed for displaying the cursor.
 				for (let x = this.content[this.y].length; x < this.x; ++x) {
 					this.content[this.y].push(space);
 				}

@@ -241,7 +241,7 @@ public:
 			auto previous = findPreviousNode(&element);
 			if (!previous)
 			{
-				// If it doesn't find it anymore, it means that a concurrent removal happen.
+				// If it doesn't find it anymore, it means that a concurrent removal happened.
 				// The previous pointer has already been updated, therefore, this node
 				// can be removed safely.
 
@@ -290,7 +290,7 @@ public:
 						previous->nextRaw = setWeakMark(previous->nextRaw);
 					}
 
-					// Ensure that the chain remain unchanged
+					// Ensure that the chain remains unchanged
 					{
 						auto current = previous->nextRaw;
 						while (--distanceFromElement)

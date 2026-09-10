@@ -264,7 +264,7 @@ private:
 			{
 				return {begin, end, maybeIndex};
 			}
-			// If the entry was not taken, it means that a concurrent write happen,
+			// If the entry was not taken, it means that a concurrent write happened,
 			// then try again.
 			begin = read_.load();
 			end = write_.load();
@@ -272,7 +272,7 @@ private:
 		return {};
 	}
 
-	/// Create a Spans of 2 as a range starting from \b being to \b end.
+	/// Create a Span of 2 as a range starting from \b begin to \b end.
 	template <class U>
 	static constexpr bzd::Spans<U, 2u> makeSpans(U* data, const Index begin, const Index end) noexcept
 	{

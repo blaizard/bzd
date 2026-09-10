@@ -24,7 +24,7 @@ export default class Scopes {
 		return scopeList.some((scope) => this.contains(scope));
 	}
 
-	/// Have exactly the same scopes are the ones passed into argument.
+	/// Have exactly the same scopes as the ones passed into argument.
 	sameAs(scopes) {
 		let scopesObject = new Scopes(scopes);
 		if (scopesObject.list_.length != this.list_.length) {

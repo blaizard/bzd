@@ -59,7 +59,7 @@ public: // Accessors.
 	}
 
 	/// Get the span of contiguous memory containing data starting from the tail.
-	/// In other word, this represents the first half of contiguous data to be read.
+	/// In other words, this represents the first half of contiguous data to be read.
 	///
 	/// \return A span containing the contiguous memory region.
 	[[nodiscard]] constexpr auto asSpanForReading() const noexcept
@@ -74,7 +74,7 @@ public: // Accessors.
 	}
 
 	/// Get the span of contiguous memory containing free slots starting from the head.
-	/// In other word, this represents the first half of contiguous free slots.
+	/// In other words, this represents the first half of contiguous free slots.
 	///
 	/// \return A span containing the contiguous memory region.
 	[[nodiscard]] constexpr auto asSpanForWriting() noexcept

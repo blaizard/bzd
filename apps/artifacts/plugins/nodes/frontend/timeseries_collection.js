@@ -53,10 +53,11 @@ export default class TimeseriesCollection {
 
 	/// Add a new chunk of data to the collection.
 	////
-	/// The data is expected to be an array of [time, value] pairs, sorted by time.
+	/// The data is expected to be a dictionary of collections, each being an array of
+	/// [time, value] pairs, sorted by time.
 	/// If there is an overlap with existing data, the overlapping range is replaced.
 	///
-	/// \param data A dictionaty of arrays of [time, value] pairs, sorted by time.
+	/// \param newData A dictionary of arrays of [time, value] pairs, sorted by time.
 	add(newData) {
 		for (const [collection, collectionNewData] of Object.entries(newData)) {
 			Exception.assertPrecondition(

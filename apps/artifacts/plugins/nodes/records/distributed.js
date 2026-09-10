@@ -8,7 +8,7 @@ import FileSystemMemory from "#bzd/nodejs/core/mock/filesystem.js";
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
 const Log = LogFactory("apps", "plugin", "nodes");
 
-/// Similar than Records but works with multiple host on the same disk.
+/// Similar to Records but works with multiple hosts on the same disk.
 ///
 /// They share a directory with the following structure:
 /// - root
@@ -20,8 +20,7 @@ const Log = LogFactory("apps", "plugin", "nodes");
 export default class RecordsDistributed {
 	/// Constructor for the distributed records.
 	///
-	/// \param hostname The hostname of the current machine.
-	/// \param options for the records.
+	/// \param options The options for the records.
 	constructor(options = {}) {
 		this.options = Object.assign(
 			{

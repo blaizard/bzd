@@ -105,7 +105,7 @@ export default class StorageGoogleDrive extends Storage {
 				modified: new Date(Date.parse(data.modifiedTime)),
 			},
 			{
-				// Google documents cannot be downloaded directly, then need to be exported.
+				// Google documents cannot be downloaded directly, they need to be exported.
 				read: !isGoogleDocument && data.capabilities.canDownload,
 				write: data.capabilities.canEdit,
 				delete: data.capabilities.canDelete,

@@ -73,7 +73,7 @@ export default class StorageDisk extends Storage {
 		super(
 			Object.assign(
 				{
-					/// If false, it will attempt to create a directory if it does not exists.
+					/// If false, it will attempt to create a directory if it does not exist.
 					mustExists: false,
 				},
 				options,

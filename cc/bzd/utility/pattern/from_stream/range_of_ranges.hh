@@ -33,7 +33,7 @@ struct FromStream<Output> : public bzd::FromString<Output>
 				sortedRange.output = maybeResult.value().value();
 			}
 
-			// Dot not look further if lazy mode.
+			// Do not look further if lazy mode.
 			if (metadata.mode == Metadata::Mode::lazy && sortedRange.output.hasValue())
 			{
 				return false;

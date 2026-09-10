@@ -114,7 +114,7 @@ export default class TokenAuthenticationServer extends AuthenticationServer {
 				data = await authentication.readToken(refreshToken);
 
 				// This ensures that a wrongly formatted token will trigger a new token being generated
-				// while still having the error reported. This ensure smooth transition to new token format.
+				// while still having the error reported. This ensures a smooth transition to new token format.
 				authentication.validationRefreshToken.validate(data);
 			} catch (e) {
 				Exception.fromError(e).print();

@@ -74,7 +74,7 @@
 			/// The formatting can be:
 			/// - A string -> mask: ***-***
 			/// - A Function -> format (value) => (...)
-			/// - A Dictionaty -> presets: { "hello" => "<i>hello</i>" }
+			/// - A Dictionary -> presets: { "hello" => "<i>hello</i>" }
 			format() {
 				return this.getOption("format", false);
 			},
@@ -272,7 +272,7 @@
 			handleBlur(e, text) {
 				if (this.hasChanged) {
 					// Safari uses '\n' when the user removed everything with backspace.
-					// This keep a consistent behavior with other browsers.
+					// This keeps a consistent behavior with other browsers.
 					text = text.trim();
 					if (this.multi) {
 						this.valueListAdd(text);

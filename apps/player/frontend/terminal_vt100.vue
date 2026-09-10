@@ -185,11 +185,11 @@
 				const size = content.length;
 				let i = 0;
 				do {
-					// If the row does not exists, create it. The loop need to cover this.y, hence the <= sign.
+					// If the row does not exist, create it. The loop needs to cover this.y, hence the <= sign.
 					for (let y = this.content.length; y <= this.y; ++y) {
 						this.content[y] = [];
 					}
-					// If the column does not exists, create it. The loop does not need to cover this.x because this will be done when writing.
+					// If the column does not exist, create it. The loop does not need to cover this.x because this will be done when writing.
 					for (let x = this.content[this.y].length; x < this.x; ++x) {
 						this.content[this.y].push([" ", 0]);
 					}

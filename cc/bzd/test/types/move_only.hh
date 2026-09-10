@@ -6,14 +6,14 @@
 namespace bzd::test {
 
 /// Type that implements only a move constructor and move assignment operator.
-/// In other word, the copy constructor and copy assignment operator is deleted.
+/// In other words, the copy constructor and copy assignment operator are deleted.
 class MoveOnly
 {
 protected:
 	using Self = MoveOnly;
 
 public:
-	/// Construct a move oonly object.
+	/// Construct a move only object.
 	///
 	/// \param destroyedBeforeMoved A pointer to a boolean that will be set to true in case the object was destroyed before being moved.
 	constexpr MoveOnly(bzd::Bool* const destroyedBeforeMoved = nullptr) noexcept : destroyedBeforeMoved_{destroyedBeforeMoved} {}

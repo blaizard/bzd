@@ -123,7 +123,7 @@ public:
 	template <class Profiler = bzd::components::generic::CoreProfilerNoop>
 	void run(const UInt16 coreUId, Profiler& profiler = bzd::components::generic::getCoreProfilerNoop()) noexcept
 	{
-		// Storage for context related to the this running instance.
+		// Storage for context related to this running instance.
 		ExecutorContext<Executable> context{coreUId};
 		auto scope = registerContext(context);
 		auto scopeProfiler = registerProfiler(profiler, context);
@@ -272,7 +272,7 @@ private:
 
 	/// Push a new workload to the queue.
 	///
-	/// It is pushed at the end of the queue, so will be executed after all previous workload are.
+	/// It is pushed at the end of the queue, so it will be executed after all previous workloads are.
 	///
 	/// \param executable The workload to be executed.
 	/// \param increment Increment the counters.

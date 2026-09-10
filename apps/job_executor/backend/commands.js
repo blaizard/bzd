@@ -36,7 +36,7 @@ export default class Commands {
 			this.make(uid, executor);
 		}
 
-		// Prefill the entries that are have not been discovered.
+		// Prefill the entries that have not been discovered.
 		for (const uid of this.context.getAllJobs()) {
 			if (!(uid in this.executors)) {
 				const contextJob = this.getContext(uid);
