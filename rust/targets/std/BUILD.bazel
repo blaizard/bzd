@@ -28,4 +28,7 @@ bdl_target(
     },
     language = "rust",
     visibility = ["//visibility:public"],
+    deps = [
+        "//rust/components/generic/executor",
+    ],
 )

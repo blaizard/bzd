@@ -1,7 +1,9 @@
+use "rust/components/generic/executor/interface.bdl"
 
 
 
 composition {
+	executor = bzd.components.generic.GenericExecutor() [executor];
 	
 }
 

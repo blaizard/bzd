@@ -56,6 +56,9 @@ def formatRust(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] 
 	return template.render(bdl.tree, Transform(data=data))
 
 
-def compositionRust(composition: CompositionView) -> str:
+def compositionRust(
+	composition: CompositionView,
+	data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+) -> str:
 	template = Template.fromPath(pathlib.Path(__file__).parent / "template/composition.rs.btl", indent=True)
-	return template.render(composition, Transform(composition=composition))
+	return template.render(composition, Transform(composition=composition, data=data))

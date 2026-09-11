@@ -18,6 +18,13 @@ if __name__ == "__main__":
 		help="The target to process.",
 	)
 	parser.add_argument(
+		"--import",
+		dest="imports",
+		action="append",
+		type=str,
+		help="Crate name of a bdl dependency to import.",
+	)
+	parser.add_argument(
 		"bdls",
 		nargs="+",
 		type=pathlib.Path,
@@ -33,5 +40,6 @@ if __name__ == "__main__":
 
 	content = compositionRust(
 		composition=composition.view(args.target),
+		data={"rust": {"imports": list(dict.fromkeys(args.imports or []))}},
 	)
 	args.output.write_text(content)

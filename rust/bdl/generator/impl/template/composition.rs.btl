@@ -2,12 +2,15 @@
 
 #[allow(unused_imports)]
 use rust_interfaces_executor::Executor;
+{% for import in data.rust.imports %}
 #[allow(unused_imports)]
-use rust_components_generic_executor::GenericExecutor;
+use {{ import }}::*;
+{% end %}
 
 pub async fn executor() -> i32
 {
-	let result = 0;
+	#[warn(unused_assignments)]
+	let mut result = 0;
 {% for context in contexts %}
 	let executor = GenericExecutor::new();
 	result = executor{{ contextToExecutorPushCalls(context) }}.join().await;

@@ -65,6 +65,10 @@ def _rust_generate_composition_impl(ctx):
     args.add("--output", ctx.outputs.output)
     args.add("--target", ctx.attr.target_name)
 
+    for dep in all_deps:
+        if rust_common.crate_info in dep:
+            args.add("--import", dep[rust_common.crate_info].name)
+
     sources = [source[1] for provider in info.bdls for source in provider.sources.to_list()]
     args.add_all(sources)
 
@@ -132,8 +136,6 @@ def _generator_rust_composition_impl(name, visibility, target_name, target, comp
         ],
         deps = [
             Label("//rust/interfaces:executor"),
-            # TODO: remove this dependency, it should come from the composition.
-            Label("//rust/components/generic/executor"),
             "{}.composition".format(name),
         ],
         tags = ["manual"],
