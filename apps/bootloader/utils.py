@@ -1,8 +1,23 @@
+import contextlib
+import fcntl
+import os
 import pathlib
 import tempfile
 import time
 import typing
-import os
+
+
+@contextlib.contextmanager
+def _lockedNamespace(path: pathlib.Path) -> typing.Generator[None, None, None]:
+	"""Serialize access to a namespace directory across processes."""
+
+	lockFile = os.open(path, os.O_WRONLY | os.O_CREAT)
+	try:
+		fcntl.flock(lockFile, fcntl.LOCK_EX)
+		yield
+	finally:
+		fcntl.flock(lockFile, fcntl.LOCK_UN)
+		os.close(lockFile)
 
 
 class RollingNamedTemporaryFile:
@@ -19,6 +34,7 @@ class RollingNamedTemporaryFile:
 		self.maxFiles = maxFiles
 
 		self.temporaryDirectory.mkdir(exist_ok=True, parents=True)
+		self.lockPath = self.temporaryDirectory / ".lock"
 
 	def get(self) -> pathlib.Path:
 		"""Get a named temporary file from a namespace.
@@ -27,21 +43,22 @@ class RollingNamedTemporaryFile:
 		        The full path of the temporary file.
 		"""
 
-		# Generate a unique file name using time + random bytes for guaranteed uniqueness.
-		while True:
-			path = self.temporaryDirectory / f"tmp.{time.time()}.{os.urandom(8).hex()}"
-			if not path.exists():
-				path.touch()
-				break
+		with _lockedNamespace(self.lockPath):
+			# Generate a unique file name using time + random bytes for guaranteed uniqueness.
+			while True:
+				path = self.temporaryDirectory / f"tmp.{time.time()}.{os.urandom(8).hex()}"
+				if not path.exists():
+					path.touch()
+					break
 
-		# Get all the files and sort them by modification date.
-		latestFiles = self.all()
+			# Get all the files and sort them by modification date.
+			latestFiles = self.all()
 
-		# Keep only the "maxFiles" newest files.
-		while len(latestFiles) > self.maxFiles:
-			latestFiles.pop().unlink()
+			# Keep only the "maxFiles" newest files.
+			while len(latestFiles) > self.maxFiles:
+				latestFiles.pop().unlink(missing_ok=True)
 
-		return path
+			return path
 
 	def all(self) -> typing.List[pathlib.Path]:
 		"""Get all the files sorted by modification date, the newest the first."""
@@ -52,5 +69,6 @@ class RollingNamedTemporaryFile:
 	def reset(self) -> None:
 		"""Delete all temporary files associated with this namespace."""
 
-		for f in self.all():
-			f.unlink()
+		with _lockedNamespace(self.lockPath):
+			for f in self.all():
+				f.unlink(missing_ok=True)
