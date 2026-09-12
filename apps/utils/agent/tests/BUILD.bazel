@@ -5,6 +5,6 @@ py_test(
     srcs = ["json_test.py"],
     main = "json_test.py",
     deps = [
-        "//apps/utils/json:json_lib",
+        "//apps/utils/agent:agent_lib",
     ],
 )

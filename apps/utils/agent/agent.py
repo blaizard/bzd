@@ -7,7 +7,7 @@ import pathlib
 import sys
 import typing
 
-from apps.utils.json.json import loadAndRepair
+from apps.utils.agent.json import loadAndRepair
 from bzd.utils.run import localCommand
 
 

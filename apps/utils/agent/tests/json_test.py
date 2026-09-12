@@ -1,6 +1,6 @@
 import unittest
 
-from apps.utils.json.json import loadAndRepair
+from apps.utils.agent.json import loadAndRepair
 
 
 class TestLoadAndRepair(unittest.TestCase):

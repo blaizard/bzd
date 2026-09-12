@@ -1,4 +1,18 @@
-load("@rules_python//python:defs.bzl", "py_binary")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "agent_lib",
+    srcs = [
+        "agent.py",
+        "json.py",
+    ],
+    visibility = [
+        "//apps/utils/agent:__subpackages__",
+    ],
+    deps = [
+        "@bzd_python//bzd/utils:run",
+    ],
+)
 
 py_binary(
     name = "agent",
@@ -6,7 +20,6 @@ py_binary(
         "agent.py",
     ],
     deps = [
-        "//apps/utils/json:json_lib",
-        "@bzd_python//bzd/utils:run",
+        ":agent_lib",
     ],
 )

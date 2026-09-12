@@ -1,5 +1,5 @@
-import argparse
-import pathlib
+"""JSON helpers."""
+
 import json
 import typing
 
@@ -56,28 +56,3 @@ def loadAndRepair(content: str) -> typing.Union[typing.Dict[str, typing.Any], ty
 		f"the largest candidate is {len(largestCandidate)} character(s) long.\n"
 		f"{error}"
 	)
-
-
-if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="JSON utility.")
-	parser.add_argument("--file", type=pathlib.Path, help="The input file.")
-	parser.add_argument(
-		"--repair",
-		action="store_true",
-		help="Whether the input should be repaired (invalid json, or might have preamble, etc).",
-	)
-	parser.add_argument("--dump", action="store_true", help="Dump the json content on stdout.")
-	args = parser.parse_args()
-
-	content = None
-	if args.file:
-		content = args.file.read_text()
-	assert content is not None, "Missing input."
-
-	try:
-		contentJson = loadAndRepair(content) if args.repair else json.loads(content)
-	except (ValueError, json.JSONDecodeError) as error:
-		parser.exit(1, f"ERROR: {error}\n")
-
-	if args.dump:
-		print(json.dumps(contentJson, indent=4))
