@@ -1111,6 +1111,42 @@
                     }
                 }
             ]
+        },
+        {
+            "doc": "Wrong-typed password (number) is rejected with 400 (not 500).",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": 1234,
+                        "persistent": false,
+                        "uid": "admin@admin.com"
+                    }
+                }
+            ]
+        },
+        {
+            "doc": "Wrong-typed password (boolean) is rejected with 400 (not 500).",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/login",
+                {
+                    "data": {
+                        "identifier": "tests",
+                        "password": true,
+                        "persistent": false,
+                        "uid": "admin@admin.com"
+                    }
+                }
+            ]
         }
     ]
 }

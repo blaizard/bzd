@@ -100,6 +100,23 @@ describe("User", () => {
 				});
 			}, "Old password is different");
 		});
+
+		it("rejects a non-string password in isPasswordEqual", async () => {
+			const user = await makeUserWithPassword("dummy-5@dummy.com");
+			await Exception.assertThrows(async () => {
+				await user.isPasswordEqual(1234);
+			}, "The password must be a string");
+		});
+
+		it("rejects a non-string password in setPassword", async () => {
+			const user = await users.create("dummy-6@dummy.com");
+			await Exception.assertThrows(async () => {
+				await users.update(user.getUid(), async (u) => {
+					await u.setPassword(1234);
+					return u;
+				});
+			}, "The password must be a string");
+		});
 	});
 
 	describe("deleteWithPassword", () => {

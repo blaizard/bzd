@@ -70,6 +70,11 @@ export default class User {
 	}
 
 	async setPassword(password) {
+		Exception.assertPrecondition(
+			typeof password == "string",
+			"The password must be a string, instead: '{:?}'",
+			password,
+		);
 		this.modified.push("password");
 		const hash = await Bcrypt.hash(password);
 		this.value.password = hash;
@@ -79,6 +84,11 @@ export default class User {
 		if (!this.value.password || !password) {
 			return false;
 		}
+		Exception.assertPrecondition(
+			typeof password == "string",
+			"The password must be a string, instead: '{:?}'",
+			password,
+		);
 		return await Bcrypt.compare(this.value.password, password);
 	}
 
