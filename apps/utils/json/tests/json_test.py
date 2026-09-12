@@ -56,6 +56,28 @@ class TestLoadAndRepair(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			loadAndRepair(content)
 
+	def testInvalidEscapeErrorIsDiagnostic(self) -> None:
+		content = '{"a": "HTTP/\\|Set-Cookie"}'
+		with self.assertRaises(ValueError) as context:
+			loadAndRepair(content)
+		message = str(context.exception)
+		self.assertIn("Invalid \\escape", message)
+		self.assertIn("column", message)
+
+	def testNoCandidateErrorIsInformative(self) -> None:
+		content = "hello world"
+		with self.assertRaises(ValueError) as context:
+			loadAndRepair(content)
+		self.assertIn("candidate", str(context.exception))
+
+	def testMultipleFailingCandidatesReportCount(self) -> None:
+		content = '{"a": "HTTP/\\|Set-Cookie"} {"b": "invalid\\escape"}'
+		with self.assertRaises(ValueError) as context:
+			loadAndRepair(content)
+		message = str(context.exception)
+		self.assertIn("2 candidate(s)", message)
+		self.assertIn("Invalid \\escape", message)
+
 
 if __name__ == "__main__":
 	unittest.main()

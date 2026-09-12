@@ -34,14 +34,28 @@ def loadAndRepair(content: str) -> typing.Union[typing.Dict[str, typing.Any], ty
 	candidates.sort(key=len, reverse=True)
 
 	# Decode
+	failedParses: typing.List[typing.Tuple[str, json.JSONDecodeError]] = []
 	for candidate in candidates:
 		try:
 			result: typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]] = json.loads(candidate)
 			return result
-		except json.JSONDecodeError:
-			continue
+		except json.JSONDecodeError as parseError:
+			failedParses.append((candidate, parseError))
 
-	raise ValueError("No valid JSON object found in input.")
+	# No candidate found means there is no JSON object or array in the content.
+	if not failedParses:
+		raise ValueError(
+			"No valid JSON object found in input: no JSON object/array candidate "
+			"(a balanced '{'...'}' or '['...']' span) was found in the content."
+		)
+
+	# All candidates failed to parse, report the most likely (largest) one with a precise diagnostic.
+	largestCandidate, error = failedParses[0]
+	raise ValueError(
+		f"No valid JSON object found in input: {len(failedParses)} candidate(s) tried, "
+		f"the largest candidate is {len(largestCandidate)} character(s) long.\n"
+		f"{error}"
+	)
 
 
 if __name__ == "__main__":
@@ -60,7 +74,10 @@ if __name__ == "__main__":
 		content = args.file.read_text()
 	assert content is not None, "Missing input."
 
-	contentJson = loadAndRepair(content) if args.repair else json.loads(content)
+	try:
+		contentJson = loadAndRepair(content) if args.repair else json.loads(content)
+	except (ValueError, json.JSONDecodeError) as error:
+		parser.exit(1, f"ERROR: {error}\n")
 
 	if args.dump:
 		print(json.dumps(contentJson, indent=4))
