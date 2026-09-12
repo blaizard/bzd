@@ -1,0 +1,23 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_binary")
+
+rust_library(
+    name = "component",
+    srcs = [
+        "component.rs",
+    ],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_binary(
+    name = "composition",
+    srcs = [
+        "composition.rs",
+    ],
+    deps = [
+        ":component",
+        "//rust/bzd",
+    ],
+)
