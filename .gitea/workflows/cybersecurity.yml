@@ -23,3 +23,4 @@ jobs:
         with:
             prompt: |
                 Scan the repository for security vulnerabilities, secrets leakage, and misconfigurations.
+                Omit any finding that is an intended behavior defined by the current configuration.

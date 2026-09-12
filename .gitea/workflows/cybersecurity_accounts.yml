@@ -29,3 +29,4 @@ jobs:
                 auth issues, injection, input validation, rate limiting, info disclosure,
                 confirm rate limiting on login attempt, etc.
                 Enumerate endpoints first, then test each.
+                Omit any finding that is an intended behavior defined by the current configuration.

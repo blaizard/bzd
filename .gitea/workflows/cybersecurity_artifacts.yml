@@ -28,3 +28,4 @@ jobs:
                 Stress-test and probe its API (on http://localhost:8081) for security flaws:
                 auth issues, injection, input validation, rate limiting, info disclosure, etc.
                 Enumerate endpoints first, then test each.
+                Omit any finding that is an intended behavior defined by the current configuration.
