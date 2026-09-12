@@ -6,6 +6,7 @@ bzd_nodejs_test(
     main = "disk_test.js",
     deps = [
         "//nodejs/core:exception",
+        "//nodejs/core/mock:filesystem",
         "//nodejs/db/storage:disk",
     ],
 )

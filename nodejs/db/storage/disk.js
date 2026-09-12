@@ -1,4 +1,3 @@
-import Fs from "fs";
 import Path from "path";
 
 import ExceptionFactory from "../../core/exception.js";
@@ -15,18 +14,18 @@ const Log = LogFactory("db", "storage", "disk");
 const Exception = ExceptionFactory("db", "storage", "disk");
 
 /// Get the metadata of a file
-async function getMetadata(filePath) {
+async function getMetadata(fileSystem, filePath) {
 	let isRead = true;
 	let isWrite = true;
 	let isDelete = true;
 	let isList = true;
 	let type = "";
 
-	if (!(await FileSystem.exists(filePath))) {
+	if (!(await fileSystem.exists(filePath))) {
 		throw new FileNotFoundError(filePath);
 	}
 
-	const stat = await FileSystem.stat(filePath);
+	const stat = await fileSystem.stat(filePath);
 
 	if (stat.isFile()) {
 		isList = false;
@@ -75,6 +74,8 @@ export default class StorageDisk extends Storage {
 				{
 					/// If false, it will attempt to create a directory if it does not exist.
 					mustExists: false,
+					/// File system implementation to use (a mock for tests).
+					fs: FileSystem,
 				},
 				options,
 			),
@@ -86,11 +87,11 @@ export default class StorageDisk extends Storage {
 
 	/// Initialize the storage module
 	async _initialize() {
-		if (!(await FileSystem.exists(this.path))) {
+		if (!(await this.options.fs.exists(this.path))) {
 			Exception.assert(!this.options.mustExists, "'{}' is not a valid path.", this.path);
-			await FileSystem.mkdir(this.path);
+			await this.options.fs.mkdir(this.path);
 		}
-		this.root = await FileSystem.realpath(this.path);
+		this.root = await this.options.fs.realpath(this.path);
 	}
 
 	/// Get the full path of the given path, asserting it stays within the volume root.
@@ -110,7 +111,7 @@ export default class StorageDisk extends Storage {
 	/// Resolve the real path of the given path, walking up to the deepest existing ancestor if the leaf does not exist.
 	async _resolveRealPath(path) {
 		try {
-			return await FileSystem.realpath(path);
+			return await this.options.fs.realpath(path);
 		} catch (e) {
 			if (e.code !== "ENOENT") {
 				throw e;
@@ -124,53 +125,53 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _isImpl(pathList) {
-		return await FileSystem.exists(await this._getFullPath(pathList));
+		return await this.options.fs.exists(await this._getFullPath(pathList));
 	}
 
 	async _readImpl(pathList) {
 		const path = await this._getFullPath(pathList);
-		if (!(await FileSystem.exists(path))) {
+		if (!(await this.options.fs.exists(path))) {
 			throw new FileNotFoundError(path);
 		}
-		return Fs.createReadStream(path);
+		return this.options.fs.createReadStream(path);
 	}
 
 	async _writeImpl(pathList, readStream) {
 		const fullPath = await this._getFullPath(pathList);
-		let writeStream = Fs.createWriteStream(fullPath);
+		let writeStream = this.options.fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
 	}
 
 	async _deleteImpl(pathList) {
 		const path = await this._getFullPath(pathList);
-		if (!(await FileSystem.exists(path))) {
+		if (!(await this.options.fs.exists(path))) {
 			throw new FileNotFoundError(path);
 		}
-		if ((await FileSystem.stat(path)).isDirectory()) {
-			await FileSystem.rmdir(path, { force: false });
+		if ((await this.options.fs.stat(path)).isDirectory()) {
+			await this.options.fs.rmdir(path, { force: false });
 		} else {
-			await FileSystem.unlink(path);
+			await this.options.fs.unlink(path);
 		}
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
 		const fullPath = await this._getFullPath(pathList);
-		if (await FileSystem.exists(fullPath)) {
-			const data = await FileSystem.readdir(fullPath, /*withFileTypes*/ includeMetadata);
+		if (await this.options.fs.exists(fullPath)) {
+			const data = await this.options.fs.readdir(fullPath, /*withFileTypes*/ includeMetadata);
 			if (includeMetadata) {
 				return await CollectionPaging.makeFromList(data, maxOrPaging, async (dirent) => {
 					let filePath = fullPath + "/" + dirent.name;
 					if (dirent.isSymbolicLink()) {
 						// Try to resolve the actual path.
 						try {
-							filePath = await FileSystem.realpath(filePath);
+							filePath = await this.options.fs.realpath(filePath);
 						} catch (e) {
 							// Ignore
 						}
 					}
 
-					let metadata = await getMetadata(filePath);
+					let metadata = await getMetadata(this.options.fs, filePath);
 					// This might differ in case of symlinks
 					metadata.name = dirent.name;
 					return metadata;
@@ -183,20 +184,20 @@ export default class StorageDisk extends Storage {
 
 	async _mkdirImpl(pathList) {
 		const fullPath = await this._getFullPath(pathList);
-		await FileSystem.mkdir(fullPath, { force: true });
+		await this.options.fs.mkdir(fullPath, { force: true });
 	}
 
 	async _metadataImpl(pathList) {
 		const filePath = await this._getFullPath(pathList);
-		if (!(await FileSystem.exists(filePath))) {
+		if (!(await this.options.fs.exists(filePath))) {
 			throw new FileNotFoundError(filePath);
 		}
-		return await getMetadata(filePath);
+		return await getMetadata(this.options.fs, filePath);
 	}
 
 	async _setPermissionImpl(pathList, permissions) {
 		const filePath = await this._getFullPath(pathList);
-		if (!(await FileSystem.exists(filePath))) {
+		if (!(await this.options.fs.exists(filePath))) {
 			throw new FileNotFoundError(filePath);
 		}
 
@@ -211,6 +212,6 @@ export default class StorageDisk extends Storage {
 		if (permissions.isExecutable()) {
 			mode |= 0o100 | 0o10 | 0o1;
 		}
-		return await FileSystem.chmod(filePath, mode);
+		return await this.options.fs.chmod(filePath, mode);
 	}
 }

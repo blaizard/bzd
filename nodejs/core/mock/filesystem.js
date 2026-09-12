@@ -1,3 +1,6 @@
+import Path from "path";
+import { Readable, Writable } from "stream";
+
 import Pathlib from "#bzd/nodejs/utils/pathlib.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import ClockDate from "#bzd/nodejs/core/clock/date.js";
@@ -107,7 +110,7 @@ class Stats {
 		return false;
 	}
 	isDirectory() {
-		return this.entry.constructor == Object;
+		return this.entry instanceof Directory;
 	}
 	isFIFO() {
 		return false;
@@ -179,10 +182,10 @@ class Stats {
 		return this.entry.ctimeS * 1000;
 	}
 	get atime() {
-		return new Date(this.mtimeMs);
+		return new Date(this.atimeMs);
 	}
 	get mtime() {
-		return new Date(this.atimeMs);
+		return new Date(this.mtimeMs);
 	}
 	get ctime() {
 		return new Date(this.ctimeMs);
@@ -378,5 +381,101 @@ export default class FileSystem {
 		await this.options.wait();
 		const file = this._toEntry(path, _Policy.create | _Policy.file | _Policy.touch);
 		file.content = data;
+	}
+
+	/// Check if a file or directory exists
+	async exists(path) {
+		await this.options.wait();
+		const p = Pathlib.path(path);
+		try {
+			const parent = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
+			return p.name in parent.children;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	/// Resolve the real path of the given path, resolving any symlink.
+	async realpath(path) {
+		await this.options.wait();
+		return this._resolvePath(path);
+	}
+
+	/// Resolve the real path of the given path, resolving any symlink.
+	///
+	/// \return the canonical path if it can be resolved within the tree, otherwise the
+	///         symlink target joined with the remaining segments (escaping the tree).
+	_resolvePath(path) {
+		const parts = Pathlib.path(path).normalize.parts;
+		let entry = this.root;
+		const canonical = [];
+		for (const [index, segment] of parts.entries()) {
+			if (!(segment in entry.children)) {
+				const exception = new Exception("The path '{}' does not exists.", path);
+				exception.code = "ENOENT";
+				throw exception;
+			}
+			let child = entry.children[segment];
+			if (child instanceof Symlink) {
+				// Try to resolve the symlink within the tree.
+				try {
+					const targetParts = Pathlib.path(this._resolvePath(child.path)).normalize.parts;
+					entry = this._toEntry(child.path, _Policy.mustExists);
+					canonical.length = 0;
+					canonical.push(...targetParts);
+				} catch (e) {
+					// The target escapes the tree: return it joined with the remaining segments.
+					return Path.join(child.path, ...parts.slice(index + 1));
+				}
+			} else {
+				entry = child;
+				canonical.push(segment);
+			}
+		}
+		return Path.join(...canonical);
+	}
+
+	/// Change the permissions of a file.
+	async chmod(path, mode) {
+		await this.options.wait();
+		const entry = this._toEntry(path, _Policy.mustExists);
+		entry.read = Boolean(mode & 0o400);
+		entry.write = Boolean(mode & 0o200);
+		entry.exec = Boolean(mode & 0o100);
+	}
+
+	/// Create a symbolic link at a given path pointing to the given target.
+	async symlink(target, path) {
+		await this.options.wait();
+		const p = Pathlib.path(path);
+		const parent = this._toEntry(p.parent, _Policy.mustExists | _Policy.directory);
+		Exception.assert(!(p.name in parent.children), "The entry '{}' already exists.", p.asPosix());
+		parent.children[p.name] = new Symlink(target, this.options.clock);
+	}
+
+	/// Return a readable stream to read the content of a file.
+	createReadStream(path) {
+		const file = this._toEntry(path, _Policy.mustExists | _Policy.file);
+		const content = Buffer.isBuffer(file.content) ? file.content : Buffer.from(file.content);
+		return Readable.from([content]);
+	}
+
+	/// Return a writable stream to write the content of a file.
+	createWriteStream(path) {
+		const chunks = [];
+		return new Writable({
+			write: (chunk, encoding, callback) => {
+				chunks.push(chunk);
+				callback();
+			},
+			final: async (callback) => {
+				try {
+					await this.writeBinary(path, Buffer.concat(chunks));
+					callback();
+				} catch (e) {
+					callback(e);
+				}
+			},
+		});
 	}
 }

@@ -132,6 +132,16 @@ export default class FileSystem {
         await Fs.promises.utimes(path, atimeS, mtimeS);
     }
 
+    /// Create a readable stream to read a file.
+    static createReadStream(path: string): Fs.ReadStream {
+        return Fs.createReadStream(path);
+    }
+
+    /// Create a writable stream to write a file.
+    static createWriteStream(path: string): Fs.WriteStream {
+        return Fs.createWriteStream(path);
+    }
+
     /// Open a file asynchronously
     static async open(path: string, options: Fs.OpenMode): Promise<Fs.promises.FileHandle> {
         return await Fs.promises.open(path, options);

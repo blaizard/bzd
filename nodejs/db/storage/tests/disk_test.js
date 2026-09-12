@@ -1,8 +1,7 @@
-import Fs from "fs";
-import Os from "os";
 import Path from "path";
 
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import Filesystem from "#bzd/nodejs/core/mock/filesystem.js";
 import StorageDisk from "#bzd/nodejs/db/storage/disk.js";
 
 const Exception = ExceptionFactory("test", "db", "storage", "disk");
@@ -12,8 +11,7 @@ describe("StorageDisk", () => {
 		let storage = null;
 
 		before(async () => {
-			const root = await Fs.promises.mkdtemp(Path.join(Os.tmpdir(), "bzd-disk-"));
-			storage = await StorageDisk.make(root, { write: true });
+			storage = await StorageDisk.make("root", { fs: new Filesystem(), write: true });
 		});
 
 		it("joins a simple path", async () => {
@@ -67,14 +65,15 @@ describe("StorageDisk", () => {
 		let storage = null;
 
 		before(async () => {
-			const root = await Fs.promises.mkdtemp(Path.join(Os.tmpdir(), "bzd-disk-"));
-			await Fs.promises.writeFile(Path.join(root, "inside.txt"), "inside");
-			await Fs.promises.writeFile(Path.join(root, "secret.txt"), "secret");
+			const filesystem = new Filesystem({
+				"root/inside.txt": "inside",
+				"root/secret.txt": "secret",
+			});
 			// A symlink inside the root pointing to a file outside of the root.
-			await Fs.promises.symlink("/etc/passwd", Path.join(root, "escape-file.txt"));
+			await filesystem.symlink("/etc/passwd", "root/escape-file.txt");
 			// A symlink inside the root pointing to a directory outside of the root.
-			await Fs.promises.symlink("/etc", Path.join(root, "escape-dir"));
-			storage = await StorageDisk.make(root, { write: true });
+			await filesystem.symlink("/etc", "root/escape-dir");
+			storage = await StorageDisk.make("root", { fs: filesystem, write: true });
 		});
 
 		it("reads a file inside the root", async () => {
@@ -104,13 +103,12 @@ describe("StorageDisk", () => {
 		let storage = null;
 
 		before(async () => {
-			const realRoot = await Fs.promises.mkdtemp(Path.join(Os.tmpdir(), "bzd-disk-real-"));
-			await Fs.promises.writeFile(Path.join(realRoot, "inside.txt"), "inside");
-			await Fs.promises.symlink("/etc/passwd", Path.join(realRoot, "escape-file.txt"));
-			const root = await Fs.promises.mkdtemp(Path.join(Os.tmpdir(), "bzd-disk-link-"));
-			await Fs.promises.rmdir(root);
-			await Fs.promises.symlink(realRoot, root);
-			storage = await StorageDisk.make(root, { write: true });
+			const filesystem = new Filesystem({
+				"real-root/inside.txt": "inside",
+			});
+			await filesystem.symlink("/etc/passwd", "real-root/escape-file.txt");
+			await filesystem.symlink("real-root", "link-root");
+			storage = await StorageDisk.make("link-root", { fs: filesystem, write: true });
 		});
 
 		it("reads a file through a symlinked root", async () => {
