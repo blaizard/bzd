@@ -63,7 +63,7 @@ jobs:
                   cat /tmp/agent-response.json
 
                   failure_found=$(jq -r '.failure_found // false' /tmp/agent-response.json)
-                  title=$(jq -r '.title' /tmp/agent-response.json)
+                  title=$(jq -r '.title' /tmp/agent-response.json | tr '\r\n' ' ')
                   description=$(jq -r '.description' /tmp/agent-response.json)
                   reproduction_steps=$(jq -r '.reproduction_steps' /tmp/agent-response.json)
 

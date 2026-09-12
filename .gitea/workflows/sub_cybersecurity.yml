@@ -65,7 +65,7 @@ jobs:
                   cat /tmp/agent-response.json
 
                   vulnerability_found=$(jq -r '.vulnerability_found // false' /tmp/agent-response.json)
-                  title=$(jq -r '.title' /tmp/agent-response.json)
+                  title=$(jq -r '.title' /tmp/agent-response.json | tr '\r\n' ' ')
                   severity=$(jq -r '.severity' /tmp/agent-response.json)
                   description=$(jq -r '.description' /tmp/agent-response.json)
                   reproduction_steps=$(jq -r '.reproduction_steps' /tmp/agent-response.json)
