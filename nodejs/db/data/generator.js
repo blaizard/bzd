@@ -73,7 +73,7 @@ export default class Generator {
 				break;
 			}
 
-			let nextValues = {};
+			let nextValues = Object.create(null);
 			const nbValues = allValues.length;
 			while (true) {
 				// Get the next oldest values for every keys and ensure ALL keys have been

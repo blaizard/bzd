@@ -11,14 +11,14 @@ export default class ToStringHandler {
 
 	process(fragments) {
 		// Extract all fragments that are 1-level deep and create a dictionary of their values.
-		const values = {};
+		const values = Object.create(null);
 		for (const fragment of fragments.all()) {
 			const key = fragment.key;
 			if (key.length >= 1) {
 				const last = key.pop();
 				const entryKey = KeyMapping.keyToInternal(key);
 				values[entryKey] ??= {
-					values: {},
+					values: Object.create(null),
 					options: {},
 				};
 				values[entryKey].values[last] = fragment.value;

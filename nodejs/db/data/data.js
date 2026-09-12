@@ -30,7 +30,7 @@ export default class Data {
 			},
 			options,
 		);
-		this.storage = {};
+		this.storage = Object.create(null);
 
 		this.options.cache.register("tree", async (uid) => {
 			// Convert data into a tree with leaf being the internal key.
@@ -41,12 +41,12 @@ export default class Data {
 			// }
 			// Using SPECIAL_KEY_FOR_VALUE for the key, enables nested keys from leaf nodes.
 			//
-			let tree = {};
-			if (uid in this.storage) {
+			let tree = Object.create(null);
+			if (Object.hasOwn(this.storage, uid)) {
 				for (const [internal, _] of Object.entries(this.storage[uid].data)) {
 					const paths = KeyMapping.internalToKey(internal);
 					const object = paths.reduce((r, segment) => {
-						r[segment] ??= {};
+						r[segment] ??= Object.create(null);
 						return r[segment];
 					}, tree);
 					object[SPECIAL_KEY_FOR_VALUE] = { internal: internal, key: paths };
@@ -74,16 +74,16 @@ export default class Data {
 
 	/// Helper to access an internal value.
 	getDataInternal_(uid, key, internal) {
-		if (!(uid in this.storage)) {
+		if (!Object.hasOwn(this.storage, uid)) {
 			this.storage[uid] = {
 				metadata: {
 					tags: new Set(),
 				},
-				data: {},
+				data: Object.create(null),
 			};
 			this.options.onCreateUid(uid, this.storage[uid].metadata);
 		}
-		if (!(internal in this.storage[uid].data)) {
+		if (!Object.hasOwn(this.storage[uid].data, internal)) {
 			this.storage[uid].data[internal] = {
 				expiresType: "auto",
 				expires: 60, // seconds
@@ -103,7 +103,7 @@ export default class Data {
 	async getTree_(uid, key) {
 		const data = await this.tree.get(uid);
 		const reducedData = key.reduce((r, segment) => {
-			if (r === null || !(segment in r) || segment == SPECIAL_KEY_FOR_VALUE) {
+			if (r === null || !Object.hasOwn(r, segment) || segment == SPECIAL_KEY_FOR_VALUE) {
 				return null;
 			}
 			return r[segment];
@@ -145,7 +145,7 @@ export default class Data {
 						const subKey = key.concat(k);
 						treeToKeys(v, children - 1, subKey);
 						if (includeInner) {
-							const isLeaf = SPECIAL_KEY_FOR_VALUE in v;
+							const isLeaf = Object.hasOwn(v, SPECIAL_KEY_FOR_VALUE);
 							keys.push({
 								key: subKey,
 								leaf: isLeaf,
@@ -308,7 +308,7 @@ export default class Data {
 		include = null,
 		sampling = null,
 	}) {
-		const data = uid in this.storage ? this.storage[uid].data : {};
+		const data = Object.hasOwn(this.storage, uid) ? this.storage[uid].data : Object.create(null);
 
 		const valuesToResult = (key, internal, values) => {
 			const dataInternal = this.getDataInternal_(uid, key, internal);

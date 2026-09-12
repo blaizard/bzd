@@ -1,3 +1,5 @@
+import { isObject } from "#bzd/nodejs/utils/object.js";
+
 /// Dump the given object as a string for observability purposes.
 ///
 /// Unlike JSON.stringify, it handles very large objects by printing only the first `maxSize` characters.
@@ -56,8 +58,8 @@ export function toDumpString(object: unknown, maxSize: number = 1000): string {
                 if (item instanceof Set) {
                     return iterableToString(item, sizeLeft, "Set(", ")");
                 }
-                if (item.constructor === Object) {
-                    return dictionaryToString(item as Record<string, unknown>, sizeLeft, "{", "}");
+                if (isObject(item)) {
+                    return dictionaryToString(item, sizeLeft, "{", "}");
                 }
                 return "??";
             case "boolean":
@@ -116,12 +118,12 @@ export default function formatString(str: string, ...args: unknown[]): string {
         let value: unknown = null;
         if (typeof format.index === "string") {
             const a = args[0];
-            if (!a || typeof a !== "object" || a.constructor !== Object) {
+            if (!isObject(a)) {
                 throw new Error(
                     "Expected a dictionary as argument to match key '" + format.index + "' while formatting string: " + str
                 );
             }
-            const dict = a as Record<string, unknown>;
+            const dict = a;
             if (!(format.index in dict)) {
                 throw new Error("Missing key '" + format.index + "' while formatting string: " + str);
             }

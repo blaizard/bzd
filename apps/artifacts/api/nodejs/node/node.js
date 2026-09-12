@@ -171,11 +171,11 @@ export class Node extends ArtifactsBase {
 	///
 	/// \note Same keys will be overwritten, keeping the latest one only.
 	static toTree(data) {
-		let tree = {};
+		let tree = Object.create(null);
 		for (const [key, value] of data) {
 			const last = key.pop();
 			const object = key.reduce((r, segment) => {
-				r[segment] ??= {};
+				r[segment] ??= Object.create(null);
 				return r[segment];
 			}, tree);
 			object[last] = value;

@@ -113,11 +113,11 @@ export default class Handlers {
 		//		 }
 		//    }
 		// }
-		const result = {};
+		const result = Object.create(null);
 		for (const [path, props] of Object.entries(configuration)) {
 			const key = KeyMapping.pathToKey(path);
 			const object = key.reduce((r, segment) => {
-				r[segment] ??= {};
+				r[segment] ??= Object.create(null);
 				return r[segment];
 			}, result);
 

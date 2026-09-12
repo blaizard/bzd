@@ -869,6 +869,51 @@ describe("Plugin", () => {
 		});
 	});
 
+	describe("Prototype pollution", () => {
+		const tester = new PluginTester();
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records-prototype-pollution",
+				clean: true,
+			},
+		});
+
+		it("write under a __proto__ key does not pollute the global prototype", async () => {
+			await tester.start();
+			try {
+				const writeResponse = await tester.send("nodes", "post", "/uid/__proto__/shadowed", {
+					headers: { "Content-Type": "application/json" },
+					data: JSON.stringify({ marker: 1 }),
+				});
+				Exception.assertEqual(writeResponse.status, 200);
+				Exception.assertEqual(Object.prototype.shadowed, undefined);
+				Exception.assertEqual({}.shadowed, undefined);
+
+				await tester.send("nodes", "post", "/other/shadowed", {
+					headers: { "Content-Type": "text/plain" },
+					data: "hello",
+				});
+				const shadowedResponse = await tester.send("nodes", "get", "/other/shadowed");
+				Exception.assertEqual(shadowedResponse.status, 200);
+				Exception.assertEqual(shadowedResponse.data, { data: "hello" });
+
+				const markerResponse = await tester.send("nodes", "get", "/uid/__proto__/shadowed/marker");
+				Exception.assertEqual(markerResponse.status, 200);
+				Exception.assertEqual(markerResponse.data, { data: 1 });
+
+				const treeResponse = await tester.send("nodes", "get", "/uid?children=99");
+				Exception.assertEqual(treeResponse.status, 200);
+				Exception.assert(
+					treeResponse.data.data.some(([key]) => key[0] == "__proto__"),
+					"The tree must contain the '__proto__' entry: {}",
+					treeResponse.data.data,
+				);
+			} finally {
+				await tester.stop();
+			}
+		});
+	});
+
 	const makeSourceTest = async (onFetchCallback, verify = () => {}) => {
 		const tester = new PluginTester();
 		let fetched = false;

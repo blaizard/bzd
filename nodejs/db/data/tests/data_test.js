@@ -657,6 +657,43 @@ describe("Nodes", () => {
 			}
 		});
 
+		it("prototype pollution", async () => {
+			const data = new Data();
+
+			// Insert data under a '__proto__' path, which used to mutate Object.prototype.
+			data.insert("hello", [[["__proto__", "shadowed", "marker"], 1]]);
+
+			// The global prototype must not be polluted.
+			Exception.assertEqual(Object.prototype.shadowed, undefined);
+			Exception.assertEqual({}.shadowed, undefined);
+
+			// The inserted value is still readable through the '__proto__' path.
+			{
+				const result = await data.get({ uid: "hello", key: ["__proto__", "shadowed", "marker"] });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), 1);
+			}
+
+			// Keys colliding with inherited property names must be readable (no 500 / corruption).
+			for (const name of ["shadowed", "constructor", "toString", "hasOwnProperty"]) {
+				data.insert("hello", [[[name], 2]]);
+				const result = await data.get({ uid: "hello", key: [name] });
+				Exception.assert(result.hasValue(), "Key '{}' must be readable", name);
+				Exception.assertEqual(result.value(), 2);
+			}
+
+			// The tree must expose the '__proto__' node as a regular entry.
+			{
+				const result = await data.get({ uid: "hello", key: [], children: 10 });
+				Exception.assert(result.hasValue());
+				Exception.assert(
+					result.value().some(([key]) => key[0] == "__proto__"),
+					"The tree must contain the '__proto__' entry: {}",
+					result.value(),
+				);
+			}
+		});
+
 		it("getChildren", async () => {
 			const data = new Data();
 

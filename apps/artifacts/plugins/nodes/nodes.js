@@ -128,7 +128,7 @@ export class Nodes {
 	///
 	/// \return The disk optimized record.
 	static recordToDisk(record) {
-		let clusters = {};
+		let clusters = Object.create(null);
 		for (const [uid, data, timestamp, isFixedTimestamp] of record) {
 			const keyCluster = uid + "@" + timestamp + "@" + isFixedTimestamp;
 			clusters[keyCluster] ??= {
@@ -141,11 +141,11 @@ export class Nodes {
 		}
 		let onDiskRecord = [];
 		for (const [_, cluster] of Object.entries(clusters)) {
-			let dataCluster = {};
+			let dataCluster = Object.create(null);
 			for (const [key, ...data] of cluster.data) {
 				let current = dataCluster;
 				for (const part of key) {
-					current[part] ??= {};
+					current[part] ??= Object.create(null);
 					current = current[part];
 				}
 				current["_"] = data;

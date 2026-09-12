@@ -36,6 +36,12 @@ describe("Nodes", () => {
 			const result = Nodes.getAllPathAndValues(null);
 			Exception.assertEqual(result, [[[], null, {}]]);
 		});
+
+		it("prototype key", async () => {
+			const result = Nodes.getAllPathAndValues(JSON.parse('{"__proto__": {"a": 1}}'));
+			Exception.assertEqual(result, [[["__proto__", "a"], 1, {}]]);
+			Exception.assertEqual(Object.prototype.a, undefined);
+		});
 	});
 
 	describe("Nodes", () => {
@@ -70,6 +76,17 @@ describe("Nodes", () => {
 		it("insert w/fixed timestamp (non fixed)", async () => {
 			const fragment = await nodes.insert({ uid: "hello", key: ["mykey"], value: "world", timestamp: 123456 });
 			Exception.assertEqual(fragment, [["hello", [["mykey"], "world", {}], 123456, false]]);
+		});
+	});
+
+	describe("recordToDisk/recordFromDisk", () => {
+		it("round-trip with a __proto__ key", async () => {
+			const record = [["uid", [["__proto__", "shadowed"], 42], 1234, false]];
+			const onDisk = Nodes.recordToDisk(record);
+			Exception.assertEqual(Object.prototype.shadowed, undefined);
+			const fromDisk = Nodes.recordFromDisk(onDisk);
+			Exception.assertEqual(fromDisk, record);
+			Exception.assertEqual(Object.prototype.shadowed, undefined);
 		});
 	});
 });

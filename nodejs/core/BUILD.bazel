@@ -49,6 +49,9 @@ bzd_nodejs_library(
         "format.ts",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs/utils:object",
+    ],
 )
 
 bzd_nodejs_library(
