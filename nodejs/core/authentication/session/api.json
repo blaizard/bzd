@@ -55,14 +55,13 @@
         },
         "/auth/refresh_token": {
             "post": {
-                "cors": true,
                 "documentation": "Refresh a refresh token.",
                 "request": {
                     "type": "json",
                     "validation": {
                         "hash": "mandatory",
                         "next": "mandatory",
-                        "timeout": "mandatory",
+                        "timeout": "mandatory type(integer)",
                         "uid": "mandatory"
                     }
                 },

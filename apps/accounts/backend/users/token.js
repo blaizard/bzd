@@ -22,6 +22,7 @@ export default class TokenInfo {
 			scopes: scopes,
 			creation: Date.now(),
 			expiration: Date.now() + timeoutS * 1000,
+			lifetime: timeoutS,
 			rolling: rolling,
 		});
 	}
@@ -39,10 +40,14 @@ export default class TokenInfo {
 		return this.value.rolling || false;
 	}
 
-	// Update the minimal duration of this token
+	// Update the minimal duration of this token.
+	// The extension is bounded by the lifetime the token was issued with, so that a
+	// single refresh can never exceed the TTL of its class (SSO/login refresh tokens).
 	updateMinDuration(minDuration) {
-		if (this.duration() < minDuration) {
-			this.value.expiration = Date.now() + minDuration * 1000;
+		const lifetime = this.value.lifetime ?? (this.value.expiration - this.value.creation) / 1000;
+		const bounded = Math.min(minDuration, lifetime);
+		if (this.duration() < bounded) {
+			this.value.expiration = Date.now() + bounded * 1000;
 		}
 	}
 

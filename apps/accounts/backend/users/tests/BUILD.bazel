@@ -10,3 +10,13 @@ bzd_nodejs_test(
         "//nodejs/db/key_value_store:memory",
     ],
 )
+
+bzd_nodejs_test(
+    name = "token",
+    srcs = ["token_test.js"],
+    main = "token_test.js",
+    deps = [
+        "//apps/accounts/backend/users",
+        "//nodejs/core:exception",
+    ],
+)

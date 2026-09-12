@@ -106,6 +106,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				inputs.hash,
 				inputs.timeout,
 				inputs.next,
+				this.getIp(),
 			);
 			if (!maybeToken) {
 				throw authentication.httpErrorUnauthorized(/*requestAuthentication*/ false);

@@ -78,6 +78,7 @@ const Log = LogFactory("backend");
 	// Rate limiting
 	let emailLimiter;
 	let ipLimiter;
+	let refreshLimiter;
 
 	// ---- Helpers ----
 
@@ -182,7 +183,15 @@ const Log = LogFactory("backend");
 				return user;
 			});
 		},
-		refreshToken: async (uid, hash, minDuration, hashNext) => {
+		refreshToken: async (uid, hash, minDuration, hashNext, callerId = null) => {
+			// Per-caller rate limiting applies first, if a caller identifier is available.
+			if (callerId) {
+				const key = callerId + "/" + uid;
+				if (await refreshLimiter.isOverLimit(key)) {
+					return false;
+				}
+				await refreshLimiter.record(key);
+			}
 			// If there is no user
 			const maybeUser = await users.get(uid, /*allowNull*/ true);
 			if (maybeUser === null) {
@@ -325,6 +334,12 @@ const Log = LogFactory("backend");
 	});
 	ipLimiter = new RateLimiter(backend.cache, {
 		bucket: "rate.limit.ip",
+		threshold: 30,
+		windowMs: 900 * 1000,
+	});
+	// Keep a separate limiter from 'ipLimiter': the latter is keyed per-IP and reset on successful login.
+	refreshLimiter = new RateLimiter(backend.cache, {
+		bucket: "rate.limit.refresh",
 		threshold: 30,
 		windowMs: 900 * 1000,
 	});
