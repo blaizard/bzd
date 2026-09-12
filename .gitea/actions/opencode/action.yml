@@ -9,11 +9,19 @@ inputs:
         description: "The agent to be using."
         required: false
         default: "build"
+    expect_json:
+        description: "Whether the agent output is expected to contain valid JSON."
+        required: false
+        default: false
+    output:
+        description: "Path of the agent response file."
+        required: false
+        default: "/tmp/agent-response.txt"
 
 outputs:
     response_file:
         description: "Path of the raw agent response."
-        value: "/tmp/agent-response.txt"
+        value: ${{ inputs.output }}
 
 runs:
     using: "composite"
@@ -28,10 +36,17 @@ runs:
           env:
               PROMPT: ${{ inputs.prompt }}
               AGENT: ${{ inputs.agent }}
+              EXPECT_JSON: ${{ inputs.expect_json }}
+              OUTPUT: ${{ inputs.output }}
           run: |
               set -euo pipefail
 
-              ./tools/bazel run //apps/utils/agent -- --output /tmp/agent-response.txt --agent "$AGENT" "$PROMPT"
+              EXTRA_ARGS=""
+              if [ "$EXPECT_JSON" = "true" ]; then
+                  EXTRA_ARGS="--expect-json"
+              fi
+
+              ./tools/bazel run //apps/utils/agent -- --output "$OUTPUT" --agent "$AGENT" $EXTRA_ARGS "$PROMPT"
 
               echo  "==== response ==============================================="
-              cat /tmp/agent-response.txt
+              cat "$OUTPUT"

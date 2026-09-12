@@ -1,11 +1,13 @@
 """Run a headless agent."""
 
 import argparse
-import pathlib
-import typing
+import json
 import os
+import pathlib
 import sys
+import typing
 
+from apps.utils.json.json import loadAndRepair
 from bzd.utils.run import localCommand
 
 
@@ -62,6 +64,11 @@ if __name__ == "__main__":
 	)
 	parser.add_argument("--max-retries", type=int, default=3, help="Maximum number of retries on failure.")
 	parser.add_argument("--agent", default="build", help="The type of agent to be used.")
+	parser.add_argument(
+		"--expect-json",
+		action="store_true",
+		help="Expect the output to contain a valid JSON object or array, retry otherwise.",
+	)
 	parser.add_argument("prompt", help="The prompt to be used.")
 	args = parser.parse_args()
 
@@ -80,13 +87,27 @@ if __name__ == "__main__":
 			continueSession=continueSession,
 		)
 
-		if output is not None:
+		if output is None:
+			prompt = "continue"
+
+		# Handle json output
+		elif args.expect_json:
+			try:
+				data = loadAndRepair(output)
+				output = json.dumps(data, indent=4)
+				break
+			except ValueError as e:
+				print(str(e), flush=True)
+				output = None
+			prompt = "A JSON output is expected. Re-output your final answer as a single valid JSON object and nothing else."
+
+		# Handle raw output
+		else:
 			break
 
 		print("==== error =================================================", flush=True)
 		retry += 1
 		continueSession = True
-		prompt = "continue"
 
 	if output is None:
 		print("No output.", flush=True)
@@ -94,4 +115,5 @@ if __name__ == "__main__":
 
 	if args.output:
 		args.output.write_text(output)
+
 	sys.exit(0)

@@ -6,6 +6,7 @@ py_binary(
         "agent.py",
     ],
     deps = [
+        "//apps/utils/json:json_lib",
         "@bzd_python//bzd/utils:run",
     ],
 )

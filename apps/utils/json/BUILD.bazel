@@ -6,7 +6,7 @@ py_library(
         "json.py",
     ],
     visibility = [
-        "//apps/utils/json:__subpackages__",
+        "//apps/utils:__subpackages__",
     ],
 )
 

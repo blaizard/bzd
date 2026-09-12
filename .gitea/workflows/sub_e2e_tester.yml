@@ -26,6 +26,8 @@ jobs:
             - uses: ./.gitea/actions/opencode
               with:
                   agent: ${{ inputs.agent }}
+                  expect_json: true
+                  output: /tmp/agent-response.json
                   prompt: |
                       Act as an end-to-end integration test engineer.
 
@@ -53,12 +55,10 @@ jobs:
                         "failure_found": false
                       }
 
-            - name: "Extract JSON"
+            - name: "Read JSON"
               id: parse
               shell: bash
               run: |
-                  bzd-lease ./tools/bazel run //apps/utils/json -- --file /tmp/agent-response.txt --repair --dump > /tmp/agent-response.json
-
                   echo "==== json =============================================="
                   cat /tmp/agent-response.json
 
