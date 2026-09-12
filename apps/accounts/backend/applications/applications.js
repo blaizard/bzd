@@ -24,7 +24,7 @@ export default class Applications {
 	///
 	/// \return The application.
 	async create(uid, redirect, scopes) {
-		Exception.assert(
+		Exception.assertPrecondition(
 			(await this.get(uid, /*allowNull*/ true)) == null,
 			"An application with this UID '{}' already exists.",
 			uid,
@@ -46,7 +46,7 @@ export default class Applications {
 	async get(uid, allowNull = false) {
 		const data = await this.keyValueStore.get(this.config.bucket, uid, null);
 		if (data === null) {
-			Exception.assert(allowNull, "Application '{}' does not exists.", uid);
+			Exception.assertPrecondition(allowNull, "Application '{}' does not exists.", uid);
 			return null;
 		}
 		return new Application(uid, data);
