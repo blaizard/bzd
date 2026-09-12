@@ -59,12 +59,13 @@ jobs:
             - name: "Create branch for PR"
               env:
                   ISSUE_NUMBER: ${{ github.event.issue.number }}
+                  ISSUE_TITLE: ${{ github.event.issue.title }}
                   RUN_ID: ${{ github.run_id }}
               run: |
                   set -euo pipefail
 
                   PR_HEAD_BRANCH="agent/issue-${ISSUE_NUMBER}/${RUN_ID}"
-                  PR_TITLE="Fix: ${{ github.event.issue.title }}"
+                  PR_TITLE="Fix: ${ISSUE_TITLE}"
                   echo "PR_TITLE=${PR_TITLE}" >> $GITHUB_ENV
                   echo "PR_HEAD_BRANCH=${PR_HEAD_BRANCH}" >> $GITHUB_ENV
 
