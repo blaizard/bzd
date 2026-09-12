@@ -179,7 +179,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 				if (!data.sessions) {
 					return { sessions: {} };
 				}
-				if (hash in data.sessions) {
+				if (Object.hasOwn(data.sessions, hash)) {
 					delete data.sessions[hash];
 				}
 				return data;
@@ -353,7 +353,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			this.options.kvsBucket,
 			uid,
 			(data) => {
-				Exception.assert(!(hash in data.sessions), "The application token '{}' is registered twice.", hash);
+				Exception.assert(!Object.hasOwn(data.sessions, hash), "The application token '{}' is registered twice.", hash);
 				data.sessions[hash] = sessionData;
 				return data;
 			},
@@ -409,6 +409,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 
 		// Look for the token
+		if (!Object.hasOwn(maybeSessions.sessions, hash)) {
+			return false;
+		}
 		const maybeSession = maybeSessions.sessions[hash];
 		if (!maybeSession) {
 			return false;
