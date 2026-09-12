@@ -90,19 +90,45 @@ export default class StorageDisk extends Storage {
 			Exception.assert(!this.options.mustExists, "'{}' is not a valid path.", this.path);
 			await FileSystem.mkdir(this.path);
 		}
+		this.root = await FileSystem.realpath(this.path);
 	}
 
-	_getFullPath(pathList) {
+	/// Get the full path of the given path, asserting it stays within the volume root.
+	async _getFullPath(pathList) {
 		const path = pathlib.path(pathList).normalize;
-		return Path.join(this.path, ...path.parts);
+		const fullPath = Path.join(this.path, ...path.parts);
+		const resolved = await this._resolveRealPath(fullPath);
+		Exception.assertPrecondition(
+			resolved === this.root || resolved.startsWith(this.root + Path.sep),
+			"The path '{}' is outside of the storage root '{}'.",
+			resolved,
+			this.root,
+		);
+		return fullPath;
+	}
+
+	/// Resolve the real path of the given path, walking up to the deepest existing ancestor if the leaf does not exist.
+	async _resolveRealPath(path) {
+		try {
+			return await FileSystem.realpath(path);
+		} catch (e) {
+			if (e.code !== "ENOENT") {
+				throw e;
+			}
+			const parent = Path.dirname(path);
+			if (parent === path) {
+				throw e;
+			}
+			return Path.join(await this._resolveRealPath(parent), Path.basename(path));
+		}
 	}
 
 	async _isImpl(pathList) {
-		return await FileSystem.exists(this._getFullPath(pathList));
+		return await FileSystem.exists(await this._getFullPath(pathList));
 	}
 
 	async _readImpl(pathList) {
-		const path = this._getFullPath(pathList);
+		const path = await this._getFullPath(pathList);
 		if (!(await FileSystem.exists(path))) {
 			throw new FileNotFoundError(path);
 		}
@@ -110,14 +136,14 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _writeImpl(pathList, readStream) {
-		const fullPath = this._getFullPath(pathList);
+		const fullPath = await this._getFullPath(pathList);
 		let writeStream = Fs.createWriteStream(fullPath);
 
 		return copyStream(writeStream, readStream);
 	}
 
 	async _deleteImpl(pathList) {
-		const path = this._getFullPath(pathList);
+		const path = await this._getFullPath(pathList);
 		if (!(await FileSystem.exists(path))) {
 			throw new FileNotFoundError(path);
 		}
@@ -129,7 +155,7 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _listImpl(pathList, maxOrPaging, includeMetadata) {
-		const fullPath = this._getFullPath(pathList);
+		const fullPath = await this._getFullPath(pathList);
 		if (await FileSystem.exists(fullPath)) {
 			const data = await FileSystem.readdir(fullPath, /*withFileTypes*/ includeMetadata);
 			if (includeMetadata) {
@@ -156,12 +182,12 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _mkdirImpl(pathList) {
-		const fullPath = this._getFullPath(pathList);
+		const fullPath = await this._getFullPath(pathList);
 		await FileSystem.mkdir(fullPath, { force: true });
 	}
 
 	async _metadataImpl(pathList) {
-		const filePath = this._getFullPath(pathList);
+		const filePath = await this._getFullPath(pathList);
 		if (!(await FileSystem.exists(filePath))) {
 			throw new FileNotFoundError(filePath);
 		}
@@ -169,7 +195,7 @@ export default class StorageDisk extends Storage {
 	}
 
 	async _setPermissionImpl(pathList, permissions) {
-		const filePath = this._getFullPath(pathList);
+		const filePath = await this._getFullPath(pathList);
 		if (!(await FileSystem.exists(filePath))) {
 			throw new FileNotFoundError(filePath);
 		}
