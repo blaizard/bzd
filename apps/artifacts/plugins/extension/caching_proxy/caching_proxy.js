@@ -153,6 +153,11 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 	endpoints.register("get", "/@caching-proxy/{schema}/{path:*}", async (context) => {
 		const schema = context.getParam("schema");
 		const path = context.getParam("path", "");
+		Exception.assertPrecondition(
+			schema === "http" || schema === "https",
+			"Unsupported schema '{}' for the caching proxy.",
+			schema,
+		);
 		const url = schema + "://" + path;
 		const headersRequest = context.getHeaders();
 		const pathList = inputsToPath(url, headersRequest);

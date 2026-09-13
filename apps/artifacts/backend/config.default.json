@@ -153,6 +153,55 @@
                 "get",
                 "/x/cache/@caching-proxy/unix//var/run/docker.sock"
             ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=memory%252F..%252F..%252Fetc%252Fpasswd"
+            ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/api/v1/list",
+                {
+                    "data": {
+                        "path": [
+                            "memory/../../etc/passwd"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/x/nodes?bulk=1",
+                {
+                    "data": "{\"data\":{\"x\":5}}",
+                    "headers": {
+                        "content-type": "application/json"
+                    }
+                }
+            ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/x/cache/@caching-proxy/file//etc/passwd"
+            ]
         }
     ],
     "tokens": {

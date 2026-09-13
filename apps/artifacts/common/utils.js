@@ -5,7 +5,17 @@ const Exception = ExceptionFactory("artifacts", "utils");
 export default class Utils {
 	/// Convert a URL path to a storage key (array of strings).
 	static pathToKey(path) {
-		return path.split("/").filter(Boolean).map(decodeURIComponent);
+		Exception.assertPrecondition(typeof path === "string", "The path must be a string, not: {:?}", path);
+		return path
+			.split("/")
+			.filter(Boolean)
+			.map((segment) => {
+				try {
+					return decodeURIComponent(segment);
+				} catch (e) {
+					Exception.errorPrecondition("The path is malformed, the segment '{}' cannot be decoded.", segment);
+				}
+			});
 	}
 
 	/// Convert a storage key (array of strings) to a URL path.

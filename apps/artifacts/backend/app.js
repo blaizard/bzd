@@ -136,6 +136,7 @@ const Exception = ExceptionFactory("backend");
 	}
 
 	function assertVolumeReady(volume) {
+		Exception.assertPrecondition(volume in volumes, "No volume is associated with this path: '{}'.", volume);
 		const serviceId = volumes[volume].serviceId;
 		const info = backend.services.getService(serviceId);
 		Exception.assertPrecondition(

@@ -529,6 +529,12 @@ export default class Plugin extends PluginBase {
 					bulkDictionary,
 				);
 				for (const [nodeUid, bulk] of Object.entries(bulkDictionary)) {
+					Exception.assertPrecondition(
+						Array.isArray(bulk),
+						"The value for node '{}' must be an array of entries, not: {:?}",
+						nodeUid,
+						bulk,
+					);
 					for (const [subKey, data] of bulk) {
 						Exception.assertPrecondition(Array.isArray(subKey), "The key should be an array, not: {:?}", subKey);
 						Exception.assertPrecondition(Array.isArray(data), "The data should be an array, not: {:?}", data);

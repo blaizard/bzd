@@ -20,6 +20,18 @@ describe("Utils", () => {
 		it("decodes encoded separators within a segment", () => {
 			Exception.assertEqual(Utils.pathToKey("/cache/..%2F..%2Fetc%2Fpasswd"), ["cache", "../../etc/passwd"]);
 		});
+
+		it("throws on a non-string path", () => {
+			Exception.assertThrowsWithMatch(() => {
+				Utils.pathToKey(["foo", "bar"]);
+			}, "must be a string");
+		});
+
+		it("throws on malformed percent-encoding", () => {
+			Exception.assertThrowsWithMatch(() => {
+				Utils.pathToKey("/foo%zz/bar");
+			}, "cannot be decoded");
+		});
 	});
 
 	describe("keyToPath", () => {
