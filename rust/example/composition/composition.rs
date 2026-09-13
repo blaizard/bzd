@@ -1,5 +1,5 @@
-use component::{Component, Wrapper};
-use core::cell::OnceCell;
+use component::{Lifecycle, Wrapper};
+use core::cell::UnsafeCell;
 
 // --- These are for test purpose
 
@@ -9,6 +9,7 @@ struct UserContext {
     age: u32,
 }
 
+// The component implementation, written once per component type.
 struct User {
     context: UserContext,
     // Internal variables
@@ -25,7 +26,7 @@ impl User {
 
     fn print_info(&mut self) {
         println!(
-            "User: {}, Age: {}, printed: {} time(s)",
+            "User: {}, Age: {}, Printed: {} time(s)",
             self.context.username, self.context.age, self.nb_time_printed
         );
         self.nb_time_printed += 1;
@@ -34,41 +35,90 @@ impl User {
 
 // ---- Registry
 
-/*
-// Safety: Only safe in single-threaded environments
-struct LocalStatic<T>(OnceCell<T>);
+// Safety: Only safe in single-threaded environments.
+struct LocalStatic<T>(UnsafeCell<Option<T>>);
 unsafe impl<T> Sync for LocalStatic<T> {}
 
-fn registry_user() -> &'static Wrapper<ComponentUser> {
-    static COMPONENT: LocalStatic<Wrapper<ComponentUser>> = LocalStatic(OnceCell::new());
+impl<T> LocalStatic<T> {
+    const fn new() -> Self {
+        Self(UnsafeCell::new(None))
+    }
 
-    COMPONENT.0.get_or_init(|| {
-
-        let instance = User {
-            age: 28,
-            username: "Alex",
-        };
-
-        Wrapper::new(ComponentUser {
-            instance: instance,
-        })
-    })
+    #[allow(clippy::mut_from_ref)] // Sound because access is exclusive and single-threaded.
+    fn get_mut_or_init(&self, init: impl FnOnce() -> T) -> &mut T {
+        // Safety: The returned mutable reference is exclusive, a new one is only
+        // taken once the previous one is no longer in use.
+        let cell = unsafe { &mut *self.0.get() };
+        cell.get_or_insert_with(init)
+    }
 }
-*/
+
+struct UserEntryAlpha {
+    instance: User,
+}
+
+impl Lifecycle for UserEntryAlpha {
+    async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
+        println!("[alpha] init");
+        Ok(())
+    }
+
+    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
+        println!("[alpha] shutdown");
+        Ok(())
+    }
+}
+
+// One registry function per composition entry, it creates and returns mutable
+// access to the component instance.
+fn registry_user_alpha() -> &'static mut User {
+    static COMPONENT: LocalStatic<Wrapper<UserEntryAlpha>> = LocalStatic::new();
+    &mut COMPONENT
+        .get_mut_or_init(|| {
+            Wrapper::new(UserEntryAlpha {
+                instance: User::new(UserContext {
+                    age: 28,
+                    username: "Alex",
+                }),
+            })
+        })
+        .instance
+}
+
+struct UserEntryBeta {
+    instance: User,
+}
+
+impl Lifecycle for UserEntryBeta {
+    async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
+        println!("[beta] init");
+        Ok(())
+    }
+
+    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
+        println!("[beta] shutdown");
+        Ok(())
+    }
+}
+
+fn registry_user_beta() -> &'static mut User {
+    static COMPONENT: LocalStatic<Wrapper<UserEntryBeta>> = LocalStatic::new();
+    &mut COMPONENT
+        .get_mut_or_init(|| {
+            Wrapper::new(UserEntryBeta {
+                instance: User::new(UserContext {
+                    age: 42,
+                    username: "Bob",
+                }),
+            })
+        })
+        .instance
+}
 
 fn main() {
-    let user_context = UserContext {
-        age: 28,
-        username: "Alex",
-    };
-    let mut user = Wrapper::new(Component {
-        instance: User::new(user_context),
-        on_init: || async { Ok::<(), bzd::base::error::Error>(()) },
-        on_shutdown: || async { Ok::<(), bzd::base::error::Error>(()) },
-    });
-
-    user.instance.print_info();
-    user.instance.print_info();
-
-    println!("hello");
+    let user_alpha = registry_user_alpha();
+    let user_beta = registry_user_beta();
+    user_alpha.print_info();
+    user_alpha.print_info();
+    user_beta.print_info();
 }

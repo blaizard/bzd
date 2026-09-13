@@ -1,14 +1,17 @@
-use core::future::Future;
 use core::ops::{Deref, DerefMut};
 
-// 1. Generic Component struct holding your type and async callbacks
-pub struct Component<T, FInit, FShutdown> {
-    pub instance: T,
-    pub on_init: FInit,
-    pub on_shutdown: FShutdown,
+#[allow(async_fn_in_trait)] // Components are initialized locally and do not require Send bounds.
+pub trait Lifecycle {
+    /// Initialize the component.
+    async fn init(&mut self) -> Result<(), bzd::base::error::Error>;
+    /// Shutdown the component.
+    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>;
 }
 
-// 2. Wrapper definition
+/// Wrapper around a composition entry.
+///
+/// It reference-counts accesses so that a component shared between multiple
+/// entries is only initialized once and shutdown when the last user releases it.
 pub struct Wrapper<T> {
     inner: T,
     ref_count: usize,
@@ -37,18 +40,11 @@ impl<T> DerefMut for Wrapper<T> {
     }
 }
 
-// 3. Wrapper impl bounded by async closure traits
-impl<T, FInit, FutInit, FShutdown, FutShutdown> Wrapper<Component<T, FInit, FShutdown>>
-where
-    FInit: FnMut(&mut T) -> FutInit,
-    FutInit: Future<Output = Result<(), bzd::base::error::Error>>,
-    FShutdown: FnMut(&mut T) -> FutShutdown,
-    FutShutdown: Future<Output = Result<(), bzd::base::error::Error>>,
-{
+impl<T: Lifecycle> Wrapper<T> {
     pub async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
         self.ref_count += 1;
         if self.ref_count == 1 {
-            (self.inner.on_init)(&mut self.inner.instance).await?;
+            self.inner.init().await?;
         }
         Ok(())
     }
@@ -57,7 +53,7 @@ where
         if self.ref_count > 0 {
             self.ref_count -= 1;
             if self.ref_count == 0 {
-                (self.inner.on_shutdown)(&mut self.inner.instance).await?;
+                self.inner.shutdown().await?;
             }
         }
         Ok(())
