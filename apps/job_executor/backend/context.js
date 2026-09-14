@@ -137,7 +137,10 @@ export default class Context {
 	}
 
 	/// Allocate a new job context ID.
-	allocate() {
+	allocateUid(maybeUid = null) {
+		if (maybeUid !== null) {
+			return maybeUid;
+		}
 		// Loop until we find an UID not used.
 		while (++this.uid in this.jobs) {}
 		return this.uid;
@@ -154,13 +157,15 @@ export default class Context {
 		});
 		const all = await this.storage.listAll([], 100, /*includeMetadata*/ true);
 		const directories = all.filter((entry) => Permissions.makeFromEntry(entry).isList()).map((entry) => entry.name);
-		const regex = /^job-(\d+)$/;
+		const regex = /^job-(.+)$/;
 		for (const name of directories) {
 			const match = name.match(regex);
 			if (match) {
-				const uid = parseInt(match[1], 10);
+				const uid = match[1];
 				this.jobs[uid] = new ContextJob(this, uid);
-				this.uid = Math.max(this.uid, uid);
+				if (/^\d+$/.test(uid)) {
+					this.uid = Math.max(this.uid, parseInt(uid, 10));
+				}
 				Log.info("Discovered previous job context '{}'.", uid);
 			} else {
 				Log.warning("Unexpected directory '{}'.", name);

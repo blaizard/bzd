@@ -49,9 +49,12 @@ export default class Commands {
 		}
 	}
 
-	/// Allocate a jobId for a command.
-	async allocate() {
-		const uid = this.context.allocate();
+	/// Allocate a jobId for a command, or get it back if it already exists.
+	async allocateOrGet(maybeUid = null) {
+		const uid = this.context.allocateUid(maybeUid);
+		if (uid in this.context.jobs) {
+			return this.context.getJob(uid);
+		}
 		return await this.context.addJob(uid);
 	}
 
@@ -81,6 +84,10 @@ export default class Commands {
 
 	/// Create a command from the default executor.
 	async makeDefault(uid, contextJob) {
+		// A job might already have an executor (e.g. a preset instance rescheduled after a restart).
+		if (uid in this.executors) {
+			delete this.executors[uid];
+		}
 		const executor = await Executor.make(uid, "readonly", contextJob);
 		this.make(uid, executor);
 		return executor;

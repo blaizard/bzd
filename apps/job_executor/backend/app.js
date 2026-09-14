@@ -37,8 +37,8 @@ const Log = LogFactory("backend");
 		}),
 	);
 
-	async function schedule(getInputs, scheduler) {
-		const contextJob = await commands.allocate();
+	async function schedule(getInputs, scheduler, maybeUid = null) {
+		const contextJob = await commands.allocateOrGet(maybeUid);
 		const uid = contextJob.getUid();
 
 		try {
@@ -60,21 +60,25 @@ const Log = LogFactory("backend");
 	}
 
 	// Run preset instances.
-	for (const instance of configInstances()) {
+	for (const [uid, instance] of Object.entries(configInstances())) {
 		if (!(instance.type in jobs)) {
-			Log.warning("Ignoring instance with job type '{}'.", instance.type);
+			Log.warning("Ignoring instance '{}' with job type '{}'.", uid, instance.type);
 			continue;
 		}
 
 		const scheduler = instance.scheduler ?? { type: "queue" };
-		await schedule(() => {
-			return Object.assign(
-				{
-					type: instance.type,
-				},
-				instance.args,
-			);
-		}, scheduler);
+		await schedule(
+			() => {
+				return Object.assign(
+					{
+						type: instance.type,
+					},
+					instance.args,
+				);
+			},
+			scheduler,
+			uid,
+		);
 	}
 
 	backend.rest.handle("post", "/job/send", async function () {

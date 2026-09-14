@@ -161,9 +161,12 @@ if __name__ == "__main__":
 		help="Directory to use to store the intermediate data, this directory will be kept when the program terminated. Also if interrupted, the process will restart from the last step.",
 	)
 	parser.add_argument(
-		"action",
+		"--action",
+		dest="actions",
+		action="append",
 		type=str,
 		choices=flowSchemas.keys(),
+		required=True,
 		help="The type of action to perform.",
 	)
 	parser.add_argument("ebook", type=pathlib.Path, help="The ebook file or directory to sanitize.")
@@ -183,41 +186,44 @@ if __name__ == "__main__":
 		"discover": Discover(ebookFormat=args.format),
 	}
 
-	schema = flowSchemas[args.action]
-
 	if args.clean:
 		if args.sandbox is not None and args.sandbox.exists():
 			print(f"Cleaning sandbox {args.sandbox}.")
 			shutil.rmtree(args.sandbox)
 
 	assert args.ebook.exists(), f"File or directory '{args.ebook}' does not exists."
-	if args.ebook.is_file():
-		ebooks = [args.ebook]
-	else:
-		allFiles = args.ebook.rglob("**/*")
-		ebooks = [f for f in allFiles if hasattr(schema, f.suffix.removeprefix(".").lower())]
 
-	for index, ebook in enumerate(ebooks):
-		directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
-		try:
-			print(f"=== [{index + 1}/{len(ebooks)}] Running flow '{args.action}' on {ebook} ===")
-			provider = ProviderEbook(
-				ebook=ebook,
-				keys=args.keys,
-				metadata=ProviderEbookMetadata(title=ebook.stem),
-			)
+	for action in args.actions:
+		print(f"=== Action: {action} ===")
+		schema = flowSchemas[action]
 
-			# Run the flow in isolation, this prevents any memory leaks/hogs which becomes problematic with batch runs.
-			p = multiprocessing.Process(
-				target=runFlow,
-				args=(
-					provider,
-					FlowRegistry(schema=flowSchemas[args.action], actions=actions),
-					pathlib.Path(directory.name),
-				),
-			)
-			p.start()
-			p.join()
+		if args.ebook.is_file():
+			ebooks = [args.ebook]
+		else:
+			allFiles = args.ebook.rglob("**/*")
+			ebooks = [f for f in allFiles if hasattr(schema, f.suffix.removeprefix(".").lower())]
 
-		finally:
-			directory.cleanup()
+		for index, ebook in enumerate(ebooks):
+			directory = tempfile.TemporaryDirectory() if args.sandbox is None else SandboxDirectory(path=args.sandbox)
+			try:
+				print(f"=== [{index + 1}/{len(ebooks)}] Running flow '{action}' on {ebook} ===")
+				provider = ProviderEbook(
+					ebook=ebook,
+					keys=args.keys,
+					metadata=ProviderEbookMetadata(title=ebook.stem),
+				)
+
+				# Run the flow in isolation, this prevents any memory leaks/hogs which becomes problematic with batch runs.
+				p = multiprocessing.Process(
+					target=runFlow,
+					args=(
+						provider,
+						FlowRegistry(schema=flowSchemas[action], actions=actions),
+						pathlib.Path(directory.name),
+					),
+				)
+				p.start()
+				p.join()
+
+			finally:
+				directory.cleanup()

@@ -16,7 +16,7 @@ export default class ExecutorDocker {
 	}
 
 	static async isSupported() {
-		const result = await localCommand(["docsker", "--version"], { ignoreFailure: true }).join();
+		const result = await localCommand(["docker", "--version"], { ignoreFailure: true }).join();
 		return result.isSuccess();
 	}
 
@@ -33,11 +33,11 @@ export default class ExecutorDocker {
 				return data["Names"];
 			});
 		let executors = {};
-		const regex = /^bzd-job-executor-(\d+)$/;
+		const regex = /^bzd-job-executor-(.+)$/;
 		for (const name of containers) {
 			const match = name.match(regex);
 			if (match) {
-				const uid = parseInt(match[1], 10);
+				const uid = match[1];
 				const maybeContextJob = context.getJob(uid, null);
 				executors[uid] = new ExecutorDocker(uid, maybeContextJob);
 				await executors[uid].attach();

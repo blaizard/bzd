@@ -1,6 +1,6 @@
 {
-    "instances": [
-        {
+    "instances": {
+        "sleep": {
             "args": {
                 "time": "5"
             },
@@ -10,7 +10,7 @@
             },
             "type": "sleep"
         }
-    ],
+    },
     "jobs": {
         "$refs": [
             "apps/ebook/config.job_executor.json",

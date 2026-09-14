@@ -77,7 +77,7 @@ export default class Executor {
 		Exception.assertPrecondition(info.status != Status.running, "This executor is already running.");
 		const executor = new Executor.ExecutorClasses[info.type](this.maybeContextJob.getUid(), this.maybeContextJob);
 		this.executor = executor;
-		await this.initialize();
+		await this.attach();
 	}
 
 	/// Get the list of supported executors.
@@ -112,15 +112,23 @@ export default class Executor {
 		return Executor.ExecutorClasses[type].visitorArgs;
 	}
 
-	async initialize() {
+	/// Restore the persisted output into memory. Called once at wrapper creation.
+	async loadPersistedLogs() {
+		if (!this.maybeContextJob) {
+			return;
+		}
+		await this.maybeContextJob.getLogs((line) => {
+			this.event.trigger("output", line);
+		});
+	}
+
+	/// Wire the current inner executor to the wrapper.
+	///
+	/// Called whenever the inner executor is (re)assigned: at creation and on every reset.
+	async attach() {
 		await this.lock.acquire(async () => {
 			// If a context is associated with this executor.
 			if (this.maybeContextJob) {
-				await this.maybeContextJob.getLogs((line) => {
-					this.event.trigger("output", line);
-				});
-
-				const logPath = this.maybeContextJob.getLogPath().asPosix();
 				this.maybeContextJob.captureOutput(this.executor);
 			}
 			// If the executor supports websockets.
@@ -136,6 +144,12 @@ export default class Executor {
 				});
 			}
 		});
+	}
+
+	/// Initialize the wrapper: restore the persisted state, then wire the inner executor.
+	async initialize() {
+		await this.loadPersistedLogs();
+		await this.attach();
 	}
 
 	writeToStdin(data) {

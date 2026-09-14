@@ -14,12 +14,15 @@
                 "{zoom}"
             ],
             [
+                "--action",
                 "{action}"
             ],
             "{ebook}"
         ],
         "default": {
-            "action": "pdf",
+            "action": [
+                "pdf"
+            ],
             "dpi": "200"
         },
         "image": "local/image:latest",
@@ -30,6 +33,7 @@
                     "pdf",
                     "cover"
                 ],
+                "multi": true,
                 "name": "action",
                 "type": "Dropdown",
                 "validation": "mandatory"

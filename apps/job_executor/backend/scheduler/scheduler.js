@@ -97,6 +97,8 @@ export default class Scheduler {
 		Exception.assertPrecondition(info.status == Status.idle, "The job '{uid}' has already started", uid);
 		Exception.assertPrecondition("args" in info, "The job '{}' is missing args: {:?}", uid, info);
 
+		// Materialize the executor in case it is still a placeholder (e.g. a job restored from disk).
+		await executor.reset();
 		await executor.execute(info.args, (status) => {
 			const reschedule = (isFailure) => {
 				let timeoutMs = 1;
