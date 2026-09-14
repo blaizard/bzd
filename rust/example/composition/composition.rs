@@ -7,6 +7,7 @@ use core::cell::UnsafeCell;
 struct UserContext {
     username: &'static str,
     age: u32,
+    sibling: Option<&'static User>,
 }
 
 // The component implementation, written once per component type.
@@ -25,10 +26,15 @@ impl User {
     }
 
     fn print_info(&mut self) {
-        println!(
+        print!(
             "User: {}, Age: {}, Printed: {} time(s)",
             self.context.username, self.context.age, self.nb_time_printed
         );
+        if let Some(sibling) = self.context.sibling {
+            println!(", Sibling: {}", sibling.context.username);
+        } else {
+            println!(", No sibling");
+        }
         self.nb_time_printed += 1;
     }
 }
@@ -59,30 +65,29 @@ struct UserEntryAlpha {
 
 impl Lifecycle for UserEntryAlpha {
     async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[alpha] init");
+        println!("[alex] init");
         Ok(())
     }
 
     async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[alpha] shutdown");
+        println!("[alex] shutdown");
         Ok(())
     }
 }
 
 // One registry function per composition entry, it creates and returns mutable
-// access to the component instance.
-fn registry_user_alpha() -> &'static mut User {
+// access to the component wrapper.
+fn registry_user_alpha() -> &'static mut Wrapper<UserEntryAlpha> {
     static COMPONENT: LocalStatic<Wrapper<UserEntryAlpha>> = LocalStatic::new();
-    &mut COMPONENT
-        .get_mut_or_init(|| {
-            Wrapper::new(UserEntryAlpha {
-                instance: User::new(UserContext {
-                    age: 28,
-                    username: "Alex",
-                }),
-            })
+    COMPONENT.get_mut_or_init(|| {
+        Wrapper::new(UserEntryAlpha {
+            instance: User::new(UserContext {
+                age: 28,
+                username: "Alex",
+                sibling: Some(&registry_user_beta().instance),
+            }),
         })
-        .instance
+    })
 }
 
 struct UserEntryBeta {
@@ -91,34 +96,62 @@ struct UserEntryBeta {
 
 impl Lifecycle for UserEntryBeta {
     async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[beta] init");
+        println!("[bob] init");
         Ok(())
     }
 
     async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[beta] shutdown");
+        println!("[bob] shutdown");
         Ok(())
     }
 }
 
-fn registry_user_beta() -> &'static mut User {
+fn registry_user_beta() -> &'static mut Wrapper<UserEntryBeta> {
     static COMPONENT: LocalStatic<Wrapper<UserEntryBeta>> = LocalStatic::new();
-    &mut COMPONENT
-        .get_mut_or_init(|| {
-            Wrapper::new(UserEntryBeta {
-                instance: User::new(UserContext {
-                    age: 42,
-                    username: "Bob",
-                }),
-            })
+    COMPONENT.get_mut_or_init(|| {
+        Wrapper::new(UserEntryBeta {
+            instance: User::new(UserContext {
+                age: 42,
+                username: "Bob",
+                sibling: None,
+            }),
         })
-        .instance
+    })
 }
 
-fn main() {
+fn block_on<F: core::future::Future>(future: F) -> F::Output {
+    use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+
+    fn clone(_: *const ()) -> RawWaker {
+        RawWaker::new(core::ptr::null(), &VTABLE)
+    }
+    fn noop(_: *const ()) {}
+    static VTABLE: RawWakerVTable = RawWakerVTable::new(clone, noop, noop, noop);
+
+    let mut future = core::pin::pin!(future);
+    // Safety: The waker never dereferences its data pointer.
+    let waker = unsafe { Waker::from_raw(RawWaker::new(core::ptr::null(), &VTABLE)) };
+    let mut context = Context::from_waker(&waker);
+    loop {
+        if let Poll::Ready(result) = future.as_mut().poll(&mut context) {
+            return result;
+        }
+    }
+}
+
+fn main() -> Result<(), bzd::base::error::Error> {
     let user_alpha = registry_user_alpha();
     let user_beta = registry_user_beta();
-    user_alpha.print_info();
-    user_alpha.print_info();
-    user_beta.print_info();
+
+    block_on(user_alpha.init())?;
+    block_on(user_beta.init())?;
+
+    user_alpha.instance.print_info();
+    user_alpha.instance.print_info();
+    user_beta.instance.print_info();
+
+    block_on(user_alpha.shutdown())?;
+    block_on(user_beta.shutdown())?;
+
+    Ok(())
 }
