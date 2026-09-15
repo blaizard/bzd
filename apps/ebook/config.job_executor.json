@@ -21,9 +21,10 @@
         ],
         "default": {
             "action": [
-                "pdf"
+                "pdf",
+                "cover"
             ],
-            "dpi": "200"
+            "dpi": "300"
         },
         "image": "local/image:latest",
         "inputs": [
