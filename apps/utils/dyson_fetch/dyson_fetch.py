@@ -133,7 +133,7 @@ class Dyson:
 					)
 
 				for entry in bulk:
-					path = "/".join(entry["key"])
+					path = "/".join(entry["key"])  # type: ignore
 					print(f"{path}: {entry['value']} {entry.get('unit', '')}")
 
 				if self.maybeNode is not None:
