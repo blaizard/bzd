@@ -17,6 +17,7 @@ rust_library(
     deps = [
         ":interface",
         "//rust/bzd",
+        "//rust/libs/std",
     ],
 )
 
