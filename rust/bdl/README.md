@@ -101,6 +101,42 @@ bdl_library(
 
 The generated code for `file_b` starts with `use file_a::*;`, importing `file_a`'s symbols for internal use without re-exporting them. Downstream users must depend on `file_a` directly to access its symbols.
 
+## Components
+
+Components generate an interface trait and a context struct. For example:
+
+```bdl
+namespace bzd.components;
+
+component User {
+config:
+	username = String;
+	age = Integer [min(0)];
+
+interface:
+	method print_info();
+}
+```
+
+Generates:
+
+```rust
+pub struct BzdComponentsUserContext {
+    pub username: String,
+    pub age: i32,
+}
+
+#[allow(async_fn_in_trait)]
+pub trait BzdComponentsUserInterface {
+    fn new(context: BzdComponentsUserContext) -> Self;
+    async fn print_info(&mut self) -> Result<(), bzd::base::error::Error>;
+}
+```
+
+The component implementation provides the concrete struct and implements the trait, using `LocalStatic` for the single-threaded component registry.
+
+## Dependencies
+
 Rust dependencies provided through the `implementation` attribute are re-exported as part of the public API:
 
 ```python
