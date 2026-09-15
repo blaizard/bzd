@@ -1,3 +1,4 @@
+use core::cell::UnsafeCell;
 use core::ops::{Deref, DerefMut};
 
 #[allow(async_fn_in_trait)] // Components are initialized locally and do not require Send bounds.
@@ -57,5 +58,29 @@ impl<T: Lifecycle> Wrapper<T> {
             }
         }
         Ok(())
+    }
+}
+
+// Safety: Only safe in single-threaded environments.
+pub struct LocalStatic<T>(UnsafeCell<Option<T>>);
+unsafe impl<T> Sync for LocalStatic<T> {}
+
+impl<T> LocalStatic<T> {
+    pub const fn new() -> Self {
+        Self(UnsafeCell::new(None))
+    }
+
+    #[allow(clippy::mut_from_ref)] // Sound because access is exclusive and single-threaded.
+    pub fn get_mut_or_init(&self, init: impl FnOnce() -> T) -> &mut T {
+        // Safety: The returned mutable reference is exclusive, a new one is only
+        // taken once the previous one is no longer in use.
+        let cell = unsafe { &mut *self.0.get() };
+        cell.get_or_insert_with(init)
+    }
+}
+
+impl<T> Default for LocalStatic<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }

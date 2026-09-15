@@ -1,0 +1,15 @@
+
+namespace bzd.components;
+
+
+component User {
+config:
+	username = String;
+	age = Integer [min(0)];
+	
+interface:
+	method print_info();
+	
+}
+
+

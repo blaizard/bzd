@@ -1,5 +1,24 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_binary")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+)
+
+rust_library(
+    name = "user",
+    srcs = [
+        "user.rs",
+    ],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+    ],
+)
 
 rust_library(
     name = "component",
@@ -18,6 +37,7 @@ rust_binary(
     ],
     deps = [
         ":component",
+        ":user",
         "//rust/bzd",
     ],
 )

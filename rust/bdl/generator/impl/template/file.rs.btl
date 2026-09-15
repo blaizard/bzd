@@ -20,7 +20,20 @@ pub enum {{ data.fqn | fqnToCapitalized }} {
 		{%- elif data.category == Category.struct %}
 {# TODO: struct support - out of scope #}
 		{%- elif data.category == Category.component %}
-{# TODO: component support - out of scope #}
+{% if data.interface.methodList %}
+#[allow(async_fn_in_trait)]
+pub trait {{ data.fqn | fqnToCapitalized }}Interface {
+	fn new(context: {{ data.fqn | fqnToCapitalized }}Context) -> Self;
+{% for method in data.interface.methodList %}
+	async fn {{ method.name }}(&mut self{% for item in method.parameters %}, {{ item.name }}: {{ item.symbol | symbolToStr }}{% end %}) -> Result<(), bzd::base::error::Error>;
+{% end %}
+}
+
+{% end %}
+pub struct {{ data.fqn | fqnToCapitalized }}Context {
+{% for item in data.config.expressionList %}	pub {{ item.name }}: {{ item.symbol | symbolToStr }},
+{% end %}
+}
 		{%- elif data.category == Category.composition %}
 {# TODO: composition support - out of scope #}
 		{%- end -%}
