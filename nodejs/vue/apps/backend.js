@@ -375,5 +375,6 @@ export default class Backend {
 			await this.instances.statistics.stop();
 			this.instances.statisticsProviderProcess.stop();
 		}
+		Log.info("All servers are now stopped.");
 	}
 }

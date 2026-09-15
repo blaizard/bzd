@@ -177,16 +177,14 @@ export default class HttpServer {
 		// Stop all the clients first.
 		clearInterval(this.websocketsInterval);
 		this.wss.clients.forEach((ws) => {
-			if (ws.readyState === ws.OPEN) {
-				ws.close(1000, "Server shutting down");
-			}
+			const forceTerminate = setTimeout(() => ws.terminate(), 500);
+			ws.once("close", () => clearTimeout(forceTerminate));
+			ws.close(1000, "Server shutting down");
 		});
 		// Then the server.
 		await new Promise((resolve) => {
 			this.wss.onclose = function () {};
-			this.wss.close(() => {
-				resolve();
-			});
+			this.wss.close(() => resolve());
 		});
 	}
 

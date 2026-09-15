@@ -18,6 +18,15 @@ export default class Scheduler {
 			options,
 		);
 		this.infos = {};
+		// Timers for pending reschedules.
+		this.pendingTimeouts = new Set();
+
+		this.options.services.addStopProcess("scheduler.stop", async () => {
+			for (const timeout of this.pendingTimeouts) {
+				clearTimeout(timeout);
+			}
+			this.pendingTimeouts.clear();
+		});
 
 		this.options.services.addTimeTriggeredProcess(
 			"scheduler.monitoring",
@@ -91,6 +100,14 @@ export default class Scheduler {
 		return this.executors[uid];
 	}
 
+	_setTimeout(callback, delayMs) {
+		const timeout = setTimeout(() => {
+			this.pendingTimeouts.delete(timeout);
+			callback();
+		}, delayMs);
+		this.pendingTimeouts.add(timeout);
+	}
+
 	async _execute(uid) {
 		const executor = this._getExecutor(uid);
 		const info = await executor.getInfo();
@@ -107,7 +124,7 @@ export default class Scheduler {
 					executor.writeToStdout("\nWaiting 10s before restarting...\n");
 				}
 
-				setTimeout(() => {
+				this._setTimeout(() => {
 					executor
 						.reset()
 						.then(() => {
@@ -127,7 +144,7 @@ export default class Scheduler {
 
 			if (info.scheduler?.type == "periodically") {
 				Exception.assert(!info.scheduler?.restart, "Periodic scheduler cannot have a restart policy.");
-				setTimeout(() => {
+				this._setTimeout(() => {
 					reschedule();
 				}, info.scheduler.period * 1000);
 			} else {
