@@ -7,6 +7,9 @@ rust_library(
     ],
     crate_name = "bzd_stream_impl",
     visibility = ["//interfaces:__pkg__"],
+    deps = [
+        "//rust/bzd",
+    ],
 )
 
 rust_library(
