@@ -36,6 +36,7 @@ jobs:
 
                   if [[ "$EVENT_NAME" == "issue_comment" && "$ACTOR" != "agent" ]]; then
                       read -r ACTION _ <<< "$COMMENT_BODY"
+                      ACTION="$(printf '%s' "$ACTION" | tr -d '[:cntrl:]')"
                       if [[ "$IS_PR" == "true" ]]; then
                           route="update_pr"
                       elif [[ "$ACTION" == "/pr" ]]; then
