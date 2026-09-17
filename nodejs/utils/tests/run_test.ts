@@ -69,6 +69,16 @@ describe("localCommand", () => {
     it("Rejects unsupported event topics", () => {
         Exception.assertThrows(() => localCommand(["echo", "hello"]).on("bogus", () => {}));
     });
+
+    it("Kill resolves when the process already exited", async () => {
+        const result = await localCommand(["echo", "hello"]).join();
+        const hung = Symbol("hung");
+        const outcome = await Promise.race([
+            result.kill().then(() => "resolved"),
+            new Promise((resolve) => setTimeout(() => resolve(hung), 1000)),
+        ]);
+        Exception.assert(outcome !== hung, "kill() hung on an already-exited process");
+    });
 });
 
 describe("Status", () => {

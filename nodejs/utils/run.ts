@@ -84,8 +84,12 @@ on(topic: string, handler: (...args: any[]) => void): void {
 	}
 
 	async kill(): Promise<void> {
+		// If the process already exited, the exit event will never fire again, so resolve immediately.
+		if (this.subprocess.exitCode !== null || this.subprocess.signalCode !== null) {
+			return;
+		}
 		const promise = new Promise<void>((resolve) => {
-			this.subprocess.on("exit", () => {
+			this.subprocess.once("exit", () => {
 				resolve();
 			});
 		});
