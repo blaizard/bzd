@@ -74,7 +74,7 @@ def estimatePageDPIs(
 		print("There are no images to process, cannot estimate DPI.")
 		return None
 
-	clusters = clusteringDimensions(dimensions, tolerance=0.05)
+	clusters = clusteringDimensions(dimensions, tolerance=0.2)
 	clusters.sort(key=lambda x: len(x), reverse=True)
 	mostCommonCluster = clusters[0]
 	count = len(mostCommonCluster)
@@ -82,8 +82,11 @@ def estimatePageDPIs(
 	height = (mostCommonCluster[0][1] + mostCommonCluster[-1][1]) / 2
 
 	if count < len(dimensions) / 2:
+		others = ", ".join([f"{int(cluster[0][0])}x{int(cluster[0][1])} ({len(cluster)} times)" for cluster in clusters[1:4]])
+		if len(clusters) > 4:
+			others += "..."
 		print(
-			f"Warning: Most common dimension {int(width)}x{int(height)} only appears {count} times, which is less than half of the total images, ignoring."
+			f"Warning: Most common dimension {int(width)}x{int(height)} only appears {count} times, which is less than half of the total images (total images are {len(dimensions)}, other dimension clusters: {others}), ignoring."
 		)
 		return None
 
