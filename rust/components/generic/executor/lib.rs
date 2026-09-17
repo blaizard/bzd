@@ -3,7 +3,7 @@
 
 use core::future::Future;
 use embassy_futures::join::join;
-use rust_interfaces_executor::Executor;
+use rust_interfaces_executor::BzdExecutorInterface;
 
 pub struct GenericExecutor<W = (), S = ()> {
     workloads: W,
@@ -51,12 +51,12 @@ impl Default for GenericExecutor<(), ()> {
     }
 }
 
-impl<W, S> Executor for GenericExecutor<W, S>
+impl<W, S> BzdExecutorInterface for GenericExecutor<W, S>
 where
     W: Tasks,
     S: Tasks,
 {
-    fn push_workload<F>(self, future: F) -> impl Executor
+    fn push_workload<F>(self, future: F) -> impl BzdExecutorInterface
     where
         F: Future<Output = i32>,
     {
@@ -66,7 +66,7 @@ where
         }
     }
 
-    fn push_service<F>(self, future: F) -> impl Executor
+    fn push_service<F>(self, future: F) -> impl BzdExecutorInterface
     where
         F: Future<Output = i32>,
     {
@@ -98,7 +98,7 @@ where
 #[bzd_test::test]
 mod tests {
     use super::*;
-    use rust_interfaces_executor::Executor;
+    use rust_interfaces_executor::BzdExecutorInterface;
 
     use core::future::Future;
     use core::pin::Pin;

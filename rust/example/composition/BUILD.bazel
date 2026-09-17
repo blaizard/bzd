@@ -10,9 +10,9 @@ bdl_library(
 )
 
 rust_library(
-    name = "user",
+    name = "person",
     srcs = [
-        "user.rs",
+        "person.rs",
     ],
     deps = [
         ":interface",
@@ -22,12 +22,26 @@ rust_library(
 )
 
 rust_library(
-    name = "component",
+    name = "child",
     srcs = [
-        "component.rs",
+        "child.rs",
     ],
     deps = [
+        ":interface",
         "//rust/bzd",
+        "//rust/libs/std",
+    ],
+)
+
+rust_library(
+    name = "parent",
+    srcs = [
+        "parent.rs",
+    ],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/libs/std",
     ],
 )
 
@@ -37,8 +51,9 @@ rust_binary(
         "composition.rs",
     ],
     deps = [
-        ":component",
-        ":user",
+        ":child",
+        ":parent",
+        "//rust/bdl/generator/impl/adapter:component",
         "//rust/bzd",
     ],
 )

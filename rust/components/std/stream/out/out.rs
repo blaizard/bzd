@@ -1,4 +1,4 @@
-use interfaces_stream::BzdOStream;
+use interfaces_stream::BzdOStreamInterface;
 use std::io::{self, Write};
 
 pub struct BzdComponentsStdOut {}
@@ -15,7 +15,7 @@ impl Default for BzdComponentsStdOut {
     }
 }
 
-impl BzdOStream for BzdComponentsStdOut {
+impl BzdOStreamInterface for BzdComponentsStdOut {
     async fn write(&mut self, data: &[u8]) {
         let mut stdout = io::stdout();
         let _ = stdout.write_all(data);

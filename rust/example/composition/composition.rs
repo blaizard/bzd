@@ -1,31 +1,34 @@
+use child::{BzdComponentsChild, BzdComponentsChildContext, BzdComponentsPersonInterface};
 use component::{Lifecycle, LocalStatic, Wrapper};
-use user::*;
+use parent::{
+    BzdComponentsParent, BzdComponentsParentContext, BzdComponentsParentContextConstraintTypes,
+};
 
 // ---- Registry
 
-struct UserEntryAlpha {
-    instance: BzdComponentsUser,
+struct PersonEntryChild {
+    instance: BzdComponentsChild,
 }
 
-impl Lifecycle for UserEntryAlpha {
+impl Lifecycle for PersonEntryChild {
     async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[alex] init");
+        println!("[child] init");
         Ok(())
     }
 
     async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[alex] shutdown");
+        println!("[child] shutdown");
         Ok(())
     }
 }
 
 // One registry function per composition entry, it creates and returns mutable
 // access to the component wrapper.
-fn registry_user_alpha() -> &'static mut Wrapper<UserEntryAlpha> {
-    static COMPONENT: LocalStatic<Wrapper<UserEntryAlpha>> = LocalStatic::new();
+fn registry_person_child() -> &'static mut Wrapper<PersonEntryChild> {
+    static COMPONENT: LocalStatic<Wrapper<PersonEntryChild>> = LocalStatic::new();
     COMPONENT.get_mut_or_init(|| {
-        Wrapper::new(UserEntryAlpha {
-            instance: BzdComponentsUser::new(BzdComponentsUserContext {
+        Wrapper::new(PersonEntryChild {
+            instance: BzdComponentsChild::new(BzdComponentsChildContext {
                 age: 28,
                 username: "Alex",
             }),
@@ -33,30 +36,30 @@ fn registry_user_alpha() -> &'static mut Wrapper<UserEntryAlpha> {
     })
 }
 
-struct UserEntryBeta {
-    instance: BzdComponentsUser,
+struct PersonEntryParent {
+    instance: BzdComponentsParent<BzdComponentsParentContextConstraintTypes<BzdComponentsChild>>,
 }
 
-impl Lifecycle for UserEntryBeta {
+impl Lifecycle for PersonEntryParent {
     async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[bob] init");
+        println!("[parent] init");
         Ok(())
     }
 
     async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[bob] shutdown");
+        println!("[parent] shutdown");
         Ok(())
     }
 }
 
-fn registry_user_beta() -> &'static mut Wrapper<UserEntryBeta> {
-    static COMPONENT: LocalStatic<Wrapper<UserEntryBeta>> = LocalStatic::new();
+fn registry_person_parent() -> &'static mut Wrapper<PersonEntryParent> {
+    static COMPONENT: LocalStatic<Wrapper<PersonEntryParent>> = LocalStatic::new();
     COMPONENT.get_mut_or_init(|| {
-        Wrapper::new(UserEntryBeta {
-            instance: BzdComponentsUser::new(BzdComponentsUserContext {
-                age: 42,
-                username: "Bob",
-            }),
+        let child = &mut registry_person_child().instance;
+        Wrapper::new(PersonEntryParent {
+            instance: BzdComponentsParent::new(BzdComponentsParentContext::<
+                BzdComponentsParentContextConstraintTypes<BzdComponentsChild>,
+            >::new("Bob", 42, [child])),
         })
     })
 }
@@ -82,18 +85,18 @@ fn block_on<F: core::future::Future>(future: F) -> F::Output {
 }
 
 fn main() -> Result<(), bzd::base::error::Error> {
-    let user_alpha = registry_user_alpha();
-    let user_beta = registry_user_beta();
+    let person_child = registry_person_child();
+    let person_parent = registry_person_parent();
 
-    block_on(user_alpha.init())?;
-    block_on(user_beta.init())?;
+    block_on(person_child.init())?;
+    block_on(person_parent.init())?;
 
-    block_on(user_alpha.instance.print_info())?;
-    block_on(user_alpha.instance.print_info())?;
-    block_on(user_beta.instance.print_info())?;
+    block_on(person_child.instance.print_info())?;
+    block_on(person_child.instance.print_info())?;
+    block_on(person_parent.instance.print_info())?;
 
-    block_on(user_alpha.shutdown())?;
-    block_on(user_beta.shutdown())?;
+    block_on(person_child.shutdown())?;
+    block_on(person_parent.shutdown())?;
 
     Ok(())
 }

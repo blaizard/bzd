@@ -2,13 +2,22 @@
 namespace bzd.components;
 
 
-component User {
+component Person {
 config:
 	username = String;
 	age = Integer [min(0)];
 	
 interface:
 	method print_info();
+	
+}
+
+component Child : Person {
+}
+
+component Parent : Person {
+config:
+	children = list(Child);
 	
 }
 

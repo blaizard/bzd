@@ -4,14 +4,14 @@
 use core::future::Future;
 
 #[allow(async_fn_in_trait)] // Executors are polled locally and do not require Send bounds.
-pub trait Executor: Sized {
+pub trait BzdExecutorInterface: Sized {
     /// Register a workload.
-    fn push_workload<F>(self, future: F) -> impl Executor
+    fn push_workload<F>(self, future: F) -> impl BzdExecutorInterface
     where
         F: Future<Output = i32>;
 
     /// Register a service.
-    fn push_service<F>(self, future: F) -> impl Executor
+    fn push_service<F>(self, future: F) -> impl BzdExecutorInterface
     where
         F: Future<Output = i32>;
 
