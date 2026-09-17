@@ -78,8 +78,8 @@ def estimatePageDPIs(
 	clusters.sort(key=lambda x: len(x), reverse=True)
 	mostCommonCluster = clusters[0]
 	count = len(mostCommonCluster)
-	width = (mostCommonCluster[0][0] + mostCommonCluster[-1][0]) / 2
-	height = (mostCommonCluster[0][1] + mostCommonCluster[-1][1]) / 2
+	width = sum(dim[0] for dim in mostCommonCluster) / len(mostCommonCluster)
+	height = sum(dim[1] for dim in mostCommonCluster) / len(mostCommonCluster)
 
 	if count < len(dimensions) / 2:
 		others = ", ".join([f"{int(cluster[0][0])}x{int(cluster[0][1])} ({len(cluster)} times)" for cluster in clusters[1:4]])
