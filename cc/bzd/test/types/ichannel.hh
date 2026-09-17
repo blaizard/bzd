@@ -32,8 +32,7 @@ constexpr bzd::Bool operator&(const IChannelMode a, const IChannelMode b) noexce
 
 /// Emulation of an input channel.
 ///
-/// \tparam useInternalBuffer Return data from the internal buffer instead of the one passed into argument.
-///                           This behavior is used to support zero copy.
+/// \tparam mode The behavior of the emulated channel (copy, zero-copy, chunks).
 template <class T, bzd::Size capacity, IChannelMode mode = IChannelMode::none>
 class IChannel : public bzd::IChannel<T>
 {

@@ -57,8 +57,8 @@ export default class TimeSeries {
 	/**
 	 * Get a known timestamp value.
 	 *
-	 * \param index A positive value will return the timestamp stating from the begning
-	 * with an offset eequal to the index. A negative value, will return the timestamp
+	 * \param index A positive value will return the timestamp starting from the beginning
+	 * with an offset equal to the index. A negative value will return the timestamp
 	 * from the end.
 	 * For example, 0 will return the oldest timestamp while -1 will return the newest.
 	 *

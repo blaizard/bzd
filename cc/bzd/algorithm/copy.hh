@@ -38,9 +38,9 @@ constexpr auto copy(InputRange&& input, Output output)
 
 /// \copydoc copy
 /// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
+/// \param[out] output The destination range.
 ///
-/// \return The remainder of the output range.
+/// \return An InOutResult with the input and output iterators one past the last element copied.
 template <concepts::inputRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copy(InputRange&& input, OutputRange&& output)
 {

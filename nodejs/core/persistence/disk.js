@@ -480,7 +480,7 @@ export default class PersistenceDisk {
 	}
 
 	/**
-	 * \biref Tells if the perisitence is dirty (hence if it might need a savepoint)
+	 * \brief Tells if the persistence is dirty (hence if it might need a savepoint)
 	 */
 	isDirty() {
 		Exception.assert(this.isReady(), "Persistence is not ready yet");

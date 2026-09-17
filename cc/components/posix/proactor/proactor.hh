@@ -19,7 +19,7 @@ public:
 		return bzd::impl::getImplementation(this, &Proactor::write, &Impl::write)->write(fd, data);
 	}
 
-	/// Perform an asynchronous read operator: https://man7.org/linux/man-pages/man2/read.2.html
+	/// Perform an asynchronous read operation: https://man7.org/linux/man-pages/man2/read.2.html
 	///
 	/// This function blocks until there is at least a single byte of data to be read.
 	/// It will return with at least 1 byte or more depending on the implementation.
@@ -32,7 +32,7 @@ public:
 		return bzd::impl::getImplementation(this, &Proactor::read, &Impl::read)->read(fd, bzd::move(data));
 	}
 
-	/// Perform an asynchronous connect operator: https://man7.org/linux/man-pages/man2/connect.2.html
+	/// Perform an asynchronous connect operation: https://man7.org/linux/man-pages/man2/connect.2.html
 	///
 	/// \param fd The file descriptor to connect.
 	/// \param address The address to connect this file descriptor to.

@@ -14,11 +14,7 @@ public:
 public:
 	constexpr Suggestions(const Map& map) noexcept : map_{map} {}
 
-	/// Process a new character.
-	///
-	/// \return An error result if there is no match.
-	///         An empty result if there are matches but no full match.
-	///         An iterator if there is a full match.
+	/// Process a new character and update the range of matching suggestions.
 	constexpr void process(const bzd::StringView view) noexcept
 	{
 		struct Compare

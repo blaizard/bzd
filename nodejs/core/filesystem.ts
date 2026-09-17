@@ -167,7 +167,7 @@ export default class FileSystem {
         return await Fs.promises.link(target, path);
     }
 
-    /// Walk through a directory and print all files
+    /// Walk through a directory and yield all files.
     static async *walk(path: string): AsyncGenerator<string> {
         const dirents = await Fs.promises.readdir(path, { withFileTypes: true });
         for (const dirent of dirents) {

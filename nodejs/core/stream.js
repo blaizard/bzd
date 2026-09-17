@@ -80,8 +80,8 @@ export function teeReadStream(readStream) {
 /// \param stream - The readable stream to consume.
 /// \param maxBytes - The maximum number of bytes to read before aborting.
 /// \param timeoutMs - The maximum time in milliseconds to wait before aborting.
-/// \returns A promise that resolves to a UTF-8 string containing the extracted bytes.
-/// If the limit or timeout is reached, a truncation marker is appended.
+/// \returns A promise that resolves to a Buffer containing the extracted bytes.
+/// If the limit or timeout is reached, the buffer is truncated to that limit.
 export async function peekReadStream(stream, maxBytes = 256, timeoutMs = 1000) {
 	let buffer = Buffer.alloc(0);
 	let timer;

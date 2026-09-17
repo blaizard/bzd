@@ -18,7 +18,7 @@ public:
 	/// Default constructor that construct an invalid file descriptor.
 	FileDescriptor() = default;
 
-	/// Construct a file descriptor object a POSIX file descriptor.
+	/// Construct a file descriptor object from a POSIX file descriptor.
 	///
 	/// \param fd The file descriptor to be used.
 	constexpr explicit FileDescriptor(const NativeType fd) noexcept : native_{fd} {}

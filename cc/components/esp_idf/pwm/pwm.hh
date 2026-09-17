@@ -9,7 +9,7 @@
 #define LEDC_MODE LEDC_LOW_SPEED_MODE
 #define LEDC_CHANNEL LEDC_CHANNEL_0
 #define LEDC_DUTY_RES LEDC_TIMER_13_BIT // Set duty resolution to 13 bits
-#define LEDC_DUTY (1000)				// Set duty to 50%. (2 ** 13) * 50% = 4096
+#define LEDC_DUTY (1000)				// Set duty to 12.2%. (2 ** 13) * 12.2% = 1000
 #define LEDC_FREQUENCY (4000)			// Frequency in Hertz. Set frequency at 4 kHz
 
 namespace bzd::components::esp32 {

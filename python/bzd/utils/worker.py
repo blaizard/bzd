@@ -114,7 +114,7 @@ class Worker:
 				time.sleep(0.001)
 				continue
 
-			# Run the stask
+			# Run the task
 			isException = False
 			stdout = StringIO()
 			result = None

@@ -41,7 +41,7 @@ public:
 	[[nodiscard]] constexpr auto& spans() const noexcept { return spans_; }
 
 	/// Get the size of the memory sequence.
-	/// This is adding all span sizes and returning the sum.
+	/// This adds all span sizes and returns the sum.
 	///
 	/// \return The sum of all span sizes.
 	[[nodiscard]] constexpr Size size() const noexcept
@@ -53,7 +53,7 @@ public:
 	[[nodiscard]] constexpr auto& operator[](const Size index) noexcept { return spans_[index]; }
 	[[nodiscard]] constexpr auto& operator[](const Size index) const noexcept { return spans_[index]; }
 
-	/// Create a sub view of this spans.
+	/// Create a sub view of these spans.
 	///
 	/// \param[in] offset The offset from which to start.
 	/// \param[in] count The number of elements to include.

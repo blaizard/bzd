@@ -87,7 +87,7 @@ export class Storage extends AsyncInitialize {
 		return await toBuffer(readStream);
 	}
 
-	/// Return the content of a file as a buffer.
+	/// Return the content of a file as a string.
 	async readToString(path) {
 		const readStream = await this.read(path);
 		return await toString(readStream);

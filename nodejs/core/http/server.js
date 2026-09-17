@@ -36,7 +36,7 @@ export default class HttpServer {
 				cert: null,
 				/// \brief SSL certificate authority.
 				ca: null,
-				/// \brief Use data compression and minfy certain file types.
+				/// \brief Use data compression and minify certain file types.
 				useCompression: false,
 				/// Authentication object.
 				authentication: null,

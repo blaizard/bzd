@@ -205,8 +205,7 @@ public:
 		push(executable);
 	}
 
-	/// Shutdown the executor. This removes all the pending tasks and no other
-	/// scheduling can proceed.
+	/// Shutdown the executor. This removes all the pending tasks from the queue.
 	void shutdown() noexcept
 	{
 		// Clear the complete queue.
@@ -350,7 +349,7 @@ private:
 	bzd::threadsafe::NonOwningForwardList<ExecutorContext<Executable>> context_{};
 	/// Mutex to protect access over the context queue.
 	bzd::SpinSharedMutex contextMutex_{};
-	/// Maximum concurrent scheduler running at the same time.
+	/// Maximum number of schedulers running concurrently.
 	bzd::Atomic<Size> maxRunningCount_{0u};
 	/// Current status of the executor.
 	bzd::Atomic<Status> status_{Status::idle};

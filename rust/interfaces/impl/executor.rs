@@ -15,6 +15,6 @@ pub trait Executor: Sized {
     where
         F: Future<Output = i32>;
 
-    /// Run untl completion and return the status.
+    /// Run until completion and return the status.
     async fn join(self) -> i32;
 }

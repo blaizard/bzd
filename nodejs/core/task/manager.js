@@ -42,7 +42,7 @@ export default class Manager {
 	 * \param namespace The namespace identifier to which this task belongs to.
 	 * \param name The name of the task (part of the namespace) to which this task belongs to.
 	 * \param action A callback describing the action to be performed.
-	 * \param config Extra configuration for the task to be resigisterd.
+	 * \param config Extra configuration for the task to be registered.
 	 *
 	 * \return The new task created.
 	 */

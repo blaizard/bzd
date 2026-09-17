@@ -552,7 +552,7 @@ private:
 	bzd::test::Runner* runner_{nullptr};
 };
 
-/// Convert a type into a string view at compile type.
+/// Convert a type into a string view at compile time.
 template <class T>
 constexpr auto typeToString()
 {
@@ -654,7 +654,7 @@ private:
 	void* object_{nullptr};
 };
 
-// Hold information about the next test instance to execute.
+// Holds information about the next test instance to execute.
 struct TestNode
 {
 	/// Tells if a node is valid or not.

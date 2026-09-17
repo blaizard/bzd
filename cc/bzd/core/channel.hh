@@ -37,7 +37,7 @@ public:
 	virtual bzd::Async<> write(const bzd::Span<ValueConstType> data) noexcept = 0;
 
 	/// Write data to an output channel.
-	/// The data represented by a spans is a collection of contiguous segments,
+	/// The data represented by spans is a collection of contiguous segments,
 	/// this function uses this attribute to send segment by segment.
 	///
 	/// \param[in] data The data to be sent via this output channel.
@@ -83,7 +83,7 @@ public: // Traits.
 		///
 		/// \param count The number of items to read.
 		///
-		/// \return A generator constraint to a number of items.
+		/// \return A generator constrained to a number of items.
 		GeneratorIChannel first(Size count) noexcept
 		{
 			auto it = co_await !this->begin();

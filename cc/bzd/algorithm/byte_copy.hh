@@ -12,9 +12,9 @@ namespace bzd::algorithm {
 /// Copy an input range into an output range at byte level.
 ///
 /// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
+/// \param[out] output The destination range.
 ///
-/// \return The remainder of the output range.
+/// \return An InOutResult with the input and output iterators one past the last element copied.
 template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>
 constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 {
@@ -49,7 +49,7 @@ constexpr auto byteCopy(InputRange&& input, OutputRange&& output)
 /// Copy an input range into an output range at byte level.
 ///
 /// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
+/// \param[out] output The destination range.
 ///
 /// \return The number of elements copied.
 template <concepts::inputByteCopyableRange InputRange, concepts::outputByteCopyableRange OutputRange>

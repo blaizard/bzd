@@ -162,8 +162,8 @@ export default class PersistenceTimeSeries {
 	/**
 	 * Get a known timestamp value.
 	 *
-	 * \param index A positive value will return the timestamp stating from the begning
-	 * with an offset eequal to the index. A negative value, will return the timestamp
+	 * \param index A positive value will return the timestamp starting from the beginning
+	 * with an offset equal to the index. A negative value will return the timestamp
 	 * from the end.
 	 * For example, 0 will return the oldest timestamp while -1 will return the newest.
 	 *
@@ -232,7 +232,7 @@ export default class PersistenceTimeSeries {
 						const timestampEnd = timeSeriesData.getTimestamp(-1);
 						const timestampLength = timeSeriesData.length;
 
-						// Inset the data
+						// Insert the data
 						timeSeriesIndex.insert(timestampBegin, {
 							path: dataFileList[i],
 							length: timestampLength,

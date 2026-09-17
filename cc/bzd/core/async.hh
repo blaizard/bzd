@@ -190,7 +190,7 @@ private:
 
 	/// Destroy the current async and nested ones.
 	///
-	/// This function is not thread safe and must be called on an async object non active.
+	/// This function is not thread safe and must be called on a non-active async object.
 	constexpr void destroy() noexcept
 	{
 		if (handle_)

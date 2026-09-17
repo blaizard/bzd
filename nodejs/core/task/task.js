@@ -25,7 +25,7 @@ export default class Task {
 		this.config = Object.assign(
 			{
 				/**
-				 * Task priority (from 0 to 10), the lower the highest priority
+				 * Task priority (from 0 to 3), the lower the value, the higher the priority
 				 */
 				priority: Task.PRIORITY_LOW,
 				/**

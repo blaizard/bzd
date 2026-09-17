@@ -131,7 +131,7 @@ export default class Provider {
 			Object.assign(
 				this.commongOptions,
 				{
-					/// Period in secoonds at which this service should run.
+					/// Period in seconds at which this service should run.
 					periodS: 24 * 3600,
 					/// The first start will be after a certain number of seconds.
 					/// If unset, the amount will be random within the periodS given.
