@@ -32,7 +32,7 @@ The Rust generator converts BDL definitions into a `no_std` Rust file. Symbols a
 ```bdl
 namespace bzd.test;
 
-interface MyInterface {
+interface MyService {
 	method add(a = const Integer, b = const Integer) -> Integer;
 }
 ```
@@ -40,21 +40,22 @@ interface MyInterface {
 The generated code provides:
 
 ```rust
-pub trait BzdTestMyInterface {
-    fn add(&self, a: i32, b: i32) -> i32;
+#[allow(async_fn_in_trait)]
+pub trait BzdTestMyServiceInterface {
+    async fn add(&mut self, a: i32, b: i32) -> Result<i32, bzd::base::error::Error>;
 }
 ```
 
 The implementation implements the trait:
 
 ```rust
-use rust_bdl_tests_interface_interface::BzdTestMyInterface;
+use rust_bdl_tests_interface_interface::BzdTestMyServiceInterface;
 
 struct Calculator;
 
-impl BzdTestMyInterface for Calculator {
-    fn add(&self, a: i32, b: i32) -> i32 {
-        a + b
+impl BzdTestMyServiceInterface for Calculator {
+    async fn add(&mut self, a: i32, b: i32) -> Result<i32, bzd::base::error::Error> {
+        Ok(a + b)
     }
 }
 ```
@@ -103,7 +104,7 @@ The generated code for `file_b` starts with `use file_a::*;`, importing `file_a`
 
 ## Components
 
-Components generate an interface trait and a context struct. For example:
+Components generate an interface trait and a context struct holding the `config:` values. For example:
 
 ```bdl
 namespace bzd.components;
@@ -121,19 +122,32 @@ interface:
 Generates:
 
 ```rust
-pub struct BzdComponentsUserContext {
-    pub username: String,
-    pub age: i32,
+pub trait BzdComponentsUserInterface {
+    async fn print_info(&mut self) -> Result<(), bzd::base::error::Error>;
 }
 
-#[allow(async_fn_in_trait)]
-pub trait BzdComponentsUserInterface {
-    fn new(context: BzdComponentsUserContext) -> Self;
-    async fn print_info(&mut self) -> Result<(), bzd::base::error::Error>;
+pub struct BzdComponentsUserContext {
+    pub username: &'static str,
+    pub age: u32,
 }
 ```
 
-The component implementation provides the concrete struct and implements the trait, using `LocalStatic` for the single-threaded component registry.
+When a `config:` entry references another component or interface, the context is generic over a `ContextConstraint` trait and stores the dependency as `&'static mut`:
+
+```rust
+pub trait BzdComponentsManagerContextConstraint {
+    type User: BzdComponentsUserInterface + 'static;
+}
+
+pub struct BzdComponentsManagerContext<C>
+where
+    C: BzdComponentsManagerContextConstraint,
+{
+    pub user: &'static mut C::User,
+}
+```
+
+The component implementation provides the concrete struct and implements the trait. The runtime support crate `//rust/bdl/generator/impl/adapter:component` provides `LocalStatic` (single-threaded `&'static mut` registry), `Wrapper`, and `Lifecycle`.
 
 ## Dependencies
 

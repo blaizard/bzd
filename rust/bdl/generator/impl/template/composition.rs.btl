@@ -1,7 +1,7 @@
 #![no_std]
 
 #[allow(unused_imports)]
-use rust_interfaces_executor::Executor;
+use rust_interfaces_executor::BzdExecutorInterface;
 {% for import in data.rust.imports %}
 #[allow(unused_imports)]
 use {{ import }}::*;

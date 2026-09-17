@@ -8,12 +8,13 @@ from rust.bdl.generator.impl.visitor import formatRust
 class TestInterface(unittest.TestCase):
 	def testSimpleInterface(self) -> None:
 
-		bdlContent = """interface MyInterface {
+		bdlContent = """interface MyService {
 	method add(a = const Integer, b = const Integer) -> Integer;
 }
 """
-		expectedContent = """pub trait MyInterface {
-    fn add(&self, a: i32, b: i32) -> i32;
+		expectedContent = """#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn add(&mut self, a: i32, b: i32) -> Result<i32, bzd::base::error::Error>;
 }
 """
 
@@ -29,12 +30,13 @@ class TestInterface(unittest.TestCase):
 
 		bdlContent = """namespace bzd.test;
 
-interface MyInterface {
+interface MyService {
 	method add(a = const Integer, b = const Integer) -> Integer;
 }
 """
-		expectedContent = """pub trait BzdTestMyInterface {
-    fn add(&self, a: i32, b: i32) -> i32;
+		expectedContent = """#[allow(async_fn_in_trait)]
+pub trait BzdTestMyServiceInterface {
+	async fn add(&mut self, a: i32, b: i32) -> Result<i32, bzd::base::error::Error>;
 }
 """
 
@@ -99,122 +101,101 @@ pub enum LightState {
 
 		testCases = {
 			"Float": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const Float) -> Float;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: f32) -> f32;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: f32) -> Result<f32, bzd::base::error::Error>;
 }
 """,
 			),
 			"Boolean": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const Boolean) -> Boolean;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: bool) -> bool;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: bool) -> Result<bool, bzd::base::error::Error>;
 }
 """,
 			),
 			"Byte": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const Byte) -> Byte;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: u8) -> u8;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: u8) -> Result<u8, bzd::base::error::Error>;
 }
 """,
 			),
 			"String": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const String) -> String;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: &'static str) -> &'static str;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: &'static str) -> Result<&'static str, bzd::base::error::Error>;
 }
 """,
 			),
 			"Void": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = Boolean) -> Void;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: bool) -> ();
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: bool) -> Result<(), bzd::base::error::Error>;
 }
 """,
 			),
 			"None": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = Boolean) -> None;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: bool) -> ();
-}
-""",
-			),
-			"Result<Void>": (
-				"""interface MyInterface {
-	method f() -> Result<Void>;
-}
-""",
-				"""pub trait MyInterface {
-    fn f(&self) -> Result<(), bzd::base::error::Error>;
-}
-""",
-			),
-			"Result<Integer>": (
-				"""interface MyInterface {
-	method f(a = Boolean) -> Result<Integer>;
-}
-""",
-				"""pub trait MyInterface {
-    fn f(&self, a: bool) -> Result<i32, bzd::base::error::Error>;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: bool) -> Result<(), bzd::base::error::Error>;
 }
 """,
 			),
 			"Array default capacity": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const Integer) -> Array<Integer>;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: i32) -> &[i32; 1];
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: i32) -> Result<&[i32; 1], bzd::base::error::Error>;
 }
 """,
 			),
 			"Array with capacity": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f() -> Array<Integer> [capacity(4)];
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self) -> &[i32; 4];
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self) -> Result<&[i32; 4], bzd::base::error::Error>;
 }
 """,
 			),
 			"Vector": (
-				"""interface MyInterface {
+				"""interface MyService {
 	method f(a = const Integer) -> Vector<Integer>;
 }
 """,
-				"""pub trait MyInterface {
-    fn f(&self, a: i32) -> &[i32];
-}
-""",
-			),
-			"Result parameter": (
-				"""interface MyInterface {
-	method f(a = const Result<Integer>) -> Integer;
-}
-""",
-				"""pub trait MyInterface {
-    fn f(&self, a: &Result<i32, bzd::base::error::Error>) -> i32;
+				"""#[allow(async_fn_in_trait)]
+pub trait MyServiceInterface {
+	async fn f(&mut self, a: i32) -> Result<&[i32], bzd::base::error::Error>;
 }
 """,
 			),

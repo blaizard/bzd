@@ -1,0 +1,14 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "component",
+    srcs = [
+        "component.rs",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//rust/bzd",
+    ],
+)

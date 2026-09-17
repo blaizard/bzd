@@ -2,7 +2,7 @@
 namespace bzd.test;
 
 
-interface MyInterface {
+interface Hello {
 	method add(a = const Integer, b = const Integer) -> Integer;
 	
 }

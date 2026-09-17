@@ -1,0 +1,23 @@
+
+namespace bzd.test;
+
+
+component User {
+config:
+	username = String;
+	
+interface:
+	method greet() -> String;
+	
+}
+
+component Manager {
+config:
+	user = User;
+	
+interface:
+	method run();
+	
+}
+
+

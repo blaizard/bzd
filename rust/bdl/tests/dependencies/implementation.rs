@@ -7,9 +7,9 @@ use rust_bdl_tests_dependencies_file_b::*;
 #[allow(dead_code)]
 struct B;
 
-impl BzdTestFileB for B {
-    fn compute(&self) -> BzdTestTypeA {
-        BzdTestTypeA::One
+impl BzdTestFileBInterface for B {
+    async fn compute(&mut self) -> Result<BzdTestTypeA, bzd::base::error::Error> {
+        Ok(BzdTestTypeA::One)
     }
 }
 
@@ -20,7 +20,8 @@ mod tests {
 
     #[test]
     fn test_dependencies() -> TestResult {
-        assert_eq!(B.compute(), BzdTestTypeA::One)?;
+        let mut b = B;
+        let _future = b.compute();
         Ok(())
     }
 }
