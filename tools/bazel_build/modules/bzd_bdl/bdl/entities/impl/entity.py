@@ -2,7 +2,7 @@ import typing
 import json
 import copy
 
-from bzd.parser.element import Element, ElementBuilder
+from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error, AssertionResult
 
 from bdl.contracts.validation import Validation
@@ -274,6 +274,10 @@ class Entity:
 		return self._getNestedByCategory("config")
 
 	@property
+	def configAggregated(self) -> EntitySequence:
+		return self._getNestedByCategory("config_aggregated")
+
+	@property
 	def composition(self) -> EntitySequence:
 		return self._getNestedByCategory(self.compositionAttr)
 
@@ -390,6 +394,18 @@ class Entity:
 
 		return params
 
+	def getConfigAggregated(self) -> Parameters:
+		"""Get the preprocessed config declaration including inherited entries."""
+
+		from bdl.entities.impl.expression import Expression
+
+		return Parameters(
+			element=self.element,
+			NestedElementType=Expression,
+			nestedKind="config_aggregated",
+			filterFct=lambda config: config.category == Category.expression,
+		)
+
 	def markAsResolved(self) -> None:
 		"""
 		Mark an entity as resolved.
@@ -433,6 +449,15 @@ class Entity:
 			)
 			# Note, config entities are resolved only later, when used.
 			# This allow symbol discovery at a later stage, only when the element is actually instantiated.
+
+		configAggregated = SequenceBuilder()
+		for fqn in reversed(self.getParents()):
+			parent = resolver.getEntityResolved(fqn=fqn).assertValue(element=self.element)
+			for config in parent.configRaw:
+				configAggregated.pushBackElement(copy.deepcopy(config.element))
+		for config in self.configRaw:
+			configAggregated.pushBackElement(copy.deepcopy(config.element))
+		ElementBuilder.cast(self.element, ElementBuilder).setNestedSequence("config_aggregated", configAggregated)
 
 	def _resolveTrailingFQN(
 		self,

@@ -9,14 +9,12 @@ from bdl.entities.impl.entity import Entity, EntityExpression
 from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.fragment.fqn import FQN
-from bdl.entities.impl.fragment.parameters import Parameters
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 from bdl.entities.impl.types import Category as CategoryOriginal
 from bdl.entities.impl.method import Method
 from bdl.entities.impl.nested import Nested
 from bdl.visitors.composition.components import Context, ExpressionEntry
 from bdl.visitors.composition.visitor import CompositionView
-from bdl.visitors.symbol_map import Resolver
 
 from rust.bdl.generator.impl.symbol import fqnToCapitalized as fqnToCapitalizedOriginal
 from rust.bdl.generator.impl.symbol import symbolRustToStr
@@ -29,11 +27,9 @@ class Transform:
 		self,
 		composition: typing.Optional[CompositionView] = None,
 		data: Optional[Dict[str, Any]] = None,
-		resolver: typing.Optional[Resolver] = None,
 	) -> None:
 		self.data = data if data else {}
 		self.composition = composition
-		self.resolver = resolver
 
 	def fqnToCapitalized(self, fqn: str) -> str:
 		return fqnToCapitalizedOriginal(fqn=fqn)
@@ -79,6 +75,8 @@ class Transform:
 	def configDependencySymbol(self, item: EntityExpression) -> Optional[Symbol]:
 		if item.symbol.category in {CategoryOriginal.interface, CategoryOriginal.component}:
 			return item.symbol
+		if isinstance(item, Expression) and item.isInterfaceType:
+			return item.interfaceType
 		if self.isList(item):
 			items = self.listItems(typing.cast(Expression, item))
 			if items and items[0].param.isSymbol:
@@ -91,7 +89,7 @@ class Transform:
 		return self.symbolInterfaceToStr(dependencySymbol)
 
 	def configTypeItems(self, entity: Entity) -> typing.List[EntityExpression]:
-		return [item for item in self.configValues(entity) if self.configDependencySymbol(item) is not None]
+		return [item for item in entity.getConfigAggregated() if self.configDependencySymbol(item) is not None]
 
 	def configTypeParameters(self, entity: Entity) -> str:
 		items = self.configTypeItems(entity)
@@ -116,7 +114,7 @@ class Transform:
 		)
 
 	def configConstructorFields(self, entity: Entity) -> str:
-		return ", ".join([item.name for item in self.configValues(entity)])
+		return ", ".join([item.name for item in entity.getConfigAggregated()])
 
 	def configConstructorValueToStr(self, item: EntityExpression) -> str:
 		if self.isList(item):
@@ -126,11 +124,7 @@ class Transform:
 		return symbolRustToStr(item.symbol)
 
 	def configConstructorParameters(self, entity: Entity) -> str:
-		return ", ".join([f"{item.name}: {self.configConstructorValueToStr(item)}" for item in self.configValues(entity)])
-
-	def configValues(self, entity: Entity) -> Parameters:
-		assert self.resolver is not None
-		return entity.getConfigValues(resolver=self.resolver)
+		return ", ".join([f"{item.name}: {self.configConstructorValueToStr(item)}" for item in entity.getConfigAggregated()])
 
 	def workloadToPath(self, entry: ExpressionEntry) -> str:
 		return "::".join(FQN.toNamespace(entry.expression.symbol.kinds[-1]))
@@ -145,7 +139,7 @@ class Transform:
 
 def formatRust(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:
 	template = Template.fromPath(pathlib.Path(__file__).parent / "template/file.rs.btl", indent=True)
-	return template.render(bdl.tree, Transform(data=data, resolver=Resolver(symbols=bdl.symbols)))
+	return template.render(bdl.tree, Transform(data=data))
 
 
 def compositionRust(

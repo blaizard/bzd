@@ -48,6 +48,77 @@ pub trait BzdTestMyServiceInterface {
 			expectedContent.rstrip("\n"),
 		)
 
+	def testComponent(self) -> None:
+
+		bdlContent = """component MyComponent {
+config:
+	age = Integer;
+interface:
+	method foo(a = const Integer) -> Integer;
+}
+"""
+		expectedContent = """#[allow(async_fn_in_trait)]
+pub trait MyComponentInterface {
+	async fn foo(&mut self, a: i32) -> Result<i32, bzd::base::error::Error>;
+}
+
+pub struct MyComponentContext {
+	pub age: i32,
+}
+"""
+
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertEqual(
+			actual.rstrip("\n"),
+			expectedContent.rstrip("\n"),
+		)
+
+	def testComponentWithParents(self) -> None:
+
+		bdlContent = """component Base {
+config:
+	age = Integer;
+interface:
+	method foo(a = const Integer) -> Integer;
+}
+
+component Derived : Base {
+config:
+	username = String;
+interface:
+	method bar() -> Void;
+}
+"""
+		expectedContent = """#[allow(async_fn_in_trait)]
+pub trait BaseInterface {
+	async fn foo(&mut self, a: i32) -> Result<i32, bzd::base::error::Error>;
+}
+
+pub struct BaseContext {
+	pub age: i32,
+}
+
+#[allow(async_fn_in_trait)]
+pub trait DerivedInterface: BaseInterface {
+	async fn bar(&mut self) -> Result<(), bzd::base::error::Error>;
+}
+
+pub struct DerivedContext {
+	pub age: i32,
+	pub username: &'static str,
+}
+"""
+
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertEqual(
+			actual.rstrip("\n"),
+			expectedContent.rstrip("\n"),
+		)
+
 	def testEnum(self) -> None:
 
 		bdlContent = """namespace bzd.components.esp;

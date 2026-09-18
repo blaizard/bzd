@@ -52,7 +52,7 @@ impl{{ data | configTypeParameters }} {{ data.fqn | fqnToCapitalized }}ContextCo
 }
 
 pub struct {{ data.fqn | fqnToCapitalized }}Context<C> where C: {{ data.fqn | fqnToCapitalized }}ContextConstraint {
-{% for item in configValues(data) %}
+{% for item in data.getConfigAggregated() %}
 	pub {{ item.name }}: {{ configContextValue(item) }},
 {% end %}
 }
@@ -64,7 +64,7 @@ impl{{ data | configTypeParameters }} {{ data.fqn | fqnToCapitalized }}Context<{
 }
 {% else %}
 pub struct {{ data.fqn | fqnToCapitalized }}Context {
-{% for item in configValues(data) %}
+{% for item in data.getConfigAggregated() %}
 	pub {{ item.name }}: {{ item.symbol | symbolToStr }},
 {% end %}
 }
