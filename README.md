@@ -8,20 +8,20 @@ Access the [rendered version of this documentation](https://blaizard.github.io/b
 Fullstack, lightweight and flexible framework for IoT applications.
 This mono-repository enables the following technologies:
 
-|             C++20              |           Rust (2024)           |            Python3.13             |           Node (v23)            |              Vue               |              Bazel               |              KiCad               |
+|             C++20              |           Rust (2024)           |            Python 3.13            |           Node (v23)            |              Vue               |              Bazel               |              KiCad               |
 | :----------------------------: | :-----------------------------: | :-------------------------------: | :-----------------------------: | :----------------------------: | :------------------------------: | :------------------------------: |
 | ![](./docs/assets/png/cpp.png) | ![](./docs/assets/png/rust.png) | ![](./docs/assets/png/python.png) | ![](./docs/assets/png/node.png) | ![](./docs/assets/png/vue.png) | ![](./docs/assets/png/bazel.png) | ![](./docs/assets/png/kicad.png) |
 
 ## Overview
 
 This framework is built to run on all sorts of embedded platforms, from bare-metal 8-bit microcontrollers to high-performance compute units.
-It is made to remove any dependencies from STL, but to provide a similar set of components and utilities to develop applications in an
+It is made to remove any dependency on the STL, but to provide a similar set of components and utilities to develop applications in an
 efficient and safe manner.
 
 It features the following:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
-- The core library is self-contained, no reliance on third-party libraries, only on the freestanding STL.
+- The core library is self-contained, with no reliance on third-party libraries, only on the freestanding STL.
 - Flexible error handling model.
 - Based on C++ coroutines.
 - Compile-time string formatting tool.

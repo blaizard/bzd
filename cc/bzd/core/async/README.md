@@ -10,7 +10,7 @@ Thanks to this object you can, for example, resume the coroutine. The coroutine_
 ### Frame
 
 The frame contains the current state of the coroutine.
-A coroutine function is created by the compiler when you call a new coroutine, for example `auto resumable_object = delay(10_ms);`
+A coroutine frame is created by the compiler when you call a coroutine function, for example `auto resumable_object = delay(10_ms);`
 
 ```c++
 Async<> delay(args...)
@@ -101,7 +101,7 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 
 ### To be aware
 
-- Coroutine in C++ together with lambda capture is nasty, better not use it: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp51-do-not-use-capturing-lambdas-that-are-coroutines
+- Coroutines in C++ together with lambda capture are nasty, better not use them: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp51-do-not-use-capturing-lambdas-that-are-coroutines
 - Generators should not use the error propagation syntax, otherwise the generator async is considered terminated, while it might be reused.
 
 ### Task
@@ -151,9 +151,9 @@ while (it != myFunc.end()) {
 
 #### All
 
-Coroutines can be composed and executed in parallel, depending on the executor used underneath.
+Coroutines can be composed and executed concurrently on an executor; to run them in parallel across multiple cores, use `allParallel` instead.
 
-To have multiple coroutines run in parallel, this can be done as follows:
+To have multiple coroutines run concurrently, this can be done as follows:
 
 ```c++
 const auto result = co_await bzd::async::all(myFunc(), myFunc(), myFunc());
@@ -193,7 +193,7 @@ if (!result)
 const auto value = result.value();
 ```
 
-The error propagation goes to upper levels until an awaitable handling the error is found.
+The error propagation goes to upper levels until an awaitable that handles the error is found.
 
 Error propagation can also apply to `bzd::async::any` coroutines, and it will ensure the coroutine at a specific index
 returns a valid result, otherwise the error will be propagated to the caller.
@@ -208,7 +208,7 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments:
 the first, which is guaranteed to be called, contains a movable-only suspended executable object as argument.
-The user needs to dispose it within this callback. Once the callback is completed, the suspended executable object
+The user needs to dispose of it within this callback. Once the callback completes, the suspended executable object
 cannot be moved anymore.
 It is also guaranteed that no cancellation can occur during the lifetime of this callback.
 
