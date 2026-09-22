@@ -8,7 +8,7 @@ use embassy_sync::signal::Signal;
 use esp_hal::system::software_reset;
 use esp_println::{print, println};
 
-use composition::executor;
+use composition::runExecutor;
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -35,6 +35,11 @@ pub fn exit(code: i32) -> ! {
 
 #[esp_rtos::main]
 async fn main(_spawner: Spawner) -> ! {
-    let result = executor().await;
-    println!("executor() completed with {result}");
+    match runExecutor().await {
+        Ok(()) => exit(0),
+        Err(e) => {
+            println!("executor() failed: {e}");
+            exit(1);
+        }
+    }
 }

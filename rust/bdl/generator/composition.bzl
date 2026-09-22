@@ -135,6 +135,8 @@ def _generator_rust_composition_impl(name, visibility, target_name, target, comp
             "{}.composition.rs".format(name),
         ],
         deps = [
+            Label("//rust/bdl/generator/impl/adapter:component"),
+            Label("//rust/bzd"),
             Label("//rust/interfaces:executor"),
             "{}.composition".format(name),
         ],

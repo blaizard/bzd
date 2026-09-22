@@ -1,19 +1,112 @@
 #![no_std]
 
 #[allow(unused_imports)]
+use component::{Lifecycle, LocalStatic, Wrapper};
+
+#[allow(unused_imports)]
 use rust_interfaces_executor::BzdExecutorInterface;
 {% for import in data.rust.imports %}
 #[allow(unused_imports)]
 use {{ import }}::*;
 {% end %}
 
-pub async fn executor() -> i32
-{
-	#[warn(unused_assignments)]
-	let mut result = 0;
+// ---- Registry
+
 {% for context in contexts %}
-	let executor = GenericExecutor::new();
-	result = executor{{ contextToExecutorPushCalls(context) }}.join().await;
-{% end %}
-	result
+{% for fqn, entry in registry[context] %}
+#[allow(dead_code)]
+struct {{ fqn | entryStructNameToStr }} {
+	instance: {{ entryTypeToStr(entry, context) }},
 }
+
+impl Lifecycle for {{ fqn | entryStructNameToStr }} {
+	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
+	{
+{% for dep in entry.deps %}
+		{{ dep.fqn | registryNameToStr }}().init().await?;
+{% end %}
+{% for init in entry.init %}
+		self.instance.{{ initMethodNameToStr(init) }}().await?;
+{% end %}
+		Ok(())
+	}
+
+	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
+	{
+{% for shutdown in entry.shutdown %}
+		self.instance.{{ initMethodNameToStr(shutdown) }}().await?;
+{% end %}
+{% for dep in entry.deps %}
+		{{ dep.fqn | registryNameToStr }}().shutdown().await?;
+{% end %}
+		Ok(())
+	}
+}
+
+fn {{ fqn | registryNameToStr }}() -> &'static mut Wrapper<{{ fqn | entryStructNameToStr }}> {
+	static COMPONENT: LocalStatic<Wrapper<{{ fqn | entryStructNameToStr }}>> = LocalStatic::new();
+	COMPONENT.get_mut_or_init(|| {
+		Wrapper::new({{ fqn | entryStructNameToStr }} {
+			instance: {{ entryConstructorToStr(entry, context) }},
+		})
+	})
+}
+
+{% end %}
+{% end %}
+// ---- Execution
+
+{% for context in contexts %}
+#[allow(non_snake_case)]
+pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::error::Error>
+{
+	// Create all registry entries.
+{% for fqn, entry in registry[context] %}
+	let {{ fqn | registryNameToStr }} = {{ fqn | registryNameToStr }}();
+{% end %}
+
+	// Initialize all registry entries.
+{% for fqn, entry in registry[context] %}
+	{{ fqn | registryNameToStr }}.init().await?;
+{% end %}
+
+	// Execute the workloads and services.
+	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
+	let result = GenericExecutor::new()
+{% for entry in workloads[context] %}
+		.push_workload(async {
+			match {{ workloadMethodToStr(entry) }}.await {
+				Ok(()) => 0,
+				Err(e) => {
+					*failure.borrow_mut() = Some(e);
+					1
+				}
+			}
+		})
+{% end %}
+{% for entry in services[context] %}
+		.push_service(async {
+			match {{ workloadMethodToStr(entry) }}.await {
+				Ok(()) => 0,
+				Err(e) => {
+					*failure.borrow_mut() = Some(e);
+					1
+				}
+			}
+		})
+{% end %}
+		.join()
+		.await;
+
+	// Shutdown all registry entries.
+{% for fqn, entry in registry[context] %}
+	{{ fqn | registryNameToStr }}.shutdown().await?;
+{% end %}
+
+	if result != 0 {
+		return Err(failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed.")));
+	}
+	Ok(())
+}
+
+{% end %}

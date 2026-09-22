@@ -1,4 +1,5 @@
 import typing
+import json
 import pathlib
 
 from typing import Any, Dict, Optional
@@ -126,15 +127,133 @@ class Transform:
 	def configConstructorParameters(self, entity: Entity) -> str:
 		return ", ".join([f"{item.name}: {self.configConstructorValueToStr(item)}" for item in entity.getConfigAggregated()])
 
-	def workloadToPath(self, entry: ExpressionEntry) -> str:
-		return "::".join(FQN.toNamespace(entry.expression.symbol.kinds[-1]))
+	def literalNativeToStr(self, literalNative: Any) -> str:
+		"""Convert a literal native type into its Rust representation."""
 
-	def contextToExecutorPushCalls(self, context: Context) -> str:
-		assert self.composition is not None
-		entries = []
-		entries += [f".push_workload({self.workloadToPath(entry)}())" for entry in self.composition.workloads[context]]
-		entries += [f".push_service({self.workloadToPath(entry)}())" for entry in self.composition.services[context]]
-		return "".join(entries)
+		if isinstance(literalNative, dict):
+			assert "type" in literalNative, (
+				f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
+			)
+			literalType = literalNative["type"]
+			if literalType == "enum":
+				return fqnToCapitalizedOriginal(literalNative["fqn"])
+			raise KeyError(f"Unsupported extended literal of type '{literalType}'")
+
+		if isinstance(literalNative, str):
+			return json.dumps(literalNative)
+
+		if isinstance(literalNative, bool):
+			return "true" if literalNative else "false"
+
+		return str(literalNative)
+
+	def registryNameToStr(self, fqn: str) -> str:
+		return "registry_{}".format("_".join(FQN.toNamespace(fqn)))
+
+	def entryStructNameToStr(self, fqn: str) -> str:
+		return "{}Entry".format(self.fqnToCapitalized(fqn))
+
+	def runFunctionNameToStr(self, context: Context) -> str:
+		return "run{}".format(self.fqnToCapitalized(context.executorWithoutTarget))
+
+	def isExecutorEntry(self, entity: ExpressionEntry, context: Context) -> bool:
+		return entity.expression.fqn == context.executor
+
+	def configDependencyItems(self, entity: ExpressionEntry) -> typing.List[ParametersResolvedItem]:
+		"""Get the resolved config items that reference a dependency (component or interface)."""
+
+		return [
+			item
+			for item in entity.expression.parametersResolved
+			if item.param.isSymbol and self.configDependencySymbol(item.param) is not None
+		]
+
+	def configParamValueToStr(self, item: ParametersResolvedItem) -> str:
+		"""Render the value of a resolved config parameter, either a literal or a registry reference."""
+
+		if item.param.isLiteral:
+			return self.literalNativeToStr(item.param.literalNative)
+		param = typing.cast(Expression, item.param)
+		if param.isSymbol and self.isList(param):
+			values = [self.configParamValueToStr(value) for value in self.listItems(param)]
+			return "[{}]".format(", ".join(values))
+		fqn = param.underlyingValueFQN
+		assert fqn is not None, f"The parameter '{param}' must reference a registry entry."
+		return "&mut {}().instance".format(self.registryNameToStr(fqn))
+
+	def configParamConcreteType(self, item: ParametersResolvedItem, context: Context) -> Optional[str]:
+		"""Resolve the concrete type of a config dependency, through the registry if possible."""
+
+		param = typing.cast(Expression, item.param)
+		if param.isSymbol and self.isList(param):
+			items = self.listItems(param)
+			if items:
+				return self.configParamConcreteType(items[0], context=context)
+			return None
+		if param.isLValue:
+			fqn = param.underlyingValueFQN
+			assert fqn is not None
+			assert self.composition is not None
+			entry = self.composition.registry[context].get(fqn)
+			if entry is not None:
+				return self.symbolToStr(entry.expression.symbol)
+		dependencySymbol = self.configDependencySymbol(param)
+		return self.symbolToStr(dependencySymbol) if dependencySymbol is not None else None
+
+	def constraintTypesToStr(self, entity: ExpressionEntry, context: Context) -> str:
+		"""Generate the constraint types argument, e.g. 'BzdParentContextConstraintTypes<DefaultChild>', or '' if no dependency."""
+
+		items = self.configDependencyItems(entity)
+		if not items:
+			return ""
+		args = []
+		for item in items:
+			concreteType = self.configParamConcreteType(item, context=context)
+			assert concreteType is not None, f"Cannot resolve the concrete type of the dependency '{item}'."
+			args.append(concreteType)
+		return "{}ContextConstraintTypes<{}>".format(self.symbolToStr(entity.expression.symbol), ", ".join(args))
+
+	def entryTypeToStr(self, entity: ExpressionEntry, context: Context) -> str:
+		"""Generate the concrete component type of a registry entry."""
+
+		if self.isExecutorEntry(entity, context):
+			return entity.expression.symbol.propertyName
+		baseType = self.symbolToStr(entity.expression.symbol)
+		constraint = self.constraintTypesToStr(entity, context)
+		return "{}<{}>".format(baseType, constraint) if constraint else baseType
+
+	def entryConstructorToStr(self, entity: ExpressionEntry, context: Context) -> str:
+		"""Generate the construction call of a registry entry instance."""
+
+		if self.isExecutorEntry(entity, context):
+			return "{}::new()".format(entity.expression.symbol.propertyName)
+		return "{}::new({})".format(self.entryTypeToStr(entity, context), self.contextNewToStr(entity, context))
+
+	def contextNewToStr(self, entity: ExpressionEntry, context: Context) -> str:
+		"""Generate the context construction call of a registry entry."""
+
+		contextType = "{}Context".format(self.symbolToStr(entity.expression.symbol))
+		if self.configDependencyItems(entity):
+			constraint = self.constraintTypesToStr(entity, context)
+			args = ", ".join(self.configParamValueToStr(item) for item in entity.expression.parametersResolved)
+			return "{}::<{}>::new({})".format(contextType, constraint, args)
+		fields = ", ".join(
+			"{}: {}".format(item.name, self.configParamValueToStr(item)) for item in entity.expression.parametersResolved
+		)
+		return "{} {{ {} }}".format(contextType, fields)
+
+	def initMethodNameToStr(self, expression: Expression) -> str:
+		"""Get the method name of an init/shutdown expression, used on the component instance."""
+
+		return expression.symbol.propertyName
+
+	def workloadMethodToStr(self, entry: ExpressionEntry) -> str:
+		"""Generate the method call of a workload/service entry on its component instance."""
+
+		symbol = entry.expression.symbol
+		assert symbol.this, f"The workload '{entry.expression}' must be a method call on a component instance."
+		parameters = ", ".join(self.configParamValueToStr(item) for item in entry.expression.parametersResolved)
+		return "{}().instance.{}({})".format(self.registryNameToStr(symbol.this), symbol.propertyName, parameters)
 
 
 def formatRust(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:

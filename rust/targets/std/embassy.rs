@@ -1,15 +1,22 @@
 use embassy_executor::{Executor, Spawner};
 use static_cell::StaticCell;
 
-use composition::executor;
+use composition::runExecutor;
 
 static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[embassy_executor::task]
 async fn main_task() {
-    let result = executor().await;
-    println!("executor() completed with {result}");
-    exit(0);
+    match runExecutor().await {
+        Ok(()) => {
+            println!("executor() completed successfully");
+            exit(0);
+        }
+        Err(e) => {
+            println!("executor() failed: {e}");
+            exit(1);
+        }
+    }
 }
 
 pub fn exit(code: i32) -> ! {
