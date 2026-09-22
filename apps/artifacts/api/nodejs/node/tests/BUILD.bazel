@@ -9,5 +9,6 @@ bzd_nodejs_test(
     deps = [
         "//apps/artifacts/api/nodejs/node",
         "//nodejs/core:exception",
+        "//nodejs/core/http:client",
     ],
 )

@@ -7,6 +7,7 @@ py_test(
     visibility = ["//visibility:public"],
     deps = [
         "//apps/artifacts/api/python/node",
+        "@bzd_python//bzd/http:client",
         "@bzd_python//bzd/http:client_mock",
     ],
 )

@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
+from bzd.http.client import HttpClientException
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
 from apps.artifacts.api.python.common import ArtifactsBase, NodePublishNoRemote
@@ -17,6 +18,11 @@ BulkEntry = typing.List[typing.Union[typing.List[str], typing.List[BulkData]]]
 BulkEntries = typing.List[BulkEntry]
 # The bulk payload for a multi-node request: {uid: BulkEntries}.
 BulkMulti = typing.Dict[str, BulkEntries]
+# HTTP status codes that indicate a request that is malformed and can never succeed.
+# 400 Bad Request
+# 413 Content Too Large
+# 422 Unprocessable Content
+MalformedRequestStatusCodes = (400, 413, 422)
 
 
 class PublisherProtocol(typing.Protocol):
@@ -118,7 +124,14 @@ class Node(ArtifactsBase):
 					url = remote + entry.uri
 					if entry.isClientTimestamp:
 						content["timestamp"] = time.time() * 1000
-					self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+					try:
+						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
+					except HttpClientException as e:
+						if e.status in MalformedRequestStatusCodes:
+							self.logger.error(f"Remote '{remote}' dropped the malformed request: {str(e)}")
+							self.buffer.pop(0)
+							continue
+						raise
 					self.buffer.pop(0)
 
 			self._tryRemotes(publishOnRemote, "Unable to publish to any of the remotes.", retryForS=self.blockForS)

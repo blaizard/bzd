@@ -1,4 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import { HttpClientException } from "#bzd/nodejs/core/http/client.js";
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "node");
@@ -153,6 +154,46 @@ describe("Node", () => {
 			});
 			await node.publish({ data: 1, uid: "u", path: ["foo"] });
 			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/root/foo/");
+		});
+
+		it("Drops the request when the remote responds with a malformed request status", async () => {
+			for (const code of [400, 413, 422]) {
+				const node = makeNode({
+					post: async () => {
+						throw new HttpClientException(code, "bad", `HTTP Error: ${code}`);
+					},
+				});
+				await node.publish({ data: 1, uid: "testuid" });
+			}
+		});
+
+		it("Does not try the next remote for a malformed request", async () => {
+			const calls = [];
+			const node = new Node({
+				remotes: ["http://remote1", "http://remote2"],
+				volume: "nodes",
+				token: null,
+				httpClient: {
+					post: async (url) => {
+						calls.push(url);
+						throw new HttpClientException(400, "bad", "HTTP Error: 400");
+					},
+					get: async () => ({}),
+				},
+			});
+			await node.publish({ data: 1, uid: "u" });
+			Exception.assertEqual(calls, ["http://remote1/x/nodes/u/data/"]);
+		});
+
+		it("Still throws when the remote responds with a server error status", async () => {
+			const node = makeNode({
+				post: async () => {
+					throw new HttpClientException(500, "boom", "HTTP Error: 500");
+				},
+			});
+			await Exception.assertThrows(async () => {
+				await node.publish({ data: 1, uid: "testuid" });
+			});
 		});
 
 		it("Throws when posting to all remotes fails", async () => {

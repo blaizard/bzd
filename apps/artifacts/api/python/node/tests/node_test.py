@@ -4,6 +4,7 @@ import json
 
 from apps.artifacts.api.python.common import NodePublishNoRemote
 from apps.artifacts.api.python.node.node import Node
+from bzd.http.client import HttpClientException
 from bzd.http.client_mock import HttpClientMock, HttpResponseMock
 
 
@@ -167,6 +168,87 @@ class TestRun(unittest.TestCase):
 		node = Node(uid="testuid", remotes=["http://remote1"], httpClient=HttpClientMock(callback=callback), blockForS=0.05)
 		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
 		self.assertGreaterEqual(self.calledCounter, 2)
+
+	def testPublishBadRequestDropsEntry(self) -> None:
+		self.calledCounter = 0
+
+		def callback(**kwargs: typing.Any) -> typing.Any:
+			self.calledCounter += 1
+			raise HttpClientException(
+				message="HTTP Error: Bad Request (400)",
+				status=400,
+				reason="Bad Request",
+				content=b"",
+			)
+
+		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
+		node.publish(1)
+		self.assertEqual(self.calledCounter, 1)
+		self.assertEqual(node.buffer, [])
+
+	def testPublishMalformedStatusesDropped(self) -> None:
+		for status in (400, 413, 422):
+			with self.subTest(status=status):
+
+				def callback(**kwargs: typing.Any) -> typing.Any:
+					raise HttpClientException(
+						message=f"HTTP Error ({status})",
+						status=status,
+						reason="Malformed",
+						content=b"",
+					)
+
+				node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
+				node.publish(1)
+				self.assertEqual(node.buffer, [])
+
+	def testPublishBadRequestContinuesWithOthers(self) -> None:
+		self.calledCounter = 0
+		self.callbackMode = "network_error"
+		self.dropRemaining = 0
+
+		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+			self.calledCounter += 1
+			if self.callbackMode == "network_error":
+				raise Exception("Unreachable")
+			if self.dropRemaining > 0:
+				self.dropRemaining -= 1
+				raise HttpClientException(
+					message="HTTP Error: Bad Request (400)",
+					status=400,
+					reason="Bad Request",
+					content=b"",
+				)
+			return "ok"
+
+		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback), maxBufferSize=10)
+
+		# Accumulate two entries in the buffer with unreachable remotes.
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(2))
+		self.assertEqual(len(node.buffer), 2)
+
+		# Drain the buffer: the first buffered entry is malformed and dropped,
+		# the remaining ones are published.
+		self.callbackMode = "drain"
+		self.dropRemaining = 1
+		node.publish(3)
+		self.assertEqual(node.buffer, [])
+		self.assertEqual(self.calledCounter, 5)
+
+	def testPublishServerErrorStillRaises(self) -> None:
+
+		def callback(**kwargs: typing.Any) -> typing.Any:
+			raise HttpClientException(
+				message="HTTP Error: Internal Server Error (500)",
+				status=500,
+				reason="Internal Server Error",
+				content=b"",
+			)
+
+		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
+		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
+		self.assertEqual(len(node.buffer), 1)
 
 	def testExportGetErrorContinues(self) -> None:
 

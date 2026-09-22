@@ -2,11 +2,15 @@ import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
 import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import { ArtifactsBase } from "#bzd/apps/artifacts/api/nodejs/common.js";
+import { HttpClientException } from "#bzd/nodejs/core/http/client.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 
 const Exception = ExceptionFactory("artifacts", "api");
 const Log = LogFactory("artifacts", "api");
+
+/// HTTP status codes that indicate a request that is malformed and can never succeed.
+const MALFORMED_REQUEST_STATUS_CODES = [400, 413, 422];
 
 export class Node extends ArtifactsBase {
 	constructor({ path = null, ...rest } = {}) {
@@ -84,7 +88,16 @@ export class Node extends ArtifactsBase {
 				content.timestamp = timestampMs();
 			}
 			const url = remote + entry.uri;
-			await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
+			try {
+				await this.httpClient.post(url, { json: content, query: { bulk: 1 }, headers: headers });
+			} catch (e) {
+				if (e instanceof HttpClientException && MALFORMED_REQUEST_STATUS_CODES.includes(e.code)) {
+					// The request is malformed and can never succeed, drop it.
+					this.logger.error(`Remote '${remote}' dropped the malformed request: ${e}`);
+					return;
+				}
+				throw e;
+			}
 		}, "Unable to publish to any of the remotes.");
 	}
 
