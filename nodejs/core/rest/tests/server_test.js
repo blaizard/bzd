@@ -51,5 +51,32 @@ describe("RestServer", () => {
 			});
 			Exception.assertEqual(response.status, 400);
 		});
+
+		it("returns 200 for a JSON content-type with parameters", async () => {
+			const mockChannel = await makeServer();
+			const response = await mockChannel.send("post", "/api/v1/echo", {
+				headers: { "content-type": "application/json; charset=utf-8" },
+				data: { hello: "world" },
+			});
+			Exception.assertEqual(response.status, 200);
+		});
+
+		it("returns 400 when the body is sent with urlencoded content-type", async () => {
+			const mockChannel = await makeServer();
+			const response = await mockChannel.send("post", "/api/v1/echo", {
+				headers: { "content-type": "application/x-www-form-urlencoded" },
+				data: { '{"hello":"world"}': "" },
+			});
+			Exception.assertEqual(response.status, 400);
+		});
+
+		it("returns 400 for any content-type that does not comply with JSON", async () => {
+			const mockChannel = await makeServer();
+			const response = await mockChannel.send("post", "/api/v1/echo", {
+				headers: { "content-type": "text/plain" },
+				data: { hello: "world" },
+			});
+			Exception.assertEqual(response.status, 400);
+		});
 	});
 });

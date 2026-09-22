@@ -251,7 +251,7 @@ export default class Validation {
 				{
 					const maybeMessage = Validation.resultToString(result);
 					if (maybeMessage) {
-						throw new Exception(maybeMessage);
+						throw new Exception("{}", maybeMessage);
 					}
 				}
 				break;
@@ -259,7 +259,7 @@ export default class Validation {
 				{
 					const maybeMessage = Validation.resultToString(result);
 					if (maybeMessage) {
-						throw Exception.makePreconditionException(maybeMessage);
+						throw Exception.makePreconditionException("{}", maybeMessage);
 					}
 				}
 				break;

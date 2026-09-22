@@ -36,6 +36,50 @@ describe("Validation", () => {
 			validator.validate({ test: "ok" }, { output: "throw_precondition" });
 		});
 	});
+	describe("format braces in keys", () => {
+		const phantomKey = '{"uid":"admin@admin.com","password":"1234"}';
+		const expectedMessage = "'" + phantomKey + "' does not validate: Key '" + phantomKey + "' is missing";
+		const makeValidator = () => {
+			return new Validation({
+				test: "mandatory",
+			});
+		};
+		it("throws a precondition when a validation key contains format braces", () => {
+			try {
+				makeValidator().validate(
+					{
+						test: "ok",
+						[phantomKey]: "",
+					},
+					{ output: "throw_precondition", all: true },
+				);
+				Exception.unreachable("Expected the validation to fail.");
+			} catch (e) {
+				Exception.assert(e instanceof ExceptionPrecondition, "The error must be a precondition: '{}'", e);
+				Exception.assertEqual(e.message, expectedMessage);
+			}
+		});
+		it("throws a base exception when a validation key contains format braces", () => {
+			try {
+				makeValidator().validate(
+					{
+						test: "ok",
+						[phantomKey]: "",
+					},
+					{ all: true },
+				);
+				Exception.unreachable("Expected the validation to fail.");
+			} catch (e) {
+				Exception.assert(!(e instanceof ExceptionPrecondition), "The error must not be a precondition.");
+				Exception.assert(
+					!(e instanceof Error && e.message.startsWith("Expected a dictionary as argument")),
+					"The error must not be a raw format error: '{}'",
+					e,
+				);
+				Exception.assertEqual(e.message, expectedMessage);
+			}
+		});
+	});
 	describe("min", () => {
 		it("mandatory min", () => {
 			const validator = new Validation({

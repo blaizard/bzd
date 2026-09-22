@@ -106,10 +106,18 @@ export default class RestServer extends Base {
 					case "raw":
 						data["raw"] = context.getBody();
 						break;
-					case "json":
+					case "json": {
+						const contentType = context.getHeader("content-type", "");
+						const type = String(contentType).toLowerCase().split(";")[0].trim();
+						Exception.assertPrecondition(
+							type === "" || type === "application/json" || type.endsWith("+json"),
+							"Content-Type '{}' is not supported for JSON requests.",
+							contentType,
+						);
 						data = context.getBody();
 						Exception.assertPrecondition(data !== null && typeof data === "object", "Invalid JSON body.");
 						break;
+					}
 					case "query":
 						data = context.getQueries();
 						break;
@@ -210,3 +218,5 @@ export default class RestServer extends Base {
 		this.options.channel.addRoute(method, this.getEndpoint(endpoint), handler, webOptions);
 	}
 }
+
+// ---- Private members ----
