@@ -36,7 +36,7 @@ export default class StubAuthenticationServer extends AuthenticationServer {
 		let scopes = this.options.scopes;
 
 		// Update the scopes if the token is part of the registered tokens.
-		if (maybeAccessToken && maybeAccessToken in this.tokens) {
+		if (maybeAccessToken && Object.hasOwn(this.tokens, maybeAccessToken)) {
 			scopes = scopes.concat(this.tokens[maybeAccessToken]);
 		}
 
@@ -55,7 +55,7 @@ export default class StubAuthenticationServer extends AuthenticationServer {
 	/// \param token The token to be preloaded.
 	/// \param scopes The scopes to be assigned to this token.
 	async _preloadApplicationTokenImpl(token, scopes) {
-		Exception.assert(!(token in this.tokens), "The token '{}' has been registered twice.", token);
+		Exception.assert(!Object.hasOwn(this.tokens, token), "The token '{}' has been registered twice.", token);
 		this.tokens[token] = scopes;
 	}
 }
