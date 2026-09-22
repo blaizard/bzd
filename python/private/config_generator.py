@@ -23,7 +23,7 @@ def toPython(data: typing.Any) -> typing.Tuple[str, str]:
 		content = ", ".join([toPython(v)[0] for v in data])
 		return f"[ {content} ]", "list"
 	if isinstance(data, dict):
-		content = ", ".join([f'"{k}": {toPython(v)[0]}' for k, v in data.items()])
+		content = ", ".join([f"{json.dumps(k)}: {toPython(v)[0]}" for k, v in data.items()])
 		return f"{{ {content} }}", "dict"
 	return str(data), "typing.Any"
 

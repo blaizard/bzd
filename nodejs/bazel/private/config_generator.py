@@ -23,7 +23,7 @@ def toTypeScript(data: typing.Any) -> typing.Tuple[str, str]:
 		content = ", ".join([toTypeScript(v)[0] for v in data])
 		return f"[ {content} ]", "unknown[]"
 	if isinstance(data, dict):
-		content = ", ".join([f'"{k}": {toTypeScript(v)[0]}' for k, v in data.items()])
+		content = ", ".join([f"{json.dumps(k)}: {toTypeScript(v)[0]}" for k, v in data.items()])
 		return f"{{ {content} }}", "object"
 	return json.dumps(data), "unknown"
 

@@ -3,7 +3,7 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { stat } from "fs/promises";
 
-import { a, b, b_c, bin_hello_world } from "./config_nodejs.js";
+import { a, b, b_c, e, bin_hello_world } from "./config_nodejs.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -12,6 +12,7 @@ describe("config", function () {
 		assert.strictEqual(a(), 42);
 		assert.strictEqual(b_c(), "hello");
 		assert.deepStrictEqual(b(), { c: "hello", d: false });
+		assert.deepStrictEqual(e(), [1, { f: 2 }, { '{"f":2}': "quoted" }]);
 	});
 
 	it("binary", async () => {

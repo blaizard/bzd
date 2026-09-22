@@ -27,6 +27,7 @@ bzd_nodejs_config(
         "b": "b",
         "b.c": "b_c",
         "bin.hello_world": "bin_hello_world",
+        "e": "e",
     },
 )
 

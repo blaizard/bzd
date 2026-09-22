@@ -1,7 +1,7 @@
 import subprocess
 import unittest
 
-from config_python import a, b, b_c, bin_hello_world
+from config_python import a, b, b_c, e, bin_hello_world
 
 
 class TestRun(unittest.TestCase):
@@ -9,6 +9,7 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(a(), 42)
 		self.assertEqual(b_c(), "hello")
 		self.assertEqual(b(), {"c": "hello", "d": False})
+		self.assertEqual(e(), [1, {"f": 2}, {'{"f":2}': "quoted"}])
 
 	def testBinary(self) -> None:
 		binaryPath = bin_hello_world()
