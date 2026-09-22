@@ -27,5 +27,5 @@ inline auto noop_coroutine() noexcept { return ::std::experimental::noop_corouti
 } // namespace bzd::async::impl
 
 #else
-static_assert(false, "Compiler is missing support for couroutines.");
+static_assert(false, "Compiler is missing support for coroutines.");
 #endif

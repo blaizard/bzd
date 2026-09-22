@@ -71,7 +71,7 @@ constexpr auto makeArray(T&& t, Ts&&... ts) noexcept
 
 } // namespace bzd
 
-// Add support for structure bindings: `auto [a, b] = bzd::Array<int, 2>{inPlace, 1, 2.3};`
+// Add support for structure bindings: `auto [a, b] = bzd::Array<int, 2>{inPlace, 1, 2};`
 #include <tuple>
 
 namespace std {

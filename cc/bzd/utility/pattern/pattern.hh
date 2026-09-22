@@ -207,7 +207,7 @@ constexpr auto parse() noexcept
 			results[index].index = parseIndex<Adapter>(pattern, autoIndex++);
 			Adapter::assertTrue(pattern.size() > 0, "Replacement field pattern ended abruptly (after parseIndex)");
 			Adapter::assertTrue(sizeof...(Args) >= 0 && results[index].index < sizeof...(Args),
-								"The index of one for the field is greater than the number of argument provided.");
+								"The index of the field is greater than the number of arguments provided.");
 			if constexpr (sizeof...(Args))
 			{
 				const auto options = parseOptions<Adapter>(pattern);

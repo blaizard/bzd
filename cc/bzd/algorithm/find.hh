@@ -18,7 +18,7 @@ template <concepts::forwardIterator Iterator, concepts::sentinelFor<Iterator> Se
 }
 
 /// \copydoc find
-/// \param[in,out] range The range of elements to examine.
+/// \param[in] range The range of elements to examine.
 template <concepts::forwardRange Range, class... Args>
 constexpr auto find(Range&& range, Args&&... args)
 {

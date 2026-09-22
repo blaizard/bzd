@@ -9,7 +9,7 @@ namespace bzd::algorithm {
 /// Copies exactly \c count values from the range beginning at first to the range beginning at result.
 ///
 /// \param[in] first The beginning of the range of elements to copy from.
-/// \param[in] count The number of the elements to copy.
+/// \param[in] count The number of elements to copy.
 /// \param[out] result The beginning of the destination range.
 ///
 /// \return Iterator in the destination range, pointing past the last element copied if count>0 or result otherwise.
@@ -29,7 +29,7 @@ constexpr OutputIt copyN(InputIt first, const Size count, OutputIt result)
 
 /// \copydoc copyN
 /// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
+/// \param[out] output The destination range.
 template <concepts::forwardRange InputRange, concepts::outputRange OutputRange>
 constexpr auto copyN(InputRange&& input, const Size count, OutputRange&& output)
 {

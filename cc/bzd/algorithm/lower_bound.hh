@@ -49,7 +49,7 @@ constexpr Iterator lowerBound(Iterator first, Sentinel last, const T& value, Com
 }
 
 /// \copydoc lowerBound
-/// \param[in,out] range The partially-ordered range to examine.
+/// \param[in] range The partially-ordered range to examine.
 template <concepts::forwardRange Range, class... Args>
 constexpr auto lowerBound(Range&& range, Args&&... args)
 {

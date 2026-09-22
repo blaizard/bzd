@@ -29,7 +29,7 @@ template <concepts::forwardIterator Iterator,
 }
 
 /// \copydoc findIf
-/// \param[in,out] range The range of elements to examine.
+/// \param[in] range The range of elements to examine.
 template <concepts::forwardRange Range, class... Args>
 constexpr auto findIf(Range&& range, Args&&... args)
 {

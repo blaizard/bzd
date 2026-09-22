@@ -13,7 +13,7 @@ class Server
 public:
 	bzd::Async<> bind(const StringView endpoint, const bzd::network::PortType port) noexcept
 	{
-		// Try to connect as it is an IP address
+		// Try to parse the endpoint as an IP address
 		auto maybeAddress = Address::fromIp(protocol::tcp, endpoint, port);
 		if (maybeAddress)
 		{

@@ -49,7 +49,7 @@ constexpr Iterator upperBound(Iterator first, Sentinel last, const T& value, Com
 }
 
 /// \copydoc upperBound
-/// \param[in,out] range The partially-ordered range to examine.
+/// \param[in] range The partially-ordered range to examine.
 template <concepts::forwardRange Range, class... Args>
 constexpr auto upperBound(Range&& range, Args&&... args)
 {

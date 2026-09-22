@@ -25,7 +25,7 @@ struct SpanResizeablePolicies
 /// Therefore this implementation behaves slightly differently from the standard library:
 /// - All elements are initialized at the creation.
 /// - When resizing, erased elements are not destroyed and appended elements are not constructed.
-/// - Pushed back elements are copy/moved assigned to the previous one.
+/// - Pushed back elements are constructed in-place at the end of the container.
 template <class T, class Storage, class Policies = SpanResizeablePolicies>
 class SpanResizeable : public Span<T, Storage>
 {
@@ -177,7 +177,7 @@ public: // Modifiers.
 	}
 
 	/// Appends a new element to the end of the container.
-	/// The element is constructed through using placement-new in-place.
+	/// The element is constructed in-place using placement new.
 	///
 	/// \param args... Arguments forwarded to the constructor.
 	template <class... Args>

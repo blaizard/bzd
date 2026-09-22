@@ -26,7 +26,7 @@ constexpr OutputIt copyBackward(InputIt first, InputSentinel last, OutputIt resu
 
 /// \copydoc copyBackward
 /// \param[in] input The range of elements to copy from.
-/// \param[out] output The range of the destination range.
+/// \param[out] output The destination range.
 template <concepts::bidirectionalRange InputRange, concepts::bidirectionalRange OutputRange>
 constexpr auto copyBackward(InputRange&& input, OutputRange&& output) noexcept
 {

@@ -107,7 +107,7 @@ public:
 	/// of this executable to this parent.
 	constexpr void propagateError(bzd::Error&& error) noexcept
 	{
-		// Look for the first caller that does not have the propagate flag and resume.
+		// Look for the first caller that does not have the propagate flag.
 		auto executable{this};
 		do
 		{

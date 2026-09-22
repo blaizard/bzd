@@ -11,8 +11,8 @@ namespace bzd {
 
 /// Spans is a container for span(s), representing data from multiple contiguous memory
 /// sections.
-/// The knowledge of number of spans is defined at compile time, from which iterators and channels
-/// can take advantage for copying or moving data.
+/// The number of spans is known at compile time, which iterators and channels
+/// can take advantage of to copy or move data.
 template <class T, Size N>
 class Spans
 {
