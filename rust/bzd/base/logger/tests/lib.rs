@@ -39,10 +39,10 @@ mod tests {
         let mut sink = RecordingSink::new();
         {
             let mut logger = Logger::new(&mut sink);
-            log_info!(logger, "count = {}, name = {}", 42, "Alex");
-            log_warning!(logger, "careful");
-            log_error!(logger, "boom");
-            log_debug!(logger, "hidden");
+            log_info!(logger, "count = {}, name = {}", 42, "Alex").await?;
+            log_warning!(logger, "careful").await?;
+            log_error!(logger, "boom").await?;
+            log_debug!(logger, "hidden").await?;
         }
         let message = sink.as_str();
         assert_eq!(message.contains("[i] ["), true)?;
@@ -62,7 +62,7 @@ mod tests {
         {
             let mut logger = Logger::new(&mut sink);
             let error = error::failure("boom");
-            log_error!(logger, "{}", error);
+            log_error!(logger, "{}", error).await?;
         }
         assert_eq!(sink.as_str().ends_with(": failure: boom\n"), true)?;
         Ok(())
@@ -74,7 +74,7 @@ mod tests {
         {
             let mut logger = Logger::new(&mut sink);
             let long = core::str::from_utf8(&[b'x'; 600]).unwrap();
-            log_info!(logger, "{}", long);
+            log_info!(logger, "{}", long).await?;
         }
         let message = sink.as_str();
         assert_eq!(message.matches('x').count(), 600)?;
@@ -88,9 +88,9 @@ mod tests {
         {
             let mut logger = Logger::new(&mut sink);
             logger.set_minimum_level(Level::Error);
-            log_error!(logger, "shown");
-            log_warning!(logger, "hidden");
-            log_info!(logger, "hidden");
+            log_error!(logger, "shown").await?;
+            log_warning!(logger, "hidden").await?;
+            log_info!(logger, "hidden").await?;
         }
         let message = sink.as_str();
         assert_eq!(message.contains("] shown\n"), true)?;
@@ -103,7 +103,7 @@ mod tests {
         let mut sink = RecordingSink::new();
         {
             let mut logger = Logger::new(&mut sink);
-            log_info!(logger, "hello");
+            log_info!(logger, "hello").await?;
         }
         assert_eq!(sink.as_str().contains(file!()), true)?;
         Ok(())

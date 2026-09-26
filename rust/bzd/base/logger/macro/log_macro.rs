@@ -84,9 +84,9 @@ impl Parse for LogInput {
     }
 }
 
-/// Expand a log macro invocation, writing each piece directly to the logger's
-/// stream without any intermediate buffer, and propagating write errors to
-/// the caller.
+/// Expand a log macro invocation into an async block, writing each piece
+/// directly to the logger's stream without any intermediate buffer. Write
+/// errors are returned as the block's result, to be handled by the caller.
 fn expand(input: TokenStream, level: &str) -> TokenStream {
     let input = syn::parse_macro_input!(input as LogInput);
     let logger = &input.logger;
@@ -129,13 +129,14 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
     let level: syn::Path = syn::parse_str(level).expect("valid level path");
 
     quote! {
-        {
+        async {
             let logger = &mut #logger;
             if logger.is_enabled(#level) {
                 logger.write_header(#level, ::core::panic::Location::caller()).await?;
                 #statements
                 logger.write_str("\n").await?;
             }
+            Ok(())
         }
     }
     .into()
