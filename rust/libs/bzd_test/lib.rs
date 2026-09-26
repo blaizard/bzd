@@ -25,9 +25,37 @@ pub mod tests {
     }
 }
 
+/// Create a failure error at the caller's location for use in `assert_eq!`.
+#[doc(hidden)]
+#[track_caller]
+pub fn assert_failed(message: &'static str) -> bzd::base::error::Error {
+    bzd::base::error::failure(message)
+}
+
+#[doc(hidden)]
+pub fn block_on<F: core::future::Future>(future: F) -> F::Output {
+    use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+
+    fn clone(_: *const ()) -> RawWaker {
+        RawWaker::new(core::ptr::null(), &VTABLE)
+    }
+    fn noop(_: *const ()) {}
+    static VTABLE: RawWakerVTable = RawWakerVTable::new(clone, noop, noop, noop);
+
+    let mut future = core::pin::pin!(future);
+    // Safety: The waker never dereferences its data pointer.
+    let waker = unsafe { Waker::from_raw(RawWaker::new(core::ptr::null(), &VTABLE)) };
+    let mut context = Context::from_waker(&waker);
+    loop {
+        if let Poll::Ready(result) = future.as_mut().poll(&mut context) {
+            return result;
+        }
+    }
+}
+
 pub mod public {
     pub use crate::assert_eq;
-    pub use crate::types::{TestError, TestResult};
+    pub use crate::types::TestResult;
 }
 
 #[unsafe(no_mangle)]

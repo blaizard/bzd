@@ -27,4 +27,7 @@ rust_library(
         ":proc_macro",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bzd",
+    ],
 )

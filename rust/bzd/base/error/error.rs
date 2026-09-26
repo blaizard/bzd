@@ -181,13 +181,8 @@ mod tests {
     }
 
     fn assert_location(error: &Error) -> TestResult {
-        if error.file().is_empty() || error.line() == 0 {
-            return Err(TestError {
-                file: file!(),
-                line: line!(),
-                message: "error location not captured",
-            });
-        }
+        assert_eq!(error.file().is_empty(), false)?;
+        assert_eq!(error.line() == 0, false)?;
         Ok(())
     }
 

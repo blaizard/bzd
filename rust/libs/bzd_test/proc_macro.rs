@@ -35,6 +35,14 @@ pub fn test(_args: TokenStream, input: TokenStream) -> TokenStream {
                     // Check for #[ignore]
                     let is_ignored = func.attrs.iter().any(|attr| attr.path().is_ident("ignore"));
 
+                    // Wrap async tests in block_on so they can be executed synchronously.
+                    if func.sig.asyncness.is_some() {
+                        let block = func.block.clone();
+                        func.sig.asyncness = None;
+                        func.block =
+                            Box::new(syn::parse_quote!({ ::bzd_test::block_on(async #block) }));
+                    }
+
                     let test_name = &func.sig.ident;
                     let reg_name = format_ident!("__REG_{}", test_name.to_string().to_uppercase());
 

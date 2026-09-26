@@ -23,10 +23,32 @@ mod tests {
         Ok(())
     }
 
+    struct YieldOnce(Option<i32>);
+
+    impl core::future::Future for YieldOnce {
+        type Output = i32;
+
+        fn poll(
+            self: core::pin::Pin<&mut Self>,
+            _: &mut core::task::Context<'_>,
+        ) -> core::task::Poll<i32> {
+            match self.get_mut().0.take() {
+                Some(value) => core::task::Poll::Ready(value),
+                None => core::task::Poll::Pending,
+            }
+        }
+    }
+
+    #[test]
+    async fn test_async() -> TestResult {
+        assert_eq!(YieldOnce(Some(42)).await, 42)?;
+        Ok(())
+    }
+
     #[test]
     fn test_nb_tests() -> TestResult {
         let tests = get_tests();
-        assert_eq!(tests.len(), 4)?;
+        assert_eq!(tests.len(), 5)?;
         Ok(())
     }
 }
