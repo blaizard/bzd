@@ -39,8 +39,7 @@ pub fn test(_args: TokenStream, input: TokenStream) -> TokenStream {
                     if func.sig.asyncness.is_some() {
                         let block = func.block.clone();
                         func.sig.asyncness = None;
-                        *func.block =
-                            syn::parse_quote!({ ::bzd_test::block_on(async #block) });
+                        *func.block = syn::parse_quote!({ ::bzd_test::block_on(async #block) });
                     }
 
                     let test_name = &func.sig.ident;
