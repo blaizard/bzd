@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import KeyValueStoreMemory from "#bzd/nodejs/db/key_value_store/memory.js";
 import User from "#bzd/apps/accounts/backend/users/user.js";
 import Users from "#bzd/apps/accounts/backend/users/users.js";
+import TokenInfo from "#bzd/apps/accounts/backend/users/token.js";
 
 const Exception = ExceptionFactory("test", "user");
 
@@ -146,6 +147,24 @@ describe("User", () => {
 			const user = await makeUserWithPassword("dummy-4@dummy.com");
 			await users.deleteWithPassword(user.getUid(), "1234");
 			Exception.assert((await users.get(user.getUid(), /*allowNull*/ true)) === null, "The user must be deleted.");
+		});
+	});
+
+	describe("tokens", () => {
+		const inheritedProperties = ["__proto__", "constructor", "toString", "valueOf", "hasOwnProperty", "isPrototypeOf"];
+
+		it("rejects forged tokens using inherited prototype property names", () => {
+			const user = User.create("uid", "user@dummy.com");
+			user.addRole("user");
+			user.addToken("a-genuine-hash", TokenInfo.make("identifier", ["/self/basic/r"], 30, /*rolling*/ false));
+
+			// A genuine hash still resolves.
+			Exception.assert(user.getToken("a-genuine-hash", null) !== null, "A genuine token hash must resolve.");
+
+			// Forged tokens using inherited property names must return the default value.
+			for (const name of inheritedProperties) {
+				Exception.assert(user.getToken(name, null) === null, "Forged token '{}' must be rejected.", name);
+			}
 		});
 	});
 });

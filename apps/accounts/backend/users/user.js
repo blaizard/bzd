@@ -228,7 +228,7 @@ export default class User {
 	/// \param allowNull If the result can be null or not.
 	getSubscription(application, allowNull = false) {
 		const subscriptions = this.getSubscriptions();
-		if (application in subscriptions) {
+		if (Object.hasOwn(subscriptions, application)) {
 			return new Subscription(subscriptions[application]);
 		}
 		Exception.assert(allowNull, "The subscription for application '{}' is not present.", application);
@@ -295,7 +295,7 @@ export default class User {
 			this.value.tokens = {};
 		}
 		Exception.assert(
-			!(hash in this.value.tokens),
+			!Object.hasOwn(this.value.tokens, hash),
 			"Token with hash '{}' already exists for user '{}'.",
 			hash,
 			this.uid,
@@ -309,7 +309,7 @@ export default class User {
 
 	getToken(hash, defaultValue) {
 		if ("tokens" in this.value) {
-			if (hash in this.value.tokens) {
+			if (Object.hasOwn(this.value.tokens, hash)) {
 				return new TokenInfo(this.value.tokens[hash]);
 			}
 		}
@@ -318,7 +318,7 @@ export default class User {
 
 	removeToken(hash) {
 		if ("tokens" in this.value) {
-			if (hash in this.value.tokens) {
+			if (Object.hasOwn(this.value.tokens, hash)) {
 				const token = this.getToken(hash, null);
 				Exception.assert(token !== null, "There is no token with this hash: '{}'.", hash);
 				this.modified.push("tokens(" + token.identifier() + " -" + hash.slice(0, 16) + "[...])");
