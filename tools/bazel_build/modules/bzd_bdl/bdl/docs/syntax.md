@@ -86,12 +86,12 @@ use "cc/bzd/core/my_interface.bdl"
 An expression is defined as follows:
 
 ```
-[const] <type> <name> [= <values>] [[<contracts>...]];
+[<name> [: <interface>] =] <type>[(<values>)] [[<contracts>...]];
 ```
 
 where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`.
 
-- `value` is either a literal.
+- `value` is a literal.
 - `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
 - `regexpr` is a regular expression `/[a-z]*/`.
 - `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abc: bzd.OStream = target.out;`
@@ -101,7 +101,7 @@ where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`
 A method is defined as follows:
 
 ```
-method <name>(<expression1>, ...) [-> <type>] [[<contracts>...]];
+method <name>(<expression1>, ...) [[<contracts>...]] [-> <type>] [[<contracts>...]];
 ```
 
 ## Interfaces

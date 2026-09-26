@@ -155,7 +155,7 @@ Note that parameters are only overridable at composition stage. This information
 configuration. This is different from Bazel build settings mechanism for example where such variant is passed through the
 build tree and available at all stages of the build.
 
-```bd
+```bdl
 // How it might be defined.
 composition gateway.ethernet {
     ip = String;

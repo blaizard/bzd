@@ -22,7 +22,7 @@ composition
 
 Sometimes, for portability purposes, you might want to inject the knowledge of cores at runtime.
 To do so, a platform specific executor can be made, abstracting the notion of cores.
-For example, a linux machine can be composed as follow:
+For example, a linux machine can be composed as follows:
 
 ```bdl
 composition

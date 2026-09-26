@@ -4,7 +4,7 @@ Resolving symbols within a `bdl` file is done at different build stages to allow
 
 ## Overview
 
-The build process consists of 3 main stages, the `preprocess`, the `composition` and the `generators` stages.
+The build process consists of 3 main stages: the `preprocess`, `composition` and `generators` stages.
 
 The `preprocess` and `composition` stages output artifacts, and the `composition` process consumes the `preprocess` artifact; this gives the possibility to cache and reuse outputs for various composition processes.
 

@@ -4,7 +4,7 @@ This framework offers component based development. Components come at various le
 
 A component contains 2 entities, an interface, that is shared between all components of the same type and an implementation-specific configuration.
 
-For example, we will define a square which interface is a generic shape.
+For example, we will define a square whose interface is a generic shape.
 
 ```bdl
 interface Shape
