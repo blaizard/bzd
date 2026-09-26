@@ -65,6 +65,8 @@
 				periodMs: null,
 				lock: new Lock(),
 				viewportUpdatedTimeout: null,
+				timestampMsReactive: null,
+				timestampTimer: null,
 			};
 		},
 		watch: {
@@ -84,10 +86,15 @@
 			await this.fetchDashboards();
 			this.viewportUpdated();
 			window.addEventListener("scroll", this.handleScroll);
+			this.timestampMsReactive = timestampMs();
+			this.timestampTimer = setInterval(() => {
+				this.timestampMsReactive = timestampMs();
+			}, 1000);
 		},
 		beforeUnmount() {
 			window.removeEventListener("scroll", this.handleScroll);
 			clearTimeout(this.viewportUpdatedTimeout);
+			clearInterval(this.timestampTimer);
 			this.inputs.close();
 		},
 		computed: {
@@ -175,7 +182,7 @@
 				if (timestampNewest === null) {
 					return "";
 				}
-				const durationS = Math.max(timestampMs() + this.timestampDiff - timestampNewest, 0) / 1000;
+				const durationS = Math.max(this.timestampMsReactive + this.timestampDiff - timestampNewest, 0) / 1000;
 				return ` (updated ${timeToString(durationS, 0)} ago)`;
 			},
 			formDescription() {
