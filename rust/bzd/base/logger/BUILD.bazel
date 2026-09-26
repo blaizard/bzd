@@ -1,0 +1,21 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "logger",
+    srcs = [
+        "log_value/base.rs",
+        "log_value/error_impl.rs",
+        "log_value/integral.rs",
+        "log_value/mod.rs",
+        "log_value/string.rs",
+        "logger.rs",
+    ],
+    proc_macro_deps = [
+        "//rust/bzd/base/logger/macro:log_macro",
+    ],
+    visibility = ["//rust/bzd/base:__pkg__"],
+    deps = [
+        "//rust/bzd/base/error",
+        "//rust/interfaces/impl:stream",
+    ],
+)

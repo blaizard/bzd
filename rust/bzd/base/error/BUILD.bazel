@@ -6,7 +6,11 @@ rust_library(
     srcs = [
         "error.rs",
     ],
-    visibility = ["//rust/bzd/base:__pkg__"],
+    visibility = [
+        "//rust/bzd/base:__pkg__",
+        "//rust/bzd/base/logger:__pkg__",
+        "//rust/interfaces/impl:__pkg__",
+    ],
 )
 
 rust_test(

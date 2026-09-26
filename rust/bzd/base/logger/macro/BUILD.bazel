@@ -1,0 +1,18 @@
+load("@rules_rust//rust:defs.bzl", "rust_proc_macro")
+
+rust_proc_macro(
+    name = "log_macro",
+    srcs = [
+        "log_macro.rs",
+    ],
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//rust/bzd/base/logger:__pkg__"],
+    deps = [
+        "@crates//:quote",
+        "@crates//:syn",
+    ],
+)

@@ -6,9 +6,12 @@ rust_library(
         "stream.rs",
     ],
     crate_name = "bzd_stream_impl",
-    visibility = ["//interfaces:__pkg__"],
+    visibility = [
+        "//interfaces:__pkg__",
+        "//rust/bzd/base/logger:__pkg__",
+    ],
     deps = [
-        "//rust/bzd",
+        "//rust/bzd/base/error",
     ],
 )
 

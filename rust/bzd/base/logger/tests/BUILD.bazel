@@ -1,0 +1,18 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "lib",
+    srcs = [
+        "lib.rs",
+    ],
+    deps = [
+        "//interfaces:stream",
+        "//rust/bzd",
+    ],
+)
+
+rust_test(
+    name = "logger_public_test",
+    crate = ":lib",
+)
