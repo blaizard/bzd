@@ -150,6 +150,11 @@ class Transform:
 	def registryNameToStr(self, fqn: str) -> str:
 		return "registry_{}".format("_".join(FQN.toNamespace(fqn)))
 
+	def outFqn(self, context: Context) -> str:
+		fqn = "{}.out".format(context.target)
+		assert self.composition is not None
+		return fqn if fqn in self.composition.registry[context] else ""
+
 	def entryStructNameToStr(self, fqn: str) -> str:
 		return "{}Entry".format(self.fqnToCapitalized(fqn))
 
@@ -225,9 +230,12 @@ class Transform:
 	def entryConstructorToStr(self, entity: ExpressionEntry, context: Context) -> str:
 		"""Generate the construction call of a registry entry instance."""
 
-		if self.isExecutorEntry(entity, context):
-			return "{}::new()".format(entity.expression.symbol.propertyName)
-		return "{}::new({})".format(self.entryTypeToStr(entity, context), self.contextNewToStr(entity, context))
+		entryType = self.entryTypeToStr(entity, context)
+		if self.isExecutorEntry(entity, context) or not entity.expression.parametersResolved:
+			return "{}::new()".format(entryType)
+		# In expression position, generic arguments must be given with turbofish.
+		constructorType = entryType.replace("<", "::<", 1) if "<" in entryType else entryType
+		return "{}::new({})".format(constructorType, self.contextNewToStr(entity, context))
 
 	def contextNewToStr(self, entity: ExpressionEntry, context: Context) -> str:
 		"""Generate the context construction call of a registry entry."""

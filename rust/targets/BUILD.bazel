@@ -8,3 +8,14 @@ alias(
     }),
     visibility = ["//visibility:public"],
 )
+
+alias(
+    name = "auto",
+    actual = select({
+        "@bzd_platforms//al:linux": "//rust/targets/std:auto",
+        "@bzd_platforms//al:osx": "//rust/targets/std:auto",
+        "@bzd_platforms//isa:xtensa_lx6": "//rust/targets/esp:auto",
+        "@bzd_platforms//isa:xtensa_lx7": "//rust/targets/esp:auto",
+    }),
+    visibility = ["//visibility:public"],
+)

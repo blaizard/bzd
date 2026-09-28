@@ -30,5 +30,6 @@ bdl_target(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/generic/executor",
+        "//rust/components/std/stream/out",
     ],
 )

@@ -1,0 +1,15 @@
+use "interfaces/stream.bdl"
+
+namespace bzd.example;
+
+
+component HelloWorld {
+config:
+	out = {out};
+	
+interface:
+	method run();
+	
+}
+
+

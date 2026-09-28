@@ -1,9 +1,11 @@
 use "rust/components/generic/executor/interface.bdl"
+use "rust/components/std/stream/out/interface.bdl"
 
 
 
 composition {
 	executor = bzd.components.generic.GenericExecutor() [executor];
+	out = bzd.components.std.Out();
 	
 }
 

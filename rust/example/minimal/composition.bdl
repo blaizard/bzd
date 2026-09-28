@@ -1,0 +1,11 @@
+use "rust/example/minimal/interface.bdl"
+
+
+
+composition {
+	hello = bzd.example.HelloWorld();
+	hello.run();
+	
+}
+
+

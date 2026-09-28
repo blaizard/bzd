@@ -4,6 +4,9 @@
 use component::{Lifecycle, LocalStatic, Wrapper};
 
 #[allow(unused_imports)]
+use bzd::base::logger::{log_error, log_info, Logger};
+
+#[allow(unused_imports)]
 use rust_interfaces_executor::BzdExecutorInterface;
 {% for import in data.rust.imports %}
 #[allow(unused_imports)]
@@ -60,19 +63,20 @@ fn {{ fqn | registryNameToStr }}() -> &'static mut Wrapper<{{ fqn | entryStructN
 #[allow(non_snake_case)]
 pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::error::Error>
 {
-	// Create all registry entries.
-{% for fqn, entry in registry[context] %}
-	let {{ fqn | registryNameToStr }} = {{ fqn | registryNameToStr }}();
-{% end %}
+	// Create the logger, bound to the 'out' registry entry.
+{% if context | outFqn == "" %}{{ btl.error("The composition must declare a referenced 'out' entry to enable logging.") }}{% end %}
+	let mut logger = Logger::new(&mut {{ context | outFqn | registryNameToStr }}().instance);
 
 	// Initialize all registry entries.
 {% for fqn, entry in registry[context] %}
-	{{ fqn | registryNameToStr }}.init().await?;
+	{{ fqn | registryNameToStr }}().init().await?;
 {% end %}
+	log_info!(logger, "[{{ context.executor }}] Initialization completed.").await?;
 
 	// Execute the workloads and services.
+	log_info!(logger, "[{{ context.executor }}] Composition phase.").await?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
-	let result = GenericExecutor::new()
+	let executor = GenericExecutor::new()
 {% for entry in workloads[context] %}
 		.push_workload(async {
 			match {{ workloadMethodToStr(entry) }}.await {
@@ -95,16 +99,22 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 			}
 		})
 {% end %}
-		.join()
-		.await;
+		;
+
+	log_info!(logger, "[{{ context.executor }}] Execution phase.").await?;
+	let result = executor.join().await;
+
+	log_info!(logger, "[{{ context.executor }}] Completion.").await?;
 
 	// Shutdown all registry entries.
 {% for fqn, entry in registry[context] %}
-	{{ fqn | registryNameToStr }}.shutdown().await?;
+	{{ fqn | registryNameToStr }}().shutdown().await?;
 {% end %}
 
 	if result != 0 {
-		return Err(failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed.")));
+		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
+		log_error!(logger, "[{{ context.executor }}] Workload failure: {}", error).await?;
+		return Err(error);
 	}
 	Ok(())
 }

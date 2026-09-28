@@ -1,8 +1,37 @@
-load("@bzd_bdl//:defs.bzl", "bdl_system")
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "composition",
+    srcs = [
+        "composition.bdl",
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:stream",
+    ],
+)
+
+rust_library(
+    name = "hello_world",
+    srcs = [
+        "hello_world.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":composition",
+        "//interfaces:stream",
+        "//rust/bzd",
+    ],
+)
 
 bdl_system(
     name = "minimal",
     targets = {
-        "std": "//rust/targets/std:auto",
+        "std": "//rust/targets:auto",
     },
+    deps = [
+        ":hello_world",
+    ],
 )
