@@ -159,6 +159,7 @@ const Exception = ExceptionFactory("backend");
 
 				Exception.assertPrecondition(volume, "There is no volume associated with this path: '{}'.", inputs.path);
 				const storage = await backend.cache.get("volume", volume);
+				Exception.assertPrecondition(storage.readAccess, "This volume '{}' does not support reading files.", volume);
 				const metadata = await storage.metadata(pathList);
 				if (metadata.size) {
 					this.setHeader("Content-Length", metadata.size);

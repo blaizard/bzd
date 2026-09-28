@@ -202,6 +202,24 @@
                 "get",
                 "/x/cache/@caching-proxy/file//etc/passwd"
             ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=nodes/testnode"
+            ]
+        },
+        {
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=nodes_mirror/testnode"
+            ]
         }
     ],
     "tokens": {

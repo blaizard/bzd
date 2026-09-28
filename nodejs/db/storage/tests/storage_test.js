@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import StorageMemory from "#bzd/nodejs/db/storage/memory.js";
+import { Storage } from "#bzd/nodejs/db/storage/storage.js";
 import pathlib from "#bzd/nodejs/utils/pathlib.js";
 
 const Exception = ExceptionFactory("test", "db", "storage");
@@ -37,6 +38,43 @@ describe("Storage", () => {
 			await storage.writeFromChunk("single.txt", "content for single");
 			Exception.assertEqual(await storage.is("single.txt"), true);
 			Exception.assertEqual(await storage.readToString("single.txt"), "content for single");
+		});
+	});
+
+	describe("readAccess", () => {
+		class StorageListOnly extends Storage {
+			async _initialize() {}
+		}
+
+		it("is false for a list-only storage", () => {
+			const storage = new StorageListOnly();
+			Exception.assertEqual(storage.readAccess, false);
+		});
+
+		it("is true for a storage implementing read", () => {
+			const storage = new StorageMemory({}, { write: true });
+			Exception.assertEqual(storage.readAccess, true);
+		});
+	});
+
+	describe("writeAccess", () => {
+		class StorageListOnly extends Storage {
+			async _initialize() {}
+		}
+
+		it("is false for a storage without write implementation", () => {
+			const storage = new StorageListOnly();
+			Exception.assertEqual(storage.writeAccess, false);
+		});
+
+		it("is false when write is enabled but no write implementation exists", () => {
+			const storage = new StorageListOnly({}, { write: true });
+			Exception.assertEqual(storage.writeAccess, false);
+		});
+
+		it("is true for a storage implementing write", () => {
+			const storage = new StorageMemory({}, { write: true });
+			Exception.assertEqual(storage.writeAccess, true);
 		});
 	});
 });

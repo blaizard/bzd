@@ -63,6 +63,26 @@
                     }
                 }
             ]
+        },
+        {
+            "doc": "Check that the public nodes volume does not disclose internal errors on file reads.",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=nodes/testnode"
+            ]
+        },
+        {
+            "doc": "Check that the public nodes_mirror volume does not disclose internal errors on file reads.",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=nodes_mirror/testnode"
+            ]
         }
     ]
 }

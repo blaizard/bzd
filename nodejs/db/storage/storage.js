@@ -38,7 +38,12 @@ export class Storage extends AsyncInitialize {
 
 	/// Check if the storage has write access.
 	get writeAccess() {
-		return Boolean(this.options.write);
+		return Boolean(this.options.write) && typeof this._writeImpl == "function";
+	}
+
+	/// Whether the storage can serve file content.
+	get readAccess() {
+		return typeof this._readImpl == "function";
 	}
 
 	/// Tell whether a key exists or not
