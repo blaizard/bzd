@@ -105,7 +105,8 @@ mod tests {
             let mut logger = Logger::new(&mut sink);
             log_info!(logger, "hello").await?;
         }
-        assert_eq!(sink.as_str().contains(file!()), true)?;
+        let name = file!().rsplit_once('/').map_or(file!(), |(_, name)| name);
+        assert_eq!(sink.as_str().contains(name), true)?;
         Ok(())
     }
 }

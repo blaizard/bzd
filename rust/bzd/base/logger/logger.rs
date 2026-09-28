@@ -67,9 +67,11 @@ impl<'a, S: BzdOStreamInterface> Logger<'a, S> {
         level: Level,
         location: &'static Location<'static>,
     ) -> Result<(), Error> {
+        let file = location.file();
+        let name = file.rsplit_once('/').map_or(file, |(_, name)| name);
         self.write_str(level.as_str()).await?;
         self.write_str(" [").await?;
-        self.write_str(location.file()).await?;
+        self.write_str(name).await?;
         self.write_str(":").await?;
         write_unsigned(location.line() as u64, self.sink).await?;
         self.write_str("] ").await
