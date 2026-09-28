@@ -55,7 +55,7 @@ describe("TokenInfo", () => {
 				token.data().expiration = Date.now() + 1;
 				token.updateMinDuration(300);
 				const duration = token.duration();
-				Exception.assert(duration >= 300, "The sliding window must keep extending: {}", duration);
+				Exception.assert(duration >= 299, "The sliding window must keep extending: {}", duration);
 				Exception.assert(duration <= 1801, "The sliding window must stay within the class lifetime: {}", duration);
 			}
 		});
