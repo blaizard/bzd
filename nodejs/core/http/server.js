@@ -287,9 +287,7 @@ export default class HttpServer {
 			setHeaders: (res, path) => {
 				// Disable caching of the index and during development.
 				if (path == indexAbsolute || process.env.NODE_ENV == "development") {
-					res.header("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
-					res.header("Pragma", "no-cache");
-					res.header("Expires", "0");
+					setNoCacheHeaders(res);
 				}
 				Object.entries(options.headers).forEach(([key, value]) => {
 					res.header(key, value);
@@ -303,7 +301,10 @@ export default class HttpServer {
 			const fallback = Path.join(absolutePath, options.fallback);
 			Exception.assert(await FileSystem.exists(fallback), "The fallback is not present at path '{}'.", fallback);
 			this.app.use(uri, (req, res, next) => {
-				if ((req.method === "GET" || req.method === "HEAD") && req.accepts("html")) {
+				// Cannot use: req.accepts("html") as it also matches "*/*", which browsers send for module scripts.
+				if ((req.method === "GET" || req.method === "HEAD") && (req.headers.accept || "").includes("text/html")) {
+					// No-cache: the fallback index.html references content-hashed assets, it must never be cached.
+					setNoCacheHeaders(res);
 					// dotfiles option is important here to allow serving files starting with a dot (.cache for example).
 					res.status(200).sendFile(fallback, { dotfiles: "allow" }, (err) => {
 						if (err) {
@@ -485,6 +486,12 @@ export default class HttpServer {
 }
 
 // ---- Private members ----
+
+function setNoCacheHeaders(res) {
+	res.header("Cache-Control", "max-age=0, no-cache, no-store, must-revalidate");
+	res.header("Pragma", "no-cache");
+	res.header("Expires", "0");
+}
 
 function resetErrorHandler(reject) {
 	this.server.on("error", (e) => {
