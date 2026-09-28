@@ -119,7 +119,7 @@ class Docker:
 				"active": True if data["State"].lower() == "running" else False,
 				"version": {},
 				"volumes": {mount["Name"]: mount["Destination"] for mount in data.get("Mounts", []) if mount["Type"] == "volume"},
-				"size": data["SizeRootFs"],
+				"size": data.get("SizeRootFs"),
 			}
 
 			if "Image" in data:
@@ -278,8 +278,10 @@ class Docker:
 		output = {
 			"active": container["active"],
 			"version": container["version"],
-			"disk": {"/": {"used": container["size"]}},
+			"disk": {},
 		}
+		if container["size"] is not None:
+			output["disk"]["/"] = {"used": container["size"]}
 
 		for volume, destination in container["volumes"].items():
 			diskSpace = self.diskSpace.get(1).get("volumes", {})
