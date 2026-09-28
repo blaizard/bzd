@@ -124,13 +124,13 @@ function generateHash(rect, rectParent) {
 }
 
 export default {
-	inserted: function (el) {
+	mounted: function (el) {
 		autoResize(el);
 	},
-	componentUpdated: function (el) {
+	updated: function (el) {
 		autoResize(el);
 	},
-	unbind: function (el) {
+	unmounted: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
 	},

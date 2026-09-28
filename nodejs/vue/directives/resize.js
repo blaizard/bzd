@@ -92,13 +92,13 @@ function setElementId(el) {
 }
 
 export default {
-	inserted: function (el, binding) {
+	mounted: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
-	componentUpdated: function (el, binding) {
+	updated: function (el, binding) {
 		onResizeProcess(el, binding.value);
 	},
-	unbind: function (el) {
+	unmounted: function (el) {
 		const uid = getElementId(el);
 		unregisterObserver(uid);
 	},

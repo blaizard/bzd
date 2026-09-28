@@ -172,13 +172,13 @@ function update(el, config) {
 }
 
 export default {
-	inserted(el, binding) {
+	mounted(el, binding) {
 		// Set parent node position
 		el.parentNode.style.position = "relative";
 		el.style.cssText += "position: absolute; padding: 0; margin: 0; display: inline-block;";
 		update(el, binding.value);
 	},
-	update(el, binding) {
+	updated(el, binding) {
 		update(el, binding.value);
 	},
 };
