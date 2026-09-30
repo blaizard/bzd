@@ -50,11 +50,11 @@ class DockerRegistry:
 				images[repository][tag] = digest
 		return images
 
-	def delete(self, repository: str, tag: str) -> None:
+	def delete(self, repository: str, digest: str) -> None:
 		"""Delete an image."""
 
 		HttpClient.delete(
-			f"{self.url}/v2/{repository}/manifests/{tag}",
+			f"{self.url}/v2/{repository}/manifests/{digest}",
 			headers={
 				"Accept": "application/vnd.docker.distribution.manifest.v2+json,"
 				"application/vnd.docker.distribution.manifest.list.v2+json,"

@@ -454,20 +454,27 @@ if __name__ == "__main__":
 				allImages = dockerRegistry.getImages()
 
 				# Only keep unused image tags.
+				usedDigests: typing.Set[str] = set()
 				for repository, tags in usedImages.items():
 					if repository in allImages:
 						for tag in tags:
 							if tag in allImages[repository]:
+								usedDigests.add(allImages[repository][tag])
 								del allImages[repository][tag]
 								print(f"- Keeping image {repository}:{tag}", flush=True)
 
-				# Remove unused image tags.
+				# Multiple tags can reference the same manifest digest.
+				removedDigests: typing.Set[str] = set()
 				for repository, tagsDigest in allImages.items():
 					for tag, digest in tagsDigest.items():
+						# Skip digests still referenced by a kept tag.
+						if digest in usedDigests or digest in removedDigests:
+							continue
 						print(
 							f"- Removing image {repository}:{tag} ({digest}).",
 							flush=True,
 						)
-						dockerRegistry.delete(repository, tag)
+						dockerRegistry.delete(repository, digest)
+						removedDigests.add(digest)
 
 	sys.exit(0)
