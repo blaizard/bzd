@@ -68,7 +68,7 @@
 								callbacks: {
 									label: (item) => {
 										const label = item.dataset.label || "";
-										const formatted = UCUMToString(item.parsed.y, this.options.unit);
+										const formatted = this.options.unit ? UCUMToString(item.parsed.y, this.options.unit) : undefined;
 										if (formatted) {
 											return label + ": " + formatted + " (" + item.formattedValue + ")";
 										}
@@ -103,7 +103,7 @@
 								suggestedMax: this.options.max,
 								ticks: {
 									callback: (value, index, ticks) => {
-										return UCUMToString(value, this.options.unit, value);
+										return this.options.unit ? UCUMToString(value, this.options.unit, value) : value;
 									},
 								},
 							},
