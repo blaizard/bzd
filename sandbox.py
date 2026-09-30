@@ -202,7 +202,7 @@ class FeatureOpenCode(Feature):
 			# Add generic agents/commands/skills.
 			self.includes(".opencode/agents", f"{context.home}/.config/opencode/agents", context)
 			self.includes(".opencode/commands", f"{context.home}/.config/opencode/commands", context)
-			for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture"]:
+			for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture", "write-tests"]:
 				self.includes(f".opencode/skills/{skill}", f"{context.home}/.config/opencode/skills/{skill}", context)
 			self.dockerFile += [
 				# This ensure the migration of the database.

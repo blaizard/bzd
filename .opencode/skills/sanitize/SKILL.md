@@ -1,7 +1,6 @@
 ---
 name: sanitize
 description: Use when asked to implement, sanitize, clean up, refactor code, run formatters/linters, fix comments, or prepare files for a commit.
-compatibility: opencode
 ---
 
 Act as a Senior Software Engineer and sanitize the changes you are working on by:
