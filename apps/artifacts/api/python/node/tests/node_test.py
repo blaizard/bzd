@@ -20,6 +20,7 @@ class TestRun(unittest.TestCase):
 			# Navigate: data["data"][0] = [subKey, pairs]; pairs[0] = [ts, value]; value is [1]
 			self.assertEqual(data["data"][0][1][0][1], "hello")
 			self.assertIn("timestamp", data)
+			self.assertIsInstance(data["timestamp"], int)
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
 		node.publish("hello")
@@ -44,7 +45,7 @@ class TestRun(unittest.TestCase):
 			accessor(timestampMs=2, value={"hello": "world2"})
 		self.assertEqual(self.calledCounter, 1)
 
-	def testPublishBulkFixedTimestamp(self) -> None:
+	def testPublishBulkAbsoluteTimestamp(self) -> None:
 		self.calledCounter = 0
 
 		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
@@ -75,6 +76,7 @@ class TestRun(unittest.TestCase):
 			self.assertEqual(data["data"]["hello"][0][1][0][1], "1")
 			self.assertEqual(data["data"]["world"][0][1][0][1], "2")
 			self.assertIn("timestamp", data)
+			self.assertIsInstance(data["timestamp"], int)
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
 		node.publishMultiNodes(data={"hello": "1", "world": "2"})

@@ -521,8 +521,8 @@ export default class Plugin extends PluginBase {
 
 			// Normalize the data to bulk data format.
 			// timestampClient = The timestamp on the client side, if unset, use the current timestamp.
-			// isFixedTimestamp = If this timestamp is intended to be modified or not.
-			const processBulk = async (bulkDictionary, timestampClient, isFixedTimestamp) => {
+			// isAbsoluteTimestamp = If this timestamp is absolute or based on the server time.
+			const processBulk = async (bulkDictionary, timestampClient, isAbsoluteTimestamp) => {
 				Exception.assertPrecondition(
 					isObject(bulkDictionary),
 					"A multi node request must be made with a dictionary: {:?}",
@@ -546,14 +546,14 @@ export default class Plugin extends PluginBase {
 								value,
 								timestamp,
 							);
-							const actualTimestamp = isFixedTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
-							await processValue(nodeUid, dataKey, value, expires, unit, actualTimestamp, isFixedTimestamp);
+							const actualTimestamp = isAbsoluteTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
+							await processValue(nodeUid, dataKey, value, expires, unit, actualTimestamp, isAbsoluteTimestamp);
 						}
 					}
 				}
 			};
 
-			const processValue = async (nodeUid, dataKey, value, expires, unit, timestamp, isFixedTimestamp) => {
+			const processValue = async (nodeUid, dataKey, value, expires, unit, timestamp, isAbsoluteTimestamp) => {
 				const newRecords = await this.nodes.insert({
 					uid: nodeUid,
 					key: dataKey,
@@ -561,7 +561,7 @@ export default class Plugin extends PluginBase {
 					expires: expires,
 					unit: unit,
 					timestamp: timestamp,
-					isFixedTimestamp: isFixedTimestamp,
+					isAbsoluteTimestamp: isAbsoluteTimestamp,
 				});
 				records = records.concat(newRecords);
 			};
@@ -571,16 +571,16 @@ export default class Plugin extends PluginBase {
 
 			if (inputs.bulk) {
 				Exception.assertPrecondition(isObject(inputs.data), "The data must be an object: {:?}", inputs.data);
-				const isFixedTimestamp = !("timestamp" in inputs.data);
+				const isAbsoluteTimestamp = !("timestamp" in inputs.data);
 				Exception.assertPrecondition(
-					isFixedTimestamp || typeof inputs.data.timestamp == "number",
+					isAbsoluteTimestamp || typeof inputs.data.timestamp == "number",
 					"The timestamp given is not a number {}.",
 					inputs.data.timestamp,
 				);
 				const data = inputs.data.data;
 				const timestamp = inputs.data.timestamp ?? now;
 
-				await processBulk(isMultiNode ? data : { [uid]: data }, timestamp, isFixedTimestamp);
+				await processBulk(isMultiNode ? data : { [uid]: data }, timestamp, isAbsoluteTimestamp);
 			} else if (isMultiNode) {
 				Exception.assertPrecondition(
 					isObject(inputs.data),
@@ -595,7 +595,7 @@ export default class Plugin extends PluginBase {
 						/*expires*/ null,
 						/*unit*/ null,
 						timestampMs(),
-						/*isFixedTimestamp*/ false,
+						/*isAbsoluteTimestamp*/ false,
 					);
 				}
 			} else {
@@ -606,7 +606,7 @@ export default class Plugin extends PluginBase {
 					/*expires*/ null,
 					/*unit*/ null,
 					timestampMs(),
-					/*isFixedTimestamp*/ false,
+					/*isAbsoluteTimestamp*/ false,
 				);
 			}
 

@@ -7,6 +7,10 @@ import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
 
+/// The number of records that can share the same millisecond timestamp before
+/// their nanosecond timestamp collides in the database.
+const OFFSET_MODULUS = 1000000;
+
 export default class DatabaseInfluxDB extends Database {
 	constructor(...args) {
 		super(...args);
@@ -54,6 +58,7 @@ export default class DatabaseInfluxDB extends Database {
 		});
 
 		this.retentionS = this.options.retentionS || null;
+		this.offset = 0;
 	}
 
 	/// Convert a value into influxdb fields.
@@ -117,6 +122,17 @@ export default class DatabaseInfluxDB extends Database {
 			}
 		}
 		return value;
+	}
+
+	timestampToInflux(timestamp) {
+		const timestampInflux = (BigInt(Math.round(timestamp)) * BigInt(OFFSET_MODULUS) + BigInt(this.offset)).toString();
+		this.offset = (this.offset + 1) % OFFSET_MODULUS;
+		return timestampInflux;
+	}
+
+	/// Convert an 'after' timestamp (in ms) into the nanosecond boundary just after it.
+	afterToInflux(after) {
+		return (BigInt(Math.round(after)) * BigInt(OFFSET_MODULUS) + BigInt(OFFSET_MODULUS) - 1n).toString();
 	}
 
 	installServices(provider) {
@@ -244,7 +260,7 @@ export default class DatabaseInfluxDB extends Database {
 		for (const [uid, data, timestamp] of records) {
 			const [key, value] = data;
 			// InfluxDB doesn't support numbers with comma.
-			const timestampNanoseconds = Math.round(timestamp * 1000000);
+			const timestampNanoseconds = this.timestampToInflux(timestamp);
 			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {
 				Exception.assert(
 					timestamp,
@@ -303,12 +319,15 @@ export default class DatabaseInfluxDB extends Database {
 			const periodMs = Math.round((before - after) / count) || 1;
 			influxQL += 'SELECT FIRST("' + field + '") ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time > " + Math.round(after) + "ms AND time < " + Math.round(before) + "ms ";
+			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns AND time < " + Math.round(before) + "ms ";
+			// ORDER BY is not supported with GROUP BY, but the buckets are
+			// guaranteed to be returned in ascending time order.
 			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
 		} else if (after !== null) {
 			influxQL += 'SELECT "' + field + '" ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time > " + Math.round(after) + "ms ";
+			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns ";
+			influxQL += "ORDER BY time ASC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else if (before !== null) {
 			influxQL += 'SELECT "' + field + '" ';
@@ -331,6 +350,6 @@ export default class DatabaseInfluxDB extends Database {
 				return [timestamp, DatabaseInfluxDB.fromDBValueToValue(value)];
 			});
 
-		return output.reverse();
+		return after === null ? output : output.reverse();
 	}
 }

@@ -760,7 +760,7 @@ describe("Plugin", () => {
 		});
 
 		it("write dangerous values", async () => {
-			// Store spreadsheet formula payloads (CWE-1236) plus normal values at a fixed timestamp.
+			// Store spreadsheet formula payloads (CWE-1236) plus normal values at an absolute timestamp.
 			await tester.send("nodes", "post", "/uid", {
 				query: { bulk: 1 },
 				headers: { "Content-Type": "application/json" },
@@ -1144,7 +1144,7 @@ describe("Plugin", () => {
 				headers: { "Content-Type": "application/json" },
 				data: JSON.stringify({ a: 1, b: 2 }),
 			});
-			// Write data with fixed timestamp
+			// Write data with absolute timestamp
 			await tester.send("nodes", "post", "/uid01/hello/fixed", {
 				query: { bulk: 1 },
 				headers: { "Content-Type": "application/json" },
@@ -1203,7 +1203,7 @@ describe("Plugin", () => {
 			});
 		});
 
-		it("no retention + fixed timestamp", async () => {
+		it("no retention + absolute timestamp", async () => {
 			await makeInfluxDBDatabaseTest((url, options, resolve) => {
 				if (url.endsWith("/api/v2/buckets")) {
 					return {
@@ -1216,7 +1216,7 @@ describe("Plugin", () => {
 					};
 				} else if (url.endsWith("/api/v2/write")) {
 					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
-					Exception.assert(options.data.includes("uid01 hello.fixed.c=3 1234000000"));
+					Exception.assert(options.data.includes("uid01 hello.fixed.c=3 1234"));
 					resolve();
 				} else if (url.endsWith("/query")) {
 					return {

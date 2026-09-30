@@ -45,10 +45,10 @@ export class Nodes {
 	/// \param expires The expiry time in seconds.
 	/// \param unit The unit of the value.
 	/// \param timestamp The timestamp to use.
-	/// \param isFixedTimestamp Whether the timestamp is fixed and shall not be modified or is based on the server time.
+	/// \param isAbsoluteTimestamp Whether the timestamp is absolute or is based on the server time.
 	///
 	/// \return A list of records corresponding to this change.
-	async insert({ uid, key, value, expires = null, unit = null, timestamp = null, isFixedTimestamp = false }) {
+	async insert({ uid, key, value, expires = null, unit = null, timestamp = null, isAbsoluteTimestamp = false }) {
 		let options = {};
 		if (expires) {
 			options.expires = expires;
@@ -70,7 +70,7 @@ export class Nodes {
 			if (options.expires !== undefined) {
 				updatedOptions.expires = options.expires;
 			}
-			return [uid, [key, value, updatedOptions], timestamp, isFixedTimestamp];
+			return [uid, [key, value, updatedOptions], timestamp, isAbsoluteTimestamp];
 		});
 	}
 
@@ -87,6 +87,7 @@ export class Nodes {
 	/// \param before Only return values before this timestamp.
 	/// \param include Include the given path to the result.
 	/// \param sampling The sampling method to be used.
+	/// \param continuation The continuation to be used.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
 	async get({
@@ -99,8 +100,9 @@ export class Nodes {
 		before = null,
 		include = null,
 		sampling = null,
+		continuation = null,
 	}) {
-		return await this.data.get({ uid, key, metadata, children, count, after, before, include, sampling });
+		return await this.data.get({ uid, key, metadata, children, count, after, before, include, sampling, continuation });
 	}
 
 	/// Get children of a given key.
@@ -115,7 +117,7 @@ export class Nodes {
 
 	// Insert a record entry to the data.
 	insertFromRecord(records) {
-		for (const [uid, data, timestamp, _isFixedTimestamp] of records) {
+		for (const [uid, data, timestamp, _isAbsoluteTimestamp] of records) {
 			this.data.insert(uid, [data], timestamp);
 		}
 	}
@@ -129,12 +131,12 @@ export class Nodes {
 	/// \return The disk optimized record.
 	static recordToDisk(record) {
 		let clusters = Object.create(null);
-		for (const [uid, data, timestamp, isFixedTimestamp] of record) {
-			const keyCluster = uid + "@" + timestamp + "@" + isFixedTimestamp;
+		for (const [uid, data, timestamp, isAbsoluteTimestamp] of record) {
+			const keyCluster = uid + "@" + timestamp + "@" + isAbsoluteTimestamp;
 			clusters[keyCluster] ??= {
 				uid: uid,
 				timestamp: timestamp,
-				isFixedTimestamp: isFixedTimestamp,
+				isAbsoluteTimestamp: isAbsoluteTimestamp,
 				data: [],
 			};
 			clusters[keyCluster].data.push(data);
@@ -150,7 +152,7 @@ export class Nodes {
 				}
 				current["_"] = data;
 			}
-			onDiskRecord.push([cluster.uid, dataCluster, cluster.timestamp, Boolean(cluster.isFixedTimestamp) ? 1 : 0]);
+			onDiskRecord.push([cluster.uid, dataCluster, cluster.timestamp, Boolean(cluster.isAbsoluteTimestamp) ? 1 : 0]);
 		}
 		return onDiskRecord;
 	}
@@ -173,9 +175,9 @@ export class Nodes {
 			}
 			return paths;
 		};
-		for (const [uid, dataCluster, timestamp, isFixedTimestamp] of record) {
+		for (const [uid, dataCluster, timestamp, isAbsoluteTimestamp] of record) {
 			for (const data of traverse(dataCluster)) {
-				fromDiskRecord.push([uid, data, timestamp, Boolean(isFixedTimestamp)]);
+				fromDiskRecord.push([uid, data, timestamp, Boolean(isAbsoluteTimestamp)]);
 			}
 		}
 		return fromDiskRecord;
@@ -186,10 +188,10 @@ export class Nodes {
 	/// \param uid The identifier of the node.
 	/// \param data The data to be inserted in the record (typically: [key, value, metadata])
 	/// \param timestamp The timestamp in Ms of this value.
-	/// \param isFixedTimestamp If the timestamp is considered fixed or not.
+	/// \param isAbsoluteTimestamp If the timestamp is absolute or not.
 	///
 	/// \return A record containing this information.
-	static recordFromSingleEntry(uid, data, timestamp, isFixedTimestamp = false) {
-		return [[uid, data, timestamp, isFixedTimestamp]];
+	static recordFromSingleEntry(uid, data, timestamp, isAbsoluteTimestamp = false) {
+		return [[uid, data, timestamp, isAbsoluteTimestamp]];
 	}
 }

@@ -55,7 +55,7 @@ function pathToKey(path) {
 ///
 export async function handleDataGet(
 	data,
-	{ uid, key, metadata, children, count, after, before, include, sampling, keys },
+	{ uid, key, metadata, children, count, after, before, include, sampling, continuation, keys },
 ) {
 	Exception.assertPrecondition(uid !== undefined, "'uid' must be set");
 
@@ -79,9 +79,10 @@ export async function handleDataGet(
 	before = before ?? null;
 	include = include ?? null;
 	sampling = sampling ?? null;
+	continuation = continuation ?? null;
 
 	Log.trace(
-		"Handle data get with key={}, metadata={}, children={}, count={}, after={}, before={}, include={}, sampling={}, keys={}",
+		"Handle data get with key={}, metadata={}, children={}, count={}, after={}, before={}, include={}, sampling={}, continuation={}, keys={}",
 		key,
 		metadata,
 		children,
@@ -90,6 +91,7 @@ export async function handleDataGet(
 		before,
 		include,
 		sampling,
+		continuation,
 		keys,
 	);
 
@@ -119,13 +121,13 @@ export async function handleDataGet(
 			before,
 			include,
 			sampling,
+			continuation,
 		});
 		if (maybeData.isEmpty()) {
 			return null;
 		}
-		output = Object.assign(output, {
-			data: maybeData.value(),
-		});
+		const value = maybeData.value();
+		output = Object.assign(output, count === null ? { data: value } : value);
 	}
 
 	return output;
@@ -144,6 +146,7 @@ export function getDataGetInputsFromQuery(context) {
 			.map((path) => pathToKey(path)),
 	);
 	const sampling = context.getQuery("sampling", undefined, String);
+	const continuation = context.getQuery("continuation", undefined, JSON.parse);
 	const keys = context.getQuery("keys", undefined, Boolean);
 
 	return {
@@ -154,6 +157,7 @@ export function getDataGetInputsFromQuery(context) {
 		before,
 		include,
 		sampling,
+		continuation,
 		keys,
 	};
 }

@@ -7,6 +7,7 @@ bzd_nodejs_test(
     deps = [
         "//nodejs/core:exception",
         "//nodejs/db/data",
+        "//nodejs/db/data:key_mapping",
         "//nodejs/utils:timestamp",
     ],
 )

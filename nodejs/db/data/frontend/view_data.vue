@@ -8,12 +8,12 @@
 		<div v-if="isEmpty">
 			<div>Updated: {{ durationString }} ago</div>
 			<Keys class="keys" :value="tree" :path-list="pathList" v-slot="serializeSlotProps" @select="propagateOnSelect">
-				<Value
-					v-if="isPathListValue(serializeSlotProps.pathList)"
-					:value="serializeSlotProps.value"
-					:view="0"
+				<History
+					v-if="isValue && isPathListValue(serializeSlotProps.pathList)"
+					:api-get="apiGet"
+					:path-list="pathList"
 					:timestamp="timestampServer"
-				></Value>
+				></History>
 				<Value
 					v-else
 					:value="serializeSlotProps.value"
@@ -39,6 +39,7 @@
 <script>
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import Value from "#bzd/nodejs/db/data/frontend/value.vue";
+	import History from "#bzd/nodejs/db/data/frontend/history.vue";
 	import Keys from "#bzd/nodejs/db/data/frontend/keys.vue";
 	import Input from "#bzd/nodejs/vue/components/form/element/input.vue";
 	import { timeToString } from "#bzd/nodejs/utils/to_string.js";
@@ -48,6 +49,7 @@
 		mixins: [Component],
 		components: {
 			Value,
+			History,
 			Keys,
 			Input,
 			Form,
@@ -85,9 +87,6 @@
 			},
 			value() {
 				return this.tree["_"] || [];
-			},
-			valueOldestTimestamp() {
-				return this.value[0][0];
 			},
 			timestampServer() {
 				return this.metadata.timestamp || Date.now();
@@ -137,8 +136,7 @@
 				object["_"].sort((a, b) => {
 					return b[0] - a[0];
 				});
-				const keepLastN = key.length === 0 ? 100 : 10;
-				object["_"] = object["_"].slice(0, keepLastN);
+				object["_"] = object["_"].slice(0, 10);
 				const newest = object["_"][0];
 				this.timestampNewest = Math.max(this.timestampNewest, newest[0]);
 
@@ -157,12 +155,6 @@
 						this.updateTree(key, value);
 					}
 				});
-				if (this.isValue) {
-					await this.handleSubmit(async () => {
-						const value = await this.apiGet({ metadata: 1, count: 10, before: this.valueOldestTimestamp });
-						this.updateTree([], value.data);
-					});
-				}
 				if (!this.isDestroyed) {
 					this.timeout = setTimeout(this.fetchMetadata, 1000);
 				}

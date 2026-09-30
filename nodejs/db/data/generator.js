@@ -1,3 +1,8 @@
+const dropNewerOrEqual = (values, timestamp) => {
+	const firstIndexToKeep = values.findIndex(([valueTimestamp]) => valueTimestamp < timestamp);
+	values.splice(0, firstIndexToKeep == -1 ? values.length : firstIndexToKeep);
+};
+
 export default class Generator {
 	constructor(data, uid, key, children, after, before) {
 		this.data = data;
@@ -7,39 +12,32 @@ export default class Generator {
 		this.after = after;
 		this.before = before;
 		this.columns = null;
+		this.continuation = null;
 	}
 
-	async _fetchDataAfter(after, count = 1000) {
-		if (this.before !== null && after > this.before) {
-			return null;
-		}
-
+	async _fetchData(count = 1000) {
 		const maybeData = await this.data.get({
 			uid: this.uid,
 			key: this.key,
 			metadata: true,
 			children: this.children,
 			count: count,
-			after: after,
+			after: this.after,
+			continuation: this.continuation,
 		});
 		if (maybeData.isEmpty()) {
 			return null;
 		}
+		const value = maybeData.value();
+		this.continuation = value.continuation ?? null;
 		// Handle the case when only a single value is requested.
-		const normalizedData = this.children == 0 ? [[[], maybeData.value()]] : maybeData.value();
-		// This does the following:
-		// - Convert the key into a string.
-		// - Remove entries that are too new.
-		// - Filter out the empty entries.
+		const normalizedData = this.children == 0 ? [[[], value.data]] : value.data;
+		// Convert the key into a string, remove the entries that are too new
+		// and filter out the empty entries.
 		const allValues = normalizedData
 			.map(([key, values]) => {
 				if (this.before !== null) {
-					const firstIndexToKeep = values.findIndex(([timestamp]) => timestamp < this.before);
-					if (firstIndexToKeep == -1) {
-						values = [];
-					} else {
-						values.splice(0, firstIndexToKeep);
-					}
+					dropNewerOrEqual(values, this.before);
 				}
 				return [key.join("."), values];
 			})
@@ -60,42 +58,55 @@ export default class Generator {
 
 	async getColumns() {
 		if (this.columns === null) {
-			await this._fetchDataAfter(this.after, 1);
+			await this._fetchData(1);
+			this.continuation = null;
 		}
 		return this.columns || [];
 	}
 
 	async *byTimestamp() {
-		let after = this.after;
+		// Per-key state to consume the pages newest first.
+		const nextValues = Object.create(null);
+		const lastEmitted = Object.create(null);
 		while (true) {
-			const allValues = await this._fetchDataAfter(after);
+			const allValues = await this._fetchData();
 			if (!allValues) {
 				break;
 			}
+			// A key whose continuation is done is re-fetched from scratch on the
+			// next page, drop the values that were already emitted.
+			for (const [key, values] of allValues) {
+				if (lastEmitted[key] !== undefined) {
+					dropNewerOrEqual(values, lastEmitted[key]);
+				}
+				values.reverse();
+			}
 
-			let nextValues = Object.create(null);
-			const nbValues = allValues.length;
 			while (true) {
-				// Get the next oldest values for every keys and ensure ALL keys have been
-				// populated, otherwise re-fetch.
-				const nbCurrentValues = allValues.reduce((accmulator, [key, values]) => {
-					nextValues[key] ??= values.pop();
-					return accmulator + (nextValues[key] === undefined ? 0 : 1);
-				}, 0);
-				if (nbCurrentValues == 0 || nbCurrentValues != nbValues) {
+				// Refill the next newest value for every key that can still provide one.
+				for (const [key, values] of allValues) {
+					if (nextValues[key] === undefined && values.length) {
+						nextValues[key] = values.pop();
+					}
+				}
+				if (Object.keys(nextValues).length === 0) {
 					break;
 				}
 
-				// Only keep the values with the oldest timestamp.
-				const timestamp = Math.min(...Object.values(nextValues).map(([t]) => t));
-				const yieldValuesPair = Object.entries(nextValues)
-					.map(([key, [t, v]]) => (t == timestamp ? [key, v] : false))
-					.filter(Boolean);
-				yieldValuesPair.forEach(([key, _]) => delete nextValues[key]);
+				// Only keep the values with the newest timestamp.
+				const timestamp = Math.max(...Object.values(nextValues).map(([t]) => t));
+				const yieldValuesPair = Object.entries(nextValues).filter(([, [t]]) => t == timestamp);
+				for (const [key] of yieldValuesPair) {
+					delete nextValues[key];
+					lastEmitted[key] = timestamp;
+				}
 
-				yield [timestamp, Object.fromEntries(yieldValuesPair)];
+				yield [timestamp, Object.fromEntries(yieldValuesPair.map(([key, [, v]]) => [key, v]))];
+			}
 
-				after = timestamp;
+			// If there is no continuation, all the data has been fetched.
+			if (this.continuation === null) {
+				break;
 			}
 		}
 	}

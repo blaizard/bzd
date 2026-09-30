@@ -20,7 +20,7 @@ async function assertGetValue(data, key, expectedValue) {
 async function assertGetWithUnit(data, key, expectedValue, expectedUnit) {
 	const result = await data.get({ uid: "statistics", key, count: 1, metadata: true });
 	Exception.assert(result.hasValue(), "Expected data for key", key);
-	const entries = result.value();
+	const entries = result.value().data;
 	Exception.assert(entries.length >= 1);
 	Exception.assertEqual(entries[0][1], expectedValue);
 	Exception.assertEqual(entries[0][3], expectedUnit);

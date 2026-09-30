@@ -32,7 +32,7 @@ describe("Generator", () => {
 	});
 
 	describe("byTimestamp", () => {
-		it("yields single key values in ascending timestamp order", async () => {
+		it("yields single key values in descending timestamp order", async () => {
 			const data = new Data();
 			data.insert("uid1", [[["sensor", "a"], "v1"]], 1000);
 			data.insert("uid1", [[["sensor", "a"], "v2"]], 1010);
@@ -44,13 +44,13 @@ describe("Generator", () => {
 				results.push(entry);
 			}
 			Exception.assertEqual(results, [
-				[1000, { a: "v1" }],
-				[1010, { a: "v2" }],
 				[1020, { a: "v3" }],
+				[1010, { a: "v2" }],
+				[1000, { a: "v1" }],
 			]);
 		});
 
-		it("interleaves multiple keys by oldest timestamp", async () => {
+		it("interleaves multiple keys by newest timestamp", async () => {
 			const data = new Data();
 			data.insert("uid1", [[["sensor", "a"], "a_80"]], 80);
 			data.insert("uid1", [[["sensor", "a"], "a_100"]], 100);
@@ -63,10 +63,10 @@ describe("Generator", () => {
 				results.push(entry);
 			}
 			Exception.assertEqual(results, [
-				[50, { b: "b_50" }],
-				[80, { a: "a_80" }],
-				[100, { a: "a_100" }],
 				[150, { b: "b_150" }],
+				[100, { a: "a_100" }],
+				[80, { a: "a_80" }],
+				[50, { b: "b_50" }],
 			]);
 		});
 
@@ -95,8 +95,8 @@ describe("Generator", () => {
 				results.push(entry);
 			}
 			Exception.assertEqual(results, [
-				[50, { a: "a_50", b: "b_50" }],
 				[100, { a: "a_100", b: "b_100" }],
+				[50, { a: "a_50", b: "b_50" }],
 			]);
 		});
 
@@ -112,8 +112,8 @@ describe("Generator", () => {
 				results.push(entry);
 			}
 			Exception.assertEqual(results, [
-				[0, { a: "v0" }],
 				[50, { a: "v50" }],
+				[0, { a: "v0" }],
 			]);
 		});
 
@@ -139,8 +139,8 @@ describe("Generator", () => {
 				results.push(entry);
 			}
 			Exception.assertEqual(results, [
-				[100, { "": "v1" }],
 				[200, { "": "v2" }],
+				[100, { "": "v1" }],
 			]);
 		});
 	});

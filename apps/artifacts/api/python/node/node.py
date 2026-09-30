@@ -1,3 +1,4 @@
+import math
 import typing
 import time
 import threading
@@ -123,7 +124,7 @@ class Node(ArtifactsBase):
 					content: typing.Dict[str, typing.Any] = {"data": entry.data}
 					url = remote + entry.uri
 					if entry.isClientTimestamp:
-						content["timestamp"] = time.time() * 1000
+						content["timestamp"] = math.floor(time.time() * 1000)
 					try:
 						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
 					except HttpClientException as e:
@@ -168,7 +169,7 @@ class Node(ArtifactsBase):
 		if not data:
 			return
 
-		timestampMs = time.time() * 1000
+		timestampMs = math.floor(time.time() * 1000)
 		self._publish(
 			BufferEntryBulk(
 				uri=f"/x/{volume or self.volume}/",
@@ -204,7 +205,7 @@ class Node(ArtifactsBase):
 					[
 						[],
 						[
-							[round(time.time() * 1000), data],
+							[math.floor(time.time() * 1000), data],
 						],
 					]
 				],
@@ -241,7 +242,7 @@ class Node(ArtifactsBase):
 			unit: typing.Optional[str] = None,
 		) -> None:
 			if timestampMs is None:
-				timestampMs = round(time.time() * 1000)
+				timestampMs = math.floor(time.time() * 1000)
 			data = [timestampMs, value]
 			if expires is not None or unit is not None:
 				data.append(expires)
@@ -362,7 +363,7 @@ class LoggerHandlerNode(LoggerHandler):
 			with self.node.publishBulk(path=["log"]) as publisher:
 				for log in data:
 					publisher(
-						timestampMs=log.timestamp,
+						timestampMs=math.floor(log.timestamp * 1000),
 						value={
 							self.name: {
 								"name": log.name,

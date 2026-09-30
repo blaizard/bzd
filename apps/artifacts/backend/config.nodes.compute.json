@@ -147,6 +147,16 @@
             ]
         }
     },
+    "nodes.notifications": {
+        "cpu.utilization": {
+            "message": "CPU '{name}' is at 100% utilization for >= 1h.",
+            "signal": "duration(max(/data/cpu/{name}) > 0.95, 3600)"
+        },
+        "temperature.too.high": {
+            "message": "Temperature '{name}' is over 50C.",
+            "signal": "max(/data/temperature/{name}) > 50"
+        }
+    },
     "nodes.schema": {
         "/data/battery": {
             "additionalProperties": {

@@ -44,8 +44,8 @@ export default class SourceNodes extends Source {
 			tick,
 		);
 		const updatedRecords = result.records.map((record) =>
-			Nodes.recordFromDisk(record).map(([uid, key, value, timestamp, isFixedTimestamp]) => {
-				return [uid, key, value, isFixedTimestamp ? timestamp : timestamp + timeDelayLocalRemote];
+			Nodes.recordFromDisk(record).map(([uid, key, value, timestamp, isAbsoluteTimestamp]) => {
+				return [uid, key, value, isAbsoluteTimestamp ? timestamp : timestamp + timeDelayLocalRemote];
 			}),
 		);
 

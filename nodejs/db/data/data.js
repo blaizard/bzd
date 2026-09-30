@@ -175,7 +175,7 @@ export default class Data {
 	///
 	/// The value might correspond to a time series, where the newest values come first.
 	///
-	/// \return An array of tuple, containing the timestamps and their corresponding value.
+	/// \return An array of tuples, containing the timestamps and their corresponding value.
 	///         Or null, if there is no reference to this data (wrong uid/internal).
 	async getWithMetadata_({ uid, key, value, count, after = null, before = null, sampling = null }) {
 		// If there is data locally.
@@ -244,7 +244,8 @@ export default class Data {
 					return [];
 				}
 
-				let result = value.slice(Math.max(end - count + 1, 0), end + 1);
+				const start = value.findIndex((d) => d[0] > after);
+				let result = value.slice(start, Math.min(start + count, end + 1));
 
 				// If it matches the last element, it might be that older elements are also matching.
 				if (end == value.length - 1) {
@@ -293,7 +294,8 @@ export default class Data {
 			return result;
 		}
 
-		return await this.getExternal_({ uid, key, count, after, before });
+		const external = await this.getExternal_({ uid, key, count, after, before });
+		return external === null ? [] : external;
 	}
 
 	/// Get all keys/value pair children of key.
@@ -307,6 +309,7 @@ export default class Data {
 		before = null,
 		include = null,
 		sampling = null,
+		continuation = null,
 	}) {
 		const data = Object.hasOwn(this.storage, uid) ? this.storage[uid].data : Object.create(null);
 
@@ -329,6 +332,46 @@ export default class Data {
 				.map(([_, v]) => {
 					return v;
 				});
+		};
+
+		const getCursorStart = (values, cursor) => {
+			if (cursor === null) {
+				return 0;
+			}
+			const index = values.findIndex(([timestamp]) => timestamp == cursor.timestamp);
+			return index == -1 ? 0 : index + cursor.offset;
+		};
+
+		const getNextCursor = (page, cursor) => {
+			const timestamp = page.at(-1)[0];
+			const offset = page.filter(([valueTimestamp]) => valueTimestamp == timestamp).length;
+			return {
+				timestamp,
+				offset: cursor?.timestamp == timestamp ? cursor.offset + offset : offset,
+			};
+		};
+
+		const getValues = async ({ key, internal }) => {
+			const value = data[internal]?.values;
+			const pageSize = count ?? 1;
+			const cursor = continuation?.[internal] ?? null;
+			const values = await this.getWithMetadata_({
+				uid,
+				key,
+				value,
+				count: pageSize + (cursor?.offset ?? 0),
+				after,
+				before: cursor ? Math.min(before ?? cursor.timestamp + 1, cursor.timestamp + 1) : before,
+				sampling,
+			});
+
+			const start = getCursorStart(values, cursor);
+			const page = values.slice(start, start + pageSize);
+			const result = page.length ? page : value?.length ? [] : null;
+			return {
+				data: result,
+				continuation: count !== null && page.length == pageSize ? getNextCursor(page, cursor) : null,
+			};
 		};
 
 		// Get the list of keys.
@@ -355,22 +398,12 @@ export default class Data {
 			if (keys !== null) {
 				// Get all values in parallel.
 				const valuesWithMetadata = await Promise.all(
-					keys.map((child) =>
-						this.getWithMetadata_({
-							uid,
-							key: child.key,
-							value: data[child.internal]?.values,
-							count: count || 1,
-							after,
-							before,
-							sampling,
-						}),
-					),
+					keys.map((child) => getValues({ key: child.key, internal: child.internal })),
 				);
 
 				const allValues = keys
 					.map((child, index) => {
-						const values = valuesWithMetadata[index];
+						const values = valuesWithMetadata[index].data;
 						// Filter out entries that are empty.
 						if (values && values.length) {
 							const result = valuesToResult(child.key, child.internal, values);
@@ -382,24 +415,31 @@ export default class Data {
 					})
 					.filter((x) => x !== null);
 
-				return new Optional(allValues);
+				if (count === null) {
+					return new Optional(allValues);
+				}
+				const allContinuations = Object.fromEntries(
+					keys.map((child, index) => [child.internal, valuesWithMetadata[index].continuation]),
+				);
+				return new Optional({
+					data: allValues,
+					continuation: Object.values(allContinuations).some(Boolean) ? allContinuations : null,
+				});
 			}
 		}
 		// Get the value directly.
 		else {
 			const internal = KeyMapping.keyToInternal(key);
-			const values = await this.getWithMetadata_({
-				uid,
-				key,
-				value: data[internal]?.values,
-				count: count || 1,
-				after,
-				before,
-				sampling,
-			});
-			if (values !== null) {
-				const result = valuesToResult(key, internal, values);
-				return new Optional(count === null ? result[0] : result);
+			const values = await getValues({ key, internal });
+			if (values.data !== null) {
+				const result = valuesToResult(key, internal, values.data);
+				if (count === null) {
+					return new Optional(result[0]);
+				}
+				return new Optional({
+					data: result,
+					continuation: values.continuation ? { [internal]: values.continuation } : null,
+				});
 			}
 		}
 
@@ -414,7 +454,7 @@ export default class Data {
 	///
 	/// \return The timestamp actually written.
 	insert(uid, fragments, timestamp = null) {
-		timestamp = timestamp === null ? timestampMs() : timestamp;
+		timestamp = Math.floor(timestamp === null ? timestampMs() : timestamp);
 
 		// Identify the path of the fragments and their values.
 		for (const [key, value, options] of fragments) {
