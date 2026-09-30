@@ -298,7 +298,6 @@ describe("Webdav", () => {
 			});
 		});
 
-		// webdav4: rm file
 		it("propfind on file with depth=1", async () => {
 			const response = await tester.send("memory", "propfind", "/webdav/a.txt", {
 				headers: {

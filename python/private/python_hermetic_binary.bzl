@@ -33,7 +33,7 @@ exec {py_interpreter} {binary} "$@"
 
 bzd_python_hermetic_launcher = rule(
     implementation = _bzd_python_hermetic_launcher_impl,
-    doc = "Create a hermetic python launcher, as the one provided by py_binrary relies on the system python, see: https://github.com/bazel-contrib/rules_python/issues/2727.",
+    doc = "Create a hermetic python launcher, as the one provided by py_binary relies on the system python, see: https://github.com/bazel-contrib/rules_python/issues/2727.",
     attrs = {
         "binary": attr.label(
             doc = "The python executable to be wrapped.",

@@ -1,4 +1,4 @@
-"""Rules for NodeJs Docker."""
+"""Rules for Python Docker."""
 
 load("@bzd_rules_oci//:defs.bzl", "bzd_oci_image_from_binary")
 load("//private:python_hermetic_binary.bzl", "bzd_python_hermetic_launcher")

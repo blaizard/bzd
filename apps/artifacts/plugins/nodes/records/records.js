@@ -19,7 +19,7 @@ const Log = LogFactory("apps", "plugin", "nodes");
 ///          - 7.rec
 ///
 /// The format of each entry is as follows:
-/// [tick, payload]
+/// [tick, payload, size, tickRemote]
 export default class Records {
 	/// Construct on-disk iterable records.
 	///
@@ -251,6 +251,7 @@ export default class Records {
 	///         1. The next tick to get the new value.
 	///         2. The value.
 	///         3. The approximated size of the serialized payload.
+	///         4. The remote tick if any.
 	async *read(tick = 0) {
 		yield* this.reader.read(tick);
 	}
@@ -368,7 +369,7 @@ export default class Records {
 		return [tick, remoteTick];
 	}
 
-	/// Ensure that everything is in order and reset the tick count.
+	/// Ensure that everything is in order and remove invalid records.
 	async sanitize(callback) {
 		for (const storage of Object.values(this.storages)) {
 			await storage.lock.acquire(async () => {

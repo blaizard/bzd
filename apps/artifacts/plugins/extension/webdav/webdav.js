@@ -67,7 +67,7 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 	);
 	const lock = new Lock();
 
-	/// Write the content of a file.
+	/// Handle the OPTIONS preflight request.
 	endpoints.register("options", "/webdav/{path:*}", async (context) => {
 		context.setHeader("Allow", "GET, PUT, DELETE, MKCOL, OPTIONS, PROPFIND, HEAD, COPY, MOVE");
 		context.setHeader("Content-Type", "httpd/unix-directory");

@@ -311,7 +311,7 @@ def localBazelTarget(
 ) -> ExecuteResult:
 	"""Execute a bazel target locally.
 
-	Note, the environment variable is passed to ensure the current are not propagated to the environment.
+	Note, only the PATH variable of the current environment is propagated, together with the provided env.
 	"""
 
 	defaultEnv = {

@@ -9,9 +9,9 @@ const Log = LogFactory("apps", "plugin", "nodes");
 
 /// Concurrent lock-free reader of records on disk.
 export default class RecordsReader {
-	/// Construct on-disk iterable records.
+	/// Construct an on-disk records reader.
 	///
-	/// \param options Configuration options for the Record instance.
+	/// \param options Configuration options for the RecordsReader instance.
 	/// - path (string, required): The base directory where record storages are located.
 	/// - fs: The file system module to use.
 	/// - statistics: The statistics object to be used.
@@ -134,7 +134,7 @@ export default class RecordsReader {
 	/// \return A tuple, containing the list of payload previously stored, and the next tick.
 	///         In case there are no new payloads, null is returned.
 	async _readStorageByChunk(storageName, tick) {
-		/// If the tick is null, return null, this is to ease looping over _read.
+		/// Return null if the tick is null, to ease looping in _readStorage.
 		if (tick === null) {
 			return null;
 		}
@@ -222,6 +222,7 @@ export default class RecordsReader {
 	///         1. The next tick to get the new value.
 	///         2. The value.
 	///         3. The approximated size of the serialized payload.
+	///         4. The remote tick if any.
 	async *read(tick = 0) {
 		// Load the first value of all records and filter the ones without values.
 		let iterators = Object.keys(this.storages).map((storageName) => ({

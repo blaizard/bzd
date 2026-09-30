@@ -16,7 +16,7 @@ import { createHash } from "crypto";
 const Log = LoggerFactory("apps", "plugin", "caching-proxy");
 const Exception = ExceptionFactory("apps", "plugin", "caching-proxy");
 
-// Headers to be used to compute the cache key, they might have effect on the content.
+// Headers to be used to compute the cache key, they might have an effect on the content.
 const HEADERS_CACHE_KEY = ["accept-encoding", "accept", "accept-language"];
 // Headers to remove from the request.
 const HEADERS_REQUEST_BLACKLIST = new Set([
@@ -239,7 +239,7 @@ export default function extensionCachingProxy(plugin, options, provider, endpoin
 				const dirs = [];
 				const dirsWithFile = new Set();
 				for await (const [path, entry] of storage.walk([], /*maxOrPaging*/ 100, /*includeMetadata*/ true)) {
-					// Ignore top-level files, as these are the files that are used or metadata storing.
+					// Ignore top-level files, as these are used by the system or store metadata.
 					if (!path.length) {
 						continue;
 					}

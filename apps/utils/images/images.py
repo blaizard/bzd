@@ -88,7 +88,7 @@ class Converters:
 				file.unlink()
 
 	def _updateDate(self, path: pathlib.Path) -> None:
-		"""Read and merge sidecar exif attributes to the image."""
+		"""Update the file timestamps to the oldest date found in its EXIF metadata."""
 
 		output = self._run(["exiftool", "-json", path.as_posix()])
 		if not output:
