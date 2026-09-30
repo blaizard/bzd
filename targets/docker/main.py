@@ -468,6 +468,6 @@ if __name__ == "__main__":
 							f"- Removing image {repository}:{tag} ({digest}).",
 							flush=True,
 						)
-						dockerRegistry.delete(repository, digest)
+						dockerRegistry.delete(repository, tag)
 
 	sys.exit(0)
