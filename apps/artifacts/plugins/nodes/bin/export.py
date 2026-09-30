@@ -9,11 +9,11 @@ from apps.artifacts.api.python.node.node import Node
 logger = Logger("apps.plugin.nodes")
 
 
-def stringToTimestampMs(string: str) -> int:
-	"""Convert a time string into a timestamp in milliseconds."""
+def stringToTimestampUs(string: str) -> int:
+	"""Convert a time string into a timestamp in microseconds."""
 
 	date = dateutil.parser.parse(string)  #  type: ignore
-	return int(date.timestamp() * 1000)
+	return int(date.timestamp() * 1000000)
 
 
 if __name__ == "__main__":
@@ -44,8 +44,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	node = Node.fromUrl(args.url)
-	after = None if args.after is None else stringToTimestampMs(args.after)
-	before = None if args.before is None else stringToTimestampMs(args.before)
+	after = None if args.after is None else stringToTimestampUs(args.after)
+	before = None if args.before is None else stringToTimestampUs(args.before)
 
 	toProcess = []
 	if args.level > 0:
@@ -63,9 +63,9 @@ if __name__ == "__main__":
 
 	logger.info(f"Exporting {len(toProcess)} file(s) using {str(node)}")
 	if after is not None:
-		logger.info(f"Starting at {str(datetime.datetime.fromtimestamp(after / 1000.0, tz=datetime.timezone.utc))}")
+		logger.info(f"Starting at {str(datetime.datetime.fromtimestamp(after / 1000000.0, tz=datetime.timezone.utc))}")
 	if before is not None:
-		logger.info(f"Ending at {str(datetime.datetime.fromtimestamp(before / 1000.0, tz=datetime.timezone.utc))}")
+		logger.info(f"Ending at {str(datetime.datetime.fromtimestamp(before / 1000000.0, tz=datetime.timezone.utc))}")
 
 	for index, [key, path] in enumerate(toProcess):
 		logger.info(f"[{index + 1}/{len(toProcess)}] exporting {path}")

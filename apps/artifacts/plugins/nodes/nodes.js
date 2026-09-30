@@ -187,11 +187,11 @@ export class Nodes {
 	///
 	/// \param uid The identifier of the node.
 	/// \param data The data to be inserted in the record (typically: [key, value, metadata])
-	/// \param timestamp The timestamp in Ms of this value.
+	/// \param timestampUs The timestamp in microseconds of this value.
 	/// \param isAbsoluteTimestamp If the timestamp is absolute or not.
 	///
 	/// \return A record containing this information.
-	static recordFromSingleEntry(uid, data, timestamp, isAbsoluteTimestamp = false) {
-		return [[uid, data, timestamp, isAbsoluteTimestamp]];
+	static recordFromSingleEntry(uid, data, timestampUs, isAbsoluteTimestamp = false) {
+		return [[uid, data, timestampUs, isAbsoluteTimestamp]];
 	}
 }

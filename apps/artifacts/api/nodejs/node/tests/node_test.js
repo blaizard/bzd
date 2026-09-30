@@ -287,8 +287,8 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "testuid" }, (publish) => {
-				publish({ timestampMs: 100, value: "a" });
-				publish({ timestampMs: 200, value: "b" });
+				publish({ timestampUs: 100, value: "a" });
+				publish({ timestampUs: 200, value: "b" });
 			});
 
 			Exception.assertEqual(calls.length, 1);
@@ -308,7 +308,7 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u", path: ["foo", "bar"] }, (publish) => {
-				publish({ timestampMs: 1, data: "x" });
+				publish({ timestampUs: 1, data: "x" });
 			});
 			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/foo/bar/");
 		});
@@ -323,7 +323,7 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u", path: ["foo"] }, (publish) => {
-				publish({ timestampMs: 1, data: "x" });
+				publish({ timestampUs: 1, data: "x" });
 			});
 			Exception.assertEqual(urls[0], "http://test/x/nodes/u/data/root/foo/");
 		});
@@ -353,7 +353,7 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u", isClientTimestamp: false }, (publish) => {
-				publish({ timestampMs: 100, data: "x" });
+				publish({ timestampUs: 100, data: "x" });
 			});
 
 			Exception.assertEqual(calls[0].json.timestamp, undefined);
@@ -368,7 +368,7 @@ describe("Node", () => {
 				},
 			});
 			await node.publishBulk({ uid: "u" }, (publish) => {
-				publish({ timestampMs: 100, data: "x" });
+				publish({ timestampUs: 100, data: "x" });
 			});
 
 			Exception.assert(typeof calls[0].json.timestamp === "number");

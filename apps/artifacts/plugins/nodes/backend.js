@@ -15,7 +15,7 @@ import Utils from "#bzd/apps/artifacts/common/utils.js";
 import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import { Readable } from "stream";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs, timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
 
 const databaseTypes = {
@@ -288,7 +288,7 @@ export default class Plugin extends PluginBase {
 			context.setStatus(200);
 			context.sendJson({
 				version: this.version,
-				timestamp: timestampMs(),
+				timestamp: timestampUs(),
 			});
 		});
 
@@ -319,7 +319,7 @@ export default class Plugin extends PluginBase {
 				Object.assign(
 					{
 						version: this.version,
-						timestamp: timestampMs(),
+						timestamp: timestampUs(),
 					},
 					output,
 				),
@@ -380,7 +380,7 @@ export default class Plugin extends PluginBase {
 
 					for await (const [timestamp, values] of generator.byTimestamp()) {
 						const row = columns.map((column) => valueToCell(values[column]));
-						stream.push(new Date(timestamp).toUTCString() + ";" + timestamp + ";" + row.join(";") + "\n");
+						stream.push(new Date(timestamp / 1000).toUTCString() + ";" + timestamp + ";" + row.join(";") + "\n");
 					}
 					stream.push(null);
 					await sending;
@@ -443,7 +443,7 @@ export default class Plugin extends PluginBase {
 			context.sendJson({
 				version: this.version,
 				dashboards: dashboards,
-				timestamp: timestampMs(),
+				timestamp: timestampUs(),
 			});
 		});
 
@@ -515,7 +515,7 @@ export default class Plugin extends PluginBase {
 				return;
 			}
 
-			const now = timestampMs();
+			const now = timestampUs();
 			const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
 			let records = [];
 
@@ -546,7 +546,7 @@ export default class Plugin extends PluginBase {
 								value,
 								timestamp,
 							);
-							const actualTimestamp = isAbsoluteTimestamp ? timestamp : timestamp - timestampClient + timestampMs();
+							const actualTimestamp = isAbsoluteTimestamp ? timestamp : timestamp - timestampClient + timestampUs();
 							await processValue(nodeUid, dataKey, value, expires, unit, actualTimestamp, isAbsoluteTimestamp);
 						}
 					}
@@ -594,7 +594,7 @@ export default class Plugin extends PluginBase {
 						value,
 						/*expires*/ null,
 						/*unit*/ null,
-						timestampMs(),
+						timestampUs(),
 						/*isAbsoluteTimestamp*/ false,
 					);
 				}
@@ -605,7 +605,7 @@ export default class Plugin extends PluginBase {
 					inputs.data,
 					/*expires*/ null,
 					/*unit*/ null,
-					timestampMs(),
+					timestampUs(),
 					/*isAbsoluteTimestamp*/ false,
 				);
 			}
@@ -731,7 +731,7 @@ export default class Plugin extends PluginBase {
 	}
 
 	get version() {
-		return 4;
+		return 5;
 	}
 
 	/// Read records from the given tick.
@@ -772,7 +772,7 @@ export default class Plugin extends PluginBase {
 	///
 	/// \param uid The identifier of the node.
 	/// \param data The data to be written.
-	/// \param timestamp The timestamp in Ms of this value.
+	/// \param timestamp The timestamp in microseconds of this value.
 	write(uid, data, timestamp) {
 		this.nodes.insertFromRecord(Nodes.recordFromSingleEntry(uid, data, timestamp));
 	}

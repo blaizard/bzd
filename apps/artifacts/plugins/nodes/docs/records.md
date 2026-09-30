@@ -28,6 +28,7 @@ The architecture revolves around the concept of "storages." A storage is a direc
   - `payload` is the data itself, stored as a JSON string.
   - `payloadSize` is the size of the serialized payload string.
   - `remoteTick` is a tick value from another system that relates to the data in the payload.
+  - Timestamps embedded in the payload are in microseconds since the Unix epoch.
   - Record files have a maximum size limit, preventing them from growing indefinitely.
 - **Tick System:**
   - The system uses a tick-based approach to order records.

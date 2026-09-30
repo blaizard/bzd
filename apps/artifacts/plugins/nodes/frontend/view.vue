@@ -41,8 +41,8 @@
 				options: {},
 				exportOptions: {
 					format: "csv",
-					after: nowMinus1Year.getTime(),
-					before: now.getTime(),
+					after: nowMinus1Year.getTime() * 1000,
+					before: now.getTime() * 1000,
 				},
 			};
 		},

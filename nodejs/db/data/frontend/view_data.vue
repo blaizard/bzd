@@ -72,7 +72,7 @@
 		},
 		computed: {
 			durationString() {
-				return timeToString(Math.max(this.timestampServer - this.timestampNewest, 0) / 1000);
+				return timeToString(Math.max(this.timestampServer - this.timestampNewest, 0) / 1000000);
 			},
 			isValue() {
 				return "_" in this.tree;
@@ -89,7 +89,7 @@
 				return this.tree["_"] || [];
 			},
 			timestampServer() {
-				return this.metadata.timestamp || Date.now();
+				return this.metadata.timestamp || Date.now() * 1000;
 			},
 			isEmpty() {
 				return this.filter.trim() === "";

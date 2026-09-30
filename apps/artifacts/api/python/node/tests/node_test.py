@@ -41,8 +41,8 @@ class TestRun(unittest.TestCase):
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
 		with node.publishBulk() as accessor:
-			accessor(timestampMs=1, value={"hello": "world1"})
-			accessor(timestampMs=2, value={"hello": "world2"})
+			accessor(timestampUs=1, value={"hello": "world1"})
+			accessor(timestampUs=2, value={"hello": "world2"})
 		self.assertEqual(self.calledCounter, 1)
 
 	def testPublishBulkAbsoluteTimestamp(self) -> None:
@@ -60,8 +60,8 @@ class TestRun(unittest.TestCase):
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
 		with node.publishBulk(isClientTimestamp=False) as accessor:
-			accessor(timestampMs=1, value={"hello": "world1"})
-			accessor(timestampMs=2, value={"hello": "world2"})
+			accessor(timestampUs=1, value={"hello": "world1"})
+			accessor(timestampUs=2, value={"hello": "world2"})
 		self.assertEqual(self.calledCounter, 1)
 
 	def testPublishMultiNodes(self) -> None:

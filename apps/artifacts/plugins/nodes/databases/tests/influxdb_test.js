@@ -66,25 +66,33 @@ describe("Influxdb", () => {
 	});
 
 	describe("timestampToInflux", () => {
-		it("converts milliseconds to nanoseconds", () => {
+		it("converts microseconds to nanoseconds", () => {
 			const database = makeDatabase();
-			Exception.assertEqual(database.timestampToInflux(1), "1000000");
-			Exception.assertEqual(database.timestampToInflux(1000), "1000000001");
-			Exception.assertEqual(database.timestampToInflux(1000.4), "1000000002");
+			Exception.assertEqual(database.timestampToInflux(1), "1000");
+			Exception.assertEqual(database.timestampToInflux(1000), "1000001");
+			Exception.assertEqual(database.timestampToInflux(1000.4), "1000002");
 		});
 
 		it("increments the offset for identical timestamps", () => {
 			const database = makeDatabase();
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000000");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000001");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000002");
+			Exception.assertEqual(database.timestampToInflux(1234), "1234000");
+			Exception.assertEqual(database.timestampToInflux(1234), "1234001");
+			Exception.assertEqual(database.timestampToInflux(1234), "1234002");
 		});
 
-		it("wraps the offset around after a million records", () => {
+		it("wraps the offset around after a thousand records", () => {
 			const database = makeDatabase();
-			database.offset = 999999;
-			Exception.assertEqual(database.timestampToInflux(1234), "1234999999");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000000");
+			database.offset = 999;
+			Exception.assertEqual(database.timestampToInflux(1234), "1234999");
+			Exception.assertEqual(database.timestampToInflux(1234), "1234000");
+		});
+	});
+
+	describe("beforeToInflux", () => {
+		it("converts microseconds to the nanosecond boundary just before it", () => {
+			const database = makeDatabase();
+			Exception.assertEqual(database.beforeToInflux(3000), "3000000");
+			Exception.assertEqual(database.beforeToInflux(1234), "1234000");
 		});
 	});
 
@@ -93,7 +101,7 @@ describe("Influxdb", () => {
 			const queries = [];
 			const database = makeDatabase({ queries: queries });
 			await database.onExternal("hello", ["a"], 2, 1790742920029, null);
-			Exception.assert(queries[0].includes("time > 1790742920029999999ns"));
+			Exception.assert(queries[0].includes("time > 1790742920029999ns"));
 		});
 
 		it("bounded by after, uses the nanosecond boundary and returns newest first", async () => {
@@ -106,7 +114,7 @@ describe("Influxdb", () => {
 				],
 			});
 			const output = await database.onExternal("hello", ["a"], 2, 1000, null);
-			Exception.assert(queries[0].includes("time > 1000999999ns"));
+			Exception.assert(queries[0].includes("time > 1000999ns"));
 			Exception.assert(queries[0].includes("ORDER BY time ASC"));
 			Exception.assertEqual(output, [
 				[2000, 2],
@@ -114,7 +122,7 @@ describe("Influxdb", () => {
 			]);
 		});
 
-		it("bounded by before, keeps the millisecond bound and does not reverse", async () => {
+		it("bounded by before, keeps the nanosecond bound and does not reverse", async () => {
 			const queries = [];
 			const database = makeDatabase({
 				queries: queries,
@@ -124,7 +132,7 @@ describe("Influxdb", () => {
 				],
 			});
 			const output = await database.onExternal("hello", ["a"], 2, null, 3000);
-			Exception.assert(queries[0].includes("time < 3000ms"));
+			Exception.assert(queries[0].includes("time < 3000000ns"));
 			Exception.assert(queries[0].includes("ORDER BY time DESC"));
 			Exception.assertEqual(output, [
 				[2000, 2],
@@ -142,7 +150,7 @@ describe("Influxdb", () => {
 				],
 			});
 			const output = await database.onExternal("hello", ["a"], 2, 1000, 3000);
-			Exception.assert(queries[0].includes("time > 1000999999ns AND time < 3000ms"));
+			Exception.assert(queries[0].includes("time > 1000999ns AND time < 3000000ns"));
 			Exception.assertEqual(output, [
 				[2000, 2],
 				[1000, 1],

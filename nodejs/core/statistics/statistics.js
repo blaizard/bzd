@@ -4,7 +4,7 @@ import Provider from "#bzd/nodejs/core/statistics/provider.js";
 import Data from "#bzd/nodejs/db/data/data.js";
 import ServiceProvider from "#bzd/nodejs/core/services/provider.js";
 import Services from "#bzd/nodejs/core/services/services.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
@@ -87,13 +87,13 @@ export default class Statistics {
 						children: 99,
 						after: lastTimestamp,
 					});
-					lastTimestamp = timestampMs();
+					lastTimestamp = timestampUs();
 					if (maybeData.isEmpty()) {
 						return "empty";
 					}
 					await node.publishBulk({}, (publish) => {
-						for (const [key, [timestampMs, value, expires, unit]] of maybeData.value()) {
-							publish({ key: key, timestampMs: timestampMs, value: value, expires: expires, unit: unit });
+						for (const [key, [timestampUs, value, expires, unit]] of maybeData.value()) {
+							publish({ key: key, timestampUs: timestampUs, value: value, expires: expires, unit: unit });
 						}
 					});
 				},

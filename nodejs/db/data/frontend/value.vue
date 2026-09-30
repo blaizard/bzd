@@ -89,15 +89,15 @@
 			setViewOriginal() {
 				this.viewAll = false;
 			},
-			timestampToString(timestampMs) {
-				return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}", timestampMs);
+			timestampToString(timestampUs) {
+				return dateToString("{y:04}-{m:02}-{d:02} {h:02}:{min:02}:{s:02}", timestampUs / 1000);
 			},
 			onClick() {
 				this.$emit("select");
 			},
-			isExpired(timestampMs) {
+			isExpired(timestampUs) {
 				if (this.metadata.expires) {
-					return this.timestamp > timestampMs + this.metadata.expires * 1000;
+					return this.timestamp > timestampUs + this.metadata.expires * 1000000;
 				}
 				return false;
 			},

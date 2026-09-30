@@ -2,14 +2,14 @@ import Database from "#bzd/apps/artifacts/plugins/nodes/databases/database.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import Services from "#bzd/nodejs/core/services/services.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
 
-/// The number of records that can share the same millisecond timestamp before
+/// The number of records that can share the same microsecond timestamp before
 /// their nanosecond timestamp collides in the database.
-const OFFSET_MODULUS = 1000000;
+const OFFSET_MODULUS = 1000;
 
 export default class DatabaseInfluxDB extends Database {
 	constructor(...args) {
@@ -44,7 +44,7 @@ export default class DatabaseInfluxDB extends Database {
 		this.clientQuery = new this.components.HttpClientFactory(this.options.host, {
 			query: {
 				db: this.options.bucket,
-				epoch: "ms",
+				epoch: "u",
 			},
 			headers: {
 				"Content-Type": "application/vnd.influxql",
@@ -130,9 +130,14 @@ export default class DatabaseInfluxDB extends Database {
 		return timestampInflux;
 	}
 
-	/// Convert an 'after' timestamp (in ms) into the nanosecond boundary just after it.
+	/// Convert an 'after' timestamp (in microseconds) into the nanosecond boundary just after it.
 	afterToInflux(after) {
 		return (BigInt(Math.round(after)) * BigInt(OFFSET_MODULUS) + BigInt(OFFSET_MODULUS) - 1n).toString();
+	}
+
+	/// Convert a 'before' timestamp (in microseconds) into the nanosecond boundary just before it.
+	beforeToInflux(before) {
+		return (BigInt(Math.round(before)) * BigInt(OFFSET_MODULUS)).toString();
 	}
 
 	installServices(provider) {
@@ -256,7 +261,7 @@ export default class DatabaseInfluxDB extends Database {
 	async onRecords(records) {
 		let content = [];
 		let skipped = 0;
-		const timestampMin = this.retentionS ? timestampMs() - this.retentionS * 1000 + 86400 * 1000 : 0;
+		const timestampMin = this.retentionS ? timestampUs() - this.retentionS * 1000000 + 86400 * 1000000 : 0;
 		for (const [uid, data, timestamp] of records) {
 			const [key, value] = data;
 			// InfluxDB doesn't support numbers with comma.
@@ -316,10 +321,10 @@ export default class DatabaseInfluxDB extends Database {
 		let influxQL = "";
 
 		if (after !== null && before !== null) {
-			const periodMs = Math.round((before - after) / count) || 1;
+			const periodMs = Math.round((before - after) / count / 1000) || 1;
 			influxQL += 'SELECT FIRST("' + field + '") ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns AND time < " + Math.round(before) + "ms ";
+			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns AND time < " + this.beforeToInflux(before) + "ns ";
 			// ORDER BY is not supported with GROUP BY, but the buckets are
 			// guaranteed to be returned in ascending time order.
 			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
@@ -332,7 +337,7 @@ export default class DatabaseInfluxDB extends Database {
 		} else if (before !== null) {
 			influxQL += 'SELECT "' + field + '" ';
 			influxQL += 'FROM "' + uid + '" ';
-			influxQL += "WHERE time < " + Math.round(before) + "ms ";
+			influxQL += "WHERE time < " + this.beforeToInflux(before) + "ns ";
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {

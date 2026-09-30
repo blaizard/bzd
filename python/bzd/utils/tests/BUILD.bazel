@@ -59,3 +59,13 @@ py_test(
         "@bzd_python//bzd/utils:worker",
     ],
 )
+
+py_test(
+    name = "timestamp",
+    srcs = ["timestamp_test.py"],
+    main = "timestamp_test.py",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_python//bzd/utils:timestamp",
+    ],
+)

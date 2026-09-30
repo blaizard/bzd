@@ -738,7 +738,7 @@ describe("Plugin", () => {
 			Exception.assertEqual(response.data.records.length, 2);
 			Exception.assertEqual(response.data.end, true);
 			Exception.assertEqual(response.data.next, 3);
-			Exception.assertEqual(response.data.version, 4);
+			Exception.assertEqual(response.data.version, 5);
 		}).timeout(10000);
 
 		it("stop", async () => {
@@ -957,7 +957,7 @@ describe("Plugin", () => {
 		it("empty", async () => {
 			await makeSourceTest(
 				() => ({
-					version: 4,
+					version: 5,
 					timestamp: 121231,
 					records: [],
 					next: 1,
@@ -971,7 +971,7 @@ describe("Plugin", () => {
 		it("malformed", async () => {
 			await Exception.assertThrowsWithMatch(async () => {
 				await makeSourceTest(() => ({
-					version: 4,
+					version: 5,
 					timestamp: "string!>",
 					records: { "this is not as expected": "no no no" },
 					next: 10000,
@@ -982,7 +982,7 @@ describe("Plugin", () => {
 		it("valid records", async () => {
 			await makeSourceTest(
 				() => ({
-					version: 4,
+					version: 5,
 					timestamp: 121231,
 					records: [recordOnDiskTest1],
 					next: 1,

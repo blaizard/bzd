@@ -1,11 +1,11 @@
 import math
 import typing
-import time
 import threading
 from contextlib import contextmanager
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
+import bzd.utils.timestamp as timestamp
 from bzd.http.client import HttpClientException
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
@@ -30,7 +30,7 @@ class PublisherProtocol(typing.Protocol):
 	def __call__(
 		self,
 		value: typing.Any,
-		timestampMs: typing.Optional[float] = None,
+		timestampUs: typing.Optional[float] = None,
 		key: typing.Optional[typing.List[str]] = None,
 		expires: typing.Optional[float] = None,
 		unit: typing.Optional[str] = None,
@@ -47,7 +47,7 @@ class BufferEntryBulk:
 	# - For a single-node bulk: a BulkEntries list of [subKey, [[ts, value], ...]] entries.
 	# - For a multi-node bulk: a BulkMulti mapping of node uid to a BulkEntries list.
 	data: typing.Union[BulkEntries, BulkMulti]
-	# If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
+	# If true, it means that the timestamp given for each entry are the client timestamp in microseconds.
 	# They might be adjusted to match the exact time at which they will be sent.
 	# If false, they will not be modified.
 	isClientTimestamp: bool
@@ -124,7 +124,7 @@ class Node(ArtifactsBase):
 					content: typing.Dict[str, typing.Any] = {"data": entry.data}
 					url = remote + entry.uri
 					if entry.isClientTimestamp:
-						content["timestamp"] = math.floor(time.time() * 1000)
+						content["timestamp"] = timestamp.timestampUs()
 					try:
 						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
 					except HttpClientException as e:
@@ -169,11 +169,11 @@ class Node(ArtifactsBase):
 		if not data:
 			return
 
-		timestampMs = math.floor(time.time() * 1000)
+		timestampValue = timestamp.timestampUs()
 		self._publish(
 			BufferEntryBulk(
 				uri=f"/x/{volume or self.volume}/",
-				data={uid: [[[], [[timestampMs, value]]]] for uid, value in data.items()},
+				data={uid: [[[], [[timestampValue, value]]]] for uid, value in data.items()},
 				isClientTimestamp=True,
 			)
 		)
@@ -205,7 +205,7 @@ class Node(ArtifactsBase):
 					[
 						[],
 						[
-							[math.floor(time.time() * 1000), data],
+							[timestamp.timestampUs(), data],
 						],
 					]
 				],
@@ -227,7 +227,7 @@ class Node(ArtifactsBase):
 		        uid: The unique identifier of the node.
 		        volume: The volume to which the data should be sent.
 		        path: The path to publish to.
-		        isClientTimestamp: If true, it means that the timestamp given for each entry are the client timestamp in milliseconds.
+		        isClientTimestamp: If true, it means that the timestamp given for each entry are the client timestamp in microseconds.
 		                                           They might be adjusted to match the exact time at which they will be sent.
 		                                           If false, they will not be modified.
 		"""
@@ -236,14 +236,14 @@ class Node(ArtifactsBase):
 
 		def publisher(
 			value: typing.Any,
-			timestampMs: typing.Optional[float] = None,
+			timestampUs: typing.Optional[float] = None,
 			key: typing.Optional[typing.List[str]] = None,
 			expires: typing.Optional[float] = None,
 			unit: typing.Optional[str] = None,
 		) -> None:
-			if timestampMs is None:
-				timestampMs = math.floor(time.time() * 1000)
-			data = [timestampMs, value]
+			if timestampUs is None:
+				timestampUs = timestamp.timestampUs()
+			data = [timestampUs, value]
 			if expires is not None or unit is not None:
 				data.append(expires)
 				if unit is not None:
@@ -363,7 +363,7 @@ class LoggerHandlerNode(LoggerHandler):
 			with self.node.publishBulk(path=["log"]) as publisher:
 				for log in data:
 					publisher(
-						timestampMs=math.floor(log.timestamp * 1000),
+						timestampUs=math.floor(log.timestamp * 1000000),
 						value={
 							self.name: {
 								"name": log.name,

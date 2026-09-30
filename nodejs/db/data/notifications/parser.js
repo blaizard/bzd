@@ -45,7 +45,7 @@ const FUNCTIONS = {
 	duration: {
 		args: [ArgumentType.comparison, ArgumentType.number],
 		compile: (condition, seconds) => {
-			const secondsMs = seconds * 1000;
+			const secondsUs = seconds * 1000000;
 			return (ctx) => {
 				const result = condition(ctx);
 				if (result) {
@@ -53,7 +53,7 @@ const FUNCTIONS = {
 						ctx.memory.durationSince = ctx.timestamp;
 						return false;
 					}
-					return ctx.timestamp - ctx.memory.durationSince >= secondsMs;
+					return ctx.timestamp - ctx.memory.durationSince >= secondsUs;
 				}
 				ctx.memory.durationSince = null;
 				return false;

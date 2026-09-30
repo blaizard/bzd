@@ -34,8 +34,8 @@
 			},
 			timeRange() {
 				if (this.timeRange[0] && this.timeRange[1]) {
-					this.chart.options.scales.x.min = this.timeRange[0];
-					this.chart.options.scales.x.max = this.timeRange[1];
+					this.chart.options.scales.x.min = this.timeRange[0] / 1000;
+					this.chart.options.scales.x.max = this.timeRange[1] / 1000;
 					this.chart.update("none"); // "none" suppress animation.
 				}
 			},
@@ -128,7 +128,7 @@
 						const label = this.options.inputs?.[name]?.name ?? name;
 						if (input.data.length > 0 && Array.isArray(input.data[0][1])) {
 							const zippedData = input.data[0][1].map((_, index) =>
-								input.data.map(([t, v]) => ({ x: t, y: v[index] })),
+								input.data.map(([t, v]) => ({ x: t / 1000, y: v[index] })),
 							);
 							return zippedData.map((data, index) =>
 								this.adaptDataset({
@@ -141,7 +141,7 @@
 						return [
 							this.adaptDataset({
 								label: label,
-								data: input.data.map(([t, v]) => ({ x: t, y: v })),
+								data: input.data.map(([t, v]) => ({ x: t / 1000, y: v })),
 								spanGaps: false,
 							}),
 						];

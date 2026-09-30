@@ -2,7 +2,7 @@ import Cache from "#bzd/nodejs/core/cache.js";
 import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
 import Optional from "#bzd/nodejs/utils/optional.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("db", "data");
 
@@ -324,10 +324,10 @@ export default class Data {
 				}
 				return result;
 			}
-			const expiredTimestampMs = timestampMs() - dataInternal.expires * 1000;
+			const expiredTimestampUs = timestampUs() - dataInternal.expires * 1000000;
 			return values
 				.filter(([t, _]) => {
-					return t > expiredTimestampMs;
+					return t > expiredTimestampUs;
 				})
 				.map(([_, v]) => {
 					return v;
@@ -454,7 +454,7 @@ export default class Data {
 	///
 	/// \return The timestamp actually written.
 	insert(uid, fragments, timestamp = null) {
-		timestamp = Math.floor(timestamp === null ? timestampMs() : timestamp);
+		timestamp = Math.floor(timestamp === null ? timestampUs() : timestamp);
 
 		// Identify the path of the fragments and their values.
 		for (const [key, value, options] of fragments) {
@@ -487,7 +487,7 @@ export default class Data {
 					// Estimate the rate and estimate the expiration rate.
 					// The expiration is rounded to avoid long floats when sent via HTTP,
 					// the value is a minimum of 1s (as it doesn't make sense to have it at 0 or a lower granularity).
-					const expiresEstimate = ((timestamp - data.values[0][0]) * 3) / 1000;
+					const expiresEstimate = ((timestamp - data.values[0][0]) * 3) / 1000000;
 					data.expires = Math.round(0.4 * data.expires + 0.6 * expiresEstimate) || 1;
 				}
 			}

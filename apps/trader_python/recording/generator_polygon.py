@@ -35,7 +35,7 @@ class Generator:
 				with self.node.publishBulk(path=["ohlc", ticker, "USD", "polygon.io"], isClientTimestamp=False) as publish:
 					for item in data.get("results", []):
 						publish(
-							timestampMs=item["t"],
+							timestampUs=item["t"] * 1000,
 							value={
 								"price": item.get("vw") or (item["o"] + item["l"] + item["c"] + item["l"]) / 4,
 								"volume": item["v"],

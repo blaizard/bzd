@@ -25,7 +25,7 @@
 	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/frontend/view_graph.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
-	import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+	import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import { dateToDefaultString, timeToString } from "#bzd/nodejs/utils/to_string.js";
@@ -62,10 +62,10 @@
 					interval: "Last 15 minutes",
 				},
 				timeout: null,
-				periodMs: null,
+				periodUs: null,
 				lock: new Lock(),
 				viewportUpdatedTimeout: null,
-				timestampMsReactive: null,
+				timestampUsReactive: null,
 				timestampTimer: null,
 			};
 		},
@@ -86,9 +86,9 @@
 			await this.fetchDashboards();
 			this.viewportUpdated();
 			window.addEventListener("scroll", this.handleScroll);
-			this.timestampMsReactive = timestampMs();
+			this.timestampUsReactive = timestampUs();
 			this.timestampTimer = setInterval(() => {
-				this.timestampMsReactive = timestampMs();
+				this.timestampUsReactive = timestampUs();
 			}, 1000);
 		},
 		beforeUnmount() {
@@ -105,49 +105,49 @@
 			intervalOptions() {
 				return {
 					"Last 5 minutes": async () => {
-						await this.useLastPeriod(5 * 60 * 1000);
+						await this.useLastPeriod(5 * 60 * 1000000);
 					},
 					"Last 15 minutes": async () => {
-						await this.useLastPeriod(15 * 60 * 1000);
+						await this.useLastPeriod(15 * 60 * 1000000);
 					},
 					"Last 30 minutes": async () => {
-						await this.useLastPeriod(30 * 60 * 1000);
+						await this.useLastPeriod(30 * 60 * 1000000);
 					},
 					"Last 1 hour": async () => {
-						await this.useLastPeriod(1 * 60 * 60 * 1000);
+						await this.useLastPeriod(1 * 60 * 60 * 1000000);
 					},
 					"Last 3 hours": async () => {
-						await this.useLastPeriod(3 * 60 * 60 * 1000);
+						await this.useLastPeriod(3 * 60 * 60 * 1000000);
 					},
 					"Last 6 hours": async () => {
-						await this.useLastPeriod(6 * 60 * 60 * 1000);
+						await this.useLastPeriod(6 * 60 * 60 * 1000000);
 					},
 					"Last 12 hours": async () => {
-						await this.useLastPeriod(12 * 60 * 60 * 1000);
+						await this.useLastPeriod(12 * 60 * 60 * 1000000);
 					},
 					"Last 24 hours": async () => {
-						await this.useLastPeriod(24 * 60 * 60 * 1000);
+						await this.useLastPeriod(24 * 60 * 60 * 1000000);
 					},
 					"Last 2 days": async () => {
-						await this.useLastPeriod(2 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(2 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 7 days": async () => {
-						await this.useLastPeriod(7 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(7 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 30 days": async () => {
-						await this.useLastPeriod(30 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(30 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 6 months": async () => {
-						await this.useLastPeriod(6 * 30 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(6 * 30 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 1 year": async () => {
-						await this.useLastPeriod(365 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(365 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 2 years": async () => {
-						await this.useLastPeriod(2 * 365 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(2 * 365 * 24 * 60 * 60 * 1000000);
 					},
 					"Last 5 years": async () => {
-						await this.useLastPeriod(5 * 365 * 24 * 60 * 60 * 1000);
+						await this.useLastPeriod(5 * 365 * 24 * 60 * 60 * 1000000);
 					},
 				};
 			},
@@ -161,10 +161,10 @@
 			},
 			timeRange() {
 				const [_, timestampNewest] = this.inputs.timeRange;
-				if (timestampNewest === null || this.periodMs === null) {
+				if (timestampNewest === null || this.periodUs === null) {
 					return [null, null];
 				}
-				return [timestampNewest - this.periodMs, timestampNewest];
+				return [timestampNewest - this.periodUs, timestampNewest];
 			},
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;
@@ -172,8 +172,8 @@
 					return "...";
 				}
 				const result = [
-					timestampOldest ? dateToDefaultString(timestampOldest) : "?",
-					timestampNewest ? dateToDefaultString(timestampNewest) : "?",
+					timestampOldest ? dateToDefaultString(timestampOldest / 1000) : "?",
+					timestampNewest ? dateToDefaultString(timestampNewest / 1000) : "?",
 				];
 				return result.join(" - ") + this.timeRangeAgoString;
 			},
@@ -182,7 +182,7 @@
 				if (timestampNewest === null) {
 					return "";
 				}
-				const durationS = Math.max(this.timestampMsReactive + this.timestampDiff - timestampNewest, 0) / 1000;
+				const durationS = Math.max(this.timestampUsReactive + this.timestampDiff - timestampNewest, 0) / 1000000;
 				return ` (updated ${timeToString(durationS, 0)} ago)`;
 			},
 			formDescription() {
@@ -234,9 +234,9 @@
 			/// This includes the newest timestamp and the timestamp diff between the client and the server.
 			async getTimestamp() {
 				if (this.getTimestampCache === null) {
-					const timestampBefore = timestampMs();
+					const timestampBefore = timestampUs();
 					const data = await this.fetchData({ count: 1, all: true });
-					const timestampAfter = timestampMs();
+					const timestampAfter = timestampUs();
 					const timestampClient = (timestampAfter + timestampBefore) / 2;
 
 					this.getTimestampCache = {
@@ -249,36 +249,36 @@
 				if (this.getTimestampCache.server === null) {
 					return [null, null];
 				}
-				const elapsedTime = timestampMs() - this.getTimestampCache.client;
+				const elapsedTime = timestampUs() - this.getTimestampCache.client;
 				return [
 					this.getTimestampCache.server + elapsedTime,
 					this.getTimestampCache.server - this.getTimestampCache.client,
 				];
 			},
-			async useLastPeriod(periodMs) {
+			async useLastPeriod(periodUs) {
 				this.loading = true;
 				try {
 					const [timestampNewest, timestampDiff] = await this.getTimestamp();
 
 					const nbSamples = Math.max(Math.round(this.viewport.width / 2), 100);
-					this.periodMs = periodMs;
-					this.inputs.reset({ periodLimit: this.periodMs });
+					this.periodUs = periodUs;
+					this.inputs.reset({ periodLimit: this.periodUs });
 
 					if (timestampNewest !== null) {
 						const data = await this.fetchData({
 							before: timestampNewest,
-							after: timestampNewest - this.periodMs,
+							after: timestampNewest - this.periodUs,
 							count: nbSamples,
 							all: false,
 						});
 						this.inputs.add(data);
 
 						// Adjust the refresh period to match the sampling of the graph.
-						const refreshPeriodMs = Math.max(periodMs / nbSamples, 1000);
+						const refreshPeriodMs = Math.max(periodUs / nbSamples / 1000, 1000);
 						this.inputs.refreshPeriodically(async ([_, timestampNewestLocal]) => {
-							const timestampNewestRemote = Math.max(timestampMs() + timestampDiff, timestampNewestLocal + 1);
-							const periodRequestedMs = timestampNewestRemote - timestampNewestLocal;
-							const count = Math.round((periodRequestedMs * nbSamples) / periodMs);
+							const timestampNewestRemote = Math.max(timestampUs() + timestampDiff, timestampNewestLocal + 1);
+							const periodRequestedUs = timestampNewestRemote - timestampNewestLocal;
+							const count = Math.round((periodRequestedUs * nbSamples) / periodUs);
 							if (count) {
 								return await this.fetchData({
 									after: timestampNewestLocal,
@@ -338,12 +338,12 @@
 				await this.handleSubmit(
 					async () => {
 						// Get the dashboard and approximate the time difference between the server and the client.
-						const t1 = timestampMs();
+						const t1 = timestampUs();
 						const result = await this.requestBackend(this.dashboardEndpoint, {
 							method: "get",
 							expect: "json",
 						});
-						const t4 = timestampMs();
+						const t4 = timestampUs();
 						const networkDelay = (t4 - t1) / 2; // Time it took to receive the response.
 						this.timestampDiff = result.timestamp + networkDelay - t4;
 

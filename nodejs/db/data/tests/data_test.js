@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import Data from "#bzd/nodejs/db/data/data.js";
 import KeyMapping from "#bzd/nodejs/db/data/key_mapping.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "db", "data");
 
@@ -144,7 +144,7 @@ describe("Nodes", () => {
 
 		it("continuation", async () => {
 			const data = new Data();
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 			const internal = KeyMapping.keyToInternal(["a", "b"]);
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp - 4);
@@ -201,7 +201,7 @@ describe("Nodes", () => {
 
 		it("continuation children", async () => {
 			const data = new Data();
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 			const internalA = KeyMapping.keyToInternal(["sensor", "a"]);
 			const internalB = KeyMapping.keyToInternal(["sensor", "b"]);
 
@@ -249,7 +249,7 @@ describe("Nodes", () => {
 
 		it("timestamp", async () => {
 			const data = new Data();
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp - 2);
 			data.insert("hello", [[["a", "b"], 10]], timestamp);
@@ -306,9 +306,9 @@ describe("Nodes", () => {
 			}
 		});
 
-		it("float timestamp is floored to integer ms", async () => {
+		it("float timestamp is floored to integer us", async () => {
 			const data = new Data();
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp - 0.7);
 			data.insert("hello", [[["a", "b"], 10]], timestamp + 0.2);
@@ -324,8 +324,8 @@ describe("Nodes", () => {
 
 		it("expired", async () => {
 			const data = new Data();
-			const timestamp = timestampMs();
-			const expiredTimestamp = timestamp - 1000 * 1000;
+			const timestamp = timestampUs();
+			const expiredTimestamp = timestamp - 1000000 * 1000;
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp);
 			data.insert("hello", [[["a", "b"], 10]], expiredTimestamp);
@@ -439,7 +439,7 @@ describe("Nodes", () => {
 					return externalData;
 				},
 			});
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);
@@ -526,7 +526,7 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);
@@ -624,7 +624,7 @@ describe("Nodes", () => {
 					return externalData === null ? null : externalData.slice(0, count);
 				},
 			});
-			const timestamp = timestampMs();
+			const timestamp = timestampUs();
 
 			data.insert("hello", [[["a"], 1]], timestamp + 1);
 			data.insert("hello", [[["a"], 2]], timestamp + 2);

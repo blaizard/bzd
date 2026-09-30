@@ -122,3 +122,9 @@ py_library(
         requirement("pyserial"),
     ],
 )
+
+py_library(
+    name = "timestamp",
+    srcs = ["timestamp.py"],
+    visibility = ["//visibility:public"],
+)

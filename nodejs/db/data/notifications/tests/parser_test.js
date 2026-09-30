@@ -47,14 +47,14 @@ describe("SignalParser", () => {
 
 			// The condition has been true for exactly 1h.
 			Exception.assertEqual(
-				signal.evaluate(makeCtx(values, { variant: "main", timestamp: 3600 * 1000, memory: memory })),
+				signal.evaluate(makeCtx(values, { variant: "main", timestamp: 3600 * 1000000, memory: memory })),
 				true,
 			);
 
 			// A low value resets the duration.
 			const lowValues = { [key("data", "cpu", "main")]: [0.1] };
 			Exception.assertEqual(
-				signal.evaluate(makeCtx(lowValues, { variant: "main", timestamp: 3600 * 1000 + 1, memory: memory })),
+				signal.evaluate(makeCtx(lowValues, { variant: "main", timestamp: 3600 * 1000000 + 1, memory: memory })),
 				false,
 			);
 			Exception.assertEqual(memory.durationSince, null);

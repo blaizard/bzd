@@ -102,5 +102,6 @@
 	.history-scroll {
 		max-height: 300px;
 		overflow-y: auto;
+		padding: 20px 0;
 	}
 </style>

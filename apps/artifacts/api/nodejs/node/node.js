@@ -1,5 +1,5 @@
 import { CollectionPaging } from "#bzd/nodejs/db/utils.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import { ArtifactsBase } from "#bzd/apps/artifacts/api/nodejs/common.js";
 import { HttpClientException } from "#bzd/nodejs/core/http/client.js";
@@ -38,7 +38,7 @@ export class Node extends ArtifactsBase {
 		const uri = this._makeURI(uid, volume, path);
 		await this._publish({
 			uri: uri,
-			data: [[[], [[timestampMs(), data]]]],
+			data: [[[], [[timestampUs(), data]]]],
 			isClientTimestamp: true,
 		});
 	}
@@ -49,15 +49,15 @@ export class Node extends ArtifactsBase {
 	/// \param volume The volume to which the data should be sent.
 	/// \param path The path to publish to.
 	/// \param isClientTimestamp If true, the timestamps given for each entry are the client timestamp
-	///                          in milliseconds.
-	/// \param callback Function invoked with a `publish(timestampMs, data)` helper.
+	///                          in microseconds.
+	/// \param callback Function invoked with a `publish(timestampUs, data)` helper.
 	async publishBulk({ uid = null, volume = null, path = null, isClientTimestamp = true } = {}, callback) {
 		const bulk = [];
-		await callback(({ value, timestampMs = null, key = null, expires = null, unit = null }) => {
-			if (timestampMs === null) {
-				timestampMs = Date.now();
+		await callback(({ value, timestampUs: providedTimestampUs = null, key = null, expires = null, unit = null }) => {
+			if (providedTimestampUs === null) {
+				providedTimestampUs = timestampUs();
 			}
-			let data = [timestampMs, value];
+			let data = [providedTimestampUs, value];
 			if (expires) {
 				data[2] = expires;
 			}
@@ -85,7 +85,7 @@ export class Node extends ArtifactsBase {
 		await this.tryRemotes(async (remote) => {
 			const content = { data: entry.data };
 			if (entry.isClientTimestamp) {
-				content.timestamp = timestampMs();
+				content.timestamp = timestampUs();
 			}
 			const url = remote + entry.uri;
 			try {
@@ -170,7 +170,7 @@ export class Node extends ArtifactsBase {
 
 		// Adjust the timestamp to the local server.
 		if (metadata) {
-			const timestampDiff = result.timestamp - timestampMs();
+			const timestampDiff = result.timestamp - timestampUs();
 			result.data = result.data.map(([key, value]) => {
 				const [t, ...rest] = value;
 				return [key, [t - timestampDiff, ...rest]];

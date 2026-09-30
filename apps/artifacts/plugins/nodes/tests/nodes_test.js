@@ -1,7 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
 import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.js";
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
 
@@ -58,7 +58,7 @@ describe("Nodes", () => {
 			Exception.assertEqual(fragment[0].length, 4);
 			Exception.assertEqual(fragment[0][0], "hello");
 			Exception.assertEqual(fragment[0][1], [["mykey"], "world", {}]);
-			Exception.assert(fragment[0][2] <= timestampMs());
+			Exception.assert(fragment[0][2] <= timestampUs());
 			Exception.assertEqual(fragment[0][3], false);
 		});
 

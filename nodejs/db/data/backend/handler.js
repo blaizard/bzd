@@ -1,4 +1,4 @@
-import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 
@@ -98,7 +98,7 @@ export async function handleDataGet(
 	let output = {};
 	if (metadata) {
 		output = Object.assign(output, {
-			timestamp: timestampMs(),
+			timestamp: timestampUs(),
 		});
 	}
 

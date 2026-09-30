@@ -24,5 +24,6 @@ py_library(
         "@bzd_python//bzd/http:utils",
         "@bzd_python//bzd/logging",
         "@bzd_python//bzd/logging/handler",
+        "@bzd_python//bzd/utils:timestamp",
     ],
 )
