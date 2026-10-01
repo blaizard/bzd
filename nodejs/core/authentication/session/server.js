@@ -61,6 +61,9 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			this.options.kvs = new KeyValueStoreMemory("session-authentication");
 		}
 
+		// Statistics recording the usage of preloaded application tokens.
+		this.statisticsTokens = this.statistics.makeNested("tokens");
+
 		Log.info("Using session authentication.");
 	}
 
@@ -332,7 +335,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		}
 		// Record the usage of a preloaded application token, if any.
 		if (result.name) {
-			this.statistics.sum("token-" + result.name, 1);
+			this.statisticsTokens.sum(result.name, 1);
 		}
 		return result.session;
 	}
