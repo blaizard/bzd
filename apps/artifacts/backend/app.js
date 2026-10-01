@@ -34,8 +34,8 @@ const Exception = ExceptionFactory("backend");
 		.useLoggerMemory()
 		.setup();
 
-	for (const { token, scopes } of Object.values(configTokens())) {
-		await backend.authentication.preloadApplicationToken(token, scopes);
+	for (const [name, { token, scopes }] of Object.entries(configTokens())) {
+		await backend.authentication.preloadApplicationToken(token, scopes, name);
 	}
 	Log.info("Preloaded {} application token(s).", Object.keys(configTokens()).length);
 

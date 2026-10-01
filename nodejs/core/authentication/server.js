@@ -1,5 +1,6 @@
 import ExceptionFactory from "../exception.js";
 import { HttpError } from "../http/server_context.js";
+import StatisticsProvider from "../statistics/provider.js";
 import Session from "./session.js";
 
 const Exception = ExceptionFactory("authentication", "server");
@@ -32,6 +33,9 @@ export default class AuthenticationServer {
 			defaultOptions,
 			options,
 		);
+
+		// Statistics recording the usage of preloaded application tokens.
+		this.statistics = new StatisticsProvider();
 	}
 
 	installRest(rest) {
@@ -87,8 +91,10 @@ export default class AuthenticationServer {
 	///
 	/// \param token The token to be preloaded.
 	/// \param scopes The scopes to be assigned to this token.
-	async preloadApplicationToken(token, scopes = null) {
-		return await this._preloadApplicationTokenImpl(token, scopes);
+	/// \param name An optional name (uid) associated with this token, used for statistics. The secret
+	///             itself is never used as a key.
+	async preloadApplicationToken(token, scopes = null, name = null) {
+		return await this._preloadApplicationTokenImpl(token, scopes, name);
 	}
 
 	/// Get the access token from an HTTP context.

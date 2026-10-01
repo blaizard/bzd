@@ -330,6 +330,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		if (!result) {
 			return false;
 		}
+		// Record the usage of a preloaded application token, if any.
+		if (result.name) {
+			this.statistics.sum("token-" + result.name, 1);
+		}
 		return result.session;
 	}
 
@@ -340,13 +344,15 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	///
 	/// \param token The token to be preloaded.
 	/// \param scopes The scopes to be assigned to this token.
-	async _preloadApplicationTokenImpl(token, scopes) {
+	/// \param name An optional name (uid) associated with this token, used for statistics.
+	async _preloadApplicationTokenImpl(token, scopes, name = null) {
 		Exception.assert(!token.includes("_"), "Application tokens cannot have '_' characters: {}", token);
 		const [uid, hash] = this._readToken(token);
 
 		const sessionData = {
 			expiration: Number.MAX_VALUE,
 			scopes: scopes || [],
+			name: name,
 		};
 
 		// Insert the new token.
@@ -428,6 +434,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			hash: hash,
 			expiration: maybeSession.expiration,
 			scopes: maybeSession.scopes,
+			name: maybeSession.name ?? null,
 		};
 	}
 }

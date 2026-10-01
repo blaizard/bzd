@@ -270,6 +270,9 @@ export default class Backend {
 			if (this.instances.web) {
 				this.instances.statistics.register(this.instances.web.statistics, "backend.web");
 			}
+			if (this.instances.authentication) {
+				this.instances.statistics.register(this.instances.authentication.statistics, "backend.authentication");
+			}
 		}
 
 		if (this.instances.restSchema) {
