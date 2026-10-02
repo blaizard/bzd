@@ -100,7 +100,7 @@ export class Node extends ArtifactsBase {
 			} catch (e) {
 				if (e instanceof HttpClientException && MALFORMED_REQUEST_STATUS_CODES.includes(e.code)) {
 					// The request is malformed and can never succeed, drop it.
-					this.logger.error(`Remote '${remote}' dropped the malformed request: ${e}`);
+					this.logger.error(`Remote '${remote}' dropped the malformed request: ${e.message}`);
 					return;
 				}
 				throw e;

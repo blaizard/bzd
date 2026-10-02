@@ -64,9 +64,10 @@ export class LoggerBackendNode {
 				}
 			});
 		} catch (e) {
+			console.error("Unable to publish logs to artifacts: ", e.message);
+
 			/// Keep the entries, including those logged while publishing, for a later retry.
 			this.buffer = [...entries, ...this.buffer].slice(-this.maxBufferSize);
-			console.error("Unable to publish logs to artifacts: ", e);
 		}
 	}
 
