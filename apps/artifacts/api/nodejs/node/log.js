@@ -27,12 +27,11 @@ export class LoggerBackendNode {
 	}
 
 	processor(date, level, topics, message) {
-		const logName = (topics ?? []).join("::");
 		this.buffer.push({
 			timestampUs: date.getTime() * 1000,
 			value: {
 				[this.name]: {
-					name: logName,
+					name: (topics ?? []).join("::"),
 					level: level,
 					message: message,
 					source: "",
