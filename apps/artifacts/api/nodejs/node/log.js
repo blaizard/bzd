@@ -39,7 +39,7 @@ export class LoggerBackendNode {
 				},
 			},
 		});
-		if (this.buffer.length >= this.maxBufferSize) {
+		if (this.buffer.length >= this.maxBufferSize / 2) {
 			this.flush();
 		}
 	}
