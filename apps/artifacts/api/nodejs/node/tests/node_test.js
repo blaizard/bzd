@@ -5,7 +5,7 @@ import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 const Exception = ExceptionFactory("test", "artifacts", "node");
 
 /// Build a Node instance with a mocked HTTP client, isolating tests from network and env.
-function makeNode({ get = null, post = null, path = null } = {}) {
+function makeNode({ get = null, post = null, path = null, uid = null } = {}) {
 	const httpClient = {
 		get: get ?? (async () => ({})),
 		post: post ?? (async () => ({})),
@@ -16,6 +16,7 @@ function makeNode({ get = null, post = null, path = null } = {}) {
 		token: null,
 		httpClient,
 		path,
+		uid,
 	});
 }
 
@@ -384,6 +385,28 @@ describe("Node", () => {
 			});
 			await node.publishBulk({ uid: "testuid" }, () => {});
 			Exception.assertEqual(calls.length, 0);
+		});
+	});
+	describe("makeLoggerBackend", () => {
+		it("Publishes the buffered logs to the node", async () => {
+			const calls = [];
+			const node = makeNode({
+				uid: "testuid",
+				post: async (url, options) => {
+					calls.push({ url, json: options.json });
+					return {};
+				},
+			});
+			const backend = node.makeLoggerBackend({ name: "testapp", flushIntervalS: 3600 });
+
+			backend.processor(new Date(1000), "info", ["app"], "hello world");
+			await backend.flush();
+
+			Exception.assertEqual(calls.length, 1);
+			Exception.assertEqual(calls[0].url, "http://test/x/nodes/testuid/data/log/");
+			Exception.assertEqual(calls[0].json.data, [
+				[[], [[1000000, { testapp: { name: "app", level: "info", message: "hello world" } }]]],
+			]);
 		});
 	});
 });

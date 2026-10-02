@@ -12,6 +12,7 @@ import Cache from "#bzd/nodejs/core/cache.js";
 import Statistics from "#bzd/nodejs/core/statistics/statistics.js";
 import { configAuthentication } from "#bzd/nodejs/vue/apps/config_nodejs.js";
 import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memory.js";
+import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 import ProviderProcess from "#bzd/nodejs/core/statistics/provider_process.js";
 
 import { Command } from "commander/esm.mjs";
@@ -32,6 +33,7 @@ export default class Backend {
 			statisticsProviderProcess: null,
 			services: null,
 			loggerMemory: null,
+			loggerArtifacts: null,
 			staticPath: null,
 			staticOptions: null,
 			restSchema: null,
@@ -139,6 +141,13 @@ export default class Backend {
 		Exception.assert(this.isSetup, "Backend not set-up.");
 		Exception.assert(this.instances.loggerMemory, "LoggerMemory not set-up.");
 		return this.instances.loggerMemory;
+	}
+
+	/// Access the artifacts logger backend.
+	get loggerArtifacts() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.loggerArtifacts, "LoggerArtifacts not set-up.");
+		return this.instances.loggerArtifacts;
 	}
 
 	/// Set-up the authentication object.
@@ -251,6 +260,12 @@ export default class Backend {
 		this.instances.web = this.test
 			? new MockHttpServer(httpServerOptions)
 			: new HttpServer(this.port, httpServerOptions);
+
+		if (this.uid) {
+			Log.info("Setting up nodes logger backend with uid={}.", this.uid);
+			const node = new Node({ uid: this.uid });
+			this.instances.loggerArtifacts = node.makeLoggerBackend({ name: "backend" });
+		}
 
 		if (this.instances.services) {
 			Log.info("Setting up services");

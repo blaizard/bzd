@@ -3,12 +3,15 @@ load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_library")
 bzd_nodejs_library(
     name = "node",
     srcs = [
+        "log.js",
         "node.js",
     ],
     visibility = ["//visibility:public"],
     deps = [
         "//apps/artifacts/api/nodejs:common",
         "//apps/artifacts/common:utils",
+        "//nodejs/core:exception",
+        "//nodejs/core:log",
         "//nodejs/core/http:client",
         "//nodejs/db:utils",
         "//nodejs/utils:timestamp",

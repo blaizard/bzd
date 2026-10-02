@@ -35,6 +35,7 @@ bzd_nodejs_library(
     deps = [
         ":config_nodejs",
         "//apps/accounts/authentication:server",
+        "//apps/artifacts/api/nodejs/node",
         "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",

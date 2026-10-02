@@ -5,9 +5,9 @@ import { ArtifactsBase } from "#bzd/apps/artifacts/api/nodejs/common.js";
 import { HttpClientException } from "#bzd/nodejs/core/http/client.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import { LoggerBackendNode } from "./log.js";
 
 const Exception = ExceptionFactory("artifacts", "api");
-const Log = LogFactory("artifacts", "api");
 
 /// HTTP status codes that indicate a request that is malformed and can never succeed.
 const MALFORMED_REQUEST_STATUS_CODES = [400, 413, 422];
@@ -75,6 +75,13 @@ export class Node extends ArtifactsBase {
 			data: bulk,
 			isClientTimestamp: isClientTimestamp,
 		});
+	}
+
+	/// Create a logger backend that publishes log entries to this node.
+	///
+	/// \param options The options to pass to the logger backend.
+	makeLoggerBackend(options = {}) {
+		return new LoggerBackendNode({ node: this, logger: this.logger, ...options });
 	}
 
 	async _publish(entry) {
