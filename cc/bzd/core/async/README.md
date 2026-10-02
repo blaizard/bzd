@@ -130,7 +130,7 @@ A `void` generator is declared as follows:
 bzd::Generator<> myFunc() { ... }
 ```
 
-A non-`void` coroutine is declared as follows:
+A non-`void` generator is declared as follows:
 
 ```c++
 bzd::Generator<int> myFunc() { ... }
@@ -164,7 +164,7 @@ This will execute `myFunc` three times and return the result as a tuple.
 #### Any
 
 You might also want to execute coroutines and return when the first one terminates; this is handy to implement
-timeouts for example. It can be done as follows:
+timeouts, for example. It can be done as follows:
 
 ```c++
 const auto result = co_await bzd::async::any(myFunc(), timeout(1_s));
@@ -181,7 +181,7 @@ type provides a convenient operator to reduce boiler plate code:
 const auto value = co_await !myFunc();
 ```
 
-The value is directly returned from the coroutine, any error is propagated to the caller of this coroutine. This piece of code
+The value is returned directly from the coroutine; any error is propagated to the caller of this coroutine. This piece of code
 is equivalent to the following:
 
 ```c++
@@ -207,14 +207,14 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 ### Suspend
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments:
-the first, which is guaranteed to be called, contains a movable-only suspended executable object as argument.
+the first, which is guaranteed to be called, receives a movable-only suspended executable object as an argument.
 The user needs to dispose of it within this callback. Once the callback completes, the suspended executable object
 cannot be moved anymore.
 It is also guaranteed that no cancellation can occur during the lifetime of this callback.
 
 The second argument is optional and provides a callback to deal with cancellation.
 
-This can be used in the context of ISR.
+This can be used in the context of an ISR.
 
 ### Executor
 
@@ -234,7 +234,7 @@ flowchart TD
 ```
 
 The executor context is unique to the instance of the executor; it is passed to the current coroutine being executed or cancelled.
-Its role is to contain the continuation if any, that will be used for the next coroutine to be executed. This could be done
+Its role is to contain the continuation, if any, that will be used for the next coroutine to be executed. This could be done
 directly by returning it in the `await_suspend`; this would work fine in a single threaded system. Here we want to allow parallel
 execution on different cores if available, and for branching (`async::all` or `async::any`), we would have a race if multiple
 continuations are called concurrently. Having it after the completion of the coroutine helps with that effect, because it ensures that

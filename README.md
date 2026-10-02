@@ -73,7 +73,7 @@ To build the full project documentation, run:
 
 ## Code Quality
 
-All supported languages come with their set of code quality related tools.
+All supported languages come with their own set of code quality related tools.
 To run all static sanity checks, code formatters and documentation generators at once, run the following command:
 
 ```bash

@@ -1,6 +1,6 @@
 # Formatting (toString / toStream)
 
-The pattern library provides two synchronous and asynchronous ways to format values into an output:
+The pattern library provides both a synchronous and an asynchronous way to format values into an output:
 
 | Entry point     | Sink                          | Nature           |
 | --------------- | ----------------------------- | ---------------- |
