@@ -87,7 +87,7 @@ export class Nodes {
 	/// \param before Only return values before this timestamp.
 	/// \param include Include the given path to the result.
 	/// \param sampling The sampling method to be used.
-	/// \param continuation The continuation to be used.
+	/// \param continuation An opaque string provided by a previous request to page through the data.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
 	async get({

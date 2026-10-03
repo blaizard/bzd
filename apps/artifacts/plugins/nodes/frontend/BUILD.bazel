@@ -20,6 +20,7 @@ bzd_nodejs_library(
         "view.vue",
         "view_dashboard.vue",
         "view_graph.vue",
+        "view_log.vue",
     ],
     packages = [
         "@nodejs_deps//:chart-js",

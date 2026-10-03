@@ -146,6 +146,8 @@ describe("Nodes", () => {
 			const data = new Data();
 			const timestamp = timestampUs();
 			const internal = KeyMapping.keyToInternal(["a", "b"]);
+			const continuation1 = JSON.stringify({ [internal]: { timestamp: timestamp - 1, offset: 1 } });
+			const continuation2 = JSON.stringify({ [internal]: { timestamp: timestamp - 3, offset: 1 } });
 
 			data.insert("hello", [[["a", "b"], 1]], timestamp - 4);
 			data.insert("hello", [[["a", "b"], 2]], timestamp - 3);
@@ -158,34 +160,20 @@ describe("Nodes", () => {
 				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value().data, [5, 4]);
-				Exception.assertEqual(result.value().continuation, {
-					[internal]: { timestamp: timestamp - 1, offset: 1 },
-				});
+				Exception.assertEqual(result.value().continuation, continuation1);
 			}
 
 			// Second page using the previous continuation.
 			{
-				const result = await data.get({
-					uid: "hello",
-					key: ["a", "b"],
-					count: 2,
-					continuation: { [internal]: { timestamp: timestamp - 1, offset: 1 } },
-				});
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, continuation: continuation1 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value().data, [3, 2]);
-				Exception.assertEqual(result.value().continuation, {
-					[internal]: { timestamp: timestamp - 3, offset: 1 },
-				});
+				Exception.assertEqual(result.value().continuation, continuation2);
 			}
 
 			// Last page, the continuation is done.
 			{
-				const result = await data.get({
-					uid: "hello",
-					key: ["a", "b"],
-					count: 2,
-					continuation: { [internal]: { timestamp: timestamp - 3, offset: 1 } },
-				});
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 2, continuation: continuation2 });
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value().data, [1]);
 				Exception.assertEqual(result.value().continuation, null);
@@ -204,6 +192,10 @@ describe("Nodes", () => {
 			const timestamp = timestampUs();
 			const internalA = KeyMapping.keyToInternal(["sensor", "a"]);
 			const internalB = KeyMapping.keyToInternal(["sensor", "b"]);
+			const continuation1 = JSON.stringify({
+				[internalA]: { timestamp: timestamp - 1, offset: 1 },
+				[internalB]: { timestamp: timestamp - 1, offset: 1 },
+			});
 
 			data.insert("hello", [[["sensor", "a"], "a1"]], timestamp - 2);
 			data.insert("hello", [[["sensor", "a"], "a2"]], timestamp - 1);
@@ -220,10 +212,7 @@ describe("Nodes", () => {
 					[["a"], ["a3", "a2"]],
 					[["b"], ["b3", "b2"]],
 				]);
-				Exception.assertEqual(result.value().continuation, {
-					[internalA]: { timestamp: timestamp - 1, offset: 1 },
-					[internalB]: { timestamp: timestamp - 1, offset: 1 },
-				});
+				Exception.assertEqual(result.value().continuation, continuation1);
 			}
 
 			// Second page, both children are done.
@@ -233,10 +222,7 @@ describe("Nodes", () => {
 					key: ["sensor"],
 					children: 1,
 					count: 2,
-					continuation: {
-						[internalA]: { timestamp: timestamp - 1, offset: 1 },
-						[internalB]: { timestamp: timestamp - 1, offset: 1 },
-					},
+					continuation: continuation1,
 				});
 				Exception.assert(result.hasValue());
 				Exception.assertEqual(result.value().data, [

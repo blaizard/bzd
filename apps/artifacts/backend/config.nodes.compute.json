@@ -119,6 +119,13 @@
             "title": "Battery {name}",
             "type": "linear",
             "unit": "%"
+        },
+        {
+            "inputs": {
+                "/data/log/{name}": {}
+            },
+            "title": "Log {name}",
+            "type": "log"
         }
     ],
     "nodes.handlers": {

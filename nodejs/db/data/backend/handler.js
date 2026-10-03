@@ -42,6 +42,9 @@ function pathToKey(path) {
 /// GET <endpoint>?before=<timestamp>
 /// Only show entries before a specific timestamp (not including)
 ///
+/// GET <endpoint>?continuation=<opaque string>
+/// Pass back the continuation as received from a previous response to page through the data.
+///
 /// GET <endpoint>?include=/a/b,/a/d/e
 /// Only show the path /a/b and /a/d/e
 ///
@@ -146,7 +149,7 @@ export function getDataGetInputsFromQuery(context) {
 			.map((path) => pathToKey(path)),
 	);
 	const sampling = context.getQuery("sampling", undefined, String);
-	const continuation = context.getQuery("continuation", undefined, JSON.parse);
+	const continuation = context.getQuery("continuation", undefined, String);
 	const keys = context.getQuery("keys", undefined, Boolean);
 
 	return {

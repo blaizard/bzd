@@ -2,6 +2,7 @@ import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import MockServerContext from "#bzd/nodejs/core/http/mock/server_context.js";
 import Data from "#bzd/nodejs/db/data/data.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "db", "data", "backend", "handler");
 
@@ -125,6 +126,15 @@ describe("handleDataGet", () => {
 			Exception.assert("key" in entry);
 			Exception.assert("leaf" in entry);
 		}
+	});
+
+	it("returns continuation as an opaque string", async () => {
+		const data = new Data();
+		const timestamp = timestampUs();
+		data.insert("u", [[["a"], 1]], timestamp - 1);
+		data.insert("u", [[["a"], 2]], timestamp);
+		const out = await handleDataGet(data, { uid: "u", key: ["a"], count: 1 });
+		Exception.assert(typeof out.continuation === "string");
 	});
 
 	it("defaults keys to false when omitted", async () => {

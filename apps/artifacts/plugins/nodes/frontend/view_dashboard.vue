@@ -13,6 +13,13 @@
 					class="dashboard-component-graph"
 				>
 				</ViewGraph>
+				<ViewLog
+					v-else-if="dashboard.type === 'log'"
+					:options="dashboard"
+					:endpoint="endpoint"
+					class="dashboard-component-graph"
+				>
+				</ViewLog>
 				<div v-else class="dashboard-component-unsupported">Unsupported graph type "{{ dashboard.type }}".</div>
 			</div>
 		</div>
@@ -23,6 +30,7 @@
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/frontend/view_graph.vue";
+	import ViewLog from "#bzd/apps/artifacts/plugins/nodes/frontend/view_log.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
@@ -39,6 +47,7 @@
 		mixins: [Base, Component],
 		components: {
 			ViewGraph,
+			ViewLog,
 			Form,
 		},
 		directives: {
@@ -295,10 +304,13 @@
 				}
 			},
 			// Gather all inputs to gather from the list of dashboards.
+			// Only the graph dashboards share the timeseries collection, the other
+			// dashboards (e.g. logs) manage their own data fetching.
 			inputsKeysFromDashboards(dashboards) {
 				return [
 					...new Set(
 						dashboards
+							.filter((dashboard) => ["linear", "bar"].includes(dashboard.type))
 							.map((dashboard) => {
 								return Object.keys(dashboard.inputs);
 							})

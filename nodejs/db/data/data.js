@@ -313,6 +313,11 @@ export default class Data {
 	}) {
 		const data = Object.hasOwn(this.storage, uid) ? this.storage[uid].data : Object.create(null);
 
+		// Decode the opaque continuation string into the per-key cursor dictionary.
+		if (typeof continuation === "string") {
+			continuation = JSON.parse(continuation);
+		}
+
 		const valuesToResult = (key, internal, values) => {
 			const dataInternal = this.getDataInternal_(uid, key, internal);
 			if (metadata) {
@@ -423,7 +428,7 @@ export default class Data {
 				);
 				return new Optional({
 					data: allValues,
-					continuation: Object.values(allContinuations).some(Boolean) ? allContinuations : null,
+					continuation: Object.values(allContinuations).some(Boolean) ? JSON.stringify(allContinuations) : null,
 				});
 			}
 		}
@@ -438,7 +443,7 @@ export default class Data {
 				}
 				return new Optional({
 					data: result,
-					continuation: values.continuation ? { [internal]: values.continuation } : null,
+					continuation: values.continuation ? JSON.stringify({ [internal]: values.continuation }) : null,
 				});
 			}
 		}
