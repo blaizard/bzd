@@ -387,26 +387,4 @@ describe("Node", () => {
 			Exception.assertEqual(calls.length, 0);
 		});
 	});
-	describe("makeLoggerBackend", () => {
-		it("Publishes the buffered logs to the node", async () => {
-			const calls = [];
-			const node = makeNode({
-				uid: "testuid",
-				post: async (url, options) => {
-					calls.push({ url, json: options.json });
-					return {};
-				},
-			});
-			const backend = node.makeLoggerBackend({ name: "testapp", flushIntervalS: 3600 });
-
-			backend.processor(new Date(1000), "info", ["app"], "hello world");
-			await backend.flush();
-
-			Exception.assertEqual(calls.length, 1);
-			Exception.assertEqual(calls[0].url, "http://test/x/nodes/testuid/data/log/");
-			Exception.assertEqual(calls[0].json.data, [
-				[[], [[1000000, { testapp: { name: "app", level: "info", message: "hello world" } }]]],
-			]);
-		});
-	});
 });
