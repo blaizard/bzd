@@ -12,6 +12,7 @@ test_srcs = glob([
         "//nodejs/core:cache",
         "//nodejs/core:format",
         "//nodejs/core:lock_file",
+        "//nodejs/core:log",
         "//nodejs/core:rate_limit",
         "//nodejs/core:router",
         "//nodejs/core:template",

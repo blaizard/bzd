@@ -195,6 +195,7 @@ export default class Backend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.cache, "Cache already set-up.");
 		this.instances.cache = new Cache("cache");
+		Log.setRateLimiter(this.instances.cache);
 		return this;
 	}
 

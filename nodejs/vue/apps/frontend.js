@@ -2,6 +2,7 @@ import { createApp } from "vue";
 
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import Cache from "#bzd/nodejs/core/cache.js";
 import RestPlugin from "#bzd/nodejs/vue/rest.js";
 import WebsocketPlugin from "#bzd/nodejs/vue/websocket.js";
 import Notification from "#bzd/nodejs/vue/notification.js";
@@ -117,6 +118,7 @@ export default class Frontend {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
 		Exception.assert(!this.instances.logger, "Logger already set-up.");
 		this.instances.logger = true;
+		Log.setRateLimiter(new Cache("log"));
 		return this;
 	}
 

@@ -70,6 +70,7 @@ bzd_nodejs_library(
         "//apps/accounts/authentication:client",
         "//nodejs:icons",
         "//nodejs:vue",
+        "//nodejs/core:cache",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/core/services:frontend",

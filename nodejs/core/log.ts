@@ -1,4 +1,6 @@
 import Format from "#bzd/nodejs/core/format.js";
+// @ts-expect-error: rate_limit is a plain JS module without type declarations.
+import RateLimiter from "#bzd/nodejs/core/rate_limit.js";
 
 class Performance {
     timeStart: number;
@@ -30,9 +32,22 @@ function consoleProcessor(date: Date, level: string, topics: string[] | null, me
 
 class Logger {
     processors: Record<string, any> = {};
+    rateLimiter_: RateLimiter | null = null;
+    skippedCount_: Map<string, number> = new Map();
 
     constructor(_options?: any) {
         this.addBackend("console", consoleProcessor);
+    }
+
+    // Configure the rate limiter used to group occurrences of the same log.
+    setRateLimiter(cache: any, options?: any) {
+        const rateLimitOptions = options ?? {};
+        this.rateLimiter_ = new RateLimiter(cache, {
+            bucket: "log",
+            threshold: rateLimitOptions.threshold ?? 2,
+            windowMs: rateLimitOptions.windowMs ?? 5000,
+            clock: rateLimitOptions.clock ?? { getTimeMs: () => Date.now() },
+        });
     }
 
     static get levels(): Record<string, number> {
@@ -63,6 +78,11 @@ class Logger {
         );
     }
 
+    // Build the identity of a log, used to group occurrences of the same log.
+    static makeKey(level: string, topics: string[] | undefined, str: any): string {
+        return [level, ...(topics ?? []), String(str)].join("\0");
+    }
+
     // Process the message through all configured backends.
     process(level: string, topics?: string[], str: any = "", ...args: any[]) {
         const date = new Date();
@@ -72,6 +92,20 @@ class Logger {
             if (logLevel <= processor.level) {
                 if (message === null) {
                     message = Format(String(str), ...args);
+                    if (this.rateLimiter_ !== null) {
+                        const key = Logger.makeKey(level, topics, message);
+                        // Rate limiting: only print a given log a few times per window and count the suppressed ones.
+                        if (this.rateLimiter_.isOverLimit(key)) {
+                            this.skippedCount_.set(key, (this.skippedCount_.get(key) ?? 0) + 1);
+                            return;
+                        }
+                        void this.rateLimiter_.record(key);
+                        const skippedCount = this.skippedCount_.get(key) ?? 0;
+                        if (skippedCount > 0) {
+                            message = Format("[skipped {} logs] ", skippedCount) + message;
+                            this.skippedCount_.delete(key);
+                        }
+                    }
                 }
                 processor.process(date, level, topics, message);
             }
@@ -112,6 +146,10 @@ const LoggerFactory = (...topics: string[]) => {
         },
         addBackend(name: string, level: any, processor?: any) {
             logger.addBackend(name, level, processor);
+        },
+        /// Configure the rate limiter of the global logger.
+        setRateLimiter(cache: any, options?: any) {
+            logger.setRateLimiter(cache, options);
         },
     };
 };

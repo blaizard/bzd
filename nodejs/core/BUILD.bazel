@@ -19,6 +19,7 @@ bzd_nodejs_library(
     visibility = ["//visibility:public"],
     deps = [
         ":format",
+        ":rate_limit",
     ],
 )
 
