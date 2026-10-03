@@ -340,7 +340,7 @@
 			dashboardClass(dashboard) {
 				return {
 					"dashboard-component": true,
-					"dashboard-component-medium": true,
+					["dashboard-component-" + (dashboard.size || "medium")]: true,
 				};
 			},
 			timeToServer(timestamp) {
@@ -458,12 +458,31 @@
 			height: calc(100% - 30px);
 		}
 
+		.dashboard-component-small {
+			width: 100%;
+			height: 150px;
+		}
+
 		.dashboard-component-medium {
 			width: 100%;
 			height: 300px;
 		}
 
+		.dashboard-component-large {
+			width: 100%;
+			height: 600px;
+		}
+
+		@container (width >= 400px) {
+			.dashboard-component-small {
+				width: 50%;
+			}
+		}
+
 		@container (width >= 800px) {
+			.dashboard-component-small {
+				width: 25%;
+			}
 			.dashboard-component-medium {
 				width: 50%;
 			}

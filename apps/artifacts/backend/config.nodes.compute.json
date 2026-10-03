@@ -124,6 +124,7 @@
             "inputs": {
                 "/data/log/{name}": {}
             },
+            "size": "large",
             "title": "Log {name}",
             "type": "log"
         }
