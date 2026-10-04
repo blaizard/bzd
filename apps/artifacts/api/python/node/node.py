@@ -366,7 +366,7 @@ class LoggerHandlerNode(LoggerHandler):
 						timestampUs=math.floor(log.timestamp * 1000000),
 						value={
 							self.name: {
-								"name": log.name,
+								"topic": log.name,
 								"level": log.level,
 								"source": f"{log.filename}:{log.line}",
 								"message": log.message,

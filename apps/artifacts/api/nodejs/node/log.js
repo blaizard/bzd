@@ -31,7 +31,7 @@ export class LoggerBackendNode {
 			timestampUs: date.getTime() * 1000,
 			value: {
 				[this.name]: {
-					name: (topics ?? []).join("::"),
+					topic: (topics ?? []).join("::"),
 					level: level,
 					message: message,
 					source: "",

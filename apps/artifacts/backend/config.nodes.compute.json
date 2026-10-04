@@ -134,8 +134,7 @@
             "expires": 30
         },
         "/data/log": {
-            "history": 100,
-            "toString": "[{level}] [{name}] [{source}] {message}"
+            "history": 100
         }
     },
     "nodes.mcp": {
@@ -259,6 +258,31 @@
                 "type": "object"
             },
             "description": "Disk I/O statistics per device, including inbound, outbound throughput and usage ratio.",
+            "type": "object"
+        },
+        "/data/log": {
+            "additionalProperties": {
+                "properties": {
+                    "level": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "topic": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "level",
+                    "message"
+                ],
+                "type": "object"
+            },
+            "description": "Log entries per log stream, with a mandatory level and message.",
             "type": "object"
         },
         "/data/memory": {
