@@ -100,9 +100,8 @@
 		watch: {
 			// Reload the logs when a new time window is selected.
 			timeRange(previous) {
-				const oldSpan = previous[0] === null || previous[1] === null ? null : previous[1] - previous[0];
-				const newSpan =
-					this.timeRange[0] === null || this.timeRange[1] === null ? null : this.timeRange[1] - this.timeRange[0];
+				const oldSpan = this.span(previous);
+				const newSpan = this.span(this.timeRange);
 				if (newSpan !== null && oldSpan !== newSpan) {
 					this.lines = [];
 					this.continuation = null;
@@ -148,29 +147,24 @@
 				}
 				this.fetchingOlder = true;
 				try {
-					const container = this.$refs.scrollContainer;
-					if (!container) {
-						return;
-					}
-					const scrollHeightBefore = container.scrollHeight;
 					const result = await this.fetchData({ continuation: this.continuation });
 					const entries = this.collectEntries(result);
 					this.continuation = result.continuation ?? null;
 					if (entries.length === 0) {
 						return;
 					}
-					const nbLinesBefore = this.lines.length;
-					this.lines = this.applyWindow(this.merge(this.lines, entries));
-					// Reached the beginning of the window, stop paging further.
-					if (this.lines.length !== nbLinesBefore) {
+					// Keep only the entries within the time window.
+					const inWindow = this.applyWindow(entries);
+					if (inWindow.length === 0) {
+						// Reached the beginning of the window, stop paging further.
+						this.continuation = null;
+						return;
+					}
+					// If the page crosses the window boundary, the next page is entirely outside.
+					if (inWindow.length !== entries.length) {
 						this.continuation = null;
 					}
-					// Keep the oldest entries, the newest ones are out of view.
-					if (this.lines.length > this.maxLines) {
-						this.lines.length = this.maxLines;
-					}
-					await this.$nextTick();
-					container.scrollTop += container.scrollHeight - scrollHeightBefore;
+					await this.addLines(inWindow);
 				} finally {
 					this.fetchingOlder = false;
 				}
@@ -182,27 +176,39 @@
 				this.fetchingNewer = true;
 				try {
 					const newest = this.lines.at(-1)?.[0];
-					const container = this.$refs.scrollContainer;
-					if (newest === undefined || !container) {
+					if (newest === undefined) {
 						return;
 					}
-					const scrollHeightBefore = container.scrollHeight;
 					const result = await this.fetchData({ after: newest });
 					const entries = this.collectEntries(result);
 					if (entries.length === 0) {
 						return;
 					}
-					this.lines = this.merge(this.lines, entries);
-					// Keep the newest entries, the oldest ones are out of view.
-					if (this.lines.length > this.maxLines) {
-						this.lines.splice(0, this.lines.length - this.maxLines);
-					}
-					this.lines = this.applyWindow(this.lines);
-					await this.$nextTick();
-					container.scrollTop += container.scrollHeight - scrollHeightBefore;
+					await this.addLines(entries, { keepNewest: true });
 				} finally {
 					this.fetchingNewer = false;
 				}
+			},
+			/// Merge new entries into the list, trimming to the time window and the maximum
+			/// number of lines, while preserving the current scroll position.
+			///
+			/// \param keepNewest If true, keep the newest lines, otherwise keep the oldest ones.
+			async addLines(entries, { keepNewest = false } = {}) {
+				const container = this.$refs.scrollContainer;
+				if (!container) {
+					return;
+				}
+				const scrollHeightBefore = container.scrollHeight;
+				this.lines = this.applyWindow(this.merge(this.lines, entries));
+				if (this.lines.length > this.maxLines) {
+					if (keepNewest) {
+						this.lines.splice(0, this.lines.length - this.maxLines);
+					} else {
+						this.lines.length = this.maxLines;
+					}
+				}
+				await this.$nextTick();
+				container.scrollTop += container.scrollHeight - scrollHeightBefore;
 			},
 			collectEntries(result) {
 				const entries = [];
@@ -211,10 +217,13 @@
 						entries.push([timestamp, value]);
 					}
 				}
-				return this.merge([], entries);
+				return entries.sort((a, b) => a[0] - b[0]);
 			},
 			merge(entries, newEntries) {
 				return [...entries, ...newEntries].sort((a, b) => a[0] - b[0]);
+			},
+			span(timeRange) {
+				return timeRange[0] === null || timeRange[1] === null ? null : timeRange[1] - timeRange[0];
 			},
 			windowStart() {
 				return this.timeRange[0] ?? null;
