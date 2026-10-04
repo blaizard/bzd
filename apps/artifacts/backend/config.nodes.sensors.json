@@ -5,6 +5,10 @@
                 "/data/temperature/{name}": {}
             },
             "min": 0,
+            "tags": [
+                "sensors",
+                "temperature"
+            ],
             "title": "Temperature {name}",
             "type": "linear",
             "unit": "Cel"
@@ -15,6 +19,10 @@
             },
             "max": 1,
             "min": 0,
+            "tags": [
+                "sensors",
+                "humidity"
+            ],
             "title": "Humidity {name}",
             "type": "linear",
             "unit": "%"
@@ -24,6 +32,10 @@
                 "/data/pm25/{name}": {}
             },
             "min": 0,
+            "tags": [
+                "sensors",
+                "pm25"
+            ],
             "title": "PM2.5 {name}",
             "type": "linear",
             "unit": "ug/m3"
@@ -33,6 +45,10 @@
                 "/data/pm10/{name}": {}
             },
             "min": 0,
+            "tags": [
+                "sensors",
+                "pm10"
+            ],
             "title": "PM10 {name}",
             "type": "linear",
             "unit": "ug/m3"
