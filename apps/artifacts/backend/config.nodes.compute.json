@@ -119,23 +119,11 @@
             "title": "Battery {name}",
             "type": "linear",
             "unit": "%"
-        },
-        {
-            "inputs": {
-                "/data/log/{name}": {}
-            },
-            "size": "large",
-            "title": "Log {name}",
-            "type": "log"
         }
     ],
     "nodes.handlers": {
         "/data/leases": {
             "expires": 30
-        },
-        "/data/log": {
-            "group": true,
-            "history": 100
         }
     },
     "nodes.mcp": {
@@ -259,31 +247,6 @@
                 "type": "object"
             },
             "description": "Disk I/O statistics per device, including inbound, outbound throughput and usage ratio.",
-            "type": "object"
-        },
-        "/data/log": {
-            "additionalProperties": {
-                "properties": {
-                    "level": {
-                        "type": "string"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "source": {
-                        "type": "string"
-                    },
-                    "topic": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "level",
-                    "message"
-                ],
-                "type": "object"
-            },
-            "description": "Log entries per log stream, with a mandatory level and message.",
             "type": "object"
         },
         "/data/memory": {

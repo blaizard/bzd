@@ -5,6 +5,7 @@ load("//nodejs/bazel:defs.bzl", "bzd_nodejs_config")
 
 exports_files([
     "config.nodes.compute.json",
+    "config.nodes.log.json",
     "config.nodes.sensors.json",
 ])
 
@@ -19,6 +20,7 @@ bzd_config_default(
     ],
     deps = [
         "config.nodes.compute.json",
+        "config.nodes.log.json",
         "config.nodes.sensors.json",
     ],
 )

@@ -1,0 +1,45 @@
+{
+    "nodes.dashboards": [
+        {
+            "inputs": {
+                "/data/log/{name}": {}
+            },
+            "size": "large",
+            "title": "Log {name}",
+            "type": "log"
+        }
+    ],
+    "nodes.handlers": {
+        "/data/log": {
+            "group": true,
+            "history": 100
+        }
+    },
+    "nodes.schema": {
+        "/data/log": {
+            "additionalProperties": {
+                "properties": {
+                    "level": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "topic": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "level",
+                    "message"
+                ],
+                "type": "object"
+            },
+            "description": "Log entries per log stream, with a mandatory level and message.",
+            "type": "object"
+        }
+    }
+}
