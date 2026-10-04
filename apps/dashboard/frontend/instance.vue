@@ -1,5 +1,11 @@
 <template>
-	<div v-for="(tile, key) in tiles" :style="getStyle(key)" :class="getClass(key)" :key="uid + '-' + key">
+	<div
+		v-for="(tile, key) in tiles"
+		:style="getStyle(key)"
+		:class="getClass(key)"
+		:key="uid + '-' + key"
+		v-heartbeat="heartbeat(key)"
+	>
 		<div :class="getTileClass(key)" @click="handleClick(key)">
 			<component
 				class="content"
@@ -31,6 +37,7 @@
 	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import DirectiveTooltip from "#bzd/nodejs/vue/directives/tooltip.js";
+	import DirectiveHeartbeat from "#bzd/nodejs/vue/directives/heartbeat.js";
 	import Plugins from "../plugins/plugins.frontend.index.js";
 	import Color from "#bzd/nodejs/utils/color.js";
 	import LogFactory from "#bzd/nodejs/core/log.js";
@@ -48,6 +55,7 @@
 		directives: {
 			loading: DirectiveLoading,
 			tooltip: DirectiveTooltip,
+			heartbeat: DirectiveHeartbeat,
 		},
 		data: function () {
 			return {
@@ -55,6 +63,7 @@
 				handleTimeout: null,
 				color: null,
 				icon: null,
+				fetchCount: 0,
 			};
 		},
 		mounted() {
@@ -182,6 +191,14 @@
 					active: this.tiles[key].active,
 				};
 			},
+			/// The heartbeat state of a tile, using the tile foreground color for visibility.
+			heartbeat(key) {
+				return {
+					counter: this.fetchCount,
+					period: this.sourceType ? this.timeout : 60000,
+					color: Colors[this.getColorForeground(key)],
+				};
+			},
 			handleError(key, e) {
 				this.handleStatus(key, ["error", e]);
 			},
@@ -262,6 +279,7 @@
 			},
 			async fetch() {
 				this.handleTimeout = null;
+				++this.fetchCount;
 				try {
 					const data = await this.$rest.request("get", "/data", {
 						uid: this.uid,

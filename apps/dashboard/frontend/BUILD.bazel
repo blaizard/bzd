@@ -38,6 +38,7 @@ bzd_nodejs_web_binary(
         "//nodejs/utils:color",
         "//nodejs/vue/apps:frontend",
         "//nodejs/vue/components/form",
+        "//nodejs/vue/directives:heartbeat",
         "//nodejs/vue/directives:loading",
         "//nodejs/vue/directives:tooltip",
     ],
