@@ -51,7 +51,7 @@
 	import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
-	import { dateToDefaultString, timeToString } from "#bzd/nodejs/utils/to_string.js";
+	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.js";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
 	import Lock from "#bzd/nodejs/core/lock.js";
@@ -215,15 +215,7 @@
 					timestampOldest ? dateToDefaultString(timestampOldest / 1000) : "?",
 					timestampNewest ? dateToDefaultString(timestampNewest / 1000) : "?",
 				];
-				return result.join(" - ") + this.timeRangeAgoString;
-			},
-			timeRangeAgoString() {
-				const timestampNewest = this.timeRange[1];
-				if (timestampNewest === null) {
-					return "";
-				}
-				const durationS = Math.max(this.timestampUsReactive + this.timestampDiff - timestampNewest, 0) / 1000000;
-				return ` (updated ${timeToString(durationS, 0)} ago)`;
+				return result.join(" - ");
 			},
 			formDescription() {
 				return [
