@@ -225,12 +225,17 @@
 				font-family: monospace;
 			}
 
+			tr:hover {
+				background-color: #333;
+			}
+
 			th,
 			td {
 				padding: 4px 10px;
 				text-align: left;
 				vertical-align: top;
 				line-height: 1.4;
+				border: none;
 			}
 
 			th {

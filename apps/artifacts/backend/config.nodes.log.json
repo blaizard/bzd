@@ -5,6 +5,9 @@
                 "/data/log/{name}": {}
             },
             "size": "large",
+            "tags": [
+                "log"
+            ],
             "title": "Log {name}",
             "type": "log"
         }

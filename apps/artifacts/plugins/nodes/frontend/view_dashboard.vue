@@ -1,8 +1,20 @@
 <template>
 	<div class="view-dashboard">
+		<div class="tags" v-if="availableTags.length > 0">
+			<button class="tag" :class="{ active: selectedTag === null }" @click="selectTag(null)">All</button>
+			<button
+				class="tag"
+				v-for="tag in availableTags"
+				:key="tag"
+				:class="{ active: selectedTag === tag }"
+				@click="selectTag(tag)"
+			>
+				{{ tag }}
+			</button>
+		</div>
 		<Form :description="formDescription" v-model="options"></Form>
 		<div class="components" v-loading="loading" ref="componentContainer">
-			<div :class="dashboardClass(dashboard)" v-for="dashboard in dashboards">
+			<div :class="dashboardClass(dashboard)" v-for="dashboard in displayedDashboards">
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
 				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
 				<ViewGraph
@@ -69,6 +81,7 @@
 				inputs: new TimeseriesCollection(),
 				options: {
 					interval: "Last 15 minutes",
+					tags: null,
 				},
 				timeout: null,
 				periodUs: null,
@@ -160,6 +173,17 @@
 					},
 				};
 			},
+			availableTags() {
+				return [...new Set(this.dashboards.map((dashboard) => dashboard.tags || []).flat())].sort();
+			},
+			selectedTag() {
+				const tag = this.options.tags;
+				return tag && this.availableTags.includes(tag) ? tag : null;
+			},
+			displayedDashboards() {
+				const tag = this.selectedTag;
+				return tag ? this.dashboards.filter((dashboard) => (dashboard.tags || []).includes(tag)) : this.dashboards;
+			},
 			dashboardEndpoint() {
 				const [volume, ...key] = this.pathList;
 				return "/x/" + encodeURIComponent(volume) + "/@dashboards" + Utils.keyToPath(key);
@@ -203,13 +227,18 @@
 					},
 					{
 						type: "Message",
-						value: this.dashboards.length > 0 ? this.timeRangeString : "No dashboards",
+						value: this.displayedDashboards.length > 0 ? this.timeRangeString : "No dashboards",
 						align: "center",
 					},
 				];
 			},
 		},
 		methods: {
+			async selectTag(tag) {
+				this.options.tags = tag || null;
+				await this.$nextTick();
+				this.viewportUpdated();
+			},
 			handleScroll() {
 				clearTimeout(this.viewportUpdatedTimeout);
 				this.viewportUpdatedTimeout = setTimeout(this.viewportUpdated, 100);
@@ -228,7 +257,7 @@
 							return;
 						}
 						viewport.width = Math.max(viewport.width, rect.width);
-						viewport.dashboards.push(this.dashboards[index]);
+						viewport.dashboards.push(this.displayedDashboards[index]);
 					});
 				// Update only if needed.
 				if (
@@ -433,6 +462,30 @@
 </script>
 
 <style lang="scss" scoped>
+	@use "@/nodejs/styles/default/css/form/config.scss" as *;
+
+	.tags {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 6px;
+		padding: 4px 0;
+
+		.tag {
+			@extend %clickable;
+			@extend %actioner-reset;
+
+			color: $actionerTextColor;
+			background-color: $actionerBgColor;
+			border-radius: 10px;
+
+			&.active {
+				color: $fieldSpecialTextColor;
+				background-color: $fieldSpecialBgColor;
+			}
+		}
+	}
+
 	.components {
 		display: flex;
 		flex-direction: row;
