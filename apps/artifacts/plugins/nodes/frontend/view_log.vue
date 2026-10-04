@@ -1,10 +1,32 @@
 <template>
 	<div class="view-log">
 		<div class="view-log-lines" ref="scrollContainer" @scroll="handleScroll" v-loading="loading">
-			<div v-if="lines.length === 0" class="view-log-empty">No logs</div>
-			<div v-for="(line, index) in lines" :key="index" :class="['view-log-line', lineClass(line[1])]">
-				{{ formatLine(line[1]) }}
-			</div>
+			<table>
+				<thead>
+					<tr>
+						<th>Timestamp</th>
+						<th>Level</th>
+						<th>Topics</th>
+						<th>Source</th>
+						<th>Message</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-if="lines.length === 0">
+						<td colspan="5" class="view-log-empty">No logs</td>
+					</tr>
+					<tr v-for="(line, index) in lines" :key="index" :class="lineClass(line[1])">
+						<td v-if="isLegacy(line[1])" colspan="5" class="view-log-message">{{ line[1] }}</td>
+						<template v-else>
+							<td class="view-log-timestamp">{{ formatTimestamp(line[0]) }}</td>
+							<td class="view-log-level">{{ line[1].level || "-" }}</td>
+							<td class="view-log-topics">{{ line[1].topic || "-" }}</td>
+							<td class="view-log-source">{{ line[1].source || "-" }}</td>
+							<td class="view-log-message">{{ line[1].message }}</td>
+						</template>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </template>
@@ -13,6 +35,7 @@
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Base, Component],
@@ -161,25 +184,11 @@
 					expect: "json",
 				});
 			},
-			/// Reconstruct the display string of a log entry.
-			///
-			/// The value is either a legacy string or a dictionary of log fields.
-			formatLine(value) {
-				if (typeof value === "string") {
-					return value;
-				}
-				const parts = [];
-				if (value.level) {
-					parts.push(`[${value.level}]`);
-				}
-				if (value.topic) {
-					parts.push(`[${value.topic}]`);
-				}
-				if (value.source) {
-					parts.push(`[${value.source}]`);
-				}
-				parts.push(value.message ?? "");
-				return parts.join(" ");
+			formatTimestamp(timestampUs) {
+				return dateToDefaultString(timestampUs / 1000);
+			},
+			isLegacy(value) {
+				return typeof value === "string";
 			},
 			lineClass(value) {
 				const level = typeof value === "string" ? /^\[(\w+)\]/.exec(value)?.[1] : value.level;
@@ -208,15 +217,46 @@
 			overflow-y: auto;
 			background-color: #222;
 			color: #ddd;
-			font-family: monospace;
 			font-size: 13px;
-			padding: 10px 0;
 
-			.view-log-line {
-				padding: 0 10px;
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-family: monospace;
+			}
+
+			th,
+			td {
+				padding: 4px 10px;
+				text-align: left;
+				vertical-align: top;
 				line-height: 1.4;
+			}
+
+			th {
+				position: sticky;
+				top: 0;
+				z-index: 1;
+				background-color: #2c2c2c;
+				border-bottom: 1px solid #444;
+			}
+
+			.view-log-timestamp,
+			.view-log-level,
+			.view-log-topics,
+			.view-log-source {
+				white-space: nowrap;
+			}
+
+			.view-log-message {
 				white-space: pre-wrap;
 				word-break: break-all;
+			}
+
+			.view-log-empty {
+				padding: 10px;
+				color: #888;
+				text-align: center;
 			}
 
 			.view-log-line-error {
@@ -229,11 +269,6 @@
 			}
 
 			.view-log-line-debug {
-				color: #888;
-			}
-
-			.view-log-empty {
-				padding: 10px;
 				color: #888;
 			}
 		}
