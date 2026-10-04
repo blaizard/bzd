@@ -29,8 +29,9 @@
 					v-else-if="dashboard.type === 'log'"
 					:options="dashboard"
 					:endpoint="endpoint"
+					:timeRange="timeRange"
 					:wrap="options.wrap"
-					@update:wrap="options.wrap = $event"
+					@update:wrap="options = { ...options, wrap: $event }"
 					class="dashboard-component-graph"
 				>
 				</ViewLog>
@@ -98,8 +99,11 @@
 			async triggerConditionsChange() {
 				await this.triggerFetch();
 			},
-			options() {
-				LocalStorage.setSerializable(optionsStorageKey, this.options);
+			options: {
+				deep: true,
+				handler() {
+					LocalStorage.setSerializable(optionsStorageKey, this.options);
+				},
 			},
 		},
 		async mounted() {
@@ -196,11 +200,11 @@
 				return "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid);
 			},
 			timeRange() {
-				const [_, timestampNewest] = this.inputs.timeRange;
-				if (timestampNewest === null || this.periodUs === null) {
+				if (this.periodUs === null || this.timestampUsReactive === null) {
 					return [null, null];
 				}
-				return [timestampNewest - this.periodUs, timestampNewest];
+				const timestampNewestUs = this.timestampUsReactive + this.timestampDiff;
+				return [timestampNewestUs - this.periodUs, timestampNewestUs];
 			},
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;
@@ -238,7 +242,7 @@
 		},
 		methods: {
 			async selectTag(tag) {
-				this.options.tags = tag || null;
+				this.options = Object.assign({}, this.options, { tags: tag || null });
 				await this.$nextTick();
 				this.viewportUpdated();
 			},

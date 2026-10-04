@@ -58,6 +58,7 @@
 		props: {
 			options: { mandatory: true, type: Object },
 			endpoint: { mandatory: true, type: String },
+			timeRange: { mandatory: true, type: Array },
 			wrap: { mandatory: true, type: Boolean },
 		},
 		data: function () {
@@ -96,6 +97,19 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
+		watch: {
+			// Reload the logs when a new time window is selected.
+			timeRange(previous) {
+				const oldSpan = previous[0] === null || previous[1] === null ? null : previous[1] - previous[0];
+				const newSpan =
+					this.timeRange[0] === null || this.timeRange[1] === null ? null : this.timeRange[1] - this.timeRange[0];
+				if (newSpan !== null && oldSpan !== newSpan) {
+					this.lines = [];
+					this.continuation = null;
+					this.fetchInitial();
+				}
+			},
+		},
 		emits: ["update:wrap"],
 		methods: {
 			async handleScroll() {
@@ -110,8 +124,8 @@
 			/// it overflows or the history is exhausted.
 			async fetchInitial() {
 				const container = this.$refs.scrollContainer;
-				const result = await this.fetchData({});
-				this.lines = this.collectEntries(result);
+				const result = await this.fetchData({ after: this.windowStart() });
+				this.lines = this.applyWindow(this.collectEntries(result));
 				this.continuation = result.continuation ?? null;
 				await this.$nextTick();
 
@@ -145,7 +159,12 @@
 					if (entries.length === 0) {
 						return;
 					}
-					this.lines = this.merge(this.lines, entries);
+					const nbLinesBefore = this.lines.length;
+					this.lines = this.applyWindow(this.merge(this.lines, entries));
+					// Reached the beginning of the window, stop paging further.
+					if (this.lines.length !== nbLinesBefore) {
+						this.continuation = null;
+					}
 					// Keep the oldest entries, the newest ones are out of view.
 					if (this.lines.length > this.maxLines) {
 						this.lines.length = this.maxLines;
@@ -178,6 +197,7 @@
 					if (this.lines.length > this.maxLines) {
 						this.lines.splice(0, this.lines.length - this.maxLines);
 					}
+					this.lines = this.applyWindow(this.lines);
 					await this.$nextTick();
 					container.scrollTop += container.scrollHeight - scrollHeightBefore;
 				} finally {
@@ -195,6 +215,13 @@
 			},
 			merge(entries, newEntries) {
 				return [...entries, ...newEntries].sort((a, b) => a[0] - b[0]);
+			},
+			windowStart() {
+				return this.timeRange[0] ?? null;
+			},
+			applyWindow(entries) {
+				const start = this.windowStart();
+				return start === null ? entries : entries.filter(([timestamp]) => timestamp >= start);
 			},
 			async fetchData({ continuation = null, after = null } = {}) {
 				const query = Object.fromEntries(
