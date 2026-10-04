@@ -58,14 +58,15 @@ class EventsFactory {
 	};
 
 	// Register plugins.
+	const pluginServices = backend.services.makeProvider("plugins");
 	for (const [type, data] of Object.entries(Plugins)) {
 		// Only handle backend modules.
 		if ("module" in data) {
 			const PluginClass = (await data.module()).default;
 			pluginClasses[type] = PluginClass;
 
-			// Register cache entries.
-			PluginClass.register(cache);
+			// Register cache entries and lifecycle hooks.
+			PluginClass.register(cache, pluginServices);
 
 			// Register cache for the plugins.
 			let options = {};

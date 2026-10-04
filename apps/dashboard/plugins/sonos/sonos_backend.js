@@ -1,7 +1,9 @@
 import Sonos from "sonos";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import LogFactory from "#bzd/nodejs/core/log.js";
 
 const Exception = ExceptionFactory("plugin", "sonos");
+const Log = LogFactory("plugin", "sonos");
 
 function _getState(state) {
 	if (state == "playing" || state == "transitioning") {
@@ -61,7 +63,26 @@ export default class SonosBackend {
 		});
 	}
 
-	static register(cache) {
+	static register(cache, services) {
+		// Stop the sonos listener on shutdown so the process can exit and free its port.
+		services.addStopProcess("sonos.listener.stop", async () => {
+			const listener = Sonos.Listener;
+			if (!listener.isListening()) {
+				return;
+			}
+			// Clear the library's internal subscription renew timers so the process can exit.
+			for (const subscription of listener._deviceSubscriptions) {
+				if (subscription._renewTimer) {
+					clearInterval(subscription._renewTimer);
+				}
+			}
+			try {
+				await Promise.race([listener.stopListener(), new Promise((resolve) => setTimeout(resolve, 1000))]);
+			} catch (e) {
+				Log.warning("Failed to stop the sonos listener: {}", String(e));
+			}
+		});
+
 		cache.register(
 			"sonos.device",
 			async (key, context) => {
