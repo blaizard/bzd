@@ -1,6 +1,15 @@
 <template>
 	<div class="view-log">
-		<div class="view-log-lines" ref="scrollContainer" @scroll="handleScroll" v-loading="loading">
+		<div class="view-log-toolbar">
+			<Form :description="formDescription" v-model="wrapModel"></Form>
+		</div>
+		<div
+			class="view-log-lines"
+			:class="{ 'view-log-nowrap': !wrap }"
+			ref="scrollContainer"
+			@scroll="handleScroll"
+			v-loading="loading"
+		>
 			<table>
 				<thead>
 					<tr>
@@ -34,17 +43,22 @@
 <script>
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
 	export default {
 		mixins: [Base, Component],
+		components: {
+			Form,
+		},
 		directives: {
 			loading: DirectiveLoading,
 		},
 		props: {
 			options: { mandatory: true, type: Object },
 			endpoint: { mandatory: true, type: String },
+			wrap: { mandatory: true, type: Boolean },
 		},
 		data: function () {
 			return {
@@ -58,6 +72,19 @@
 				liveTimer: null,
 			};
 		},
+		computed: {
+			formDescription() {
+				return [{ type: "Checkbox", name: "wrap", text: "Wrap" }];
+			},
+			wrapModel: {
+				get() {
+					return { wrap: this.wrap };
+				},
+				set(value) {
+					this.$emit("update:wrap", value.wrap);
+				},
+			},
+		},
 		async mounted() {
 			await this.handleSubmit(async () => {
 				await this.fetchInitial();
@@ -69,6 +96,7 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
+		emits: ["update:wrap"],
 		methods: {
 			async handleScroll() {
 				const container = this.$refs.scrollContainer;
@@ -211,10 +239,20 @@
 <style lang="scss" scoped>
 	.view-log {
 		height: 100%;
+		display: flex;
+		flex-direction: column;
+
+		.view-log-toolbar {
+			display: flex;
+			align-items: center;
+			padding: 4px 10px;
+		}
 
 		.view-log-lines {
-			height: 100%;
+			flex: 1;
+			min-height: 0;
 			overflow-y: auto;
+			overflow-x: auto;
 			background-color: #222;
 			color: #ddd;
 			font-size: 13px;
@@ -256,6 +294,18 @@
 			.view-log-message {
 				white-space: pre-wrap;
 				word-break: break-all;
+			}
+
+			&.view-log-nowrap {
+				table {
+					width: max-content;
+					min-width: 100%;
+				}
+
+				.view-log-message {
+					white-space: pre;
+					word-break: normal;
+				}
 			}
 
 			.view-log-empty {

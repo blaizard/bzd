@@ -29,6 +29,8 @@
 					v-else-if="dashboard.type === 'log'"
 					:options="dashboard"
 					:endpoint="endpoint"
+					:wrap="options.wrap"
+					@update:wrap="options.wrap = $event"
 					class="dashboard-component-graph"
 				>
 				</ViewLog>
@@ -82,6 +84,7 @@
 				options: {
 					interval: "Last 15 minutes",
 					tags: null,
+					wrap: false,
 				},
 				timeout: null,
 				periodUs: null,
