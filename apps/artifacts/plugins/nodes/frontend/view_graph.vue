@@ -33,11 +33,7 @@
 				}
 			},
 			timeRange() {
-				if (this.timeRange[0] && this.timeRange[1]) {
-					this.chart.options.scales.x.min = this.timeRange[0] / 1000;
-					this.chart.options.scales.x.max = this.timeRange[1] / 1000;
-					this.chart.update("none"); // "none" suppress animation.
-				}
+				this.applyTimeRange();
 			},
 		},
 		mounted() {
@@ -111,6 +107,7 @@
 					},
 				}),
 			);
+			this.applyTimeRange();
 		},
 		beforeUnmount() {
 			if (this.chart) {
@@ -171,6 +168,13 @@
 						});
 					default:
 						Exception.unreachable("Unsupported graph type: '{}'.", this.graphType);
+				}
+			},
+			applyTimeRange() {
+				if (this.chart && this.timeRange[0] && this.timeRange[1]) {
+					this.chart.options.scales.x.min = this.timeRange[0] / 1000;
+					this.chart.options.scales.x.max = this.timeRange[1] / 1000;
+					this.chart.update("none"); // "none" suppress animation.
 				}
 			},
 		},
