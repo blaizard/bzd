@@ -32,6 +32,7 @@ export default class Nodes {
 					token: token,
 					path: ["data"],
 					children: 3,
+					metadata: true,
 					include: [
 						["active"],
 						["battery"],
@@ -99,7 +100,16 @@ export default class Nodes {
 		}
 
 		// Set to tree and to list.
-		const formatted = Object.entries(clusters).map(([key, data]) => Object.assign({ key: key }, Node.toTree(data)));
+		const formatted = Object.entries(clusters).map(([key, data]) => {
+			// The values are [timestamp, value] tuples: compute the latest timestamp
+			// and strip the timestamps to keep the values as before.
+			let latestTimestamp = 0;
+			const stripped = data.map(([subKey, entry]) => {
+				latestTimestamp = Math.max(latestTimestamp, entry[0]);
+				return [subKey, entry[1]];
+			});
+			return Object.assign({ key: key, latestTimestamp: latestTimestamp }, Node.toTree(stripped));
+		});
 
 		// Sort to ensure node order consistency on the dashboard.
 		return formatted.sort((a, b) => a.key.localeCompare(b.key));

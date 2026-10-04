@@ -192,9 +192,11 @@
 				};
 			},
 			/// The heartbeat state of a tile, using the tile foreground color for visibility.
+
 			heartbeat(key) {
+				const latestTimestamp = this.tiles[key]?.data?.latestTimestamp;
 				return {
-					counter: this.fetchCount,
+					counter: latestTimestamp === undefined ? this.fetchCount : Math.floor(latestTimestamp / 1000000),
 					period: this.sourceType ? this.timeout : 60000,
 					color: Colors[this.getColorForeground(key)],
 				};
