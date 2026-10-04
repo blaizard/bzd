@@ -34,7 +34,6 @@ export class LoggerBackendNode {
 					topic: (topics ?? []).join("::"),
 					level: level,
 					message: message,
-					source: "",
 				},
 			},
 		});

@@ -3,7 +3,7 @@
 		<div class="view-log-lines" ref="scrollContainer" @scroll="handleScroll" v-loading="loading">
 			<div v-if="lines.length === 0" class="view-log-empty">No logs</div>
 			<div v-for="(line, index) in lines" :key="index" :class="['view-log-line', lineClass(line[1])]">
-				{{ line[1] }}
+				{{ formatLine(line[1]) }}
 			</div>
 		</div>
 	</div>
@@ -143,18 +143,7 @@
 				return this.merge([], entries);
 			},
 			merge(entries, newEntries) {
-				const combined = [...entries, ...newEntries];
-				combined.sort((a, b) => a[0] - b[0]);
-				const result = [];
-				let previous = null;
-				for (const entry of combined) {
-					if (previous !== null && previous[0] === entry[0] && previous[1] === entry[1]) {
-						continue;
-					}
-					result.push(entry);
-					previous = entry;
-				}
-				return result;
+				return [...entries, ...newEntries].sort((a, b) => a[0] - b[0]);
 			},
 			async fetchData({ continuation = null, after = null } = {}) {
 				const query = Object.fromEntries(
@@ -172,12 +161,29 @@
 					expect: "json",
 				});
 			},
-			lineClass(value) {
-				const match = /^\[(\w+)\]/.exec(value);
-				if (!match) {
-					return null;
+			/// Reconstruct the display string of a log entry.
+			///
+			/// The value is either a legacy string or a dictionary of log fields.
+			formatLine(value) {
+				if (typeof value === "string") {
+					return value;
 				}
-				switch (match[1]) {
+				const parts = [];
+				if (value.level) {
+					parts.push(`[${value.level}]`);
+				}
+				if (value.topic) {
+					parts.push(`[${value.topic}]`);
+				}
+				if (value.source) {
+					parts.push(`[${value.source}]`);
+				}
+				parts.push(value.message ?? "");
+				return parts.join(" ");
+			},
+			lineClass(value) {
+				const level = typeof value === "string" ? /^\[(\w+)\]/.exec(value)?.[1] : value.level;
+				switch (level) {
 					case "error":
 						return "view-log-line-error";
 					case "warning":

@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import GroupHandler from "#bzd/nodejs/db/data/handlers/group.js";
 import ToStringHandler from "#bzd/nodejs/db/data/handlers/to_string.js";
 import ExpiresHandler from "#bzd/nodejs/db/data/handlers/expires.js";
 import UnitHandler from "#bzd/nodejs/db/data/handlers/unit.js";
@@ -12,6 +13,7 @@ const Log = LogFactory("db", "data", "handlers");
 
 const sortedAvailableHandlers = [
 	["validation", ValidationHandler],
+	["group", GroupHandler],
 	["toString", ToStringHandler],
 	["expires", ExpiresHandler],
 	["unit", UnitHandler],

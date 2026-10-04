@@ -65,6 +65,25 @@ describe("Influxdb", () => {
 		}
 	});
 
+	describe("fromValueToFields", () => {
+		it("serializes a dictionary as a single JSON field that round-trips", () => {
+			const value = { topic: "a::b", level: "info", message: "hello" };
+			const fields = DatabaseInfluxDB.fromValueToFields("a.b", value);
+			Exception.assertEqual(fields.length, 1);
+			Exception.assert(fields[0].startsWith('a.b="'));
+			// Unquote the line-protocol field value to get the stored JSON string.
+			const rawStoredValue = JSON.parse(fields[0].slice(fields[0].indexOf("=") + 1));
+			Exception.assertEqual(DatabaseInfluxDB.fromDBValueToValue(rawStoredValue), value);
+		});
+
+		it("serializes an array as a single JSON field", () => {
+			const fields = DatabaseInfluxDB.fromValueToFields("a.b", [0, 1, 0.5]);
+			Exception.assertEqual(fields.length, 1);
+			const rawStoredValue = JSON.parse(fields[0].slice(fields[0].indexOf("=") + 1));
+			Exception.assertEqual(DatabaseInfluxDB.fromDBValueToValue(rawStoredValue), [0, 1, 0.5]);
+		});
+	});
+
 	describe("timestampToInflux", () => {
 		it("converts microseconds to nanoseconds", () => {
 			const database = makeDatabase();

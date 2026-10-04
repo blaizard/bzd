@@ -62,6 +62,9 @@ export default class DatabaseInfluxDB extends Database {
 	}
 
 	/// Convert a value into influxdb fields.
+	///
+	/// Arrays and dictionaries are serialized into a single JSON field, so they
+	/// can be reconstructed back as a single value on read.
 	static fromValueToFields(key, value) {
 		if (typeof value === "number") {
 			return [key + "=" + value];
@@ -74,10 +77,7 @@ export default class DatabaseInfluxDB extends Database {
 		} else if (value === null) {
 			return [];
 		} else if (typeof value === "object") {
-			return Object.entries(value).reduce(
-				(acc, [k, v]) => acc.concat(DatabaseInfluxDB.fromValueToFields(key + "." + k, v)),
-				[],
-			);
+			return [key + "=" + JSON.stringify(JSON.stringify(value))];
 		}
 		return [];
 	}

@@ -134,6 +134,7 @@
             "expires": 30
         },
         "/data/log": {
+            "group": true,
             "history": 100
         }
     },

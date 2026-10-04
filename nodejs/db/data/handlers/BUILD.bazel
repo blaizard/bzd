@@ -10,12 +10,23 @@ bzd_nodejs_library(
     ],
     deps = [
         ":expires",
+        ":group",
         ":history",
         ":to_string",
         ":unit",
         ":validation",
         "//nodejs/core:exception",
         "//nodejs/core:log",
+        "//nodejs/db/data:key_mapping",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "group",
+    srcs = [
+        "group.js",
+    ],
+    deps = [
         "//nodejs/db/data:key_mapping",
     ],
 )

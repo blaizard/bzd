@@ -148,6 +148,59 @@ describe("Handlers", () => {
 		]);
 	});
 
+	it("group", () => {
+		const handlers = new Handlers({
+			"/a": {
+				group: true,
+			},
+		});
+		const result = handlers.process([
+			[["a", "name", "b"], "value1"],
+			[["c"], "value4"],
+			[["a", "name", "d"], "value6"],
+			[["a", "other", "b"], "value7"],
+		]);
+		Exception.assertEqual(result, [
+			[["a", "name"], { b: "value1", d: "value6" }, {}],
+			[["a", "other"], { b: "value7" }, {}],
+			[["c"], "value4", {}],
+		]);
+	});
+
+	it("group scalar leaves untouched", () => {
+		const handlers = new Handlers({
+			"/a": {
+				group: true,
+			},
+		});
+		const result = handlers.process([
+			[["a", "name"], "value1"],
+			[["a", "name", "b"], "value2"],
+		]);
+		Exception.assertEqual(result, [
+			[["a", "name"], "value1", {}],
+			[["a", "name"], { b: "value2" }, {}],
+		]);
+	});
+
+	it("group combined", () => {
+		const handlers = new Handlers({
+			"/a": {
+				group: true,
+				history: 2,
+			},
+		});
+		const result = handlers.process([
+			[["a", "name", "b"], "value1"],
+			[["c"], "value4"],
+			[["a", "name", "d"], "value6"],
+		]);
+		Exception.assertEqual(result, [
+			[["a", "name"], { b: "value1", d: "value6" }, { history: 2 }],
+			[["c"], "value4", {}],
+		]);
+	});
+
 	it("validation root", () => {
 		const handlers = new Handlers({
 			"/a": {
