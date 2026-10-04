@@ -55,3 +55,14 @@ bzd_nodejs_library(
         ":mask",
     ],
 )
+
+bzd_nodejs_library(
+    name = "heartbeat",
+    srcs = [
+        "heartbeat.js",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//nodejs:vue",
+    ],
+)

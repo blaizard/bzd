@@ -47,6 +47,9 @@
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
+	/// The expected period between live fetches, in milliseconds.
+	const livePeriodMs = 3000;
+
 	export default {
 		mixins: [Base, Component],
 		components: {
@@ -92,7 +95,7 @@
 			});
 			this.liveTimer = setInterval(() => {
 				this.fetchLive();
-			}, 3000);
+			}, livePeriodMs);
 		},
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
@@ -109,7 +112,7 @@
 				}
 			},
 		},
-		emits: ["update:wrap"],
+		emits: ["update:wrap", "fetch"],
 		methods: {
 			async handleScroll() {
 				const container = this.$refs.scrollContainer;
@@ -233,6 +236,7 @@
 				return start === null ? entries : entries.filter(([timestamp]) => timestamp >= start);
 			},
 			async fetchData({ continuation = null, after = null } = {}) {
+				this.$emit("fetch", livePeriodMs);
 				const query = Object.fromEntries(
 					Object.entries({
 						include: Object.keys(this.options.inputs).join(","),

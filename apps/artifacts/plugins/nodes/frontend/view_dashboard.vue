@@ -14,7 +14,11 @@
 		</div>
 		<Form :description="formDescription" v-model="options"></Form>
 		<div class="components" v-loading="loading" ref="componentContainer">
-			<div :class="dashboardClass(dashboard)" v-for="dashboard in displayedDashboards">
+			<div
+				:class="dashboardClass(dashboard)"
+				v-for="dashboard in displayedDashboards"
+				v-heartbeat="heartbeat(dashboard)"
+			>
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
 				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
 				<ViewGraph
@@ -32,6 +36,7 @@
 					:timeRange="timeRange"
 					:wrap="options.wrap"
 					@update:wrap="options = { ...options, wrap: $event }"
+					@fetch="onFetch(dashboard, $event)"
 					class="dashboard-component-graph"
 				>
 				</ViewLog>
@@ -51,6 +56,7 @@
 	import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
+	import DirectiveHeartbeat from "#bzd/nodejs/vue/directives/heartbeat.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 	import { arrayFindCommonPrefix } from "#bzd/nodejs/utils/array.js";
 	import LocalStorage from "#bzd/nodejs/core/localstorage.js";
@@ -67,6 +73,7 @@
 		},
 		directives: {
 			loading: DirectiveLoading,
+			heartbeat: DirectiveHeartbeat,
 		},
 		data: function () {
 			return {
@@ -87,6 +94,10 @@
 					tags: null,
 					wrap: false,
 				},
+				// Per-dashboard heartbeat state: { counter, period }, used by the heartbeat directive.
+				heartbeats: new Map(),
+				// Expected refresh period of the graph data, in milliseconds.
+				refreshPeriodMs: null,
 				timeout: null,
 				periodUs: null,
 				lock: new Lock(),
@@ -233,6 +244,18 @@
 			},
 		},
 		methods: {
+			/// Record a server fetch of a dashboard and its expected period.
+			onFetch(dashboard, period) {
+				const previous = this.heartbeats.get(dashboard) ?? { counter: 0 };
+				this.heartbeats.set(dashboard, {
+					counter: previous.counter + 1,
+					period: period ?? previous.period ?? 3000,
+				});
+			},
+			/// Get the heartbeat state of a dashboard, used as the directive value.
+			heartbeat(dashboard) {
+				return this.heartbeats.get(dashboard) ?? { counter: 0, period: 3000 };
+			},
 			async selectTag(tag) {
 				this.options = Object.assign({}, this.options, { tags: tag || null });
 				await this.$nextTick();
@@ -311,7 +334,7 @@
 						this.inputs.add(data);
 
 						// Adjust the refresh period to match the sampling of the graph.
-						const refreshPeriodMs = Math.max(periodUs / nbSamples / 1000, 1000);
+						this.refreshPeriodMs = Math.max(periodUs / nbSamples / 1000, 1000);
 						this.inputs.refreshPeriodically(async ([_, timestampNewestLocal]) => {
 							const timestampNewestRemote = Math.max(timestampUs() + timestampDiff, timestampNewestLocal + 1);
 							const periodRequestedUs = timestampNewestRemote - timestampNewestLocal;
@@ -325,7 +348,7 @@
 									all: false,
 								});
 							}
-						}, refreshPeriodMs);
+						}, this.refreshPeriodMs);
 					}
 				} finally {
 					this.loading = false;
@@ -417,6 +440,7 @@
 					async () => {
 						// Make requests as chunks.
 						const includes = this.inputsKeysFromDashboards(all ? this.dashboards : this.viewport.dashboards);
+						const fetchedKeys = new Set(includes);
 						let promises = [];
 						while (includes.length) {
 							const chunk = includes.splice(0, 100);
@@ -437,6 +461,14 @@
 									expect: "json",
 								}),
 							);
+						}
+						if (promises.length) {
+							// Signal only the displayed dashboards whose inputs were fetched.
+							for (const dashboard of this.displayedDashboards) {
+								if (Object.keys(dashboard.inputs).some((key) => fetchedKeys.has(key))) {
+									this.onFetch(dashboard, this.refreshPeriodMs ?? 1000);
+								}
+							}
 						}
 						const results = await Promise.all(promises);
 
