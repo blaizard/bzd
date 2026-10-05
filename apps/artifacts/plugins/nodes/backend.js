@@ -648,6 +648,12 @@ export default class Plugin extends PluginBase {
 										type: "boolean",
 										default: false,
 									},
+									fresh: {
+										description:
+											"If true, only return the entries that have not expired yet, otherwise all entries are returned.",
+										type: "boolean",
+										default: false,
+									},
 									children: {
 										description: "Number of nested levels to include as children.",
 										type: "integer",
@@ -715,6 +721,7 @@ export default class Plugin extends PluginBase {
 								before: args.before,
 								include: args.include,
 								sampling: args.sampling,
+								fresh: args.fresh,
 							});
 							Exception.assert(maybeOutput !== null, "Not found");
 							return maybeOutput;

@@ -54,8 +54,14 @@ describe("Nodes", () => {
 
 			// get expired
 			{
+				// Expired entries are returned by default.
 				const result = await data.get({ uid: "hello", key: ["a", "d", "expired"] });
-				Exception.assert(!result.hasValue());
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value(), 42);
+
+				// But excluded when fresh is requested.
+				const resultFresh = await data.get({ uid: "hello", key: ["a", "d", "expired"], fresh: true });
+				Exception.assert(!resultFresh.hasValue());
 			}
 
 			// get w/children
@@ -316,14 +322,14 @@ describe("Nodes", () => {
 			data.insert("hello", [[["a", "b"], 1]], timestamp);
 			data.insert("hello", [[["a", "b"], 10]], expiredTimestamp);
 
-			// read all w/o metadata
+			// read all w/o metadata, expired entries are included by default
 			{
 				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10 });
 				Exception.assert(result.hasValue());
-				Exception.assertEqual(result.value().data, [1]);
+				Exception.assertEqual(result.value().data, [1, 10]);
 			}
 
-			// read all w/metadata
+			// read all w/metadata, expired entries are included by default
 			{
 				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, metadata: true });
 				Exception.assert(result.hasValue());
@@ -331,6 +337,20 @@ describe("Nodes", () => {
 					[timestamp, 1, 60, ""],
 					[expiredTimestamp, 10],
 				]);
+			}
+
+			// read only fresh w/o metadata
+			{
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, fresh: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data, [1]);
+			}
+
+			// read only fresh w/metadata
+			{
+				const result = await data.get({ uid: "hello", key: ["a", "b"], count: 10, metadata: true, fresh: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data, [[timestamp, 1, 60, ""]]);
 			}
 		});
 

@@ -45,6 +45,10 @@ function pathToKey(path) {
 /// GET <endpoint>?continuation=<opaque string>
 /// Pass back the continuation as received from a previous response to page through the data.
 ///
+/// GET <endpoint>?fresh=1
+/// Only return the entries that have not expired yet.
+/// If not set, all entries are returned, including the expired ones.
+///
 /// GET <endpoint>?include=/a/b,/a/d/e
 /// Only show the path /a/b and /a/d/e
 ///
@@ -58,7 +62,7 @@ function pathToKey(path) {
 ///
 export async function handleDataGet(
 	data,
-	{ uid, key, metadata, children, count, after, before, include, sampling, continuation, keys },
+	{ uid, key, metadata, children, count, after, before, include, sampling, continuation, keys, fresh },
 ) {
 	Exception.assertPrecondition(uid !== undefined, "'uid' must be set");
 
@@ -83,9 +87,10 @@ export async function handleDataGet(
 	include = include ?? null;
 	sampling = sampling ?? null;
 	continuation = continuation ?? null;
+	fresh = fresh ?? false;
 
 	Log.trace(
-		"Handle data get with key={}, metadata={}, children={}, count={}, after={}, before={}, include={}, sampling={}, continuation={}, keys={}",
+		"Handle data get with key={}, metadata={}, children={}, count={}, after={}, before={}, include={}, sampling={}, continuation={}, keys={}, fresh={}",
 		key,
 		metadata,
 		children,
@@ -96,6 +101,7 @@ export async function handleDataGet(
 		sampling,
 		continuation,
 		keys,
+		fresh,
 	);
 
 	let output = {};
@@ -125,6 +131,7 @@ export async function handleDataGet(
 			include,
 			sampling,
 			continuation,
+			fresh,
 		});
 		if (maybeData.isEmpty()) {
 			return null;
@@ -151,6 +158,7 @@ export function getDataGetInputsFromQuery(context) {
 	const sampling = context.getQuery("sampling", undefined, String);
 	const continuation = context.getQuery("continuation", undefined, String);
 	const keys = context.getQuery("keys", undefined, Boolean);
+	const fresh = context.getQuery("fresh", undefined, Boolean);
 
 	return {
 		metadata,
@@ -162,5 +170,6 @@ export function getDataGetInputsFromQuery(context) {
 		sampling,
 		continuation,
 		keys,
+		fresh,
 	};
 }

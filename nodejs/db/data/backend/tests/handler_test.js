@@ -148,7 +148,7 @@ describe("handleDataGet", () => {
 describe("getDataGetInputsFromQuery", () => {
 	it("maps keys, metadata, children, count, sampling through their transforms", () => {
 		const ctx = MockServerContext.make({
-			query: { metadata: "1", children: "3", count: "2", sampling: "raw", keys: "1" },
+			query: { metadata: "1", children: "3", count: "2", sampling: "raw", keys: "1", fresh: "1" },
 		});
 		const out = getDataGetInputsFromQuery(ctx);
 		Exception.assertEqual(out.metadata, true);
@@ -156,6 +156,7 @@ describe("getDataGetInputsFromQuery", () => {
 		Exception.assertEqual(out.count, 2);
 		Exception.assertEqual(out.sampling, "raw");
 		Exception.assertEqual(out.keys, true);
+		Exception.assertEqual(out.fresh, true);
 	});
 
 	it("parses include into an array of decoded key arrays", () => {

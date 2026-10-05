@@ -316,6 +316,7 @@ class Node(ArtifactsBase):
 		before: typing.Optional[int] = None,
 		children: typing.Optional[int] = None,
 		keys: typing.Optional[bool] = None,
+		fresh: typing.Optional[bool] = None,
 	) -> typing.Any:
 		"""Get data from the nodes remote volumes.."""
 
@@ -333,6 +334,8 @@ class Node(ArtifactsBase):
 			query["before"] = str(before)
 		if keys is not None:
 			query["keys"] = str(1 if keys else 0)
+		if fresh is not None:
+			query["fresh"] = str(1 if fresh else 0)
 
 		def getOnRemote(remote: str) -> typing.Any:
 			url = remote + uri

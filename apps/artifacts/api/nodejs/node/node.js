@@ -145,13 +145,27 @@ export class Node extends ArtifactsBase {
 	/// \param children The number of children depth level to be included.
 	/// \param include The given path to be included. A list of list of path segments.
 	/// \param metadata Include metadata with each values.
-	async get({ remote, uid, token = null, volume = null, path = null, children = 0, include = null, metadata = false }) {
+	/// \param fresh If true, only return the entries that have not expired yet, otherwise all entries are returned.
+	async get({
+		remote,
+		uid,
+		token = null,
+		volume = null,
+		path = null,
+		children = 0,
+		include = null,
+		metadata = false,
+		fresh = false,
+	}) {
 		let query = {};
 		if (children) {
 			query.children = children;
 		}
 		if (metadata) {
 			query.metadata = 1;
+		}
+		if (fresh) {
+			query.fresh = 1;
 		}
 		if (include) {
 			query.include = include.map(Utils.keyToPath).join(",");

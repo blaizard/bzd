@@ -310,6 +310,7 @@ export default class Data {
 		include = null,
 		sampling = null,
 		continuation = null,
+		fresh = false,
 	}) {
 		const data = Object.hasOwn(this.storage, uid) ? this.storage[uid].data : Object.create(null);
 
@@ -320,6 +321,12 @@ export default class Data {
 
 		const valuesToResult = (key, internal, values) => {
 			const dataInternal = this.getDataInternal_(uid, key, internal);
+			if (fresh) {
+				const expiredTimestampUs = timestampUs() - dataInternal.expires * 1000000;
+				values = values.filter(([t, _]) => {
+					return t > expiredTimestampUs;
+				});
+			}
 			if (metadata) {
 				let result = values.map(([t, v]) => [t, v]);
 				if (result.length > 0) {
@@ -329,14 +336,9 @@ export default class Data {
 				}
 				return result;
 			}
-			const expiredTimestampUs = timestampUs() - dataInternal.expires * 1000000;
-			return values
-				.filter(([t, _]) => {
-					return t > expiredTimestampUs;
-				})
-				.map(([_, v]) => {
-					return v;
-				});
+			return values.map(([_, v]) => {
+				return v;
+			});
 		};
 
 		const getCursorStart = (values, cursor) => {

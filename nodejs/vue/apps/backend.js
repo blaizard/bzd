@@ -31,6 +31,7 @@ export default class Backend {
 			cache: null,
 			statistics: null,
 			statisticsProviderProcess: null,
+			node: null,
 			services: null,
 			loggerMemory: null,
 			loggerArtifacts: null,
@@ -46,6 +47,9 @@ export default class Backend {
 		this.port = port;
 		this.test = test;
 		this.uid = uid;
+		if (this.uid) {
+			this.instances.node = new Node({ uid: this.uid });
+		}
 		this.signalDestructor = null;
 	}
 
@@ -150,6 +154,13 @@ export default class Backend {
 		return this.instances.loggerArtifacts;
 	}
 
+	/// Access the artifacts node.
+	get node() {
+		Exception.assert(this.isSetup, "Backend not set-up.");
+		Exception.assert(this.instances.node, "Node not set-up.");
+		return this.instances.node;
+	}
+
 	/// Set-up the authentication object.
 	useAuthentication(optionsOrAuthentication = configAuthentication()) {
 		Exception.assert(this.isSetup == false, "Backend already set-up.");
@@ -214,7 +225,7 @@ export default class Backend {
 		this.instances.statistics = new Statistics(
 			Object.assign(
 				{
-					uid: this.uid,
+					node: this.instances.node,
 				},
 				options,
 			),
@@ -262,10 +273,9 @@ export default class Backend {
 			? new MockHttpServer(httpServerOptions)
 			: new HttpServer(this.port, httpServerOptions);
 
-		if (this.uid) {
+		if (this.instances.node) {
 			Log.info("Setting up nodes logger backend with uid={}.", this.uid);
-			const node = new Node({ uid: this.uid });
-			this.instances.loggerArtifacts = node.makeLoggerBackend({ name: "backend" });
+			this.instances.loggerArtifacts = this.instances.node.makeLoggerBackend({ name: "backend" });
 		}
 
 		if (this.instances.services) {

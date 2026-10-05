@@ -88,6 +88,7 @@ export class Nodes {
 	/// \param include Include the given path to the result.
 	/// \param sampling The sampling method to be used.
 	/// \param continuation An opaque string provided by a previous request to page through the data.
+	/// \param fresh If true, only return the entries that have not expired yet.
 	///
 	/// \return An optional with a value if success, empty if the key points to an unknown record.
 	async get({
@@ -101,8 +102,21 @@ export class Nodes {
 		include = null,
 		sampling = null,
 		continuation = null,
+		fresh = false,
 	}) {
-		return await this.data.get({ uid, key, metadata, children, count, after, before, include, sampling, continuation });
+		return await this.data.get({
+			uid,
+			key,
+			metadata,
+			children,
+			count,
+			after,
+			before,
+			include,
+			sampling,
+			continuation,
+			fresh,
+		});
 	}
 
 	/// Get children of a given key.

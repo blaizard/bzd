@@ -6,7 +6,6 @@ import ServiceProvider from "#bzd/nodejs/core/services/provider.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
-import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 
 const Exception = ExceptionFactory("statistics");
 const Log = LogFactory("statistics");
@@ -16,9 +15,8 @@ export default class Statistics {
 	constructor(options) {
 		this.options = Object.assign(
 			{
-				// The uid for this node, this will be used to send statistics data with this uid name.
-				// If unset, no data will be sent.
-				uid: null,
+				// The node used to publish statistics data. If unset, no data will be sent.
+				node: null,
 			},
 			options,
 		);
@@ -72,11 +70,11 @@ export default class Statistics {
 	serviceSync(...namespaces) {
 		const provider = new ServiceProvider(...namespaces);
 
-		if (this.options.uid) {
-			Log.info("Installing 'Statistics' services with uid={}.", this.options.uid);
+		const node = this.options.node;
+		if (node) {
+			Log.info("Installing 'Statistics' services with node.");
 
 			let lastTimestamp = 0;
-			const node = new Node({ uid: this.options.uid });
 			provider.addTimeTriggeredProcess(
 				"statistics.sync",
 				async (options) => {

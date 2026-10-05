@@ -47,6 +47,10 @@
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
 
+	/// The number of entries fetched per request.
+	const pageSize = 100;
+	/// The maximum number of entries kept in memory.
+	const maxLines = 1000;
 	/// The expected period between live fetches, in milliseconds.
 	const livePeriodMs = 3000;
 
@@ -67,12 +71,8 @@
 		data: function () {
 			return {
 				lines: [],
-				pageSize: 20,
-				maxLines: 1000,
-				continuation: null,
 				pinnedBottom: true,
-				fetchingOlder: false,
-				fetchingNewer: false,
+				fetching: false,
 				liveTimer: null,
 			};
 		},
@@ -88,169 +88,124 @@
 					this.$emit("update:wrap", value.wrap);
 				},
 			},
+			windowStart() {
+				return this.timeRange[0] ?? null;
+			},
 		},
 		async mounted() {
-			await this.handleSubmit(async () => {
-				await this.fetchInitial();
-			});
+			await this.handleSubmit(() => this.loadInitial());
 			this.liveTimer = setInterval(() => {
-				this.fetchLive();
+				this.fetchAdjacent("append");
 			}, livePeriodMs);
 		},
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
 		watch: {
-			// Reload the logs when a new time window is selected.
-			timeRange(previous) {
-				const oldSpan = this.span(previous);
-				const newSpan = this.span(this.timeRange);
-				if (newSpan !== null && oldSpan !== newSpan) {
+			// Reload the logs when a new time window is selected, ignoring the continuously drifting "now".
+			timeRange(newValue, previous) {
+				const span = (range) => (range[0] === null || range[1] === null ? null : range[1] - range[0]);
+				const newSpan = span(newValue);
+				if (newSpan !== null && newSpan !== span(previous)) {
 					this.lines = [];
-					this.continuation = null;
-					this.fetchInitial();
+					this.loadInitial();
 				}
 			},
 		},
 		emits: ["update:wrap", "fetch"],
 		methods: {
-			async handleScroll() {
+			handleScroll() {
 				const container = this.$refs.scrollContainer;
 				const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
 				this.pinnedBottom = distanceToBottom < 100;
 				if (container.scrollTop < 100) {
-					await this.fetchOlder();
+					this.fetchAdjacent("prepend");
 				}
 			},
-			/// Load the newest page of logs, then fill the viewport with older data until
-			/// it overflows or the history is exhausted.
-			async fetchInitial() {
-				const container = this.$refs.scrollContainer;
-				const result = await this.fetchData({ after: this.windowStart() });
-				this.lines = this.applyWindow(this.collectEntries(result));
-				this.continuation = result.continuation ?? null;
+			/// Load the newest page of the time window and stick to the bottom.
+			async loadInitial() {
+				this.lines = await this.fetchEntries({ after: this.windowStart });
+				this.pinnedBottom = true;
 				await this.$nextTick();
-
-				while (
-					container.isConnected &&
-					this.continuation !== null &&
-					container.scrollHeight <= container.clientHeight + 1
-				) {
-					await this.fetchOlder();
-				}
-
-				// Show the newest entries at the bottom when the content overflows.
-				if (container.isConnected && container.scrollHeight > container.clientHeight + 1) {
+				const container = this.$refs.scrollContainer;
+				if (container?.isConnected) {
 					container.scrollTop = container.scrollHeight;
 				}
 			},
-			async fetchOlder() {
-				if (this.fetchingOlder || this.continuation === null) {
-					return;
+			/// Fetch the page just before the oldest line ("prepend") or just after the
+			/// newest line ("append") and merge it in. Returns whether entries were added.
+			async fetchAdjacent(direction) {
+				if (this.fetching || (direction === "append" && !this.pinnedBottom)) {
+					return false;
 				}
-				this.fetchingOlder = true;
+				const reference = direction === "append" ? this.lines.at(-1)?.[0] : this.lines[0]?.[0];
+				if (reference === undefined) {
+					return false;
+				}
+				this.fetching = true;
 				try {
-					const result = await this.fetchData({ continuation: this.continuation });
-					const entries = this.collectEntries(result);
-					this.continuation = result.continuation ?? null;
-					if (entries.length === 0) {
-						return;
+					let entries =
+						direction === "append"
+							? await this.fetchEntries({ after: reference })
+							: await this.fetchEntries({ before: reference });
+					if (direction === "prepend") {
+						// Discard entries before the time window, so older paging stops at its boundary.
+						entries =
+							this.windowStart === null ? entries : entries.filter(([timestamp]) => timestamp >= this.windowStart);
 					}
-					// Keep only the entries within the time window.
-					const inWindow = this.applyWindow(entries);
-					if (inWindow.length === 0) {
-						// Reached the beginning of the window, stop paging further.
-						this.continuation = null;
-						return;
-					}
-					// If the page crosses the window boundary, the next page is entirely outside.
-					if (inWindow.length !== entries.length) {
-						this.continuation = null;
-					}
-					await this.addLines(inWindow);
+					return await this.addEntries(entries, { prepend: direction === "prepend" });
 				} finally {
-					this.fetchingOlder = false;
+					this.fetching = false;
 				}
 			},
-			async fetchLive() {
-				if (this.fetchingNewer || !this.pinnedBottom) {
-					return;
+			/// Merge new entries into the list, trimming to the maximum number of lines and
+			/// preserving the current scroll position. Returns whether entries were added.
+			async addEntries(entries, { prepend = false } = {}) {
+				if (!entries.length) {
+					return false;
 				}
-				this.fetchingNewer = true;
-				try {
-					const newest = this.lines.at(-1)?.[0];
-					if (newest === undefined) {
-						return;
-					}
-					const result = await this.fetchData({ after: newest });
-					const entries = this.collectEntries(result);
-					if (entries.length === 0) {
-						return;
-					}
-					await this.addLines(entries, { keepNewest: true });
-				} finally {
-					this.fetchingNewer = false;
-				}
-			},
-			/// Merge new entries into the list, trimming to the time window and the maximum
-			/// number of lines, while preserving the current scroll position.
-			///
-			/// \param keepNewest If true, keep the newest lines, otherwise keep the oldest ones.
-			async addLines(entries, { keepNewest = false } = {}) {
 				const container = this.$refs.scrollContainer;
-				if (!container) {
-					return;
+				const scrollHeightBefore = container?.scrollHeight ?? 0;
+				let lines = [...this.lines, ...entries].sort((a, b) => a[0] - b[0]);
+				if (lines.length > maxLines) {
+					lines = prepend ? lines.slice(0, maxLines) : lines.slice(-maxLines);
 				}
-				const scrollHeightBefore = container.scrollHeight;
-				this.lines = this.applyWindow(this.merge(this.lines, entries));
-				if (this.lines.length > this.maxLines) {
-					if (keepNewest) {
-						this.lines.splice(0, this.lines.length - this.maxLines);
-					} else {
-						this.lines.length = this.maxLines;
-					}
-				}
+				this.lines = lines;
 				await this.$nextTick();
-				container.scrollTop += container.scrollHeight - scrollHeightBefore;
-			},
-			collectEntries(result) {
-				const entries = [];
-				for (const [_, values] of result.data) {
-					for (const [timestamp, value] of values) {
-						entries.push([timestamp, value]);
+				if (container) {
+					if (prepend) {
+						container.scrollTop += container.scrollHeight - scrollHeightBefore;
+					} else {
+						container.scrollTop = container.scrollHeight;
 					}
 				}
-				return entries.sort((a, b) => a[0] - b[0]);
+				return true;
 			},
-			merge(entries, newEntries) {
-				return [...entries, ...newEntries].sort((a, b) => a[0] - b[0]);
-			},
-			span(timeRange) {
-				return timeRange[0] === null || timeRange[1] === null ? null : timeRange[1] - timeRange[0];
-			},
-			windowStart() {
-				return this.timeRange[0] ?? null;
-			},
-			applyWindow(entries) {
-				const start = this.windowStart();
-				return start === null ? entries : entries.filter(([timestamp]) => timestamp >= start);
-			},
-			async fetchData({ continuation = null, after = null } = {}) {
+			/// Fetch a page of logs: the newest entries after a timestamp, or the oldest
+			/// entries before a timestamp, flattened into sorted [timestamp, value] pairs.
+			async fetchEntries({ before = null, after = null } = {}) {
 				this.$emit("fetch", livePeriodMs);
 				const query = Object.fromEntries(
 					Object.entries({
 						include: Object.keys(this.options.inputs).join(","),
 						metadata: 1,
-						count: this.pageSize,
-						continuation: continuation,
+						count: pageSize,
+						before: before,
 						after: after,
 					}).filter(([_, value]) => value !== null),
 				);
-				return await this.requestBackend(this.endpoint, {
+				const result = await this.requestBackend(this.endpoint, {
 					method: "get",
 					query: query,
 					expect: "json",
 				});
+				const entries = [];
+				for (const [, values] of result.data) {
+					for (const [timestamp, value] of values) {
+						entries.push([timestamp, value]);
+					}
+				}
+				return entries.sort((a, b) => a[0] - b[0]);
 			},
 			formatTimestamp(timestampUs) {
 				return dateToDefaultString(timestampUs / 1000);
