@@ -7,7 +7,6 @@ from bdl.contracts.min import ContractMin
 from bdl.contracts.max import ContractMax
 from bdl.contracts.builtins import ContractInteger, ContractFloat, ContractBoolean
 from bdl.contracts.string import ContractString
-from bdl.contracts.mandatory import ContractMandatory
 from bdl.contracts.capacity import ContractCapacity
 from bdl.contracts.init import ContractInit
 from bdl.contracts.shutdown import ContractShutdown
@@ -21,7 +20,6 @@ _Contracts = [
 	ContractBoolean(),
 	ContractMin(),
 	ContractMax(),
-	ContractMandatory(),
 	ContractCapacity(),
 	ContractInit(),
 	ContractShutdown(),

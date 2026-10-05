@@ -548,6 +548,13 @@ class EntityExpression(Entity):
 		return self.element.isNestedSequence("argument")
 
 	@property
+	def isValueSet(self) -> bool:
+		"""Whether this expression carries an explicit value, as opposed to a bare type
+		declaration which has no default value and is therefore mandatory."""
+
+		return self.isValue or self.isPreset or self.isParameters or self.underlyingValueFQN is not None
+
+	@property
 	def isRValue(self) -> bool:
 		"""If the expression represents an RValue, in this context an rvalue is a temporary,
 		but it could be extended to move semantics."""

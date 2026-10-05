@@ -102,14 +102,16 @@ class Symbol:
 		if self.underlyingTypeAttr is not None and entity.underlyingTypeFQN is not None:
 			ElementBuilder.cast(self.element, ElementBuilder).setAttr(self.underlyingTypeAttr, entity.underlyingTypeFQN)
 
-		# Validate template arguments
+		# Validate template arguments. Symbols without a template slot (e.g. the
+		# inheritance symbols) do not carry template arguments: the inherited types
+		# are resolved with their own defaults.
 		configTypes = entity.getConfigTemplateTypes(resolver=resolver)
 		if not configTypes:
 			self.assertTrue(
 				condition=(not bool(self.templates)),
 				message=f"Symbol '{self.kind}' does not support template type arguments.",
 			)
-		else:
+		elif self.templateAttr is not None:
 			assert isinstance(self.templateAttr, str)
 			self.templates.makeParametersResolved(name=self.templateAttr, resolver=resolver, expected=configTypes)
 

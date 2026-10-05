@@ -33,10 +33,11 @@ class TestRun(unittest.TestCase):
 			content="struct temp { var = Boolean; }",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Object.fromContent(
-			content="struct temp { var = Boolean(); }",
-			objectContext=ObjectContext(resolve=True),
-		)
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(
+				content="struct temp { var = Boolean(); }",
+				objectContext=ObjectContext(resolve=True),
+			)
 		Object.fromContent(
 			content="struct temp { var = Boolean(true); }",
 			objectContext=ObjectContext(resolve=True),
@@ -70,10 +71,11 @@ class TestRun(unittest.TestCase):
 			content="struct temp { var = Integer; }",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Object.fromContent(
-			content="struct temp { var = Integer(); }",
-			objectContext=ObjectContext(resolve=True),
-		)
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(
+				content="struct temp { var = Integer(); }",
+				objectContext=ObjectContext(resolve=True),
+			)
 		# With value
 		Object.fromContent(
 			content="struct temp { var = Integer(12); }",
@@ -104,10 +106,11 @@ class TestRun(unittest.TestCase):
 			content="struct temp { var = Float; }",
 			objectContext=ObjectContext(resolve=True),
 		)
-		Object.fromContent(
-			content="struct temp { var = Float(); }",
-			objectContext=ObjectContext(resolve=True),
-		)
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(
+				content="struct temp { var = Float(); }",
+				objectContext=ObjectContext(resolve=True),
+			)
 		# With value
 		Object.fromContent(
 			content="struct temp { var = Float(12); }",
@@ -137,7 +140,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testResult(self) -> None:
-		with self.assertRaisesRegex(Exception, r"cannot have a 'meta' role"):
+		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(
 				content="struct temp { var = Result; }",
 				objectContext=ObjectContext(resolve=True),

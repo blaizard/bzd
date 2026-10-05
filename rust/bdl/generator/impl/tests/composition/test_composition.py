@@ -49,6 +49,39 @@ composition {
 			self._generate(content=content, imports=["child", "parent"])
 		self.assertIn("must declare a referenced 'out' entry", str(context.exception))
 
+	def testCompositionEnum(self) -> None:
+		content = """
+namespace default;
+
+enum Device {
+	uart0
+}
+
+component Out {
+config:
+	device = Device;
+}
+
+component Printer {
+config:
+	out = Out;
+interface:
+	method run();
+}
+
+component Executor {
+}
+
+composition {
+	executor = Executor() [executor];
+	out = Out(device = Device.uart0);
+	printer = Printer(out = out);
+	printer.run();
+}
+"""
+		actual = self._generate(content=content, imports=[])
+		self.assertIn("device: DefaultDevice::Uart0", actual)
+
 	def testCompositionWithOut(self) -> None:
 		content = """
 namespace default;

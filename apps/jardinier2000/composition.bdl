@@ -29,9 +29,9 @@ config:
 	
 interface:
 	method run();
-	pwmDuty0 = Integer;
-	pwmDuty1 = Integer;
-	state = const LightSate;
+	pwmDuty0 = Integer(0);
+	pwmDuty1 = Integer(0);
+	state = const LightSate(LightSate.off);
 	
 }
 
@@ -44,8 +44,8 @@ config:
 	
 interface:
 	method run();
-	pump = bzd.io.digital.State;
-	state = const WaterPumpState;
+	pump = bzd.io.digital.State(0);
+	state = const WaterPumpState(WaterPumpState.off);
 	
 }
 
@@ -56,8 +56,8 @@ config:
 	
 interface:
 	method run();
-	state = const LEDState;
-	led = bzd.io.digital.State;
+	state = const LEDState(LEDState.ok);
+	led = bzd.io.digital.State(0);
 	
 }
 
@@ -68,9 +68,9 @@ config:
 	
 interface:
 	method run();
-	lightState = LightSate;
-	waterPumpSate = WaterPumpState;
-	ledSate = LEDState;
+	lightState = LightSate(LightSate.off);
+	waterPumpSate = WaterPumpState(WaterPumpState.off);
+	ledSate = LEDState(LEDState.ok);
 	
 }
 

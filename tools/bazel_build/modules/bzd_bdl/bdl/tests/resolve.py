@@ -2,6 +2,7 @@ import unittest
 
 from bdl.object import Object, ObjectContext
 from bdl.entities.all import Expression, EnumValue
+from bdl.visitors.composition.visitor import Composition
 
 
 class TestRun(unittest.TestCase):
@@ -62,11 +63,11 @@ class TestRun(unittest.TestCase):
 						test = Test(0);
 					}
 					""",
-				objectContext=ObjectContext(resolve=True),
+				objectContext=ObjectContext(resolve=True, composition=True),
 			)
 
 	def testMandatory(self) -> None:
-		# Not mandatory
+		# A bare type has no default value and is therefore mandatory.
 		bdl = Object.fromContent(
 			content="""
 				using NewType = Integer;
@@ -77,15 +78,30 @@ class TestRun(unittest.TestCase):
 		var = bdl.entity("temp.var")
 		assert isinstance(var, Expression)
 		self.assertTrue(var.isRValue)
+		self.assertIsNone(var.literal)
 
-		with self.assertRaisesRegex(Exception, r"mandatory"):
+		# A mandatory value must be provided at instantiation.
+		with self.assertRaisesRegex(Exception, r"Missing mandatory"):
 			Object.fromContent(
 				content="""
-				struct First { val = Integer [mandatory]; } 
-				struct Temp { var = First; }
+				component Test { config: value = Integer; }
+				composition {
+					test = Test();
+				}
 				""",
-				objectContext=ObjectContext(resolve=True),
+				objectContext=ObjectContext(resolve=True, composition=True),
 			)
+
+		# An explicit value is optional and can be omitted at instantiation.
+		bdl = Object.fromContent(
+			content="""
+			component Test { config: value = Integer(12); }
+			composition {
+				test = Test();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True, composition=True),
+		)
 
 	def testNestedInheritance(self) -> None:
 		bdl = Object.fromContent(
@@ -286,7 +302,7 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(
 				content="""
-					interface Test { method hello(var = Integer); }
+					interface Test { method hello(var = Integer(0)); }
 					composition MyComposition { test = Test; hello = test.hello(dad = 3); }
 					""",
 				objectContext=ObjectContext(resolve=True, composition=True),
@@ -320,7 +336,7 @@ class TestRun(unittest.TestCase):
 			content="""
 				interface MyInterface {}
 				component MyComponent : MyInterface {}
-				method hello(var1 = Integer, var2 = Float, var3 = MyInterface);
+				method hello(var1 = Integer(0), var2 = Float(0), var3 = MyInterface);
 				composition { ref = MyComponent(); call = hello(var3 = ref, var1 = 1); }
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -350,7 +366,7 @@ class TestRun(unittest.TestCase):
 	def testStruct(self) -> None:
 		bdl = Object.fromContent(
 			content="""
-					struct Test { var = Integer; }
+					struct Test { var = Integer(0); }
 					composition { test = Test(); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -361,7 +377,7 @@ class TestRun(unittest.TestCase):
 
 		bdl = Object.fromContent(
 			content="""
-					struct Test { var = Integer; }
+					struct Test { var = Integer(0); }
 					composition { test = Test(32); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -372,7 +388,7 @@ class TestRun(unittest.TestCase):
 
 		bdl = Object.fromContent(
 			content="""
-					struct Test { var = Integer; }
+					struct Test { var = Integer(0); }
 					composition { test = Test(var = 32); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -383,7 +399,7 @@ class TestRun(unittest.TestCase):
 
 		bdl = Object.fromContent(
 			content="""
-					struct Test { var = Integer; }
+					struct Test { var = Integer(0); }
 					composition { test = Test(var = Integer(32)); }
 					""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -419,7 +435,7 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"not expected"):
 			Object.fromContent(
 				content="""
-				component Test { config: value = Integer; }
+				component Test { config: value = Integer(0); }
 				composition MyComposition { val1 = Test(hello=1); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True),
@@ -552,15 +568,17 @@ class TestRun(unittest.TestCase):
 		self.assertEqual(regexpr3.regexpr.match(["123", "1", "12", "437"]), {"123", "12", "437"})
 
 	def testTemplates(self) -> None:
-		# Mandatory template.
-		with self.assertRaisesRegex(Exception, r"mandatory"):
-			Object.fromContent(
-				content="""
-				component Test { config: using Type = Integer [mandatory]; }
-				composition MyComposition { val1 = Test; }
-				""",
-				objectContext=ObjectContext(resolve=True, composition=True),
-			)
+		# A using template has its underlying type as default and is optional.
+		bdl = Object.fromContent(
+			content="""
+			component Test { config: using Type = Integer; }
+			composition MyComposition { val1 = Test; }
+			""",
+			objectContext=ObjectContext(resolve=True, composition=True),
+		)
+		val1 = bdl.entity("MyComposition.val1")
+		assert isinstance(val1, Expression)
+		self.assertTrue(val1.isRValue)
 
 		with self.assertRaisesRegex(Exception, r"Invalid"):
 			Object.fromContent(
@@ -614,7 +632,7 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"mandatory"):
 			Object.fromContent(
 				content="""
-				component Test { config: value1 = Integer [min(10) max(32)]; valuw2 = [mandatory]; }
+				component Test { config: value1 = Integer [min(10) max(32)]; valuw2 = Integer; }
 				composition MyComposition { val1 = Test(23); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True),
@@ -687,9 +705,9 @@ class TestRun(unittest.TestCase):
 		with self.assertRaisesRegex(Exception, r"Missing.*mandatory"):
 			Object.fromContent(
 				content="""
-				component Test { config: value = Integer [mandatory]; }
+				component Test { config: value = Integer; }
 				composition MyComposition {
-					val1 = Test;
+					val1 = Test();
 				}
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True),
@@ -699,7 +717,7 @@ class TestRun(unittest.TestCase):
 			Object.fromContent(
 				content="""
 				component Test { config: value = Integer(1) [min(10) max(32)]; }
-				composition MyComposition { val1 = Test; }
+				composition MyComposition { val1 = Test(); }
 				""",
 				objectContext=ObjectContext(resolve=True, composition=True),
 			)
@@ -792,6 +810,43 @@ class TestRun(unittest.TestCase):
 
 	def testEnumDefaultValue(self) -> None:
 
+		# A bare enum type has no default value, an explicit value is required.
+		with self.assertRaisesRegex(Exception, r"value is required"):
+			bdl = Object.fromContent(
+				content="""
+				enum MyEnum
+				{
+					value1,
+					value2,
+					value3
+				}
+				composition MyComposition
+				{
+					hello = MyEnum;
+				}
+				""",
+				objectContext=ObjectContext(resolve=True),
+			)
+			Composition().visit(bdl).process()
+
+		# An empty parameter list is not a default either.
+		with self.assertRaisesRegex(Exception, r"mandatory"):
+			Object.fromContent(
+				content="""
+				enum MyEnum
+				{
+					value1,
+					value2,
+					value3
+				}
+				composition MyComposition
+				{
+					hello = MyEnum();
+				}
+				""",
+				objectContext=ObjectContext(resolve=True, composition=True),
+			)
+
 		bdl = Object.fromContent(
 			content="""
 				enum MyEnum
@@ -802,7 +857,7 @@ class TestRun(unittest.TestCase):
 				}
 				composition MyComposition
 				{
-					hello = MyEnum;
+					hello = MyEnum(MyEnum.value1);
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True),
@@ -865,7 +920,7 @@ class TestRun(unittest.TestCase):
 				component MyComponent : Test { config: hello = Integer; }
 				composition MyComposition
 				{
-					val1 = MyComponent(hello = 2);
+					val1 = MyComponent(hello = 2, value = 3);
 				}
 				""",
 			objectContext=ObjectContext(resolve=True, composition=True),

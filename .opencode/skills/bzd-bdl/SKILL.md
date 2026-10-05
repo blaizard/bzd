@@ -230,7 +230,7 @@ Examples:
 ```bdl
 method run();
 method surface() -> Area;
-method connect(host = String [mandatory], port = Integer [min(1) max(65535)]) -> Result<Void>;
+method connect(host = String, port = Integer(80) [min(1) max(65535)]) -> Result<Void>;
 ```
 
 ---
@@ -243,7 +243,6 @@ Contracts are attached with `[contract1 contract2(val) ...]` and constrain value
 | --------------- | ---------------- | ------------------------------------------------------- |
 | `min(n)`        | Value / Template | Minimum value                                           |
 | `max(n)`        | Value / Template | Maximum value                                           |
-| `mandatory`     | Value / Template | Value must be provided; no default is allowed           |
 | `capacity(n)`   | Meta             | Capacity of a container (`Array`, `Vector`)             |
 | `integer`       | Value            | Assert value is an integer                              |
 | `float`         | Value            | Assert value is a float                                 |
@@ -552,5 +551,5 @@ Before submitting any `.bdl` file or `BUILD.bazel` change, confirm:
 - [ ] `connect()` wiring uses fully qualified names when crossing namespaces.
 - [ ] When the system has multiple executors, every workload is assigned via `[executor(name)]` or `bind()`.
 - [ ] `const` is used on interface fields that should not be written by other components.
-- [ ] `[mandatory]` is added to any config field that has no sensible default.
+- [ ] A value is **mandatory** when declared as a bare type (no `...`); it is **optional** when it carries an explicit default (e.g. `Integer(12)`).
 - [ ] Run `./tools/bazel run //:sanitizer` after any `.bdl` or `BUILD.bazel` change.

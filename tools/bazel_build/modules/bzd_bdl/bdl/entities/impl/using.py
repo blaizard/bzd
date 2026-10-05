@@ -18,6 +18,14 @@ class Using(EntityExpression):
 		super().__init__(element, Role.Type)
 		Error.assertHasAttr(element=element, attr="symbol")
 
+	@property
+	def isValueSet(self) -> bool:
+		"""A using provides its underlying type as a value, hence it is not mandatory.
+		A meta using (e.g. `Any`) is a placeholder with no concrete value and remains
+		mandatory."""
+
+		return not self.isRoleMeta
+
 	def resolve(self, resolver: typing.Any) -> None:
 		"""
 		Resolve entities.

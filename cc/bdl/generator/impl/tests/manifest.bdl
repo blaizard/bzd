@@ -12,7 +12,7 @@ enum Error
 
 // Simple structure
 struct MyStruct {
-	a = Integer [min(0) max(12)];
+	a = Integer(0) [min(0) max(12)];
 	b = Result<Float>;
 	
 }
@@ -28,7 +28,7 @@ interface MyInterfaceA {
 
 // Test interface with inheritance
 interface MyInterfaceB : MyInterfaceA {
-	value = Integer;
+	value = Integer(0);
 	
 }
 

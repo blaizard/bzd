@@ -136,7 +136,11 @@ class Transform:
 			)
 			literalType = literalNative["type"]
 			if literalType == "enum":
-				return fqnToCapitalizedOriginal(literalNative["fqn"])
+				namespace = FQN.toNamespace(literalNative["fqn"])
+				return "{}::{}".format(
+					self.fqnToCapitalized(".".join(namespace[:-1])),
+					self.toCamelCase(namespace[-1]),
+				)
 			raise KeyError(f"Unsupported extended literal of type '{literalType}'")
 
 		if isinstance(literalNative, str):

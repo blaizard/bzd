@@ -8,7 +8,7 @@ struct Server {
 	
 }
 
-method check(server = Server());
+method check(server = Server);
 composition MyService {
 	server = Server(host = cfg.host, port = cfg.port);
 	check(server = server);

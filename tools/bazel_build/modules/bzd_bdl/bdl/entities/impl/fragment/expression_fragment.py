@@ -53,6 +53,7 @@ class ExpressionFragment(EntityExpression):
 			"const",
 			"fqn_type",
 			"fqn_value",
+			"preset",
 		):
 			if self.element.isAttr(attr):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
@@ -69,7 +70,7 @@ class ExpressionFragment(EntityExpression):
 			"regexpr_exclude",
 		):
 			sequence = self.element.getNestedSequence(nested)
-			if sequence:
+			if sequence is not None:
 				elementBuilder.setNestedSequence(nested, sequence)
 
 		# Merge contracts with the existing ones if any, otherwise just create it.
@@ -213,6 +214,10 @@ class SymbolFragment(ExpressionFragment):
 		self, resolver: "Resolver", resolvedTypeEntity: Entity, parameters: Parameters
 	) -> None:
 		"""Resolve and validate the parameters passed into argument."""
+
+		# A bare type declaration has no value and is therefore mandatory.
+		if not self.isParameters:
+			return
 
 		# Make the resolved parameters before the validation is completed. This is because
 		# it might make use of the parametersResolved.

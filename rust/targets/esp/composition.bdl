@@ -1,7 +1,11 @@
+use "rust/components/generic/executor/interface.bdl"
+use "rust/components/esp/stream/uart/interface.bdl"
 
 
 
 composition {
+	executor = bzd.components.generic.GenericExecutor() [executor];
+	out = bzd.components.esp.UartOut(device = bzd.components.esp.UartDevice.uart0, pin = 1, baudrate = 115200);
 	
 }
 

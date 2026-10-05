@@ -10,7 +10,7 @@ config:
 	
 interface:
 	method generate();
-	send = Integer;
+	send = Integer(0);
 	
 composition:
 	this.generate();
@@ -22,11 +22,11 @@ component Poller {
 config:
 	out = {out};
 	timer = {timer};
-	id = const Integer;
+	id = const Integer(0);
 	
 interface:
 	method poll();
-	receive = const Integer;
+	receive = const Integer(0);
 	
 }
 

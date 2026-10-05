@@ -65,14 +65,10 @@ class Enum(Entity):
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
 
-		# Get the default value.
-		maybeFirst = next(iter(self.values), None)
-		assert maybeFirst, f"This enum '{self.fqn}' does not have any values: '{self.values}'"
-
-		# Create the parameter.
+		# The value is required: it must be provided explicitly at instantiation,
 		params = Parameters(element=self.element, NestedElementType=Expression)
 		element = ElementBuilder().setAttr("category", "expression").setAttr("name", "value")
-		nested = ElementBuilder().setAttr("symbol", maybeFirst.fqn)
+		nested = ElementBuilder().setAttr("symbol", self.fqn)
 		element.pushBackElementToNestedSequence("fragments", nested)
 
 		expression = Expression(element)

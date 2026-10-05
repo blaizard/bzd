@@ -10,7 +10,7 @@ config:
 	
 interface:
 	method run();
-	send = Float;
+	send = Float(0.0);
 	
 composition:
 	this.run();

@@ -282,7 +282,7 @@ class TestRun(unittest.TestCase):
 			content="""
 				namespace default;
 				composition {
-					hello = Void;
+					hello = Void();
 				}
 				component Test {
 				interface:

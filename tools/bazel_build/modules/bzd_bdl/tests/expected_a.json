@@ -8,6 +8,7 @@
                         "category": "component",
                         "fqn": "default.executor",
                         "name": "executor",
+                        "parameters": [],
                         "symbol": "default.Executor"
                     },
                     "init": [],

@@ -1,0 +1,24 @@
+use "interfaces/stream.bdl"
+
+namespace bzd.components.esp;
+
+
+enum UartDevice
+{
+	uart0
+,	uart1
+}
+
+component UartOut : bzd.OStream {
+config:
+	device = UartDevice;
+	pin = Integer [min(0) max(39)];
+	baudrate = Integer [min(300) max(5000000)];
+	
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	
+}
+
+

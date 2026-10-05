@@ -250,6 +250,12 @@ class Entities:
 					underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
 					if underlyingType.category == Category.method:
 						workloads.append(expression)
+					elif underlyingType.category in {Category.builtin, Category.enum}:
+						# A bare type has no default value, an explicit value is required.
+						expression.assertTrue(
+							condition=expression.isValueSet,
+							message=f"A value is required for '{underlyingType.fqn}', a bare type has no default value.",
+						)
 
 		# Find the name of the default executor.
 		defaultExecutor = executors[0].fqn if len(executors) == 1 else None

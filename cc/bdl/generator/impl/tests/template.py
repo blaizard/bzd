@@ -29,9 +29,9 @@ class TestRun(unittest.TestCase):
 				using T = Any;
 			}
 			composition {
-				executor = Void;
+				executor = Void();
 				myVar = const Integer(-2);
-				myVarNotInit = Integer;
+				myVarNotInit = Integer(0);
 				myVarVarArgs = Vector<Integer>(1, 2, 3, 4);
 				myStruct = MyStruct(2);
 				myStruct2 = MyStruct(Float(2));

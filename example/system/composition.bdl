@@ -10,7 +10,7 @@ config:
 	
 interface:
 	method generate();
-	send = Integer;
+	send = Integer(0);
 	
 }
 
@@ -22,7 +22,7 @@ config:
 	
 interface:
 	method poll();
-	receive = const Integer;
+	receive = const Integer(0);
 	
 }
 

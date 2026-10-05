@@ -8,7 +8,7 @@ config:
 	// Frequency of the timer in Hz.
 	frequency = Integer [min(0)];
 	// The timer number to be used.
-	number = Integer() [min(0)];
+	number = Integer(0) [min(0)];
 	
 interface:
 	method init() [init];
@@ -26,7 +26,7 @@ interface:
 	method init() [init];
 	method shutdown() [shutdown];
 	method run();
-	duty = const Integer;
+	duty = const Integer(0);
 	
 composition:
 	this.run();

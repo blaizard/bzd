@@ -170,8 +170,6 @@ class Expression(EntityExpression):
 		)
 		fragments[0].toElement(self.element)
 
-		# TODO: If mark as "mandatory", remove the default value.
-
 	def resolve(self, resolver: "Resolver") -> None:
 		"""Resolve entities.
 
@@ -192,8 +190,9 @@ class Expression(EntityExpression):
 
 		super().resolve(resolver)
 
-		# Validate the whole expression with the contracts if any.
-		if self.contracts.validationForValue:
+		# Validate the whole expression with the contracts if any. A bare type
+		# declaration has no value and is therefore mandatory, there is nothing to validate.
+		if self.contracts.validationForValue and self.isValueSet:
 			validation = Validation(schema=[self.contracts.validationForValue], args={"resolver": resolver})
 			result = validation.validate([self], output="return")
 			self.assertTrue(

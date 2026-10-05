@@ -320,7 +320,7 @@ class Parameters(ParametersCommon):
 			maybeMetadata = self.getMetadata(key)
 			if maybeMetadata is None:
 				default.assertTrue(
-					condition=not default.contracts.has("mandatory"),
+					condition=default.isValueSet,
 					message=f"Missing mandatory parameter: '{str(key)}'.",
 				)
 				maybeMetadata = self.append(default, allowMix=True, default=True)
