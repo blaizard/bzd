@@ -49,6 +49,13 @@ systemctl daemon-reload
 systemctl reset-failed
 ```
 
+To update the service file
+
+```bash
+systemctl daemon-reload
+systemctl restart bzd
+```
+
 ### Run
 
 Print the metrics
