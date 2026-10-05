@@ -33,6 +33,7 @@ export default class Nodes {
 					path: ["data"],
 					children: 3,
 					metadata: true,
+					fresh: true,
 					include: [
 						["active"],
 						["battery"],
