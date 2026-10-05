@@ -1,0 +1,17 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@rules_rust//rust:defs.bzl", "rust_library_group")
+
+rust_library_group(
+    name = "embassy",
+    visibility = ["//visibility:public"],
+    deps = selects.with_or({
+        ("@bzd_platforms//al:linux", "@bzd_platforms//al:osx"): [
+            "@crates//:embassy-futures",
+            "@crates//:embassy-executor",
+            "@crates//:static_cell",
+        ],
+        ("@bzd_platforms//al_isa:esp32-xtensa_lx6", "@bzd_platforms//al_isa:esp32s3-xtensa_lx7"): [
+            "@bzd_espressif//hal/rust:embassy",
+        ],
+    }),
+)

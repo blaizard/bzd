@@ -19,8 +19,7 @@ bdl_target(
     ],
     data = {
         "deps": [
-            "@crates//:embassy-executor",
-            "@crates//:static_cell",
+            "//rust/libs/embassy",
         ],
         "main": [
             "embassy.rs",

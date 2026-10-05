@@ -3,8 +3,6 @@
 
 use bzd::base::panic::PanicPrint;
 use embassy_executor::Spawner;
-use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
-use embassy_sync::signal::Signal;
 use esp_hal::system::software_reset;
 use esp_println::{print, println};
 

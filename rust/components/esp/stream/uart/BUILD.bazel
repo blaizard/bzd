@@ -1,6 +1,5 @@
 load("@bzd_bdl//:defs.bzl", "bdl_library")
 load("@rules_rust//rust:defs.bzl", "rust_library")
-load("//rust:defs.bzl", "rust_test")
 
 bdl_library(
     name = "interface",
@@ -8,25 +7,21 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
-        "//rust/interfaces:executor",
+        "//interfaces:stream",
     ],
 )
 
 rust_library(
-    name = "executor",
+    name = "uart",
     srcs = [
-        "lib.rs",
+        "uart.rs",
     ],
-    crate_name = "rust_components_generic_executor",
+    crate_name = "rust_components_esp_stream_uart",
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
-        "//rust/interfaces:executor",
-        "//rust/libs/embassy",
+        "//interfaces:stream",
+        "//rust/bzd",
+        "@bzd_espressif//hal/rust",
     ],
-)
-
-rust_test(
-    name = "executor_test",
-    crate = ":executor",
 )
