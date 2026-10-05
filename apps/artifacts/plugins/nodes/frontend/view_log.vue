@@ -101,17 +101,6 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
-		watch: {
-			// Reload the logs when a new time window is selected, ignoring the continuously drifting "now".
-			timeRange(newValue, previous) {
-				const span = (range) => (range[0] === null || range[1] === null ? null : range[1] - range[0]);
-				const newSpan = span(newValue);
-				if (newSpan !== null && newSpan !== span(previous)) {
-					this.lines = [];
-					this.loadInitial();
-				}
-			},
-		},
 		emits: ["update:wrap", "fetch"],
 		methods: {
 			handleScroll() {
@@ -122,9 +111,9 @@
 					this.fetchAdjacent("prepend");
 				}
 			},
-			/// Load the newest page of the time window and stick to the bottom.
+			/// Load the latest page and stick to the bottom.
 			async loadInitial() {
-				this.lines = await this.fetchEntries({ after: this.windowStart });
+				this.lines = await this.fetchEntries();
 				this.pinnedBottom = true;
 				await this.$nextTick();
 				const container = this.$refs.scrollContainer;
@@ -133,14 +122,14 @@
 				}
 			},
 			/// Fetch the page just before the oldest line ("prepend") or just after the
-			/// newest line ("append") and merge it in. Returns whether entries were added.
+			/// newest line ("append") and merge it in.
 			async fetchAdjacent(direction) {
 				if (this.fetching || (direction === "append" && !this.pinnedBottom)) {
-					return false;
+					return;
 				}
 				const reference = direction === "append" ? this.lines.at(-1)?.[0] : this.lines[0]?.[0];
 				if (reference === undefined) {
-					return false;
+					return;
 				}
 				this.fetching = true;
 				try {
@@ -153,16 +142,16 @@
 						entries =
 							this.windowStart === null ? entries : entries.filter(([timestamp]) => timestamp >= this.windowStart);
 					}
-					return await this.addEntries(entries, { prepend: direction === "prepend" });
+					await this.addEntries(entries, { prepend: direction === "prepend" });
 				} finally {
 					this.fetching = false;
 				}
 			},
 			/// Merge new entries into the list, trimming to the maximum number of lines and
-			/// preserving the current scroll position. Returns whether entries were added.
+			/// preserving the current scroll position.
 			async addEntries(entries, { prepend = false } = {}) {
 				if (!entries.length) {
-					return false;
+					return;
 				}
 				const container = this.$refs.scrollContainer;
 				const scrollHeightBefore = container?.scrollHeight ?? 0;
@@ -179,10 +168,8 @@
 						container.scrollTop = container.scrollHeight;
 					}
 				}
-				return true;
 			},
-			/// Fetch a page of logs: the newest entries after a timestamp, or the oldest
-			/// entries before a timestamp, flattened into sorted [timestamp, value] pairs.
+			/// Fetch a page of logs.
 			async fetchEntries({ before = null, after = null } = {}) {
 				this.$emit("fetch", livePeriodMs);
 				const query = Object.fromEntries(
