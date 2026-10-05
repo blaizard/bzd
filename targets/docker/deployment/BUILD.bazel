@@ -35,5 +35,6 @@ py_library(
     deps = [
         ":base",
         "@bzd_python//bzd/template",
+        "@bzd_python//bzd/utils:secret",
     ],
 )
