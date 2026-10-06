@@ -294,7 +294,8 @@ export default class DatabaseInfluxDB extends Database {
 				data: lineProtocol,
 			});
 		} catch (e) {
-			throw Exception.fromError(e, "Line Protocol:\n'{}'", lineProtocol);
+			const start = Math.floor(Math.random() * Math.max(1, lineProtocol.length - 1023));
+			throw Exception.fromError(e, "Line Protocol:\n'[...]{}[...]'", lineProtocol.slice(start, start + 1024));
 		}
 
 		return {
