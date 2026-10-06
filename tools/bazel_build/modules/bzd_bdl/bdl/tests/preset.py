@@ -117,6 +117,22 @@ class TestRun(unittest.TestCase):
 		finally:
 			os.unlink(fixturePath)
 
+	def testResolveLeafValueWithEscapes(self) -> None:
+		"""Preset leaf strings with escapes must round-trip to their native value."""
+		value = '{"version": 1, "secret": "abc\\nXYZ"}'
+		fixturePath = self._makeFixtureFile({"scalar": value})
+		try:
+			bdl = Object.fromContent(
+				content=f'preset p from "{fixturePath}"; composition C {{ x = p.scalar; }}',
+				objectContext=ObjectContext(resolve=True, composition=True),
+			)
+			x = bdl.entity("C.x")
+			self.assertTrue(x.isLiteral)
+			self.assertEqual(x.literal, json.dumps(value))
+			self.assertEqual(x.literalNative, value)
+		finally:
+			os.unlink(fixturePath)
+
 	def testResolveNonLeafError(self) -> None:
 		"""Navigating to a non-leaf (container) should error."""
 		fixturePath = self._makeFixtureFile({"hello": [{"thisinfo": 42}]})

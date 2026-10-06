@@ -215,7 +215,7 @@ class Entity:
 			assert literal.endswith('"'), (
 				f"If a literal starts with \", it also must end with \", instead received: '{literal}'."
 			)
-			return literal[1:-1]
+			return json.loads(literal)
 		if literal.startswith("{"):
 			return typing.cast(LiteralExtended, json.loads(literal))
 		converted = float(literal)
