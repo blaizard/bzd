@@ -26,7 +26,7 @@ export default class Services {
 		/// Ignore the exception.
 		/// The error is recorded in the logs of the service, not on the application log.
 		ignore: "ignore",
-		/// Restart the whole
+		/// Restart the whole service.
 		restart: "restart",
 		/// Raise an exception when an error occurs. Note that the exception will not be thrown
 		/// immediately but only upon calling start() or stop(). This ensures that we can catch it and it is

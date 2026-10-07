@@ -417,7 +417,7 @@ export default class PersistenceDisk {
 			}
 
 			// Pre-read the current data, it is important to do it before writing to the delta file,
-			// otherwise data will be append twice.
+			// otherwise data will be appended twice.
 			await this.get();
 
 			// Add the action to the delta file, make sure it fits on a single line

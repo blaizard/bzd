@@ -383,7 +383,7 @@ protected:
 	/// actual one, therefore we need to go down the chain to find the actual one.
 	///
 	/// \param node We are looking for the previous node of this node.
-	/// \return A structure containing the previous node and the raw pointer its next node.
+	/// \return A structure containing the previous node and the raw pointer to its next node.
 	[[nodiscard]] constexpr Optional<NodeFound> findPreviousNode(ElementPtrType node) noexcept
 	{
 		NodeFound result{&front_, nullptr};

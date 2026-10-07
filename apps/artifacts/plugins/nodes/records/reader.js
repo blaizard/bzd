@@ -219,7 +219,7 @@ export default class RecordsReader {
 	/// \param tick The initial tick.
 	///
 	/// \return A tuple consisting of:
-	///         1. The next tick to get the new value.
+	///         1. The tick of the value.
 	///         2. The value.
 	///         3. The approximated size of the serialized payload.
 	///         4. The remote tick if any.

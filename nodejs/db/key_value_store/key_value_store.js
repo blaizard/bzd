@@ -43,9 +43,9 @@ class KeyValueStoreBucketAccessor {
 		return this.storage._listImpl(this.bucket, maxOrPaging);
 	}
 
-	/// List all key/value pairs from this bucket which subkey matches the value (or any of the values).
+	/// List all key/value pairs from this bucket whose subkey matches the value (or any of the values).
 	/// \param subKey The subkey for the match.
-	/// \param value The value of values (if a list) to match.
+	/// \param value The value or values (if a list) to match.
 	/// \param maxOrPaging Paging information.
 	/// \return An object containing the data and the information about paging and how to get the rest of the data.
 	async listMatch(subKey, value, maxOrPaging = 20) {
@@ -98,10 +98,10 @@ export default class KeyValueStore extends AsyncInitialize {
 		return this._listImpl(bucket, maxOrPaging);
 	}
 
-	/// List all key/value pairs from this bucket which subkey matches the value (or any of the values).
+	/// List all key/value pairs from this bucket whose subkey matches the value (or any of the values).
 	/// \param bucket The bucket to be used.
 	/// \param subKey The subkey for the match.
-	/// \param value The value of values (if a list) to match.
+	/// \param value The value or values (if a list) to match.
 	/// \param maxOrPaging Paging information.
 	/// \return An object containing the data and the information about paging and how to get the rest of the data.
 	async listMatch(bucket, subKey, value, maxOrPaging = 20) {

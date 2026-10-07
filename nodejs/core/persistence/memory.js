@@ -114,7 +114,7 @@ export default class PersistenceMemory {
 	}
 
 	/**
-	 * Write new data to the disk
+	 * Write new data to memory
 	 *
 	 * \param type The type of operation. It can be one of the following:
 	 */

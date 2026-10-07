@@ -68,10 +68,10 @@ export default class KeyValueStoreMemory extends KeyValueStore {
 		return await CollectionPaging.makeFromObject(this.buckets[bucket], maxOrPaging);
 	}
 
-	/// List all key/value pairs from this bucket which subkey matches the value (or any of the values).
+	/// List all key/value pairs from this bucket whose subkey matches the value (or any of the values).
 	/// \param bucket The bucket to be used.
 	/// \param subKey The subkey for the match.
-	/// \param value The value of values (if a list) to match.
+	/// \param value The value or values (if a list) to match.
 	/// \param maxOrPaging Paging information.
 	/// \return An object containing the data and the information about paging and how to get the rest of the data.
 	async _listMatchImpl(bucket, subKey, value, maxOrPaging) {

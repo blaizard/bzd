@@ -138,7 +138,7 @@ class Expression(EntityExpression):
 				fragment = fragments[index]
 				fragmentNext: typing.Optional[ExpressionFragment] = fragments[index + 1] if index + 1 < len(fragments) else None
 				if isinstance(fragment, OperatorFragment) and fragment.operator in operators:
-					# Look for operators that are preceded with another operator or at the beginning.
+					# Look for operators that are preceded by another operator or at the beginning.
 					isUnary = kind == "unary"
 					isUnary &= fragmentPrevious is None or isinstance(fragmentPrevious, OperatorFragment)
 					isUnary &= fragmentNext is not None and not isinstance(fragmentNext, OperatorFragment)

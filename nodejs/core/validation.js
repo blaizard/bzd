@@ -113,8 +113,8 @@ class Constraint {
  *     stayConnnected: "type(bool)"
  * }
  *
- * To each keys is associated a constraint. A constraint definition can be done
- * from a string. Each constraints are space separated and must follow the same format:
+ * To each key is associated a constraint. A constraint definition can be done
+ * from a string. Each constraint is space separated and must follow the same format:
  * <name>(<argument>)?
  * If the optional argument contains a space, the argument must have brackets.
  * By default all keys are considered as optional unless mandatory is specified.

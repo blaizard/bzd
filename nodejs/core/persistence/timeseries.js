@@ -153,8 +153,8 @@ export default class PersistenceTimeSeries {
 				return timeseries.getTimestamp(-1);
 			});
 			// Check if it needs to continue.
-			// Note +1 is important as it ensure that the timestamp is not existing in the current list, hence
-			// avoid an infinity loop situation.
+			// Note +1 is important as it ensures that the timestamp is not existing in the current list, hence
+			// avoid an infinite loop situation.
 			timestamp = timestampEnd > lastValidTimestamp ? lastValidTimestamp + 1 : null;
 		} while (timestamp != null);
 	}

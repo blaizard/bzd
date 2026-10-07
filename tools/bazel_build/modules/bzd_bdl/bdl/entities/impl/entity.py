@@ -448,7 +448,7 @@ class Entity:
 				message=f"Configuration can only contain expressions or using statements, not '{entity.category}'.",
 			)
 			# Note, config entities are resolved only later, when used.
-			# This allow symbol discovery at a later stage, only when the element is actually instantiated.
+			# This allows symbol discovery at a later stage, only when the element is actually instantiated.
 
 		configAggregated = SequenceBuilder()
 		for fqn in reversed(self.getParents()):
@@ -503,7 +503,7 @@ class Entity:
 
 	def __repr__(self) -> str:
 		"""
-		Human readable string representation of a result.
+		Human readable string representation of an entity.
 		"""
 		return self.toString()
 

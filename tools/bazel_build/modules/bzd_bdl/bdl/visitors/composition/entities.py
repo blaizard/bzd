@@ -70,7 +70,7 @@ class Entities:
 
 	@property
 	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
-		"""Get the sorted expression entry list for a specific context."""
+		"""Get the expression entries grouped by context."""
 
 		return self.expressions.all
 
@@ -375,7 +375,7 @@ class Entities:
 			)
 			entryType = EntryType.registry
 		elif underlyingType.category in {Category.builtin, Category.enum}:
-			# Ignore all builtins as they are expected to be all the time available.
+			# Ignore all builtins as they are expected to be available at all times.
 			return
 		else:
 			expression.error(message=f"Unsupported entry type '{underlyingType.category.value}' within the composition stage.")

@@ -466,7 +466,7 @@ export default class Plugin extends PluginBase {
 		/// Insert one or multiple entries.
 		///
 		/// \note If <path:*> is not empty the first item is the uid, while the rest corresponds to the key.
-		/// If <path:*> is empty, value is expected to be a dictionary which keys are the uid and value the actual value.
+		/// If <path:*> is empty, value is expected to be a dictionary whose keys are the uid and value the actual value.
 		///
 		/// POST <endpoint>/<uid>/<path:*>
 		/// ```<value>``` -> stores a new value to the path at the server timestamp.

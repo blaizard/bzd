@@ -147,7 +147,7 @@ export default class Manager {
 				this.triggerTaskScheduler();
 			}
 		}
-		// If not unregister is
+		// If not valid, unregister the task.
 		else {
 			this.unregister(task.id);
 		}
@@ -163,7 +163,7 @@ export default class Manager {
 	popNextTask() {
 		const timestamp = Manager.getTimestampMs();
 
-		// Look for the next task which timestamp already past,
+		// Look for the next task whose timestamp has already passed,
 		// starting from the highest priority
 		for (let priority = this.taskQueues.length - 1; priority >= 0; --priority) {
 			if (this.taskQueues[priority].length && this.taskQueues[priority][0].timestamp <= timestamp) {

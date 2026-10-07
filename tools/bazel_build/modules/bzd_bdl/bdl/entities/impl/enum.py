@@ -65,7 +65,7 @@ class Enum(Entity):
 
 	def getConfigValues(self, resolver: typing.Any) -> Parameters:
 
-		# The value is required: it must be provided explicitly at instantiation,
+		# The value is required: it must be provided explicitly at instantiation.
 		params = Parameters(element=self.element, NestedElementType=Expression)
 		element = ElementBuilder().setAttr("category", "expression").setAttr("name", "value")
 		nested = ElementBuilder().setAttr("symbol", self.fqn)

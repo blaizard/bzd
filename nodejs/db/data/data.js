@@ -98,7 +98,7 @@ export default class Data {
 
 	/// Get the tree at a given key.
 	///
-	/// \return the sub-tree which root is the key if this key is part of the tree,
+	/// \return the sub-tree whose root is the key if this key is part of the tree,
 	///         or null otherwise.
 	async getTree_(uid, key) {
 		const data = await this.tree.get(uid);
@@ -165,7 +165,7 @@ export default class Data {
 	///
 	/// The value might correspond to a time series, where the newest values come first.
 	///
-	/// \return An array of tuple, containing the timestamps and their corresponding value.
+	/// \return An array of tuples, containing the timestamps and their corresponding value.
 	///         Or null, if there is no reference to this data (wrong uid/internal).
 	async getExternal_({ uid, key, count, after = null, before = null }) {
 		return await this.options.external(uid, key, count, after, before);
@@ -186,12 +186,12 @@ export default class Data {
 				const start = value.findIndex((d) => d[0] < before);
 				const end = value.findLastIndex((d) => d[0] > after);
 
-				// Every samples are newer than what is requested.
+				// Every samples are older than what is requested.
 				if (end == -1) {
 					return [];
 				}
 
-				// 'before' is older than the local data, means every samples are older.
+				// 'before' is older than the local data, means every samples are newer.
 				if (start == -1) {
 					const external = await this.getExternal_({ uid, key, count, after, before });
 					return external === null ? [] : external;
@@ -209,7 +209,7 @@ export default class Data {
 					const countExternal = count - countLocal;
 
 					// Downsample the local data (we don't want to upsample, create artificial data).
-					// This simple algorithm does not alter the samples and downsample to the exact number
+					// This simple algorithm does not alter the samples and downsamples to the exact number
 					// of samples as the factor is guaranteed to be > 1.
 					if (countLocal < result.length) {
 						const downsamplingFactor = result.length / countLocal;
@@ -239,7 +239,7 @@ export default class Data {
 			if (after !== null) {
 				const end = value.findLastIndex((d) => d[0] > after);
 
-				// Every samples are newer than what is requested.
+				// Every samples are older than what is requested.
 				if (end == -1) {
 					return [];
 				}
