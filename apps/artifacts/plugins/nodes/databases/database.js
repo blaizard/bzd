@@ -47,11 +47,10 @@ export default class Database {
 		const result = await this.plugin.read(tickStart, this.options.maxSize || 1024 * 1024, /*diskFormat*/ false);
 
 		const records = result.records.reduce((all, record) => all.concat(record), []);
-		const output = records.length ? await this.onRecordsBisect(records) : {};
-
-		// Set the tick after the onRecords callback is called to make sure that on errors we do not
-		// skip the tick and will retry later on.
+		// Always set the tick to make sure that on errors we skip what has been written or failed.
 		this.tick = result.next;
+
+		const output = records.length ? await this.onRecordsBisect(records) : {};
 		const end = result.end;
 
 		return Object.assign(
