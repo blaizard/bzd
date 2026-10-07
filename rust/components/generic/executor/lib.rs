@@ -81,9 +81,14 @@ where
 
         // Drive the futures manually so we can stop polling the services once the
         // workloads are done.
+        let mut services_completed = false;
         core::future::poll_fn(|cx| {
             // Let the services make progress while the workloads are running.
-            let _ = services.as_mut().poll(cx);
+            if !services_completed {
+                if let core::task::Poll::Ready(_) = services.as_mut().poll(cx) {
+                    services_completed = true;
+                }
+            }
 
             // The workloads group only resolves once ALL workloads are complete.
             // On completion, `services` is dropped (cancelling it) at the end of
