@@ -55,11 +55,11 @@ services:
         volumes:
             - "./data/{{ hostToName(docker.host) }}:/bzd/data"
         environment:
-            - BZD_NODE_UID={{ docker.host }}
-            - BZD_TRUSTED_PROXIES=172.18.0.254
-            - BZD_KEY_FILE=/run/secrets/key_file
+            BZD_NODE_UID: "{{ docker.host }}"
+            BZD_TRUSTED_PROXIES: 172.18.0.254
+            BZD_KEY_FILE: /run/secrets/key_file
             {% if docker.node_token %}
-            - BZD_NODE_TOKEN={{ maybeDecrypt(docker.node_token) }}
+            BZD_NODE_TOKEN: "{{ maybeDecrypt(docker.node_token) }}"
             {% end %}
         labels:
             traefik.enable: "true"
