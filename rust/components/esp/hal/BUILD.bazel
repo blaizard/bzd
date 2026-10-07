@@ -1,0 +1,13 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "hal",
+    srcs = [
+        "hal.rs",
+    ],
+    crate_name = "rust_components_esp_hal",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_espressif//hal/rust",
+    ],
+)
