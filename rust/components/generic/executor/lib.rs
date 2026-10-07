@@ -84,10 +84,8 @@ where
         let mut services_completed = false;
         core::future::poll_fn(|cx| {
             // Let the services make progress while the workloads are running.
-            if !services_completed {
-                if let core::task::Poll::Ready(_) = services.as_mut().poll(cx) {
-                    services_completed = true;
-                }
+            if !services_completed && services.as_mut().poll(cx).is_ready() {
+                services_completed = true;
             }
 
             // The workloads group only resolves once ALL workloads are complete.
