@@ -63,21 +63,17 @@ export default class DatabaseInfluxDB extends Database {
 
 	/// Convert a value into influxdb fields.
 	///
-	/// Arrays and dictionaries are serialized into a single JSON field, so they
-	/// can be reconstructed back as a single value on read.
+	/// Numbers and booleans are stored natively, anything else is serialized as
+	/// JSON and base64-encoded.
 	static fromValueToFields(key, value) {
 		if (typeof value === "number") {
 			return [key + "=" + value];
 		} else if (typeof value === "boolean") {
 			return [key + "=" + (value ? "true" : "false")];
-		} else if (typeof value === "string") {
-			return [key + "=" + JSON.stringify(JSON.stringify(value))];
-		} else if (Array.isArray(value)) {
-			return [key + "=" + JSON.stringify(JSON.stringify(value))];
 		} else if (value === null) {
 			return [];
-		} else if (typeof value === "object") {
-			return [key + "=" + JSON.stringify(JSON.stringify(value))];
+		} else if (typeof value === "string" || Array.isArray(value) || typeof value === "object") {
+			return [key + '="b64:' + Buffer.from(JSON.stringify(value), "utf8").toString("base64") + '"'];
 		}
 		return [];
 	}
@@ -113,6 +109,9 @@ export default class DatabaseInfluxDB extends Database {
 	/// Convert a value coming from the database to an actual value.
 	static fromDBValueToValue(value) {
 		if (typeof value === "string") {
+			if (value.startsWith("b64:")) {
+				return JSON.parse(Buffer.from(value.slice(4), "base64").toString("utf8"));
+			}
 			try {
 				return JSON.parse(value);
 			} catch (e) {
