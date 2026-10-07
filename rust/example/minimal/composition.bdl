@@ -3,8 +3,10 @@ use "rust/example/minimal/interface.bdl"
 
 
 composition {
-	hello = bzd.example.HelloWorld();
-	hello.run();
+	hello1 = bzd.example.HelloWorld();
+	hello1.run();
+	hello2 = bzd.example.HelloWorld();
+	hello2.run();
 	
 }
 
