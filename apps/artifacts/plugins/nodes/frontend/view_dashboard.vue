@@ -23,9 +23,10 @@
 				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
 				<ViewGraph
 					v-else-if="['linear', 'bar'].includes(dashboard.type)"
-					:inputs="dashboardInputs(dashboard)"
+					:endpoint="endpoint"
 					:options="dashboard"
 					:timeRange="timeRange"
+					@fetch="onFetch(dashboard, $event)"
 					class="dashboard-component-graph"
 				>
 				</ViewGraph>
@@ -54,7 +55,6 @@
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
-	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import DirectiveHeartbeat from "#bzd/nodejs/vue/directives/heartbeat.js";
 	import { dateToDefaultString } from "#bzd/nodejs/utils/to_string.js";
@@ -86,9 +86,7 @@
 				timestampDiff: 0,
 				// Cached information for the getTimestamp function.
 				getTimestampCache: null,
-				// The server timestamp, as provided by the last data fetch.
-				timestampServer: null,
-				inputs: new TimeseriesCollection(),
+				timeRange: [null, null],
 				options: {
 					interval: "Last 15 minutes",
 					tags: null,
@@ -96,9 +94,6 @@
 				},
 				// Per-dashboard heartbeat state: { counter, period }, used by the heartbeat directive.
 				heartbeats: new Map(),
-				// Expected refresh period of the graph data, in milliseconds.
-				refreshPeriodMs: null,
-				timeout: null,
 				periodUs: null,
 				lock: new Lock(),
 				viewportUpdatedTimeout: null,
@@ -127,15 +122,20 @@
 			this.viewportUpdated();
 			window.addEventListener("scroll", this.handleScroll);
 			this.timestampUsReactive = timestampUs();
-			this.timestampTimer = setInterval(() => {
-				this.timestampUsReactive = timestampUs();
+			this.timestampTimer = setInterval(async () => {
+				this.loading = true;
+				try {
+					const [timestampNewest, _timestampDiff] = await this.getTimestamp();
+					this.timeRange = [timestampNewest - this.periodUs, timestampNewest];
+				} finally {
+					this.loading = false;
+				}
 			}, 1000);
 		},
 		beforeUnmount() {
 			window.removeEventListener("scroll", this.handleScroll);
 			clearTimeout(this.viewportUpdatedTimeout);
 			clearInterval(this.timestampTimer);
-			this.inputs.close();
 		},
 		computed: {
 			// Conditions that can trigger a new data fetch.
@@ -209,13 +209,6 @@
 			endpoint() {
 				const [volume, uid, ..._] = this.pathList;
 				return "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid);
-			},
-			timeRange() {
-				if (this.periodUs === null || this.timestampUsReactive === null) {
-					return [null, null];
-				}
-				const timestampNewestUs = this.timestampUsReactive + this.timestampDiff;
-				return [timestampNewestUs - this.periodUs, timestampNewestUs];
 			},
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;
@@ -295,13 +288,13 @@
 			async getTimestamp() {
 				if (this.getTimestampCache === null) {
 					const timestampBefore = timestampUs();
-					const data = await this.fetchData({ count: 1, all: true });
+					const timestampNewest = await this.fetchData({ count: 1, all: true });
 					const timestampAfter = timestampUs();
 					const timestampClient = (timestampAfter + timestampBefore) / 2;
 
 					this.getTimestampCache = {
 						client: timestampClient,
-						server: this.timestampServer,
+						server: timestampNewest ?? null,
 					};
 				}
 
@@ -316,52 +309,13 @@
 				];
 			},
 			async useLastPeriod(periodUs) {
-				this.loading = true;
-				try {
-					const [timestampNewest, timestampDiff] = await this.getTimestamp();
-
-					const nbSamples = Math.max(Math.round(this.viewport.width / 2), 100);
-					this.periodUs = periodUs;
-					this.inputs.reset({ periodLimit: this.periodUs });
-
-					if (timestampNewest !== null) {
-						const data = await this.fetchData({
-							before: timestampNewest,
-							after: timestampNewest - this.periodUs,
-							count: nbSamples,
-							all: false,
-						});
-						this.inputs.add(data);
-
-						// Adjust the refresh period to match the sampling of the graph.
-						this.refreshPeriodMs = Math.max(periodUs / nbSamples / 1000, 1000);
-						this.inputs.refreshPeriodically(async ([_, timestampNewestLocal]) => {
-							const timestampNewestRemote = Math.max(timestampUs() + timestampDiff, timestampNewestLocal + 1);
-							const periodRequestedUs = timestampNewestRemote - timestampNewestLocal;
-							const count = Math.round((periodRequestedUs * nbSamples) / periodUs);
-							if (count) {
-								return await this.fetchData({
-									after: timestampNewestLocal,
-									before: timestampNewestRemote,
-									count: count,
-									sampling: "newest",
-									all: false,
-								});
-							}
-						}, this.refreshPeriodMs);
-					}
-				} finally {
-					this.loading = false;
-				}
+				this.periodUs = periodUs;
 			},
 			// Gather all inputs to gather from the list of dashboards.
-			// Only the graph dashboards share the timeseries collection, the other
-			// dashboards (e.g. logs) manage their own data fetching.
 			inputsKeysFromDashboards(dashboards) {
 				return [
 					...new Set(
 						dashboards
-							.filter((dashboard) => ["linear", "bar"].includes(dashboard.type))
 							.map((dashboard) => {
 								return Object.keys(dashboard.inputs);
 							})
@@ -376,26 +330,11 @@
 					});
 				}
 			},
-			dashboardInputs(dashboard) {
-				let inputs = {};
-				for (const [input, options] of Object.entries(dashboard.inputs)) {
-					if (this.inputs.has(input)) {
-						inputs[input] = {
-							data: this.inputs.get(input),
-							options: options || {},
-						};
-					}
-				}
-				return inputs;
-			},
 			dashboardClass(dashboard) {
 				return {
 					"dashboard-component": true,
 					["dashboard-component-" + (dashboard.size || "medium")]: true,
 				};
-			},
-			timeToServer(timestamp) {
-				return timestamp + this.timestampDiff;
 			},
 			async fetchDashboards() {
 				await this.handleSubmit(
@@ -435,11 +374,11 @@
 					{ updateLoading: false },
 				);
 			},
-			async fetchData({ before = null, after = null, count = 800, sampling = null, all = false } = {}) {
+			async fetchData({ count = 800, all = false } = {}) {
 				return await this.handleSubmit(
 					async () => {
 						// Make requests as chunks.
-						const includes = this.inputsKeysFromDashboards(all ? this.dashboards : this.viewport.dashboards);
+						const includes = this.inputsKeysFromDashboards(this.dashboards);
 						const fetchedKeys = new Set(includes);
 						let promises = [];
 						while (includes.length) {
@@ -449,9 +388,6 @@
 									include: chunk.join(","),
 									metadata: 1,
 									count: count,
-									before: before,
-									after: after,
-									sampling: sampling,
 								}).filter(([_, v]) => v !== null),
 							);
 							promises.push(
@@ -462,28 +398,18 @@
 								}),
 							);
 						}
-						if (promises.length) {
-							// Signal only the displayed dashboards whose inputs were fetched.
-							for (const dashboard of this.displayedDashboards) {
-								if (Object.keys(dashboard.inputs).some((key) => fetchedKeys.has(key))) {
-									this.onFetch(dashboard, this.refreshPeriodMs ?? 1000);
+						const results = await Promise.all(promises);
+
+						// Retrieve the newest timestamp from the data itself.
+						let timestampNewest = null;
+						for (const result of results) {
+							for (const [_key, values] of result.data) {
+								for (const [timestamp] of values) {
+									timestampNewest = timestampNewest === null ? timestamp : Math.max(timestampNewest, timestamp);
 								}
 							}
 						}
-						const results = await Promise.all(promises);
-
-						if (results.length) {
-							this.timestampServer = Math.max(...results.map((result) => result.timestamp));
-						}
-
-						let inputs = {};
-						for (const result of results) {
-							for (const [key, data] of result.data) {
-								inputs[Utils.keyToPath(key)] = data;
-							}
-						}
-
-						return inputs;
+						return timestampNewest;
 					},
 					{ updateLoading: false },
 				);

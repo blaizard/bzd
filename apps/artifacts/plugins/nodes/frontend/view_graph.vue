@@ -7,23 +7,34 @@
 <script>
 	import Chart from "chart.js/auto";
 	import "chartjs-adapter-date-fns";
+	import Base from "#bzd/apps/artifacts/plugins/base.vue";
+	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
+	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import { UCUMToString } from "#bzd/nodejs/utils/to_string.js";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
+	const refreshPeriodMs = 3000;
 
 	export default {
+		mixins: [Base, Component],
 		props: {
 			options: { mandatory: true, type: Object },
-			// It should be formatted as { <name>: { "data": [[<time>, <value>], ...], "options": {} } }
-			inputs: { mandatory: true, type: Object },
+			endpoint: { mandatory: true, type: String },
 			timeRange: { mandatory: true, type: Array },
 		},
+		emits: ["fetch"],
 		data: function () {
 			// It's important to make sure chart is not reactive.
 			// see: https://github.com/chartjs/Chart.js/issues/8970
 			this.chart = null;
-			return {};
+			this.collection = new TimeseriesCollection();
+			return {
+				inputData: {},
+				fetching: false,
+				liveTimer: null,
+			};
 		},
 		watch: {
 			datasets() {
@@ -32,11 +43,15 @@
 					this.chart.update("none"); // "none" suppress animation.
 				}
 			},
-			timeRange() {
+			timeRange(value, previous) {
 				this.applyTimeRange();
+				const span = (range) => (range[0] === null || range[1] === null ? null : range[1] - range[0]);
+				if (span(value) !== span(previous)) {
+					this.loadInitial();
+				}
 			},
 		},
-		mounted() {
+		async mounted() {
 			this.chart = new Chart(
 				this.$refs.graph,
 				this.adaptConfig({
@@ -108,8 +123,14 @@
 				}),
 			);
 			this.applyTimeRange();
+			await this.loadInitial();
+			this.liveTimer = setInterval(async () => {
+				await this.fetchLatest();
+			}, refreshPeriodMs);
 		},
 		beforeUnmount() {
+			clearInterval(this.liveTimer);
+			this.collection.close();
 			if (this.chart) {
 				this.chart.destroy();
 				this.chart = null;
@@ -120,13 +141,11 @@
 				return this.options.type;
 			},
 			datasets() {
-				return Object.entries(this.inputs)
+				return Object.entries(this.inputData)
 					.map(([name, input]) => {
 						const label = this.options.inputs?.[name]?.name ?? name;
-						if (input.data.length > 0 && Array.isArray(input.data[0][1])) {
-							const zippedData = input.data[0][1].map((_, index) =>
-								input.data.map(([t, v]) => ({ x: t / 1000, y: v[index] })),
-							);
+						if (input.length > 0 && Array.isArray(input[0][1])) {
+							const zippedData = input[0][1].map((_, index) => input.map(([t, v]) => ({ x: t / 1000, y: v[index] })));
 							return zippedData.map((data, index) =>
 								this.adaptDataset({
 									label: label + "[" + index + "]",
@@ -138,7 +157,7 @@
 						return [
 							this.adaptDataset({
 								label: label,
-								data: input.data.map(([t, v]) => ({ x: t / 1000, y: v })),
+								data: input.map(([t, v]) => ({ x: t / 1000, y: v })),
 								spanGaps: false,
 							}),
 						];
@@ -147,6 +166,62 @@
 			},
 		},
 		methods: {
+			async loadInitial() {
+				if (this.fetching || this.timeRange[0] === null || this.timeRange[1] === null) {
+					return;
+				}
+				this.fetching = true;
+				try {
+					const count = Math.max(Math.round(this.$el.clientWidth / 2), 100);
+					this.collection.reset({ periodLimit: this.timeRange[1] - this.timeRange[0] });
+					this.collection.add(
+						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }),
+					);
+					this.inputData = this.collection.data;
+				} finally {
+					this.fetching = false;
+				}
+			},
+			async fetchLatest() {
+				if (this.fetching) {
+					return;
+				}
+				const [, timestampNewest] = this.collection.timeRange;
+				if (timestampNewest === null) {
+					return;
+				}
+				this.fetching = true;
+				try {
+					this.collection.add(await this.fetchData({ after: this.timestampNewest, count: 100, sampling: "newest" }));
+					this.inputData = this.collection.data;
+				} finally {
+					this.fetching = false;
+				}
+			},
+			async fetchData({ count, before = null, after = null, sampling = null }) {
+				this.$emit("fetch", refreshPeriodMs);
+				return await this.handleSubmit(
+					async () => {
+						const query = Object.fromEntries(
+							Object.entries({
+								include: Object.keys(this.options.inputs).join(","),
+								metadata: 1,
+								count: count,
+								before: before,
+								after: after,
+								sampling: sampling,
+							}).filter(([_, value]) => value !== null),
+						);
+						const result = await this.requestBackend(this.endpoint, {
+							method: "get",
+							query: query,
+							expect: "json",
+						});
+						return Object.fromEntries(result.data.map(([key, data]) => [Utils.keyToPath(key), data]));
+					},
+					{ updateLoading: false },
+				);
+			},
 			adaptDataset(dataset) {
 				switch (this.graphType) {
 					case "bar":
