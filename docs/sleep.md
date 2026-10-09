@@ -19,7 +19,7 @@ Doing it implicitly will move this on the platform side.
 
 ### Idle task
 
-When the executor has only services tasks running, it would exit and run an idle task.
+When the executor has only service tasks running, it would exit and run an idle task.
 
 ```
 while true:
@@ -41,5 +41,5 @@ def idle(executor):
         wait(1ms);
 ```
 
-The advantage with such design is that it decouuples the platform specific part. Also
+The advantage with such design is that it decouples the platform specific part. Also
 if there are multiple executors, the logic to go to sleep could incorporate them all.

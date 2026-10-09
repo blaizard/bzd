@@ -175,7 +175,7 @@ This will return a result that is a tuple of optional results of the 2 coroutine
 ### Error propagation
 
 Some errors cannot be treated at the caller level and might have to be propagated to the upper layers. For that the Async
-type provides a convenient operator to reduce boiler plate code:
+type provides a convenient operator to reduce boilerplate code:
 
 ```c++
 const auto value = co_await !myFunc();

@@ -1,6 +1,6 @@
 # BDL
 
-BDL or (Bzd Description Language) is a DSL (Domain Specific Language) for the bzd framework.
+BDL (Bzd Description Language) is a DSL (Domain Specific Language) for the bzd framework.
 
 ## Glossary
 

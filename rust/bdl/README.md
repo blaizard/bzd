@@ -149,7 +149,7 @@ where
 
 The component implementation provides the concrete struct and implements the trait. The runtime support crate `//rust/bdl/generator/impl/adapter:component` provides `LocalStatic` (single-threaded `&'static mut` registry), `Wrapper`, and `Lifecycle`.
 
-## Dependencies
+## Implementation dependencies
 
 Rust dependencies provided through the `implementation` attribute are re-exported as part of the public API:
 
