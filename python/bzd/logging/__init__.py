@@ -10,6 +10,7 @@ from bzd.logging.handler import (
 	LoggerHandlerCallback,
 )
 from bzd.logging.handler.stderr import LoggerHandlerStderr
+from bzd.utils.timestamp import timestampUs
 
 # Default logger
 logging.basicConfig(level=logging.INFO)
@@ -27,7 +28,7 @@ class _CallbackHandler(logging.Handler):
 			self.callback(
 				Log(
 					name=record.name,
-					timestamp=record.created,
+					timestamp=timestampUs() / 1_000_000,
 					message=msg,
 					level=record.levelname.lower(),
 					filename=record.filename,

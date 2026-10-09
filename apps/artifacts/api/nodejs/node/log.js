@@ -1,5 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "api");
 const Log = LogFactory("artifacts", "api");
@@ -26,9 +27,9 @@ export class LoggerBackendNode {
 		this.timer.unref();
 	}
 
-	processor(date, level, topics, message) {
+	processor(_date, level, topics, message) {
 		this.buffer.push({
-			timestampUs: date.getTime() * 1000,
+			timestampUs: timestampUs(),
 			value: {
 				[this.name]: {
 					topic: (topics ?? []).join("::"),

@@ -9,5 +9,6 @@ py_library(
     deps = [
         "//bzd/logging/handler",
         "//bzd/logging/handler:stderr",
+        "//bzd/utils:timestamp",
     ],
 )
