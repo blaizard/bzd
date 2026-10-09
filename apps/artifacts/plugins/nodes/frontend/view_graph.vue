@@ -25,7 +25,7 @@
 			timeRange: { mandatory: true, type: Array },
 			configuration: { type: Object, default: () => ({}) },
 		},
-		emits: ["fetch", "update:configuration"],
+		emits: ["fetch", "timestamp", "update:configuration"],
 		data: function () {
 			// It's important to make sure chart is not reactive.
 			// see: https://github.com/chartjs/Chart.js/issues/8970
@@ -179,6 +179,7 @@
 						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }),
 					);
 					this.inputData = this.collection.data;
+					this.emitTimestamp();
 				} finally {
 					this.fetching = false;
 				}
@@ -193,8 +194,9 @@
 				}
 				this.fetching = true;
 				try {
-					this.collection.add(await this.fetchData({ after: this.timestampNewest, count: 100, sampling: "newest" }));
+					this.collection.add(await this.fetchData({ after: timestampNewest, count: 100, sampling: "newest" }));
 					this.inputData = this.collection.data;
+					this.emitTimestamp();
 				} finally {
 					this.fetching = false;
 				}
@@ -222,6 +224,12 @@
 					},
 					{ updateLoading: false },
 				);
+			},
+			emitTimestamp() {
+				const [, timestampNewest] = this.collection.timeRange;
+				if (timestampNewest !== null) {
+					this.$emit("timestamp", timestampNewest);
+				}
 			},
 			adaptDataset(dataset) {
 				switch (this.graphType) {

@@ -30,6 +30,7 @@
 					:configuration="options.configuration"
 					@update:configuration="options = { ...options, configuration: $event }"
 					@fetch="onFetch(dashboard, $event)"
+					@timestamp="onTimestamp($event)"
 					class="dashboard-component-graph"
 				>
 				</component>
@@ -225,6 +226,18 @@
 			},
 		},
 		methods: {
+			/// Anchor the timestamp extrapolation on the newest timestamp fetched by a dashboard.
+			onTimestamp(timestamp) {
+				if (timestamp === null || timestamp === undefined) {
+					return;
+				}
+				if (this.getTimestampCache === null || timestamp > this.getTimestampCache.server) {
+					this.getTimestampCache = {
+						client: timestampUs(),
+						server: timestamp,
+					};
+				}
+			},
 			/// Record a server fetch of a dashboard and its expected period.
 			onFetch(dashboard, period) {
 				const previous = this.heartbeats.get(dashboard) ?? { counter: 0 };

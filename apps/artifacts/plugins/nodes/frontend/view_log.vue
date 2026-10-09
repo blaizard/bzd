@@ -104,7 +104,7 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
-		emits: ["update:configuration", "fetch"],
+		emits: ["update:configuration", "fetch", "timestamp"],
 		methods: {
 			handleScroll() {
 				const container = this.$refs.scrollContainer;
@@ -117,6 +117,7 @@
 			/// Load the latest page and stick to the bottom.
 			async loadInitial() {
 				this.lines = await this.fetchEntries();
+				this.emitTimestamp();
 				this.pinnedBottom = true;
 				await this.$nextTick();
 				const container = this.$refs.scrollContainer;
@@ -163,6 +164,7 @@
 					lines = prepend ? lines.slice(0, maxLines) : lines.slice(-maxLines);
 				}
 				this.lines = lines;
+				this.emitTimestamp();
 				await this.$nextTick();
 				if (container) {
 					if (prepend) {
@@ -170,6 +172,12 @@
 					} else {
 						container.scrollTop = container.scrollHeight;
 					}
+				}
+			},
+			emitTimestamp() {
+				const timestampNewest = this.lines.at(-1)?.[0] ?? null;
+				if (timestampNewest !== null) {
+					this.$emit("timestamp", timestampNewest);
 				}
 			},
 			/// Fetch a page of logs.
