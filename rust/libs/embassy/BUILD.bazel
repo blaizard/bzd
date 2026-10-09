@@ -9,6 +9,7 @@ rust_library_group(
             "@crates//:embassy-futures",
             "@crates//:embassy-executor",
             "@crates//:static_cell",
+            "@crates//:embassy-sync",
         ],
         ("@bzd_platforms//al_isa:esp32-xtensa_lx6", "@bzd_platforms//al_isa:esp32s3-xtensa_lx7"): [
             "@bzd_espressif//hal/rust:embassy",

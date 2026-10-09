@@ -1,8 +1,8 @@
 {%- macro configContextValue(item) -%}
 {% if isList(item) -%}
-[&'static mut C::{{ item.name | toCamelCase }}; {{ listSize(item) }}]
+[component::ComponentHandle<C::{{ item.name | toCamelCase }}>; {{ listSize(item) }}]
 {%- elif configDependencySymbol(item) -%}
-&'static mut C::{{ item.name | toCamelCase }}
+component::ComponentHandle<C::{{ item.name | toCamelCase }}>
 {%- else -%}
 {{ item.symbol | symbolToStr }}
 {%- end -%}

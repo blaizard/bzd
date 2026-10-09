@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+use critical_section as _;
 use rust_bdl_tests_components_complex_dependency::{
     BzdTestManagerContext, BzdTestManagerContextConstraintTypes, BzdTestManagerInterface,
     BzdTestUserContext, BzdTestUserInterface,
@@ -27,7 +28,8 @@ struct Manager {
 
 impl BzdTestManagerInterface for Manager {
     async fn run(&mut self) -> Result<(), bzd::base::error::Error> {
-        let _ = self.context.user.greet().await?;
+        let mut user = self.context.user.lock().await;
+        let _ = user.greet().await?;
         Ok(())
     }
 }
@@ -36,13 +38,15 @@ impl BzdTestManagerInterface for Manager {
 #[bzd_test::test]
 mod tests {
     use super::*;
-    use component::LocalStatic;
+    use component::{Component, StaticComponent};
 
     #[test]
     fn test_component() -> TestResult {
-        static USER: LocalStatic<User> = LocalStatic::new();
-        let user = USER.get_mut_or_init(|| User {
-            context: BzdTestUserContext { username: "Alex" },
+        static USER: StaticComponent<Component<User>> = StaticComponent::new();
+        let user = USER.get_or_init(|| {
+            Component::new(User {
+                context: BzdTestUserContext { username: "Alex" },
+            })
         });
         let mut manager = Manager {
             context: ManagerContext::new(user),

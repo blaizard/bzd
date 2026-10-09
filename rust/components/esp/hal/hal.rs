@@ -2,7 +2,7 @@
 
 use core::cell::UnsafeCell;
 
-struct Singleton<T>(UsafeCell<Option<T>>);
+struct Singleton<T>(UnsafeCell<Option<T>>);
 
 unsafe impl<T> Sync for Singleton<T> {}
 
@@ -21,5 +21,5 @@ impl<T> Singleton<T> {
 static PERIPHERALS: Singleton<esp_hal::peripherals::Peripherals> = Singleton::new();
 
 pub fn init() -> &'static mut esp_hal::peripherals::Peripherals {
-    PERIPHERALS.get_mut_or_init(|| esp_hal::init(esp_hale::Config::default()))
+    PERIPHERALS.get_mut_or_init(|| esp_hal::init(esp_hal::Config::default()))
 }

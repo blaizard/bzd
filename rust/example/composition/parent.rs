@@ -32,7 +32,8 @@ where
             self.context.age,
             self.context.children.len()
         );
-        for child in self.context.children.iter_mut() {
+        for child in self.context.children {
+            let mut child = child.lock().await;
             child.print_info().await?;
         }
         Ok(())

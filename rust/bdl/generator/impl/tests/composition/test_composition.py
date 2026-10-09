@@ -129,7 +129,7 @@ composition {
 		expectedContent = """#![no_std]
 
 #[allow(unused_imports)]
-use component::{Lifecycle, LocalStatic, Wrapper};
+use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
 use bzd::base::logger::{log_error, log_info, Logger};
@@ -142,139 +142,178 @@ use child::*;
 use parent::*;
 
 // ---- Registry
-
-#[allow(dead_code)]
 struct DefaultExecutorEntry {
-	instance: Executor,
+	component: CompositionComponent<Executor>,
 }
 
+impl DefaultExecutorEntry {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<DefaultExecutorEntry> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new(Executor::new())
+		})
+	}
+}
+
+#[allow(unused_variables)]
 impl Lifecycle for DefaultExecutorEntry {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.acquire(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.release(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 }
 
-fn registry_default_executor() -> &'static mut Wrapper<DefaultExecutorEntry> {
-	static COMPONENT: LocalStatic<Wrapper<DefaultExecutorEntry>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new(DefaultExecutorEntry {
-			instance: Executor::new(),
-		})
-	})
-}
-
-#[allow(dead_code)]
 struct DefaultOutEntry {
-	instance: DefaultOut,
+	component: CompositionComponent<DefaultOut>,
 }
 
+impl DefaultOutEntry {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<DefaultOutEntry> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new(DefaultOut::new())
+		})
+	}
+}
+
+#[allow(unused_variables)]
 impl Lifecycle for DefaultOutEntry {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.acquire(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.release(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 }
 
-fn registry_default_out() -> &'static mut Wrapper<DefaultOutEntry> {
-	static COMPONENT: LocalStatic<Wrapper<DefaultOutEntry>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new(DefaultOutEntry {
-			instance: DefaultOut::new(),
-		})
-	})
-}
-
-#[allow(dead_code)]
 struct DefaultPerson_childEntry {
-	instance: DefaultChild,
+	component: CompositionComponent<DefaultChild>,
 }
 
+impl DefaultPerson_childEntry {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<DefaultPerson_childEntry> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new(DefaultChild::new(DefaultChildContext { username: "Alex", age: 28 }))
+		})
+	}
+}
+
+#[allow(unused_variables)]
 impl Lifecycle for DefaultPerson_childEntry {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.acquire(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
+		self.component.release(async |component| {
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 }
 
-fn registry_default_person_child() -> &'static mut Wrapper<DefaultPerson_childEntry> {
-	static COMPONENT: LocalStatic<Wrapper<DefaultPerson_childEntry>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new(DefaultPerson_childEntry {
-			instance: DefaultChild::new(DefaultChildContext { username: "Alex", age: 28 }),
-		})
-	})
-}
-
-#[allow(dead_code)]
 struct DefaultPerson_parentEntry {
-	instance: DefaultParent<DefaultParentContextConstraintTypes<DefaultChild>>,
+	component: CompositionComponent<DefaultParent<DefaultParentContextConstraintTypes<DefaultChild>>>,
 }
 
+impl DefaultPerson_parentEntry {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<DefaultPerson_parentEntry> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new(DefaultParent::<DefaultParentContextConstraintTypes<DefaultChild>>::new(DefaultParentContext::<DefaultParentContextConstraintTypes<DefaultChild>>::new("Bob", 42, [&DefaultPerson_childEntry::get().component.handle()])))
+		})
+	}
+}
+
+#[allow(unused_variables)]
 impl Lifecycle for DefaultPerson_parentEntry {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
-		registry_default_person_child().init().await?;
+		self.component.acquire(async |component| {
+					DefaultPerson_childEntry::get().init().await?;
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
-		registry_default_person_child().shutdown().await?;
+		self.component.release(async |component| {
+					DefaultPerson_childEntry::get().shutdown().await?;
+			
+			Ok(())
+		}).await?;
 		Ok(())
 	}
 }
 
-fn registry_default_person_parent() -> &'static mut Wrapper<DefaultPerson_parentEntry> {
-	static COMPONENT: LocalStatic<Wrapper<DefaultPerson_parentEntry>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new(DefaultPerson_parentEntry {
-			instance: DefaultParent::<DefaultParentContextConstraintTypes<DefaultChild>>::new(DefaultParentContext::<DefaultParentContextConstraintTypes<DefaultChild>>::new("Bob", 42, [&mut registry_default_person_child().instance])),
-		})
-	})
-}
-
-#[allow(dead_code)]
 struct DefaultPrinterEntry {
-	instance: DefaultPrinter,
+	component: CompositionComponent<DefaultPrinter>,
 }
 
-impl Lifecycle for DefaultPrinterEntry {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
-	{
-		registry_default_out().init().await?;
-		Ok(())
-	}
-
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
-	{
-		registry_default_out().shutdown().await?;
-		Ok(())
-	}
-}
-
-fn registry_default_printer() -> &'static mut Wrapper<DefaultPrinterEntry> {
-	static COMPONENT: LocalStatic<Wrapper<DefaultPrinterEntry>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new(DefaultPrinterEntry {
-			instance: DefaultPrinter::new(DefaultPrinterContext { out: &mut registry_default_out().instance }),
+impl DefaultPrinterEntry {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<DefaultPrinterEntry> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new(DefaultPrinter::new(DefaultPrinterContext { out: &DefaultOutEntry::get().component.handle() }))
 		})
-	})
+	}
+}
+
+#[allow(unused_variables)]
+impl Lifecycle for DefaultPrinterEntry {
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
+	{
+		self.component.acquire(async |component| {
+					DefaultOutEntry::get().init().await?;
+			
+			Ok(())
+		}).await?;
+		Ok(())
+	}
+
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
+	{
+		self.component.release(async |component| {
+					DefaultOutEntry::get().shutdown().await?;
+			
+			Ok(())
+		}).await?;
+		Ok(())
+	}
 }
 
 // ---- Execution
@@ -282,23 +321,29 @@ fn registry_default_printer() -> &'static mut Wrapper<DefaultPrinterEntry> {
 #[allow(non_snake_case)]
 pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 {
-	// Create the logger, bound to the 'out' registry entry.
-	let mut logger = Logger::new(&mut registry_default_out().instance);
 
 	// Initialize all registry entries.
-	registry_default_executor().init().await?;
-	registry_default_out().init().await?;
-	registry_default_person_child().init().await?;
-	registry_default_person_parent().init().await?;
-	registry_default_printer().init().await?;
-	log_info!(logger, "[default.executor] Initialization completed.").await?;
+	DefaultExecutorEntry::get().init().await?;
+	DefaultOutEntry::get().init().await?;
+	DefaultPerson_childEntry::get().init().await?;
+	DefaultPerson_parentEntry::get().init().await?;
+	DefaultPrinterEntry::get().init().await?;
+	{
+		let mut out = DefaultOutEntry::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[default.executor] Initialization completed.").await?;
+	}
 
 	// Execute the workloads and services.
-	log_info!(logger, "[default.executor] Composition phase.").await?;
+	{
+		let mut out = DefaultOutEntry::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[default.executor] Composition phase.").await?;
+	}
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = GenericExecutor::new()
 		.push_workload(async {
-			match registry_default_person_child().instance.print_info().await {
+			match DefaultPerson_childEntry::get().component.lock().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -307,7 +352,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 			}
 		})
 		.push_workload(async {
-			match registry_default_person_parent().instance.print_info().await {
+			match DefaultPerson_parentEntry::get().component.lock().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -316,7 +361,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 			}
 		})
 		.push_workload(async {
-			match registry_default_printer().instance.run().await {
+			match DefaultPrinterEntry::get().component.lock().await.run().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -326,25 +371,36 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 		})
 		;
 
-	log_info!(logger, "[default.executor] Execution phase.").await?;
+	{
+		let mut out = DefaultOutEntry::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[default.executor] Execution phase.").await?;
+	}
 	let result = executor.join().await;
 
-	log_info!(logger, "[default.executor] Completion.").await?;
+	{
+		let mut out = DefaultOutEntry::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[default.executor] Completion.").await?;
+	}
 
 	// Shutdown all registry entries.
-	registry_default_executor().shutdown().await?;
-	registry_default_out().shutdown().await?;
-	registry_default_person_child().shutdown().await?;
-	registry_default_person_parent().shutdown().await?;
-	registry_default_printer().shutdown().await?;
+	DefaultExecutorEntry::get().shutdown().await?;
+	DefaultOutEntry::get().shutdown().await?;
+	DefaultPerson_childEntry::get().shutdown().await?;
+	DefaultPerson_parentEntry::get().shutdown().await?;
+	DefaultPrinterEntry::get().shutdown().await?;
 
 	if result != 0 {
 		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
+		let mut out = DefaultOutEntry::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
 		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;
 		return Err(error);
 	}
 	Ok(())
 }
+
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
 		self.assertEqual(actual.rstrip("\n"), expectedContent.rstrip("\n"))

@@ -18,10 +18,19 @@ rust_library(
         ":dependency",
         "//rust/bdl/generator/impl/adapter:component",
         "//rust/bzd",
+        "//rust/libs/critical_section/noop",
     ],
 )
 
 rust_test(
     name = "implementation_dependency_test",
-    crate = ":implementation_dependency",
+    srcs = [
+        "implementation_dependency.rs",
+    ],
+    deps = [
+        ":dependency",
+        "//rust/bdl/generator/impl/adapter:component",
+        "//rust/bzd",
+        "//rust/libs/critical_section/noop",
+    ],
 )

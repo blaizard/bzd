@@ -1,15 +1,15 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
-    name = "component",
+    name = "noop",
     srcs = [
-        "component.rs",
+        "noop.rs",
     ],
+    crate_name = "critical_section",
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "//rust/bzd",
-        "//rust/libs/embassy",
+        "@crates//:critical-section",
     ],
 )

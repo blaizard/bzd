@@ -54,6 +54,7 @@ rust_library_group(
     visibility = ["//visibility:public"],
     deps = select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "@crates_esp32//:critical-section",
             "@crates_esp32//:embassy-executor",
             "@crates_esp32//:embassy-futures",
             "@crates_esp32//:embassy-sync",
@@ -63,6 +64,7 @@ rust_library_group(
             "@crates_esp32//:static_cell",
         ],
         "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "@crates_esp32s3//:critical-section",
             "@crates_esp32s3//:embassy-executor",
             "@crates_esp32s3//:embassy-futures",
             "@crates_esp32s3//:embassy-sync",

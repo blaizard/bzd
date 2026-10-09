@@ -1,5 +1,6 @@
 use child::{BzdComponentsChild, BzdComponentsChildContext, BzdComponentsPersonInterface};
-use component::{Lifecycle, LocalStatic, Wrapper};
+use component::{CompositionComponent, Lifecycle, StaticComponent};
+use critical_section as _;
 use parent::{
     BzdComponentsParent, BzdComponentsParentContext, BzdComponentsParentContextConstraintTypes,
 };
@@ -7,61 +8,90 @@ use parent::{
 // ---- Registry
 
 struct PersonEntryChild {
-    instance: BzdComponentsChild,
+    component: CompositionComponent<BzdComponentsChild>,
 }
 
-impl Lifecycle for PersonEntryChild {
-    async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[child] init");
-        Ok(())
-    }
-
-    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[child] shutdown");
-        Ok(())
-    }
-}
-
-// One registry function per composition entry, it creates and returns mutable
-// access to the component wrapper.
-fn registry_person_child() -> &'static mut Wrapper<PersonEntryChild> {
-    static COMPONENT: LocalStatic<Wrapper<PersonEntryChild>> = LocalStatic::new();
-    COMPONENT.get_mut_or_init(|| {
-        Wrapper::new(PersonEntryChild {
-            instance: BzdComponentsChild::new(BzdComponentsChildContext {
-                age: 28,
-                username: "Alex",
-            }),
+impl PersonEntryChild {
+    fn get() -> &'static Self {
+        static COMPONENT: StaticComponent<PersonEntryChild> = StaticComponent::new();
+        COMPONENT.get_or_init(|| Self {
+            component: CompositionComponent::new(BzdComponentsChild::new(
+                BzdComponentsChildContext {
+                    age: 28,
+                    username: "Alex",
+                },
+            )),
         })
-    })
+    }
+}
+
+#[allow(unused_variables)]
+impl Lifecycle for PersonEntryChild {
+    async fn init(&self) -> Result<(), bzd::base::error::Error> {
+        self.component
+            .acquire(async |component| {
+                println!("[child] init");
+                Ok(())
+            })
+            .await?;
+        Ok(())
+    }
+
+    async fn shutdown(&self) -> Result<(), bzd::base::error::Error> {
+        self.component
+            .release(async |component| {
+                println!("[child] shutdown");
+                Ok(())
+            })
+            .await?;
+        Ok(())
+    }
 }
 
 struct PersonEntryParent {
-    instance: BzdComponentsParent<BzdComponentsParentContextConstraintTypes<BzdComponentsChild>>,
+    component: CompositionComponent<
+        BzdComponentsParent<BzdComponentsParentContextConstraintTypes<BzdComponentsChild>>,
+    >,
 }
 
-impl Lifecycle for PersonEntryParent {
-    async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[parent] init");
-        Ok(())
-    }
-
-    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        println!("[parent] shutdown");
-        Ok(())
-    }
-}
-
-fn registry_person_parent() -> &'static mut Wrapper<PersonEntryParent> {
-    static COMPONENT: LocalStatic<Wrapper<PersonEntryParent>> = LocalStatic::new();
-    COMPONENT.get_mut_or_init(|| {
-        let child = &mut registry_person_child().instance;
-        Wrapper::new(PersonEntryParent {
-            instance: BzdComponentsParent::new(BzdComponentsParentContext::<
+impl PersonEntryParent {
+    fn get() -> &'static Self {
+        static COMPONENT: StaticComponent<PersonEntryParent> = StaticComponent::new();
+        COMPONENT.get_or_init(|| Self {
+            component: CompositionComponent::new(BzdComponentsParent::<
                 BzdComponentsParentContextConstraintTypes<BzdComponentsChild>,
-            >::new("Bob", 42, [child])),
+            >::new(BzdComponentsParentContext::<
+                BzdComponentsParentContextConstraintTypes<BzdComponentsChild>,
+            >::new(
+                "Bob",
+                42,
+                [PersonEntryChild::get().component.handle()],
+            ))),
         })
-    })
+    }
+}
+
+#[allow(unused_variables)]
+impl Lifecycle for PersonEntryParent {
+    async fn init(&self) -> Result<(), bzd::base::error::Error> {
+        self.component
+            .acquire(async |component| {
+                println!("[parent] init");
+                Ok(())
+            })
+            .await?;
+        Ok(())
+    }
+
+    async fn shutdown(&self) -> Result<(), bzd::base::error::Error> {
+        self.component
+            .release(async |component| {
+                println!("[parent] shutdown");
+                Ok(())
+            })
+            .await?;
+        Ok(())
+    }
 }
 
 fn block_on<F: core::future::Future>(future: F) -> F::Output {
@@ -85,15 +115,15 @@ fn block_on<F: core::future::Future>(future: F) -> F::Output {
 }
 
 fn main() -> Result<(), bzd::base::error::Error> {
-    let person_child = registry_person_child();
-    let person_parent = registry_person_parent();
+    let person_child = PersonEntryChild::get();
+    let person_parent = PersonEntryParent::get();
 
     block_on(person_child.init())?;
     block_on(person_parent.init())?;
 
-    block_on(person_child.instance.print_info())?;
-    block_on(person_child.instance.print_info())?;
-    block_on(person_parent.instance.print_info())?;
+    block_on(async { person_child.component.lock().await.print_info().await })?;
+    block_on(async { person_child.component.lock().await.print_info().await })?;
+    block_on(async { person_parent.component.lock().await.print_info().await })?;
 
     block_on(person_child.shutdown())?;
     block_on(person_parent.shutdown())?;

@@ -19,6 +19,7 @@ bdl_target(
     ],
     data = {
         "deps": [
+            "//rust/libs/critical_section/noop",
             "//rust/libs/embassy",
         ],
         "main": [

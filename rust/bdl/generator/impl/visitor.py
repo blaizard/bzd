@@ -119,9 +119,9 @@ class Transform:
 
 	def configConstructorValueToStr(self, item: EntityExpression) -> str:
 		if self.isList(item):
-			return f"[&'static mut {self.toCamelCase(item.name)}Type; {self.listSize(item)}]"
+			return f"[component::ComponentHandle<{self.toCamelCase(item.name)}Type>; {self.listSize(item)}]"
 		if self.configDependencySymbol(item) is not None:
-			return f"&'static mut {self.toCamelCase(item.name)}Type"
+			return f"component::ComponentHandle<{self.toCamelCase(item.name)}Type>"
 		return symbolRustToStr(item.symbol)
 
 	def configConstructorParameters(self, entity: Entity) -> str:
@@ -150,9 +150,6 @@ class Transform:
 			return "true" if literalNative else "false"
 
 		return str(literalNative)
-
-	def registryNameToStr(self, fqn: str) -> str:
-		return "registry_{}".format("_".join(FQN.toNamespace(fqn)))
 
 	def outFqn(self, context: Context) -> str:
 		fqn = "{}.out".format(context.target)
@@ -188,7 +185,7 @@ class Transform:
 			return "[{}]".format(", ".join(values))
 		fqn = param.underlyingValueFQN
 		assert fqn is not None, f"The parameter '{param}' must reference a registry entry."
-		return "&mut {}().instance".format(self.registryNameToStr(fqn))
+		return "&{}::get().component.handle()".format(self.entryStructNameToStr(fqn))
 
 	def configParamConcreteType(self, item: ParametersResolvedItem, context: Context) -> Optional[str]:
 		"""Resolve the concrete type of a config dependency, through the registry if possible."""
@@ -259,13 +256,28 @@ class Transform:
 
 		return expression.symbol.propertyName
 
+	def lifecycleMethodToStr(self, expression: Expression, fqn: str) -> str:
+		"""Generate the method call of a lifecycle entry on its component instance."""
+
+		symbol = expression.symbol
+		assert symbol.this, f"The lifecycle '{expression}' must target a component instance."
+		receiver = (
+			"component"
+			if symbol.this == fqn
+			else "{}::get().component.lock().await".format(self.entryStructNameToStr(symbol.this))
+		)
+		parameters = ", ".join(self.configParamValueToStr(item) for item in expression.parametersResolved)
+		return "{}.{}({})".format(receiver, symbol.propertyName, parameters)
+
 	def workloadMethodToStr(self, entry: ExpressionEntry) -> str:
 		"""Generate the method call of a workload/service entry on its component instance."""
 
 		symbol = entry.expression.symbol
 		assert symbol.this, f"The workload '{entry.expression}' must be a method call on a component instance."
 		parameters = ", ".join(self.configParamValueToStr(item) for item in entry.expression.parametersResolved)
-		return "{}().instance.{}({})".format(self.registryNameToStr(symbol.this), symbol.propertyName, parameters)
+		return "{}::get().component.lock().await.{}({})".format(
+			self.entryStructNameToStr(symbol.this), symbol.propertyName, parameters
+		)
 
 
 def formatRust(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:

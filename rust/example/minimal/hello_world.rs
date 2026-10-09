@@ -28,7 +28,8 @@ where
     C: BzdExampleHelloWorldContextConstraint,
 {
     async fn run(&mut self) -> Result<(), bzd::base::error::Error> {
-        self.context.out.write(b"Hello, world!\n").await?;
+        let mut out = self.context.out.lock().await;
+        out.write(b"Hello, world!\n").await?;
         Ok(())
     }
 }

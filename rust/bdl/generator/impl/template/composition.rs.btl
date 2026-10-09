@@ -1,7 +1,7 @@
 #![no_std]
 
 #[allow(unused_imports)]
-use component::{Lifecycle, LocalStatic, Wrapper};
+use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
 use bzd::base::logger::{log_error, log_info, Logger};
@@ -15,44 +15,60 @@ use {{ import }}::*;
 
 // ---- Registry
 
+{#- Generate calls for all init members associated with an expression. -#}
+{%- macro callInitMembers(entry, fqn) -%}
+	{% for dep in entry.deps %}
+		{{ dep.fqn | entryStructNameToStr }}::get().init().await?;
+	{% end %}
+	{% for init in entry.init %}
+		{{ lifecycleMethodToStr(init, fqn) }}.await?;
+	{% end %}
+{% end %}
+
+{#- Generate calls for all shutdown members associated with an expression. -#}
+{%- macro callShutdownMembers(entry, fqn) -%}
+	{% for dep in entry.deps %}
+		{{ dep.fqn | entryStructNameToStr }}::get().shutdown().await?;
+	{% end %}
+	{% for shutdown in entry.shutdown %}
+		{{ lifecycleMethodToStr(shutdown, fqn) }}.await?;
+	{% end %}
+{% end %}
+
 {% for context in contexts %}
 {% for fqn, entry in registry[context] %}
-#[allow(dead_code)]
 struct {{ fqn | entryStructNameToStr }} {
-	instance: {{ entryTypeToStr(entry, context) }},
+	component: CompositionComponent<{{ entryTypeToStr(entry, context) }}>,
 }
 
-impl Lifecycle for {{ fqn | entryStructNameToStr }} {
-	async fn init(&mut self) -> Result<(), bzd::base::error::Error>
-	{
-{% for dep in entry.deps %}
-		{{ dep.fqn | registryNameToStr }}().init().await?;
-{% end %}
-{% for init in entry.init %}
-		self.instance.{{ initMethodNameToStr(init) }}().await?;
-{% end %}
-		Ok(())
-	}
-
-	async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>
-	{
-{% for shutdown in entry.shutdown %}
-		self.instance.{{ initMethodNameToStr(shutdown) }}().await?;
-{% end %}
-{% for dep in entry.deps %}
-		{{ dep.fqn | registryNameToStr }}().shutdown().await?;
-{% end %}
-		Ok(())
-	}
-}
-
-fn {{ fqn | registryNameToStr }}() -> &'static mut Wrapper<{{ fqn | entryStructNameToStr }}> {
-	static COMPONENT: LocalStatic<Wrapper<{{ fqn | entryStructNameToStr }}>> = LocalStatic::new();
-	COMPONENT.get_mut_or_init(|| {
-		Wrapper::new({{ fqn | entryStructNameToStr }} {
-			instance: {{ entryConstructorToStr(entry, context) }},
+impl {{ fqn | entryStructNameToStr }} {
+	fn get() -> &'static Self {
+		static COMPONENT: StaticComponent<{{ fqn | entryStructNameToStr }}> = StaticComponent::new();
+		COMPONENT.get_or_init(|| Self {
+			component: CompositionComponent::new({{ entryConstructorToStr(entry, context) }})
 		})
-	})
+	}
+}
+
+#[allow(unused_variables)]
+impl Lifecycle for {{ fqn | entryStructNameToStr }} {
+	async fn init(&self) -> Result<(), bzd::base::error::Error>
+	{
+		self.component.acquire(async |component| {
+			{{ callInitMembers(entry, fqn) }}
+			Ok(())
+		}).await?;
+		Ok(())
+	}
+
+	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
+	{
+		self.component.release(async |component| {
+			{{ callShutdownMembers(entry, fqn) }}
+			Ok(())
+		}).await?;
+		Ok(())
+	}
 }
 
 {% end %}
@@ -63,18 +79,24 @@ fn {{ fqn | registryNameToStr }}() -> &'static mut Wrapper<{{ fqn | entryStructN
 #[allow(non_snake_case)]
 pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::error::Error>
 {
-	// Create the logger, bound to the 'out' registry entry.
 {% if context | outFqn == "" %}{{ btl.error("The composition must declare a referenced 'out' entry to enable logging.") }}{% end %}
-	let mut logger = Logger::new(&mut {{ context | outFqn | registryNameToStr }}().instance);
 
 	// Initialize all registry entries.
 {% for fqn, entry in registry[context] %}
-	{{ fqn | registryNameToStr }}().init().await?;
+	{{ fqn | entryStructNameToStr }}::get().init().await?;
 {% end %}
-	log_info!(logger, "[{{ context.executor }}] Initialization completed.").await?;
+	{
+		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[{{ context.executor }}] Initialization completed.").await?;
+	}
 
 	// Execute the workloads and services.
-	log_info!(logger, "[{{ context.executor }}] Composition phase.").await?;
+	{
+		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[{{ context.executor }}] Composition phase.").await?;
+	}
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = GenericExecutor::new()
 {% for entry in workloads[context] %}
@@ -101,18 +123,28 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% end %}
 		;
 
-	log_info!(logger, "[{{ context.executor }}] Execution phase.").await?;
+	{
+		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[{{ context.executor }}] Execution phase.").await?;
+	}
 	let result = executor.join().await;
 
-	log_info!(logger, "[{{ context.executor }}] Completion.").await?;
+	{
+		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
+		log_info!(logger, "[{{ context.executor }}] Completion.").await?;
+	}
 
 	// Shutdown all registry entries.
 {% for fqn, entry in registry[context] %}
-	{{ fqn | registryNameToStr }}().shutdown().await?;
+	{{ fqn | entryStructNameToStr }}::get().shutdown().await?;
 {% end %}
 
 	if result != 0 {
 		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
+		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
+		let mut logger = Logger::new(&mut *out);
 		log_error!(logger, "[{{ context.executor }}] Workload failure: {}", error).await?;
 		return Err(error);
 	}

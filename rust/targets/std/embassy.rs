@@ -1,3 +1,4 @@
+use critical_section as _;
 use embassy_executor::{Executor, Spawner};
 use static_cell::StaticCell;
 

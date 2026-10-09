@@ -1,88 +1,105 @@
 #![no_std]
 
 use core::cell::UnsafeCell;
-use core::ops::{Deref, DerefMut};
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+use embassy_sync::mutex::Mutex;
 
 #[allow(async_fn_in_trait)] // Components are initialized locally and do not require Send bounds.
 pub trait Lifecycle {
     /// Initialize the component.
-    async fn init(&mut self) -> Result<(), bzd::base::error::Error>;
+    async fn init(&self) -> Result<(), bzd::base::error::Error>;
     /// Shutdown the component.
-    async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error>;
+    async fn shutdown(&self) -> Result<(), bzd::base::error::Error>;
 }
 
-/// Wrapper around a composition entry.
-///
-/// It reference-counts accesses so that a component shared between multiple
-/// entries is only initialized once and shutdown when the last user releases it.
-pub struct Wrapper<T> {
-    inner: T,
-    ref_count: usize,
-}
+pub type ComponentHandle<T> = &'static Component<T>;
 
-impl<T> Wrapper<T> {
-    pub const fn new(inner: T) -> Self {
-        Self {
-            inner,
-            ref_count: 0,
-        }
-    }
-}
+pub struct StaticComponent<T>(UnsafeCell<Option<T>>);
 
-impl<T> Deref for Wrapper<T> {
-    type Target = T;
+unsafe impl<T> Sync for StaticComponent<T> {}
 
-    fn deref(&self) -> &Self::Target {
-        &self.inner
-    }
-}
-
-impl<T> DerefMut for Wrapper<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.inner
-    }
-}
-
-impl<T: Lifecycle> Wrapper<T> {
-    pub async fn init(&mut self) -> Result<(), bzd::base::error::Error> {
-        self.ref_count += 1;
-        if self.ref_count == 1 {
-            self.inner.init().await?;
-        }
-        Ok(())
-    }
-
-    pub async fn shutdown(&mut self) -> Result<(), bzd::base::error::Error> {
-        if self.ref_count > 0 {
-            self.ref_count -= 1;
-            if self.ref_count == 0 {
-                self.inner.shutdown().await?;
-            }
-        }
-        Ok(())
-    }
-}
-
-// Safety: Only safe in single-threaded environments.
-pub struct LocalStatic<T>(UnsafeCell<Option<T>>);
-unsafe impl<T> Sync for LocalStatic<T> {}
-
-impl<T> LocalStatic<T> {
+impl<T> StaticComponent<T> {
     pub const fn new() -> Self {
         Self(UnsafeCell::new(None))
     }
 
-    #[allow(clippy::mut_from_ref)] // Sound because access is exclusive and single-threaded.
-    pub fn get_mut_or_init(&self, init: impl FnOnce() -> T) -> &mut T {
-        // Safety: The returned mutable reference is exclusive, a new one is only
-        // taken once the previous one is no longer in use.
+    pub fn get_or_init(&'static self, init: impl FnOnce() -> T) -> &'static T {
+        // Safety: registry initialization is single-threaded and exclusive.
         let cell = unsafe { &mut *self.0.get() };
-        cell.get_or_insert_with(init)
+        &*cell.get_or_insert_with(init)
     }
 }
 
-impl<T> Default for LocalStatic<T> {
+impl<T> Default for StaticComponent<T> {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub struct Component<T> {
+    inner: Mutex<NoopRawMutex, T>,
+}
+
+impl<T> Component<T> {
+    pub const fn new(inner: T) -> Self {
+        Self {
+            inner: Mutex::new(inner),
+        }
+    }
+
+    pub async fn lock(&self) -> embassy_sync::mutex::MutexGuard<'_, NoopRawMutex, T> {
+        self.inner.lock().await
+    }
+}
+
+pub struct CompositionComponent<T> {
+    component: Component<T>,
+    ref_count: AtomicUsize,
+}
+
+impl<T> CompositionComponent<T> {
+    pub const fn new(inner: T) -> Self {
+        Self {
+            component: Component::new(inner),
+            ref_count: AtomicUsize::new(0),
+        }
+    }
+
+    pub async fn acquire<F>(&self, callback: F) -> Result<bool, bzd::base::error::Error>
+    where
+        F: AsyncFnOnce(&mut T) -> Result<(), bzd::base::error::Error>,
+    {
+        let mut component = self.lock().await;
+        let is_first = self.ref_count.fetch_add(1, Ordering::Relaxed) == 0;
+
+        if is_first {
+            callback(&mut component).await?;
+        }
+
+        Ok(is_first)
+    }
+
+    pub async fn release<F>(&self, callback: F) -> Result<bool, bzd::base::error::Error>
+    where
+        F: AsyncFnOnce(&mut T) -> Result<(), bzd::base::error::Error>,
+    {
+        let mut component = self.lock().await;
+        let is_last = self.ref_count.fetch_sub(1, Ordering::Relaxed) == 1;
+
+        if is_last {
+            callback(&mut component).await?;
+        }
+
+        Ok(is_last)
+    }
+
+    pub async fn lock(&self) -> embassy_sync::mutex::MutexGuard<'_, NoopRawMutex, T> {
+        self.component.lock().await
+    }
+
+    pub fn handle(&self) -> &Component<T> {
+        &self.component
     }
 }

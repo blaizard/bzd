@@ -198,6 +198,14 @@ crates.spec(
     version = "0.1.2",
 )
 crates.spec(
+    package = "embassy-sync",
+    version = "0.7.2",
+)
+crates.spec(
+    package = "critical-section",
+    version = "1.2.0",
+)
+crates.spec(
     package = "static_cell",
     version = "2.1.1",
 )

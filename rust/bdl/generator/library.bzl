@@ -97,7 +97,10 @@ def _generator_rust_library_impl(
             "{}.rs".format(name),
         ],
         visibility = visibility,
-        deps = deps + implementation_deps + [Label("//rust/bzd:bzd")],
+        deps = deps + implementation_deps + [
+            Label("//rust/bdl/generator/impl/adapter:component"),
+            Label("//rust/bzd:bzd"),
+        ],
         **kwargs
     )
 
