@@ -21,26 +21,18 @@
 			>
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
 				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
-				<ViewGraph
-					v-else-if="['linear', 'bar'].includes(dashboard.type)"
+				<component
+					v-else-if="viewComponent(dashboard)"
+					:is="viewComponent(dashboard)"
 					:endpoint="endpoint"
 					:options="dashboard"
 					:timeRange="timeRange"
+					:configuration="options.configuration"
+					@update:configuration="options = { ...options, configuration: $event }"
 					@fetch="onFetch(dashboard, $event)"
 					class="dashboard-component-graph"
 				>
-				</ViewGraph>
-				<ViewLog
-					v-else-if="dashboard.type === 'log'"
-					:options="dashboard"
-					:endpoint="endpoint"
-					:timeRange="timeRange"
-					:wrap="options.wrap"
-					@update:wrap="options = { ...options, wrap: $event }"
-					@fetch="onFetch(dashboard, $event)"
-					class="dashboard-component-graph"
-				>
-				</ViewLog>
+				</component>
 				<div v-else class="dashboard-component-unsupported">Unsupported graph type "{{ dashboard.type }}".</div>
 			</div>
 		</div>
@@ -67,8 +59,6 @@
 	export default {
 		mixins: [Base, Component],
 		components: {
-			ViewGraph,
-			ViewLog,
 			Form,
 		},
 		directives: {
@@ -88,7 +78,7 @@
 				options: {
 					interval: "Last 15 minutes",
 					tags: null,
-					wrap: false,
+					configuration: {},
 				},
 				// Per-dashboard heartbeat state: { counter, period }, used by the heartbeat directive.
 				heartbeats: new Map(),
@@ -326,6 +316,18 @@
 					"dashboard-component": true,
 					["dashboard-component-" + (dashboard.size || "medium")]: true,
 				};
+			},
+			/// Resolve the component responsible for rendering a given dashboard.
+			viewComponent(dashboard) {
+				switch (dashboard.type) {
+					case "linear":
+						return ViewGraph;
+					case "bar":
+						return ViewGraph;
+					case "log":
+						return ViewLog;
+				}
+				return null;
 			},
 			async fetchDashboards() {
 				await this.handleSubmit(

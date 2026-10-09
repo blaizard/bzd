@@ -66,7 +66,7 @@
 			options: { mandatory: true, type: Object },
 			endpoint: { mandatory: true, type: String },
 			timeRange: { mandatory: true, type: Array },
-			wrap: { mandatory: true, type: Boolean },
+			configuration: { type: Object, default: () => ({}) },
 		},
 		data: function () {
 			return {
@@ -77,6 +77,9 @@
 			};
 		},
 		computed: {
+			wrap() {
+				return this.configuration.wrap ?? false;
+			},
 			formDescription() {
 				return [{ type: "Checkbox", name: "wrap", text: "Wrap" }];
 			},
@@ -85,7 +88,7 @@
 					return { wrap: this.wrap };
 				},
 				set(value) {
-					this.$emit("update:wrap", value.wrap);
+					this.$emit("update:configuration", { ...this.configuration, wrap: value.wrap });
 				},
 			},
 			windowStart() {
@@ -101,7 +104,7 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
-		emits: ["update:wrap", "fetch"],
+		emits: ["update:configuration", "fetch"],
 		methods: {
 			handleScroll() {
 				const container = this.$refs.scrollContainer;

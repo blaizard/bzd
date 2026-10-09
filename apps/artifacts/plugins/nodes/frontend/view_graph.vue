@@ -23,8 +23,9 @@
 			options: { mandatory: true, type: Object },
 			endpoint: { mandatory: true, type: String },
 			timeRange: { mandatory: true, type: Array },
+			configuration: { type: Object, default: () => ({}) },
 		},
-		emits: ["fetch"],
+		emits: ["fetch", "update:configuration"],
 		data: function () {
 			// It's important to make sure chart is not reactive.
 			// see: https://github.com/chartjs/Chart.js/issues/8970
