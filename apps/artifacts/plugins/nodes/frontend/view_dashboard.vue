@@ -82,8 +82,6 @@
 					dashboards: [],
 					width: 0,
 				},
-				// Timestamp difference between server and client.
-				timestampDiff: 0,
 				// Cached information for the getTimestamp function.
 				getTimestampCache: null,
 				timeRange: [null, null],
@@ -97,7 +95,6 @@
 				periodUs: null,
 				lock: new Lock(),
 				viewportUpdatedTimeout: null,
-				timestampUsReactive: null,
 				timestampTimer: null,
 			};
 		},
@@ -121,12 +118,13 @@
 			await this.fetchDashboards();
 			this.viewportUpdated();
 			window.addEventListener("scroll", this.handleScroll);
-			this.timestampUsReactive = timestampUs();
 			this.timestampTimer = setInterval(async () => {
 				this.loading = true;
 				try {
-					const [timestampNewest, _timestampDiff] = await this.getTimestamp();
-					this.timeRange = [timestampNewest - this.periodUs, timestampNewest];
+					const timestampNewest = await this.getTimestamp();
+					if (timestampNewest !== null) {
+						this.timeRange = [timestampNewest - this.periodUs, timestampNewest];
+					}
 				} finally {
 					this.loading = false;
 				}
@@ -282,31 +280,24 @@
 					this.viewport = viewport;
 				}
 			},
-			/// Get information about the timestamp of the data sets.
-			///
-			/// This includes the newest timestamp and the timestamp diff between the client and the server.
+			/// Get the newest timestamp of the data sets, extrapolated to the current time.
 			async getTimestamp() {
 				if (this.getTimestampCache === null) {
 					const timestampBefore = timestampUs();
-					const timestampNewest = await this.fetchData({ count: 1, all: true });
+					const timestampNewest = await this.fetchTimestamp();
 					const timestampAfter = timestampUs();
-					const timestampClient = (timestampAfter + timestampBefore) / 2;
 
 					this.getTimestampCache = {
-						client: timestampClient,
+						client: (timestampAfter + timestampBefore) / 2,
 						server: timestampNewest ?? null,
 					};
 				}
 
-				// Return a tuple containing the current newest timestamp and the diff between the client and remote.
 				if (this.getTimestampCache.server === null) {
-					return [null, null];
+					return null;
 				}
 				const elapsedTime = timestampUs() - this.getTimestampCache.client;
-				return [
-					this.getTimestampCache.server + elapsedTime,
-					this.getTimestampCache.server - this.getTimestampCache.client,
-				];
+				return this.getTimestampCache.server + elapsedTime;
 			},
 			async useLastPeriod(periodUs) {
 				this.periodUs = periodUs;
@@ -339,15 +330,10 @@
 			async fetchDashboards() {
 				await this.handleSubmit(
 					async () => {
-						// Get the dashboard and approximate the time difference between the server and the client.
-						const t1 = timestampUs();
 						const result = await this.requestBackend(this.dashboardEndpoint, {
 							method: "get",
 							expect: "json",
 						});
-						const t4 = timestampUs();
-						const networkDelay = (t4 - t1) / 2; // Time it took to receive the response.
-						this.timestampDiff = result.timestamp + networkDelay - t4;
 
 						// Update the input name for the inputs of the dashboard.
 						for (const dashboard of result.dashboards) {
@@ -374,22 +360,20 @@
 					{ updateLoading: false },
 				);
 			},
-			async fetchData({ count = 800, all = false } = {}) {
+			/// Fetch the newest timestamp available across all dashboard inputs.
+			async fetchTimestamp() {
 				return await this.handleSubmit(
 					async () => {
 						// Make requests as chunks.
 						const includes = this.inputsKeysFromDashboards(this.dashboards);
-						const fetchedKeys = new Set(includes);
-						let promises = [];
+						const promises = [];
 						while (includes.length) {
 							const chunk = includes.splice(0, 100);
-							const query = Object.fromEntries(
-								Object.entries({
-									include: chunk.join(","),
-									metadata: 1,
-									count: count,
-								}).filter(([_, v]) => v !== null),
-							);
+							const query = {
+								include: chunk.join(","),
+								metadata: 1,
+								count: 1,
+							};
 							promises.push(
 								this.requestBackend(this.endpoint, {
 									method: "get",
