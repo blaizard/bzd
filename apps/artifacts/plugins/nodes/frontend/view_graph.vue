@@ -30,9 +30,8 @@
 			// It's important to make sure chart is not reactive.
 			// see: https://github.com/chartjs/Chart.js/issues/8970
 			this.chart = null;
-			this.collection = new TimeseriesCollection();
 			return {
-				inputData: {},
+				collection: new TimeseriesCollection(),
 				fetching: false,
 				liveTimer: null,
 			};
@@ -142,7 +141,7 @@
 				return this.options.type;
 			},
 			datasets() {
-				return Object.entries(this.inputData)
+				return Object.entries(this.collection.data)
 					.map(([name, input]) => {
 						const label = this.options.inputs?.[name]?.name ?? name;
 						if (input.length > 0 && Array.isArray(input[0][1])) {
@@ -178,7 +177,7 @@
 					this.collection.add(
 						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }),
 					);
-					this.inputData = this.collection.data;
+					this.applyTimeRange();
 					this.emitTimestamp();
 				} finally {
 					this.fetching = false;
@@ -195,7 +194,7 @@
 				this.fetching = true;
 				try {
 					this.collection.add(await this.fetchData({ after: timestampNewest, count: 100, sampling: "newest" }));
-					this.inputData = this.collection.data;
+					this.applyTimeRange();
 					this.emitTimestamp();
 				} finally {
 					this.fetching = false;
@@ -256,8 +255,13 @@
 			},
 			applyTimeRange() {
 				if (this.chart && this.timeRange[0] && this.timeRange[1]) {
+					// Extend the window to include the newest fetched data, otherwise newly
+					// arrived samples would be clipped until the next time range update.
+					const [, timestampNewest] = this.collection.timeRange;
+					const timestampMax =
+						timestampNewest === null ? this.timeRange[1] : Math.max(this.timeRange[1], timestampNewest);
 					this.chart.options.scales.x.min = this.timeRange[0] / 1000;
-					this.chart.options.scales.x.max = this.timeRange[1] / 1000;
+					this.chart.options.scales.x.max = timestampMax / 1000;
 					this.chart.update("none"); // "none" suppress animation.
 				}
 			},

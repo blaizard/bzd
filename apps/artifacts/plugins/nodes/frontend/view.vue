@@ -41,8 +41,8 @@
 				options: {},
 				exportOptions: {
 					format: "csv",
-					after: nowMinus1Year.getTime() * 1000,
-					before: now.getTime() * 1000,
+					after: nowMinus1Year.getTime(),
+					before: now.getTime(),
 				},
 			};
 		},
@@ -107,8 +107,13 @@
 		},
 		methods: {
 			handleExportSubmit(values) {
-				const query = ["children=99", ...Object.entries(values).map(([key, value]) => key + "=" + value)];
-				const url = this.endpointExport + "?" + query.join("&");
+				const query = {
+					children: 99,
+					after: values.after * 1000,
+					before: values.before * 1000,
+					format: values.format,
+				};
+				const url = this.endpointExport + "?" + new URLSearchParams(query).toString();
 				window.location.assign(url);
 			},
 			onSelect(pathList) {
