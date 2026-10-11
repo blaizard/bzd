@@ -63,18 +63,18 @@ def splitEndOfOptionsMarker(
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="QEMU executor script.")
-	parser.add_argument("--qemu", type=pathlib.Path, required=True, help="The path of QEMU.")
+	parser.add_argument("--emulator", type=pathlib.Path, required=True, help="The path of the emulator.")
 	parser.add_argument(
 		"--binary",
 		type=pathlib.Path,
 		help="The binary containing the symbols used to decode the stack trace.",
 	)
-	scriptArgs, qemuArgs = splitEndOfOptionsMarker(sys.argv[1:])
+	scriptArgs, emulatorArgs = splitEndOfOptionsMarker(sys.argv[1:])
 	args = parser.parse_args(scriptArgs)
 
 	# Note, wrapping QEMU within a python script allow easy killing of the process.
 	# Otherwise we cannot simply use CTRL+C.
-	result = localCommand([str(args.qemu)] + qemuArgs, stdout=True, stderr=True, timeoutS=None)
+	result = localCommand([str(args.emulator)] + emulatorArgs, stdout=True, stderr=True, timeoutS=None)
 
 	# Try to decode the stack trace if any.
 	if args.binary:

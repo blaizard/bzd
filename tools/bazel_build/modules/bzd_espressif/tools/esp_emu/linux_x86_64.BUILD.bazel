@@ -1,0 +1,7 @@
+"""esp emu."""
+
+alias(
+    name = "esp_emu",
+    actual = "esp-emu",
+    visibility = ["//visibility:public"],
+)

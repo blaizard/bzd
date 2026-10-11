@@ -2,9 +2,12 @@ load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "executor_qemu",
+    name = "executor",
     srcs = [
-        ":executor_qemu.py",
+        ":executor.py",
+    ],
+    visibility = [
+        "@bzd_espressif//tools/esp_emu:__pkg__",
     ],
     deps = [
         "@bzd_python//bzd/utils:run",
@@ -13,9 +16,9 @@ py_binary(
 
 sh_binary_wrapper(
     name = "qemu-system-xtensa",
-    command = "{executor_qemu} --qemu {qemu} \"$@\"",
+    command = "{executor} --emulator {qemu} \"$@\"",
     locations = {
-        ":executor_qemu": "executor_qemu",
+        ":executor": "executor",
         "@qemu//:qemu-system-xtensa": "qemu",
     },
     visibility = ["//visibility:public"],

@@ -1,0 +1,11 @@
+load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
+
+sh_binary_wrapper(
+    name = "esp_emu",
+    command = "{executor} --emulator {esp_emu} \"$@\"",
+    locations = {
+        "//tools/qemu:executor": "executor",
+        "@esp_emu": "esp_emu",
+    },
+    visibility = ["//visibility:public"],
+)

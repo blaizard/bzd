@@ -66,6 +66,26 @@ def _load_tools(_module_ctx):
     )
 
     bzd_repository_multiplatform_maker(
+        name = "esp_emu",
+        repositories = [{
+            "build_file": "//tools/esp_emu:linux_x86_64.BUILD.bazel",
+            "compatible_with": [
+                Label("@bzd_platforms//al_isa:linux-x86_64"),
+            ],
+            "http": [
+                bzd_http_archive(
+                    integrity = "sha256-0p1B28X2kmKEpdrq8ZmhUAdAmSCH4IjBIR/8JUbnZL0=",
+                    strip_prefix = "esp-emu-0.48.0-x86_64-unknown-linux-gnu",
+                    url = "https://github.com/espressif/esp-emulator/releases/download/v0.48.0/esp-emu-0.48.0-x86_64-unknown-linux-gnu.tar.gz",
+                ),
+            ],
+        }],
+        expose = {
+            "esp_emu": "esp_emu",
+        },
+    )
+
+    bzd_repository_multiplatform_maker(
         name = "openocd",
         repositories = [{
             "build_file": "//tools/openocd:linux_x86_64.BUILD.bazel",
