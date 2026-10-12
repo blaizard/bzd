@@ -8,5 +8,6 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/bzd/base",
+        "//rust/bzd/sync",
     ],
 )

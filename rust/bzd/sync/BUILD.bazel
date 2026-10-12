@@ -1,0 +1,12 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "sync",
+    srcs = [
+        "lib.rs",
+    ],
+    visibility = ["//rust/bzd:__pkg__"],
+    deps = [
+        "//rust/bzd/sync/mutex",
+    ],
+)

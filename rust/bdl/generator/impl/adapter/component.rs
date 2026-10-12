@@ -3,8 +3,7 @@
 use core::cell::UnsafeCell;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use embassy_sync::blocking_mutex::raw::NoopRawMutex;
-use embassy_sync::mutex::Mutex;
+use bzd::sync::mutex::{Mutex, MutexGuard};
 
 #[allow(async_fn_in_trait)] // Components are initialized locally and do not require Send bounds.
 pub trait Lifecycle {
@@ -39,7 +38,7 @@ impl<T> Default for StaticComponent<T> {
 }
 
 pub struct Component<T> {
-    inner: Mutex<NoopRawMutex, T>,
+    inner: Mutex<T>,
 }
 
 impl<T> Component<T> {
@@ -49,7 +48,7 @@ impl<T> Component<T> {
         }
     }
 
-    pub async fn lock(&self) -> embassy_sync::mutex::MutexGuard<'_, NoopRawMutex, T> {
+    pub async fn lock(&self) -> MutexGuard<'_, T> {
         self.inner.lock().await
     }
 }
@@ -95,7 +94,7 @@ impl<T> CompositionComponent<T> {
         Ok(is_last)
     }
 
-    pub async fn lock(&self) -> embassy_sync::mutex::MutexGuard<'_, NoopRawMutex, T> {
+    pub async fn lock(&self) -> MutexGuard<'_, T> {
         self.component.lock().await
     }
 
