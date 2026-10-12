@@ -13,7 +13,7 @@ pub trait Lifecycle {
     async fn shutdown(&self) -> Result<(), bzd::base::error::Error>;
 }
 
-pub type ComponentHandle<T> = &'static Component<T>;
+pub type ComponentHandle<T> = &'static Mutex<T>;
 
 pub struct StaticComponent<T>(UnsafeCell<Option<T>>);
 
@@ -98,7 +98,7 @@ impl<T> CompositionComponent<T> {
         self.component.lock().await
     }
 
-    pub fn handle(&self) -> &Component<T> {
-        &self.component
+    pub fn handle(&self) -> &Mutex<T> {
+        &self.component.inner
     }
 }

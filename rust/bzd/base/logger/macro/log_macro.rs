@@ -116,12 +116,12 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
     for piece in &pieces {
         match piece {
             FormatPiece::Literal(text) => {
-                statements.extend(quote! { logger.write_str(#text).await?; });
+                statements.extend(quote! { logger.write_str(&mut guard, #text).await?; });
             }
             FormatPiece::Argument => {
                 let arg = &input.args[arg_index];
                 arg_index += 1;
-                statements.extend(quote! { logger.write_value(&#arg).await?; });
+                statements.extend(quote! { logger.write_value(&mut guard, &#arg).await?; });
             }
         }
     }
@@ -132,9 +132,11 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
         async {
             let logger = &mut #logger;
             if logger.is_enabled(#level) {
-                logger.write_header(#level, ::core::panic::Location::caller()).await?;
+                let mut guard = logger
+                    .write_header(#level, ::core::panic::Location::caller())
+                    .await?;
                 #statements
-                logger.write_str("\n").await?;
+                logger.write_str(&mut guard, "\n").await?;
             }
             Ok(())
         }

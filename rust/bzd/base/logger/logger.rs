@@ -7,6 +7,7 @@ use core::panic::Location;
 use bzd_stream_impl::BzdOStreamInterface;
 use error::Error;
 use log_value::write_unsigned;
+use mutex::{Mutex, MutexGuard};
 
 pub use log_macro::{log_debug, log_error, log_info, log_warning};
 pub use log_value::LogValue;
@@ -33,18 +34,19 @@ impl Level {
     }
 }
 
-/// A logger writing formatted messages to a stream sink.
+/// A logger writing formatted messages to a shared stream sink.
 ///
 /// The sink is generic rather than a trait object since the stream interface
-/// uses `async fn` which is not object-safe.
+/// uses `async fn` which is not object-safe. The mutex is locked once per log
+/// entry, ensuring messages from concurrent loggers are never interleaved.
 pub struct Logger<'a, S: BzdOStreamInterface> {
-    sink: &'a mut S,
+    sink: &'a Mutex<S>,
     min_level: Level,
 }
 
 impl<'a, S: BzdOStreamInterface> Logger<'a, S> {
-    /// Create a new logger writing to the given sink.
-    pub fn new(sink: &'a mut S) -> Self {
+    /// Create a new logger writing to the given protected sink.
+    pub fn new(sink: &'a Mutex<S>) -> Self {
         Self {
             sink,
             min_level: Level::Info,
@@ -61,29 +63,37 @@ impl<'a, S: BzdOStreamInterface> Logger<'a, S> {
         (level as u8) <= (self.min_level as u8)
     }
 
-    /// Write the header prefix of a log entry.
+    /// Write the header prefix of a log entry while holding the sink lock.
+    ///
+    /// The returned guard keeps the lock acquired for the whole message.
     pub async fn write_header(
-        &mut self,
+        &self,
         level: Level,
         location: &'static Location<'static>,
-    ) -> Result<(), Error> {
+    ) -> Result<MutexGuard<'a, S>, Error> {
+        let mut guard = self.sink.lock().await;
         let file = location.file();
         let name = file.rsplit_once('/').map_or(file, |(_, name)| name);
-        self.write_str(level.as_str()).await?;
-        self.write_str(" [").await?;
-        self.write_str(name).await?;
-        self.write_str(":").await?;
-        write_unsigned(location.line() as u64, self.sink).await?;
-        self.write_str("] ").await
+        guard.write(level.as_str().as_bytes()).await?;
+        guard.write(b" [").await?;
+        guard.write(name.as_bytes()).await?;
+        guard.write(b":").await?;
+        write_unsigned(location.line() as u64, &mut *guard).await?;
+        guard.write(b"] ").await?;
+        Ok(guard)
     }
 
     /// Write a string directly to the stream.
-    pub async fn write_str(&mut self, s: &str) -> Result<(), Error> {
-        self.sink.write(s.as_bytes()).await
+    pub async fn write_str(&self, out: &mut MutexGuard<'a, S>, s: &str) -> Result<(), Error> {
+        out.write(s.as_bytes()).await
     }
 
     /// Write a value directly to the stream.
-    pub async fn write_value<T: LogValue + ?Sized>(&mut self, value: &T) -> Result<(), Error> {
-        value.write(self.sink).await
+    pub async fn write_value<T: LogValue + ?Sized>(
+        &self,
+        out: &mut MutexGuard<'a, S>,
+        value: &T,
+    ) -> Result<(), Error> {
+        value.write(&mut **out).await
     }
 }

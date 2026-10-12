@@ -8,6 +8,7 @@ rust_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//rust/libs/critical_section/noop",
         "//rust/libs/std",
     ],
 )

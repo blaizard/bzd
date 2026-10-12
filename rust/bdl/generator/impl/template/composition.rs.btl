@@ -81,22 +81,18 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {
 {% if context | outFqn == "" %}{{ btl.error("The composition must declare a referenced 'out' entry to enable logging.") }}{% end %}
 
+	// Create a logger writing to the referenced 'out' component.
+	let mut logger = Logger::new({{ context | outFqn | entryStructNameToStr }}::get().component.handle());
+
 	// Initialize all registry entries.
 {% for fqn, entry in registry[context] %}
 	{{ fqn | entryStructNameToStr }}::get().init().await?;
 {% end %}
-	{
-		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[{{ context.executor }}] Initialization completed.").await?;
-	}
+
+	log_info!(logger, "[{{ context.executor }}] Initialization completed.").await?;
 
 	// Execute the workloads and services.
-	{
-		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[{{ context.executor }}] Composition phase.").await?;
-	}
+	log_info!(logger, "[{{ context.executor }}] Composition phase.").await?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = GenericExecutor::new()
 {% for entry in workloads[context] %}
@@ -123,18 +119,10 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% end %}
 		;
 
-	{
-		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[{{ context.executor }}] Execution phase.").await?;
-	}
+	log_info!(logger, "[{{ context.executor }}] Execution phase.").await?;
 	let result = executor.join().await;
 
-	{
-		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[{{ context.executor }}] Completion.").await?;
-	}
+	log_info!(logger, "[{{ context.executor }}] Completion.").await?;
 
 	// Shutdown all registry entries.
 {% for fqn, entry in registry[context] %}
@@ -143,8 +131,6 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 
 	if result != 0 {
 		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
-		let mut out = {{ context | outFqn | entryStructNameToStr }}::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
 		log_error!(logger, "[{{ context.executor }}] Workload failure: {}", error).await?;
 		return Err(error);
 	}

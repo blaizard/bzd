@@ -6,6 +6,7 @@
 mod tests {
     use bzd::base::error::{self, Error};
     use bzd::base::logger::{log_debug, log_error, log_info, log_warning, Level, Logger};
+    use bzd::sync::mutex::Mutex;
     use interfaces_stream::BzdOStreamInterface;
 
     struct RecordingSink {
@@ -36,15 +37,16 @@ mod tests {
 
     #[test]
     async fn test_logging() -> TestResult {
-        let mut sink = RecordingSink::new();
+        let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&mut sink);
+            let mut logger = Logger::new(&sink);
             log_info!(logger, "count = {}, name = {}", 42, "Alex").await?;
             log_warning!(logger, "careful").await?;
             log_error!(logger, "boom").await?;
             log_debug!(logger, "hidden").await?;
         }
-        let message = sink.as_str();
+        let guard = sink.lock().await;
+        let message = guard.as_str();
         assert_eq!(message.contains("[i] ["), true)?;
         assert_eq!(message.contains("] count = 42, name = Alex\n"), true)?;
         assert_eq!(message.contains("[w] ["), true)?;
@@ -58,25 +60,28 @@ mod tests {
 
     #[test]
     async fn test_error_value() -> TestResult {
-        let mut sink = RecordingSink::new();
+        let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&mut sink);
+            let mut logger = Logger::new(&sink);
             let error = error::failure("boom");
             log_error!(logger, "{}", error).await?;
         }
-        assert_eq!(sink.as_str().ends_with(": failure: boom\n"), true)?;
+        let guard = sink.lock().await;
+        let message = guard.as_str();
+        assert_eq!(message.ends_with(": failure: boom\n"), true)?;
         Ok(())
     }
 
     #[test]
     async fn test_long_message() -> TestResult {
-        let mut sink = RecordingSink::new();
+        let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&mut sink);
+            let mut logger = Logger::new(&sink);
             let long = core::str::from_utf8(&[b'x'; 600]).unwrap();
             log_info!(logger, "{}", long).await?;
         }
-        let message = sink.as_str();
+        let guard = sink.lock().await;
+        let message = guard.as_str();
         assert_eq!(message.matches('x').count(), 600)?;
         assert_eq!(message.ends_with("\n"), true)?;
         Ok(())
@@ -84,15 +89,16 @@ mod tests {
 
     #[test]
     async fn test_minimum_level_filtering() -> TestResult {
-        let mut sink = RecordingSink::new();
+        let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&mut sink);
+            let mut logger = Logger::new(&sink);
             logger.set_minimum_level(Level::Error);
             log_error!(logger, "shown").await?;
             log_warning!(logger, "hidden").await?;
             log_info!(logger, "hidden").await?;
         }
-        let message = sink.as_str();
+        let guard = sink.lock().await;
+        let message = guard.as_str();
         assert_eq!(message.contains("] shown\n"), true)?;
         assert_eq!(message.contains("hidden"), false)?;
         Ok(())
@@ -100,13 +106,15 @@ mod tests {
 
     #[test]
     async fn test_location() -> TestResult {
-        let mut sink = RecordingSink::new();
+        let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&mut sink);
+            let mut logger = Logger::new(&sink);
             log_info!(logger, "hello").await?;
         }
+        let guard = sink.lock().await;
+        let message = guard.as_str();
         let name = file!().rsplit_once('/').map_or(file!(), |(_, name)| name);
-        assert_eq!(sink.as_str().contains(name), true)?;
+        assert_eq!(message.contains(name), true)?;
         Ok(())
     }
 }

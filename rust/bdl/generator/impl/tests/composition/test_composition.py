@@ -322,24 +322,20 @@ impl Lifecycle for DefaultPrinterEntry {
 pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 {
 
+	// Create a logger writing to the referenced 'out' component.
+	let mut logger = Logger::new(DefaultOutEntry::get().component.handle());
+
 	// Initialize all registry entries.
 	DefaultExecutorEntry::get().init().await?;
 	DefaultOutEntry::get().init().await?;
 	DefaultPerson_childEntry::get().init().await?;
 	DefaultPerson_parentEntry::get().init().await?;
 	DefaultPrinterEntry::get().init().await?;
-	{
-		let mut out = DefaultOutEntry::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[default.executor] Initialization completed.").await?;
-	}
+
+	log_info!(logger, "[default.executor] Initialization completed.").await?;
 
 	// Execute the workloads and services.
-	{
-		let mut out = DefaultOutEntry::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[default.executor] Composition phase.").await?;
-	}
+	log_info!(logger, "[default.executor] Composition phase.").await?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = GenericExecutor::new()
 		.push_workload(async {
@@ -371,18 +367,10 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 		})
 		;
 
-	{
-		let mut out = DefaultOutEntry::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[default.executor] Execution phase.").await?;
-	}
+	log_info!(logger, "[default.executor] Execution phase.").await?;
 	let result = executor.join().await;
 
-	{
-		let mut out = DefaultOutEntry::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
-		log_info!(logger, "[default.executor] Completion.").await?;
-	}
+	log_info!(logger, "[default.executor] Completion.").await?;
 
 	// Shutdown all registry entries.
 	DefaultExecutorEntry::get().shutdown().await?;
@@ -393,8 +381,6 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	if result != 0 {
 		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
-		let mut out = DefaultOutEntry::get().component.lock().await;
-		let mut logger = Logger::new(&mut *out);
 		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;
 		return Err(error);
 	}

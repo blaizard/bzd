@@ -16,6 +16,7 @@ rust_library(
     visibility = ["//rust/bzd/base:__pkg__"],
     deps = [
         "//rust/bzd/base/error",
+        "//rust/bzd/sync/mutex",
         "//rust/interfaces/impl:stream",
     ],
 )

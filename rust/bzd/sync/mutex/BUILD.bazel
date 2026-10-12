@@ -6,6 +6,7 @@ rust_library(
         "mutex.rs",
     ],
     visibility = [
+        "//rust/bzd/base/logger:__pkg__",
         "//rust/bzd/sync:__pkg__",
     ],
     deps = [

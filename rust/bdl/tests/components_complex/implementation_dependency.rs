@@ -38,13 +38,14 @@ impl BzdTestManagerInterface for Manager {
 #[bzd_test::test]
 mod tests {
     use super::*;
-    use component::{Component, StaticComponent};
+    use bzd::sync::mutex::Mutex;
+    use component::StaticComponent;
 
     #[test]
     fn test_component() -> TestResult {
-        static USER: StaticComponent<Component<User>> = StaticComponent::new();
+        static USER: StaticComponent<Mutex<User>> = StaticComponent::new();
         let user = USER.get_or_init(|| {
-            Component::new(User {
+            Mutex::new(User {
                 context: BzdTestUserContext { username: "Alex" },
             })
         });
