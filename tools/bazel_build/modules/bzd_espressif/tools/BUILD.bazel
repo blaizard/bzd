@@ -1,0 +1,15 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "executor",
+    srcs = [
+        ":executor.py",
+    ],
+    visibility = [
+        "@bzd_espressif//tools/esp_emu:__pkg__",
+        "@bzd_espressif//tools/qemu:__pkg__",
+    ],
+    deps = [
+        "@bzd_python//bzd/utils:run",
+    ],
+)
