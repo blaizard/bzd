@@ -15,7 +15,6 @@
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
-	const refreshPeriodMs = 3000;
 
 	export default {
 		mixins: [Base, Component],
@@ -34,6 +33,7 @@
 				collection: new TimeseriesCollection(),
 				fetching: false,
 				liveTimer: null,
+				refreshPeriodMs: null,
 			};
 		},
 		watch: {
@@ -47,7 +47,7 @@
 				this.applyTimeRange();
 				const span = (range) => (range[0] === null || range[1] === null ? null : range[1] - range[0]);
 				if (span(value) !== span(previous)) {
-					this.loadInitial();
+					this.initialize();
 				}
 			},
 		},
@@ -123,10 +123,7 @@
 				}),
 			);
 			this.applyTimeRange();
-			await this.loadInitial();
-			this.liveTimer = setInterval(async () => {
-				await this.fetchLatest();
-			}, refreshPeriodMs);
+			await this.initialize();
 		},
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
@@ -166,14 +163,17 @@
 			},
 		},
 		methods: {
-			async loadInitial() {
+			async initialize() {
 				if (this.fetching || this.timeRange[0] === null || this.timeRange[1] === null) {
 					return;
 				}
 				this.fetching = true;
 				try {
-					const count = Math.max(Math.round(this.$el.clientWidth / 2), 100);
-					this.collection.reset({ periodLimit: this.timeRange[1] - this.timeRange[0] });
+					const width = this.$el.clientWidth;
+					const count = Math.max(Math.round(width / 2), 100);
+					const periodUs = this.timeRange[1] - this.timeRange[0];
+					this.refreshPeriodMs = Math.max(Math.round(periodUs / 1000 / width), 3000);
+					this.collection.reset({ periodLimit: periodUs });
 					this.collection.add(
 						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }),
 					);
@@ -182,6 +182,12 @@
 				} finally {
 					this.fetching = false;
 				}
+
+				// Fetch new data.
+				clearInterval(this.liveTimer);
+				this.liveTimer = setInterval(async () => {
+					await this.fetchLatest();
+				}, this.refreshPeriodMs);
 			},
 			async fetchLatest() {
 				if (this.fetching) {
@@ -201,7 +207,7 @@
 				}
 			},
 			async fetchData({ count, before = null, after = null, sampling = null }) {
-				this.$emit("fetch", refreshPeriodMs);
+				this.$emit("fetch", this.refreshPeriodMs);
 				return await this.handleSubmit(
 					async () => {
 						const query = Object.fromEntries(
