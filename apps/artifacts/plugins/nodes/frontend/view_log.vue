@@ -67,6 +67,7 @@
 			endpoint: { mandatory: true, type: String },
 			timeRange: { mandatory: true, type: Array },
 			configuration: { type: Object, default: () => ({}) },
+			hoverTimestamp: { type: Number, default: null },
 		},
 		data: function () {
 			return {
@@ -104,7 +105,7 @@
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
 		},
-		emits: ["update:configuration", "fetch", "timestamp"],
+		emits: ["update:configuration", "fetch", "timestamp", "hover"],
 		methods: {
 			handleScroll() {
 				const container = this.$refs.scrollContainer;

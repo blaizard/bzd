@@ -28,9 +28,11 @@
 					:options="dashboard"
 					:timeRange="timeRange"
 					:configuration="options.configuration"
+					:hoverTimestamp="hoverTimestamp"
 					@update:configuration="options = { ...options, configuration: $event }"
 					@fetch="onFetch(dashboard, $event)"
 					@timestamp="onTimestamp($event)"
+					@hover="onHover"
 					class="dashboard-component-graph"
 				>
 				</component>
@@ -87,6 +89,7 @@
 				lock: new Lock(),
 				viewportUpdatedTimeout: null,
 				timestampTimer: null,
+				hoverTimestamp: null,
 			};
 		},
 		watch: {
@@ -252,6 +255,7 @@
 			},
 			async selectTag(tag) {
 				this.options = Object.assign({}, this.options, { tags: tag || null });
+				this.hoverTimestamp = null;
 				await this.$nextTick();
 				this.viewportUpdated();
 			},
@@ -341,6 +345,10 @@
 						return ViewLog;
 				}
 				return null;
+			},
+			/// Synchronize the crosshair across all views.
+			onHover(timestamp) {
+				this.hoverTimestamp = timestamp;
 			},
 			async fetchDashboards() {
 				await this.handleSubmit(

@@ -16,6 +16,9 @@
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
+	const crosshairColor = "rgba(128, 128, 128, 0.9)";
+	const crosshairDash = [4, 4];
+
 	export default {
 		mixins: [Base, Component],
 		props: {
@@ -23,8 +26,9 @@
 			endpoint: { mandatory: true, type: String },
 			timeRange: { mandatory: true, type: Array },
 			configuration: { type: Object, default: () => ({}) },
+			hoverTimestamp: { type: Number, default: null },
 		},
-		emits: ["fetch", "timestamp", "update:configuration"],
+		emits: ["fetch", "timestamp", "update:configuration", "hover"],
 		data: function () {
 			// It's important to make sure chart is not reactive.
 			// see: https://github.com/chartjs/Chart.js/issues/8970
@@ -50,17 +54,29 @@
 					this.initialize();
 				}
 			},
+			hoverTimestamp() {
+				if (this.chart) {
+					this.chart.draw();
+				}
+			},
 		},
 		async mounted() {
 			this.chart = new Chart(
 				this.$refs.graph,
 				this.adaptConfig({
+					plugins: [this.crosshairPlugin()],
 					data: {
 						datasets: [],
 					},
 					options: {
 						responsive: true,
 						maintainAspectRatio: false,
+						onHover: (event, _activeElements, chart) => {
+							const value = chart.scales.x.getValueForPixel(event.x);
+							if (typeof value === "number" && !Number.isNaN(value)) {
+								this.$emit("hover", value * 1000);
+							}
+						},
 						elements: {
 							point: {
 								radius: 1,
@@ -270,6 +286,39 @@
 					this.chart.options.scales.x.max = timestampMax / 1000;
 					this.chart.update("none"); // "none" suppress animation.
 				}
+			},
+			/// Draw a vertical line at the synchronized timestamp on the chart.
+			crosshairPlugin() {
+				const component = this;
+				return {
+					id: "crosshair",
+					afterDatasetsDraw(chart) {
+						const timestamp = component.hoverTimestamp;
+						if (timestamp === null || timestamp === undefined) {
+							return;
+						}
+						const { left, right, top, bottom } = chart.chartArea;
+						const pixel = chart.scales.x.getPixelForValue(timestamp / 1000);
+						if (pixel < left || pixel > right) {
+							return;
+						}
+						const { ctx } = chart;
+						ctx.save();
+						ctx.beginPath();
+						ctx.setLineDash(crosshairDash);
+						ctx.lineWidth = 1;
+						ctx.strokeStyle = crosshairColor;
+						ctx.moveTo(pixel, top);
+						ctx.lineTo(pixel, bottom);
+						ctx.stroke();
+						ctx.restore();
+					},
+					beforeEvent(chart, args) {
+						if (args.event.type === "mouseout") {
+							component.$emit("hover", null);
+						}
+					},
+				};
 			},
 		},
 	};
