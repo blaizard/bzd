@@ -13,10 +13,10 @@
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import { UCUMToString } from "#bzd/nodejs/utils/to_string.js";
 	import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+	import Colors from "#bzd/nodejs/styles/default/css/colors.module.scss";
 
 	const Exception = ExceptionFactory("apps", "plugin", "nodes");
 
-	const crosshairColor = "rgba(128, 128, 128, 0.9)";
 	const crosshairDash = [4, 4];
 
 	export default {
@@ -307,7 +307,7 @@
 						ctx.beginPath();
 						ctx.setLineDash(crosshairDash);
 						ctx.lineWidth = 1;
-						ctx.strokeStyle = crosshairColor;
+						ctx.strokeStyle = Colors.gray;
 						ctx.moveTo(pixel, top);
 						ctx.lineTo(pixel, bottom);
 						ctx.stroke();

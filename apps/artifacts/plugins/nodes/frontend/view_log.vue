@@ -8,6 +8,7 @@
 			:class="{ 'view-log-nowrap': !wrap }"
 			ref="scrollContainer"
 			@scroll="handleScroll"
+			@mouseleave="onLogLeave"
 			v-loading="loading"
 		>
 			<table>
@@ -24,7 +25,12 @@
 					<tr v-if="lines.length === 0">
 						<td colspan="5" class="view-log-empty">No logs</td>
 					</tr>
-					<tr v-for="(line, index) in lines" :key="index" :class="lineClass(line[1])">
+					<tr
+						v-for="(line, index) in lines"
+						:key="index"
+						:class="[lineClass(line[1]), { 'view-log-line-hovered': hoveredIndex === index }]"
+						@mouseenter="onRowHover(line[0])"
+					>
 						<td v-if="isLegacy(line[1])" colspan="5" class="view-log-message">{{ line[1] }}</td>
 						<template v-else>
 							<td class="view-log-timestamp">{{ formatTimestamp(line[0]) }}</td>
@@ -53,6 +59,24 @@
 	const maxLines = 1000;
 	/// The expected period between live fetches, in milliseconds.
 	const livePeriodMs = 3000;
+
+	/// Find the index of the line with a timestamp closest to the given one.
+	function findNearestLogIndex(lines, timestamp) {
+		let low = 0;
+		let high = lines.length - 1;
+		while (low < high) {
+			const mid = (low + high) >> 1;
+			if (lines[mid][0] < timestamp) {
+				low = mid + 1;
+			} else {
+				high = mid;
+			}
+		}
+		if (low === 0 || lines[low][0] - timestamp < timestamp - lines[low - 1][0]) {
+			return low;
+		}
+		return low - 1;
+	}
 
 	export default {
 		mixins: [Base, Component],
@@ -95,6 +119,12 @@
 			windowStart() {
 				return this.timeRange[0] ?? null;
 			},
+			hoveredIndex() {
+				if (this.hoverTimestamp === null || this.hoverTimestamp === undefined || this.lines.length === 0) {
+					return null;
+				}
+				return findNearestLogIndex(this.lines, this.hoverTimestamp);
+			},
 		},
 		async mounted() {
 			await this.handleSubmit(() => this.loadInitial());
@@ -107,6 +137,12 @@
 		},
 		emits: ["update:configuration", "fetch", "timestamp", "hover"],
 		methods: {
+			onRowHover(timestamp) {
+				this.$emit("hover", timestamp);
+			},
+			onLogLeave() {
+				this.$emit("hover", null);
+			},
 			handleScroll() {
 				const container = this.$refs.scrollContainer;
 				const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
@@ -231,6 +267,8 @@
 </script>
 
 <style lang="scss" scoped>
+	@use "@/config.scss" as config;
+
 	.view-log {
 		height: 100%;
 		display: flex;
@@ -259,6 +297,10 @@
 
 			tr:hover {
 				background-color: #333;
+			}
+
+			tr.view-log-line-hovered {
+				background-color: config.$bzdGraphColorBlue;
 			}
 
 			th,
