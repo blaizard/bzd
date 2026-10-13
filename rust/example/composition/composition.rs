@@ -1,6 +1,5 @@
 use child::{BzdComponentsChild, BzdComponentsChildContext, BzdComponentsPersonInterface};
 use component::{CompositionComponent, Lifecycle, StaticComponent};
-use critical_section as _;
 use parent::{
     BzdComponentsParent, BzdComponentsParentContext, BzdComponentsParentContextConstraintTypes,
 };

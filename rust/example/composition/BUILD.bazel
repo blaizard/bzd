@@ -55,6 +55,5 @@ rust_binary(
         ":parent",
         "//rust/bdl/generator/impl/adapter:component",
         "//rust/bzd",
-        "//rust/libs/critical_section/noop",
     ],
 )

@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 
-use critical_section as _;
 use rust_bdl_tests_components_complex_dependency::{
     BzdTestManagerContext, BzdTestManagerContextConstraintTypes, BzdTestManagerInterface,
     BzdTestUserContext, BzdTestUserInterface,

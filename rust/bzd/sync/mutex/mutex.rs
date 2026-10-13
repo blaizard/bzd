@@ -1,13 +1,13 @@
 #![no_std]
 
-use embassy_sync::blocking_mutex::raw::NoopRawMutex;
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::mutex::{Mutex as EmbassyMutex, MutexGuard as EmbassyMutexGuard};
 
 pub struct Mutex<T: ?Sized> {
-    inner: EmbassyMutex<NoopRawMutex, T>,
+    inner: EmbassyMutex<CriticalSectionRawMutex, T>,
 }
 
-pub type MutexGuard<'a, T> = EmbassyMutexGuard<'a, NoopRawMutex, T>;
+pub type MutexGuard<'a, T> = EmbassyMutexGuard<'a, CriticalSectionRawMutex, T>;
 
 impl<T> Mutex<T> {
     pub const fn new(value: T) -> Self {
