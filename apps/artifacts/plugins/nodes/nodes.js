@@ -130,9 +130,9 @@ export class Nodes {
 	}
 
 	// Insert a record entry to the data.
-	insertFromRecord(records) {
+	insertFromRecord(records, skipIfSameTimestamp = false) {
 		for (const [uid, data, timestamp, _isAbsoluteTimestamp] of records) {
-			this.data.insert(uid, [data], timestamp);
+			this.data.insert(uid, [data], timestamp, skipIfSameTimestamp);
 		}
 	}
 

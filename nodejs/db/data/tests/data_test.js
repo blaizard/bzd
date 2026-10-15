@@ -108,6 +108,37 @@ describe("Nodes", () => {
 			}
 		}).timeout(5000);
 
+		it("skipIfSameTimestamp", async () => {
+			const data = new Data();
+			const timestamp = 123456789;
+
+			// Without the flag, duplicates at the same timestamp are kept.
+			data.insert("hello", [[["a"], "first"]], timestamp);
+			data.insert("hello", [[["a"], "first"]], timestamp);
+			{
+				const result = await data.get({ uid: "hello", key: ["a"], count: 10, metadata: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data.length, 2);
+			}
+
+			// With the flag, an entry already present at the timestamp is skipped.
+			data.insert("hello", [[["b"], "first"]], timestamp, true);
+			data.insert("hello", [[["b"], "first"]], timestamp, true);
+			{
+				const result = await data.get({ uid: "hello", key: ["b"], count: 10, metadata: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data.length, 1);
+			}
+
+			// The dedup is timestamp-based, a different value at the same timestamp is also skipped.
+			data.insert("hello", [[["b"], "second"]], timestamp, true);
+			{
+				const result = await data.get({ uid: "hello", key: ["b"], count: 10, metadata: true });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data.length, 1);
+			}
+		});
+
 		it("count", async () => {
 			const data = new Data();
 
