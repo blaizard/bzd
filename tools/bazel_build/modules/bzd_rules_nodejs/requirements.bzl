@@ -4,7 +4,7 @@ load("@bzd_lib//:defs.bzl", "bzd_repository_maker")
 load("@bzd_platforms//:defs.bzl", "to_al", "to_isa")
 
 def _sanitize_repository_name(name):
-    """Sanitize a packge name to make it compatible with bazel target."""
+    """Sanitize a package name to make it compatible with bazel target."""
 
     return "".join([c if c.isalnum() else "-" for c in name.elems()]).strip("-")
 
@@ -25,7 +25,7 @@ def _canonical_name_from_package(package: str) -> str:
     return package
 
 def _repository_name_from_package(package: str) -> str:
-    """Get the respository name from the raw package name."""
+    """Get the repository name from the raw package name."""
 
     canonical_name = _canonical_name_from_package(package)
     return _sanitize_repository_name("package-{}".format(canonical_name))

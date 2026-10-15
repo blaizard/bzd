@@ -60,7 +60,7 @@ class Visitor:
 		self.add(record, record.get("value") + ".")
 
 	def visitRecordTXT(self, record: Record) -> None:
-		# ';' must be escaped as they correspond to comments.
+		# ';' must be escaped as it corresponds to comments.
 		self.add(record, record.get("value").replace(";", "\\;"))
 
 	def visitRecordMX(self, record: Record) -> None:

@@ -79,7 +79,7 @@ def commandLease(
 			env.pop(name, None)
 
 		# Run the process in a shell, to mimic what a user would do when calling the script.
-		# This is needed by some program which need to think they are in an interactive shell.
+		# This is needed by some programs which need to think they are in an interactive shell.
 		with subprocess.Popen(
 			shlex.join(command), cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), env=env, shell=True
 		) as process:

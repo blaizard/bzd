@@ -78,7 +78,7 @@ class Workload:
 		return leaseId
 
 	def heartBeat(self, leaseId: str, ttl: int) -> bool:
-		"""Refresh an existing lease. Returns False if the lease does not exists."""
+		"""Refresh an existing lease. Returns False if the lease does not exist."""
 
 		with self.lock_:
 			if leaseId not in self.leases_:
@@ -87,7 +87,7 @@ class Workload:
 		return True
 
 	def release(self, leaseId: str) -> bool:
-		"""Remove a lease immediately. Returns False if the lease does not exists."""
+		"""Remove a lease immediately. Returns False if the lease does not exist."""
 
 		with self.lock_:
 			if leaseId not in self.leases_:

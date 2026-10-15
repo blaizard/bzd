@@ -66,7 +66,7 @@ class DriverSelenium:
 
 			retry = 0
 			while True:
-				# Setting the window as small as possible will add scrollbar, which make it possible to detect the document size.
+				# Setting the window as small as possible will add scrollbar, which makes it possible to detect the document size.
 				self.driver.set_window_size(10, 10)
 
 				# We now have the actual size of the document, with the proper ratio.

@@ -5,7 +5,7 @@ import typing
 
 
 def loadAndRepair(content: str) -> typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]]:
-	"""Load the longest valid json object from a string."""
+	"""Load the longest valid JSON object or array from a string."""
 
 	candidates = []
 	pairs = {"}": "{", "]": "["}

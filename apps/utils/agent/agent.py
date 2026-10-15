@@ -90,7 +90,7 @@ if __name__ == "__main__":
 		if output is None:
 			prompt = "continue"
 
-		# Handle json output
+		# Handle JSON output
 		elif args.expect_json:
 			try:
 				data = loadAndRepair(output)

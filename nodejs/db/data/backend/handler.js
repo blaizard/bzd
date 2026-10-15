@@ -56,7 +56,7 @@ function pathToKey(path) {
 /// ```{
 ///   data: [
 ///      [{key: ["a", "b"], leaf: false}],       # This is an inner key
-///      [{key: ["a", "b", "c"], leaf: true}],   # This is a leaf key that contain a value
+///      [{key: ["a", "b", "c"], leaf: true}],   # This is a leaf key that contains a value
 ///   ]
 /// }```
 ///

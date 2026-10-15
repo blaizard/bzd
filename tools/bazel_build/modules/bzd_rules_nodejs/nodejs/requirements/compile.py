@@ -229,7 +229,7 @@ class RequirementsFactory:
 	def make(self, requirements: Requirements) -> typing.Dict[str, typing.Any]:
 		"""Build the content of the requirements file.
 
-		Format is as follow:
+		Format is as follows:
 				"top_level": {
 					"express-minify": "express-minify@1.0.0"
 				},

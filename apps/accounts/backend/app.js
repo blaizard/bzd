@@ -367,7 +367,7 @@ const Log = LogFactory("backend");
 	backend.rest.handle("post", "/password-reset", async (inputs) => {
 		const maybeUser = await users.getFromEmail(inputs.uid, /*allowNull*/ true);
 		if (maybeUser === null) {
-			// Don't return any error code if the account does not exists.
+			// Don't return any error code if the account does not exist.
 			await delayMs(Math.random() * 2000);
 			return;
 		}

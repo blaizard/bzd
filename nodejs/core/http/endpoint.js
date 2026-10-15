@@ -5,7 +5,7 @@ const Exception = ExceptionFactory("http", "endpoint");
 
 /// Parse an endpoint.
 ///
-/// Valid schema are as follow:
+/// Valid schemas are as follows:
 /// /hello/{world}/my/{path:*}
 export default class HttpEndpoint {
 	constructor(endpoint) {

@@ -102,7 +102,7 @@ def bzd_nodejs_layout_files(ctx, file_locations, base_dir_name):
 
     Args:
         ctx: The context of the rule.
-        file_locations: The files to be layed out.
+        file_locations: The files to be laid out.
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
@@ -151,7 +151,7 @@ def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name
 
     Args:
         ctx: The context of the rule.
-        file_locations: The files to be layed out.
+        file_locations: The files to be laid out.
         packages: The packages to be installed.
         imports: Dictionary of imports to be added(name to path).
         apis: All the APIs to be merged.

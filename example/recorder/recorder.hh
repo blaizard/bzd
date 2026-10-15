@@ -60,7 +60,7 @@ public:
 	// void fetch()
 };
 
-/*The code generation should generate an interface class for the interface part, as follow:
+/*The code generation should generate an interface class for the interface part, as follows:
 
 template <class Impl>
 class HelloInterface

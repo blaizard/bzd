@@ -38,10 +38,10 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			// The bucket name for the sessions to be stored in the key value store.
 			kvsBucket: "sessions",
 			// Function to save a refresh token somewhere.
-			// Its signature is as follow: async (session, hash, durationS, identifier, rolling) { ... }
+			// Its signature is as follows: async (session, hash, durationS, identifier, rolling) { ... }
 			saveRefreshToken: null,
 			// Function to remove an existing refresh token previously saved.
-			// Its signature is as follow: async (uid, hash) { ... }
+			// Its signature is as follows: async (uid, hash) { ... }
 			removeRefreshToken: null,
 			// Maximum session allowed per user.
 			maxSessionsPerUser: 5,
@@ -408,8 +408,8 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 	/// Check the status of an access token.
 	///
 	/// \param token The token to be checked.
-	/// \param minTimeoutS Minimum timeout that make this token valid.
-	/// \return A object with a "user" field and a "session" field for the token, false otherwise.
+	/// \param minTimeoutS Minimum timeout that makes this token valid.
+	/// \return An object with a "user" field and a "session" field for the token, false otherwise.
 	async _verifyAccessToken(token, minTimeoutS = 0) {
 		const [uid, hash] = this._readToken(token);
 		const maybeSessions = await this.options.kvs.get(this.options.kvsBucket, uid, null);

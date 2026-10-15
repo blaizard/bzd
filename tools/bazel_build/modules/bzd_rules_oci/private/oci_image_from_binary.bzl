@@ -22,7 +22,7 @@ def bzd_oci_image_from_binary(name, binary, base = Label("@oci_minimal"), layers
 
     bzd_oci_image(
         name = name,
-        # Use entrypoint to that argments can be passed with `command`.
+        # Use entrypoint so that arguments can be passed with `command`.
         entrypoint = [
             "/.bzd_oci_binary_bootstrap",
         ],

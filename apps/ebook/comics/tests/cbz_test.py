@@ -22,7 +22,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample1(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── file001.jpg
 		├── file002.jpg
 		├── file003.jpg
@@ -47,7 +47,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample2(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── nested
 		│   ├── file001.jpg
 		│   ├── file002.jpg
@@ -74,7 +74,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample3(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── file001.jpg
 		├── file002.jpg
 		├── file003.jpg
@@ -100,7 +100,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample4(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── credit.jpg
 		├── nested
 		│   ├── file001.jpg
@@ -129,7 +129,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample5(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		└── no_valid_files.txt
 		"""
 		cbz = Cbz()
@@ -143,7 +143,7 @@ class TestRun(unittest.TestCase):
 			self.assertEqual(len(result), 0)
 
 	def testSample6(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── 1.jpg
 		├── 2.jpg
 		├── 3.jpg
@@ -168,7 +168,7 @@ class TestRun(unittest.TestCase):
 			)
 
 	def testSample7(self) -> None:
-		"""The content look as follow:
+		"""The content looks as follows:
 		├── Thorgal 030 - The Selkie-000.jpg
 		├── ...
 		"""
