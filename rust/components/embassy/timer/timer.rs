@@ -6,6 +6,12 @@ use interfaces_timer::BzdTimerInterface;
 
 pub struct BzdComponentsEmbassyTimer;
 
+impl Default for BzdComponentsEmbassyTimer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BzdComponentsEmbassyTimer {
     pub fn new() -> Self {
         Self
