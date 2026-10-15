@@ -1,0 +1,11 @@
+use "interfaces/timer.bdl"
+
+namespace bzd.components.embassy;
+
+
+component Timer : bzd.Timer {
+interface:
+	
+}
+
+

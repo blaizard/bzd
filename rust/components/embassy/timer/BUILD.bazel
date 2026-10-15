@@ -1,0 +1,27 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//interfaces:timer",
+    ],
+)
+
+rust_library(
+    name = "timer",
+    srcs = [
+        "timer.rs",
+    ],
+    crate_name = "rust_components_embassy_timer",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:timer",
+        "//rust/bzd",
+        "//rust/libs/embassy",
+    ],
+)

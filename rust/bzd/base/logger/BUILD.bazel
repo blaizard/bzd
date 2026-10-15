@@ -3,6 +3,8 @@ load("@rules_rust//rust:defs.bzl", "rust_library")
 rust_library(
     name = "logger",
     srcs = [
+        "backend.rs",
+        "backend_interface.rs",
         "log_value/base.rs",
         "log_value/error_impl.rs",
         "log_value/integral.rs",

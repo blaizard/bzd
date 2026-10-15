@@ -22,3 +22,14 @@ rust_library(
     ],
     visibility = ["//rust/interfaces:__pkg__"],
 )
+
+rust_library(
+    name = "timer",
+    srcs = [
+        "timer.rs",
+    ],
+    visibility = ["//interfaces:__pkg__"],
+    deps = [
+        "//rust/bzd/base/error",
+    ],
+)

@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 
-use quote::quote;
+use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::{Expr, LitStr, Token};
 
@@ -84,9 +84,8 @@ impl Parse for LogInput {
     }
 }
 
-/// Expand a log macro invocation into an async block, writing each piece
-/// directly to the logger's stream without any intermediate buffer. Write
-/// errors are returned as the block's result, to be handled by the caller.
+/// Expand a log macro invocation into an async block that sends a lazy message
+/// renderer and its source metadata to the logger's backend.
 fn expand(input: TokenStream, level: &str) -> TokenStream {
     let input = syn::parse_macro_input!(input as LogInput);
     let logger = &input.logger;
@@ -112,32 +111,78 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
     }
 
     let mut statements = quote! {};
-    let mut arg_index = 0;
+    let mut arg_index: usize = 0;
     for piece in &pieces {
         match piece {
             FormatPiece::Literal(text) => {
-                statements.extend(quote! { logger.write_str(&mut guard, #text).await?; });
+                statements.extend(quote! { out.write(#text.as_bytes()).await?; });
             }
             FormatPiece::Argument => {
-                let arg = &input.args[arg_index];
+                let field = format_ident!("arg{}", arg_index);
                 arg_index += 1;
-                statements.extend(quote! { logger.write_value(&mut guard, &#arg).await?; });
+                statements.extend(quote! { self.#field.write(out).await?; });
             }
         }
     }
+
+    let argument_types: Vec<_> = (0..input.args.len())
+        .map(|index| format_ident!("T{}", index))
+        .collect();
+    let argument_fields: Vec<_> = (0..input.args.len())
+        .map(|index| format_ident!("arg{}", index))
+        .collect();
+    let struct_generics = if argument_types.is_empty() {
+        quote! {}
+    } else {
+        quote! { <'a, #(#argument_types: ?Sized), *>}
+    };
+    let impl_generics = if argument_types.is_empty() {
+        quote! {}
+    } else {
+        quote! { <'a, #(#argument_types: ::bzd::base::logger::LogValue + ?Sized), *>}
+    };
+    let type_generics = if argument_types.is_empty() {
+        quote! {}
+    } else {
+        quote! { <'a, #(#argument_types), *> }
+    };
+    let struct_fields = argument_fields
+        .iter()
+        .zip(&argument_types)
+        .map(|(field, ty)| {
+            quote! { #field: &'a #ty }
+        });
+    let message_fields = argument_fields.iter().zip(&input.args).map(|(field, arg)| {
+        quote! { #field: &(#arg) }
+    });
 
     let level: syn::Path = syn::parse_str(level).expect("valid level path");
 
     quote! {
         async {
             let logger = &mut #logger;
-            if logger.is_enabled(#level) {
-                let mut guard = logger
-                    .write_header(#level, ::core::panic::Location::caller())
-                    .await?;
-                #statements
-                logger.write_str(&mut guard, "\n").await?;
+            struct __BzdLogMessage #struct_generics {
+                #(#struct_fields,)*
             }
+
+            impl #impl_generics ::bzd::base::logger::backend_interface::LogMessage for __BzdLogMessage #type_generics {
+                async fn write<__BzdOutput: ::bzd::base::logger::BzdOStreamInterface>(&self, out: &mut __BzdOutput) -> ::core::result::Result<(), ::bzd::base::error::Error> {
+                    use ::bzd::base::logger::{BzdOStreamInterface as _, LogValue as _};
+                    #statements
+                    Ok(())
+                }
+            }
+
+            let message = __BzdLogMessage {
+                #(#message_fields,)*
+            };
+            let location = ::core::panic::Location::caller();
+            logger.log(::bzd::base::logger::backend_interface::LogRecord {
+                level: #level,
+                file: location.file(),
+                line: location.line(),
+                message,
+            }).await?;
             Ok(())
         }
     }
@@ -147,23 +192,32 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
 /// Log an error message.
 #[proc_macro]
 pub fn log_error(input: TokenStream) -> TokenStream {
-    expand(input, "::bzd::base::logger::Level::Error")
+    expand(
+        input,
+        "::bzd::base::logger::backend_interface::Level::Error",
+    )
 }
 
 /// Log a warning message.
 #[proc_macro]
 pub fn log_warning(input: TokenStream) -> TokenStream {
-    expand(input, "::bzd::base::logger::Level::Warning")
+    expand(
+        input,
+        "::bzd::base::logger::backend_interface::Level::Warning",
+    )
 }
 
 /// Log an informational message.
 #[proc_macro]
 pub fn log_info(input: TokenStream) -> TokenStream {
-    expand(input, "::bzd::base::logger::Level::Info")
+    expand(input, "::bzd::base::logger::backend_interface::Level::Info")
 }
 
 /// Log a debug message.
 #[proc_macro]
 pub fn log_debug(input: TokenStream) -> TokenStream {
-    expand(input, "::bzd::base::logger::Level::Debug")
+    expand(
+        input,
+        "::bzd::base::logger::backend_interface::Level::Debug",
+    )
 }

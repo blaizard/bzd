@@ -5,7 +5,9 @@
 #[bzd_test::test]
 mod tests {
     use bzd::base::error::{self, Error};
-    use bzd::base::logger::{log_debug, log_error, log_info, log_warning, Level, Logger};
+    use bzd::base::logger::backend::BzdOStreamBackend;
+    use bzd::base::logger::backend_interface::Level;
+    use bzd::base::logger::{log_debug, log_error, log_info, log_warning, Logger};
     use bzd::sync::mutex::Mutex;
     use interfaces_stream::BzdOStreamInterface;
 
@@ -39,7 +41,7 @@ mod tests {
     async fn test_logging() -> TestResult {
         let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&sink);
+            let mut logger = Logger::new(BzdOStreamBackend::new(&sink));
             log_info!(logger, "count = {}, name = {}", 42, "Alex").await?;
             log_warning!(logger, "careful").await?;
             log_error!(logger, "boom").await?;
@@ -62,7 +64,7 @@ mod tests {
     async fn test_error_value() -> TestResult {
         let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&sink);
+            let mut logger = Logger::new(BzdOStreamBackend::new(&sink));
             let error = error::failure("boom");
             log_error!(logger, "{}", error).await?;
         }
@@ -76,7 +78,7 @@ mod tests {
     async fn test_long_message() -> TestResult {
         let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&sink);
+            let mut logger = Logger::new(BzdOStreamBackend::new(&sink));
             let long = core::str::from_utf8(&[b'x'; 600]).unwrap();
             log_info!(logger, "{}", long).await?;
         }
@@ -91,8 +93,9 @@ mod tests {
     async fn test_minimum_level_filtering() -> TestResult {
         let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&sink);
-            logger.set_minimum_level(Level::Error);
+            let mut backend = BzdOStreamBackend::new(&sink);
+            backend.set_minimum_level(Level::Error);
+            let mut logger = Logger::new(backend);
             log_error!(logger, "shown").await?;
             log_warning!(logger, "hidden").await?;
             log_info!(logger, "hidden").await?;
@@ -108,7 +111,7 @@ mod tests {
     async fn test_location() -> TestResult {
         let sink = Mutex::new(RecordingSink::new());
         {
-            let mut logger = Logger::new(&sink);
+            let mut logger = Logger::new(BzdOStreamBackend::new(&sink));
             log_info!(logger, "hello").await?;
         }
         let guard = sink.lock().await;

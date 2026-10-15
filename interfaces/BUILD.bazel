@@ -100,7 +100,8 @@ bdl_library(
         "timer.bdl",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//cc/bzd/platform/interfaces:timer",
-    ],
+    implementation = {
+        "cc": "//cc/bzd/platform/interfaces:timer",
+        "rust": "//rust/interfaces/impl:timer",
+    },
 )

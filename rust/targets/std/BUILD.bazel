@@ -28,6 +28,7 @@ bdl_target(
     language = "rust",
     visibility = ["//visibility:public"],
     deps = [
+        "//rust/components/embassy/timer",
         "//rust/components/generic/executor",
         "//rust/components/std/stream/out",
     ],

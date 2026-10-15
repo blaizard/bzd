@@ -132,6 +132,9 @@ composition {
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
+use bzd::base::logger::backend::BzdOStreamBackend;
+
+#[allow(unused_imports)]
 use bzd::base::logger::{log_error, log_info, Logger};
 
 #[allow(unused_imports)]
@@ -323,7 +326,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 {
 
 	// Create a logger writing to the referenced 'out' component.
-	let mut logger = Logger::new(DefaultOutEntry::get().component.handle());
+	let mut logger = Logger::new(BzdOStreamBackend::new(DefaultOutEntry::get().component.handle()));
 
 	// Initialize all registry entries.
 	DefaultExecutorEntry::get().init().await?;

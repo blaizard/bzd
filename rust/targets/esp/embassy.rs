@@ -3,8 +3,11 @@
 
 use bzd::base::panic::PanicPrint;
 use embassy_executor::Spawner;
+use esp_hal::interrupt::software::SoftwareInterruptControl;
 use esp_hal::system::software_reset;
+use esp_hal::timer::timg::TimerGroup;
 use esp_println::{print, println};
+use rust_components_esp_hal::init as esp_hal_init;
 
 use composition::runExecutor;
 
@@ -33,6 +36,12 @@ pub fn exit(code: i32) -> ! {
 
 #[esp_rtos::main]
 async fn main(_spawner: Spawner) -> ! {
+    let peripherals = esp_hal_init();
+    let timer_group = TimerGroup::new(peripherals.TIMG0.reborrow());
+    let software_interrupts = SoftwareInterruptControl::new(peripherals.SW_INTERRUPT.reborrow());
+
+    esp_rtos::start(timer_group.timer0, software_interrupts.software_interrupt0);
+
     match runExecutor().await {
         Ok(()) => exit(0),
         Err(e) => {

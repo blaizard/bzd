@@ -203,6 +203,11 @@ crates.spec(
 )
 crates.spec(
     features = ["std"],
+    package = "embassy-time",
+    version = "0.5.1",
+)
+crates.spec(
+    features = ["std"],
     package = "critical-section",
     version = "1.2.0",
 )
