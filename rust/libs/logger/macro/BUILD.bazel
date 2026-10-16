@@ -10,7 +10,7 @@ rust_proc_macro(
         "@bzd_platforms//al:osx": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    visibility = ["//rust/bzd/base/logger:__pkg__"],
+    visibility = ["//rust/libs/logger:__pkg__"],
     deps = [
         "@crates//:quote",
         "@crates//:syn",

@@ -9,6 +9,7 @@ bdl_library(
     ],
     deps = [
         "//rust/interfaces:executor",
+        "//rust/interfaces:logger",
     ],
 )
 
@@ -21,7 +22,9 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
+        "//rust/bzd",
         "//rust/interfaces:executor",
+        "//rust/interfaces:logger",
         "//rust/libs/embassy",
     ],
 )

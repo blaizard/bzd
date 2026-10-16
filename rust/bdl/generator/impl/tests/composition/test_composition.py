@@ -45,9 +45,8 @@ composition {
 	person_parent.print_info();
 }
 """
-		with self.assertRaises(Exception) as context:
-			self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("must declare a referenced 'out' entry", str(context.exception))
+		actual = self._generate(content=content, imports=["child", "parent"])
+		self.assertIn("let mut logger = Logger::new(&mut *logger_backend);", actual)
 
 	def testCompositionEnum(self) -> None:
 		content = """
@@ -132,10 +131,10 @@ composition {
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
-use bzd::base::logger::backend::BzdOStreamBackend;
+use logger::{log_error, log_info, Logger};
 
 #[allow(unused_imports)]
-use bzd::base::logger::{log_error, log_info, Logger};
+use rust_interfaces_logger::BzdLoggerLevel;
 
 #[allow(unused_imports)]
 use rust_interfaces_executor::BzdExecutorInterface;
@@ -146,14 +145,14 @@ use parent::*;
 
 // ---- Registry
 struct DefaultExecutorEntry {
-	component: CompositionComponent<Executor>,
+	component: CompositionComponent<DefaultExecutor>,
 }
 
 impl DefaultExecutorEntry {
 	fn get() -> &'static Self {
 		static COMPONENT: StaticComponent<DefaultExecutorEntry> = StaticComponent::new();
 		COMPONENT.get_or_init(|| Self {
-			component: CompositionComponent::new(Executor::new())
+			component: CompositionComponent::new(DefaultExecutor::new())
 		})
 	}
 }
@@ -213,13 +212,13 @@ impl Lifecycle for DefaultOutEntry {
 	}
 }
 
-struct DefaultPerson_childEntry {
+struct DefaultPersonChildEntry {
 	component: CompositionComponent<DefaultChild>,
 }
 
-impl DefaultPerson_childEntry {
+impl DefaultPersonChildEntry {
 	fn get() -> &'static Self {
-		static COMPONENT: StaticComponent<DefaultPerson_childEntry> = StaticComponent::new();
+		static COMPONENT: StaticComponent<DefaultPersonChildEntry> = StaticComponent::new();
 		COMPONENT.get_or_init(|| Self {
 			component: CompositionComponent::new(DefaultChild::new(DefaultChildContext { username: "Alex", age: 28 }))
 		})
@@ -227,7 +226,7 @@ impl DefaultPerson_childEntry {
 }
 
 #[allow(unused_variables)]
-impl Lifecycle for DefaultPerson_childEntry {
+impl Lifecycle for DefaultPersonChildEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
@@ -247,25 +246,25 @@ impl Lifecycle for DefaultPerson_childEntry {
 	}
 }
 
-struct DefaultPerson_parentEntry {
+struct DefaultPersonParentEntry {
 	component: CompositionComponent<DefaultParent<DefaultParentContextConstraintTypes<DefaultChild>>>,
 }
 
-impl DefaultPerson_parentEntry {
+impl DefaultPersonParentEntry {
 	fn get() -> &'static Self {
-		static COMPONENT: StaticComponent<DefaultPerson_parentEntry> = StaticComponent::new();
+		static COMPONENT: StaticComponent<DefaultPersonParentEntry> = StaticComponent::new();
 		COMPONENT.get_or_init(|| Self {
-			component: CompositionComponent::new(DefaultParent::<DefaultParentContextConstraintTypes<DefaultChild>>::new(DefaultParentContext::<DefaultParentContextConstraintTypes<DefaultChild>>::new("Bob", 42, [&DefaultPerson_childEntry::get().component.handle()])))
+			component: CompositionComponent::new(DefaultParent::<DefaultParentContextConstraintTypes<DefaultChild>>::new(DefaultParentContext::<DefaultParentContextConstraintTypes<DefaultChild>>::new("Bob", 42, [&DefaultPersonChildEntry::get().component.handle()])))
 		})
 	}
 }
 
 #[allow(unused_variables)]
-impl Lifecycle for DefaultPerson_parentEntry {
+impl Lifecycle for DefaultPersonParentEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
-					DefaultPerson_childEntry::get().init().await?;
+					DefaultPersonChildEntry::get().init().await?;
 			
 			Ok(())
 		}).await?;
@@ -275,7 +274,7 @@ impl Lifecycle for DefaultPerson_parentEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
-					DefaultPerson_childEntry::get().shutdown().await?;
+					DefaultPersonChildEntry::get().shutdown().await?;
 			
 			Ok(())
 		}).await?;
@@ -284,14 +283,14 @@ impl Lifecycle for DefaultPerson_parentEntry {
 }
 
 struct DefaultPrinterEntry {
-	component: CompositionComponent<DefaultPrinter>,
+	component: CompositionComponent<DefaultPrinter<DefaultPrinterContextConstraintTypes<DefaultOut>>>,
 }
 
 impl DefaultPrinterEntry {
 	fn get() -> &'static Self {
 		static COMPONENT: StaticComponent<DefaultPrinterEntry> = StaticComponent::new();
 		COMPONENT.get_or_init(|| Self {
-			component: CompositionComponent::new(DefaultPrinter::new(DefaultPrinterContext { out: &DefaultOutEntry::get().component.handle() }))
+			component: CompositionComponent::new(DefaultPrinter::<DefaultPrinterContextConstraintTypes<DefaultOut>>::new(DefaultPrinterContext::<DefaultPrinterContextConstraintTypes<DefaultOut>>::new(&DefaultOutEntry::get().component.handle())))
 		})
 	}
 }
@@ -324,25 +323,25 @@ impl Lifecycle for DefaultPrinterEntry {
 #[allow(non_snake_case)]
 pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 {
-
-	// Create a logger writing to the referenced 'out' component.
-	let mut logger = Logger::new(BzdOStreamBackend::new(DefaultOutEntry::get().component.handle()));
-
 	// Initialize all registry entries.
 	DefaultExecutorEntry::get().init().await?;
 	DefaultOutEntry::get().init().await?;
-	DefaultPerson_childEntry::get().init().await?;
-	DefaultPerson_parentEntry::get().init().await?;
+	DefaultPersonChildEntry::get().init().await?;
+	DefaultPersonParentEntry::get().init().await?;
 	DefaultPrinterEntry::get().init().await?;
+
+	let executor = DefaultExecutor::new();
+	let mut logger_backend = executor.logger_backend().lock().await;
+	let mut logger = Logger::new(&mut *logger_backend);
 
 	log_info!(logger, "[default.executor] Initialization completed.").await?;
 
 	// Execute the workloads and services.
 	log_info!(logger, "[default.executor] Composition phase.").await?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
-	let executor = GenericExecutor::new()
+	let executor = executor
 		.push_workload(async {
-			match DefaultPerson_childEntry::get().component.lock().await.print_info().await {
+			match DefaultPersonChildEntry::get().component.lock().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -351,7 +350,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 			}
 		})
 		.push_workload(async {
-			match DefaultPerson_parentEntry::get().component.lock().await.print_info().await {
+			match DefaultPersonParentEntry::get().component.lock().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -373,21 +372,22 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	log_info!(logger, "[default.executor] Execution phase.").await?;
 	let result = executor.join().await;
 
+	let error = (result != 0)
+		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed.")));
 	log_info!(logger, "[default.executor] Completion.").await?;
+	if let Some(error) = error.as_ref() {
+		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;
+	}
+	drop(logger_backend);
 
 	// Shutdown all registry entries.
 	DefaultExecutorEntry::get().shutdown().await?;
 	DefaultOutEntry::get().shutdown().await?;
-	DefaultPerson_childEntry::get().shutdown().await?;
-	DefaultPerson_parentEntry::get().shutdown().await?;
+	DefaultPersonChildEntry::get().shutdown().await?;
+	DefaultPersonParentEntry::get().shutdown().await?;
 	DefaultPrinterEntry::get().shutdown().await?;
 
-	if result != 0 {
-		let error = failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed."));
-		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;
-		return Err(error);
-	}
-	Ok(())
+	error.map_or(Ok(()), Err)
 }
 
 """

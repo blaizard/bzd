@@ -9,6 +9,9 @@ rust_library(
     deps = [
         "//interfaces:stream",
         "//rust/bzd",
+        "//rust/components/generic/logger/backend/ostream",
+        "//rust/interfaces:logger",
+        "//rust/libs/logger",
     ],
 )
 

@@ -8,8 +8,6 @@ rust_library(
     ],
     visibility = [
         "//rust/bzd/base:__pkg__",
-        "//rust/bzd/base/logger:__pkg__",
-        "//rust/interfaces/impl:__pkg__",
     ],
 )
 

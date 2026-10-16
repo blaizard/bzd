@@ -10,3 +10,14 @@ bdl_library(
         "rust": "//rust/interfaces/impl:executor",
     },
 )
+
+bdl_library(
+    name = "logger",
+    srcs = [
+        "logger.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    implementation = {
+        "rust": "//rust/interfaces/impl:logger",
+    },
+)

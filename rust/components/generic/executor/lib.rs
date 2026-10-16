@@ -1,14 +1,25 @@
 #![no_std]
 #![no_main]
 
+use bzd::sync::mutex::Mutex;
 use core::future::Future;
 use embassy_futures::join::join;
+pub use rust_components_generic_executor_interface::{
+    BzdComponentsGenericGenericExecutorContext,
+    BzdComponentsGenericGenericExecutorContextConstraint,
+    BzdComponentsGenericGenericExecutorContextConstraintTypes,
+    BzdComponentsGenericGenericExecutorInterface,
+};
 use rust_interfaces_executor::BzdExecutorInterface;
 
-pub struct GenericExecutor<W = (), S = ()> {
+pub struct GenericExecutor<C: BzdComponentsGenericGenericExecutorContextConstraint, W = (), S = ()>
+{
+    context: BzdComponentsGenericGenericExecutorContext<C>,
     workloads: W,
     services: S,
 }
+
+pub type BzdComponentsGenericGenericExecutor<C> = GenericExecutor<C>;
 
 #[allow(async_fn_in_trait)] // Tasks are polled locally and do not require Send bounds.
 pub trait Tasks {
@@ -36,41 +47,51 @@ where
     }
 }
 
-impl GenericExecutor<(), ()> {
-    pub const fn new() -> Self {
+impl<C: BzdComponentsGenericGenericExecutorContextConstraint> GenericExecutor<C> {
+    pub fn new(context: BzdComponentsGenericGenericExecutorContext<C>) -> Self {
         Self {
+            context,
             workloads: (),
             services: (),
         }
     }
 }
 
-impl Default for GenericExecutor<(), ()> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<W, S> BzdExecutorInterface for GenericExecutor<W, S>
+impl<C, W, S> BzdExecutorInterface for GenericExecutor<C, W, S>
 where
+    C: BzdComponentsGenericGenericExecutorContextConstraint,
     W: Tasks,
     S: Tasks,
 {
-    fn push_workload<F>(self, future: F) -> impl BzdExecutorInterface
+    type LoggerBackend = C::LoggerBackend;
+
+    fn logger_backend(&self) -> &'static Mutex<Self::LoggerBackend> {
+        self.context.logger_backend
+    }
+
+    fn push_workload<F>(
+        self,
+        future: F,
+    ) -> impl BzdExecutorInterface<LoggerBackend = Self::LoggerBackend>
     where
         F: Future<Output = i32>,
     {
         GenericExecutor {
+            context: self.context,
             workloads: (self.workloads, future),
             services: self.services,
         }
     }
 
-    fn push_service<F>(self, future: F) -> impl BzdExecutorInterface
+    fn push_service<F>(
+        self,
+        future: F,
+    ) -> impl BzdExecutorInterface<LoggerBackend = Self::LoggerBackend>
     where
         F: Future<Output = i32>,
     {
         GenericExecutor {
+            context: self.context,
             workloads: self.workloads,
             services: (self.services, future),
         }
@@ -97,11 +118,21 @@ where
     }
 }
 
+impl<C, W, S> BzdComponentsGenericGenericExecutorInterface for GenericExecutor<C, W, S>
+where
+    C: BzdComponentsGenericGenericExecutorContextConstraint,
+    W: Tasks,
+    S: Tasks,
+{
+}
+
 #[cfg(test)]
 #[bzd_test::test]
 mod tests {
     use super::*;
+    use bzd::base::error::Error;
     use rust_interfaces_executor::BzdExecutorInterface;
+    use rust_interfaces_logger::{BzdLoggerBackendInterface, LogMessage, LogRecord};
 
     use core::future::Future;
     use core::pin::Pin;
@@ -145,16 +176,41 @@ mod tests {
         YieldOnce(Some(value))
     }
 
+    struct NullBackend;
+
+    impl BzdLoggerBackendInterface for NullBackend {
+        type Level = ();
+
+        async fn log<M: LogMessage>(&mut self, _: LogRecord<Self::Level, M>) -> Result<(), Error> {
+            Ok(())
+        }
+    }
+
+    static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
+
+    fn executor(
+    ) -> GenericExecutor<BzdComponentsGenericGenericExecutorContextConstraintTypes<NullBackend>>
+    {
+        GenericExecutor::new(BzdComponentsGenericGenericExecutorContext::new(&BACKEND))
+    }
+
+    #[test]
+    fn logger_backend_is_exposed() -> TestResult {
+        let executor = executor().push_workload(async { 0 });
+        assert_eq!(core::ptr::eq(executor.logger_backend(), &BACKEND), true)?;
+        Ok(())
+    }
+
     #[test]
     fn empty_executor_returns_zero() -> TestResult {
-        let result = block_on(GenericExecutor::new().join());
+        let result = block_on(executor().join());
         assert_eq!(result, 0)?;
         Ok(())
     }
 
     #[test]
     fn workload_status_is_returned() -> TestResult {
-        let result = block_on(GenericExecutor::new().push_workload(async { 42 }).join());
+        let result = block_on(executor().push_workload(async { 42 }).join());
         assert_eq!(result, 42)?;
         Ok(())
     }
@@ -162,7 +218,7 @@ mod tests {
     #[test]
     fn multiple_workloads_return_leftmost_non_zero() -> TestResult {
         let result = block_on(
-            GenericExecutor::new()
+            executor()
                 .push_workload(async { 0 })
                 .push_workload(async { 7 })
                 .join(),
@@ -170,7 +226,7 @@ mod tests {
         assert_eq!(result, 7)?;
 
         let result = block_on(
-            GenericExecutor::new()
+            executor()
                 .push_workload(async { 3 })
                 .push_workload(async { 5 })
                 .join(),
@@ -182,7 +238,7 @@ mod tests {
     #[test]
     fn service_completion_does_not_change_result() -> TestResult {
         let result = block_on(
-            GenericExecutor::new()
+            executor()
                 .push_service(async { 99 })
                 .push_workload(yield_once(7))
                 .join(),
@@ -194,7 +250,7 @@ mod tests {
     #[test]
     fn waits_for_all_workloads_before_returning() -> TestResult {
         let result = block_on(
-            GenericExecutor::new()
+            executor()
                 .push_workload(yield_once(3))
                 .push_workload(yield_once(5))
                 .join(),
@@ -220,7 +276,7 @@ mod tests {
         });
 
         let result = block_on(
-            GenericExecutor::new()
+            executor()
                 .push_service(service)
                 .push_workload(async { 7 })
                 .join(),

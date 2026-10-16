@@ -30,6 +30,7 @@ bdl_target(
     deps = [
         "//rust/components/embassy/timer",
         "//rust/components/generic/executor",
+        "//rust/components/generic/logger/backend/ostream",
         "//rust/components/std/stream/out",
     ],
 )

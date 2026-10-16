@@ -8,10 +8,9 @@ rust_library(
     crate_name = "bzd_stream_impl",
     visibility = [
         "//interfaces:__pkg__",
-        "//rust/bzd/base/logger:__pkg__",
     ],
     deps = [
-        "//rust/bzd/base/error",
+        "//rust/bzd",
     ],
 )
 
@@ -21,6 +20,22 @@ rust_library(
         "executor.rs",
     ],
     visibility = ["//rust/interfaces:__pkg__"],
+    deps = [
+        "//rust/bzd",
+        "//rust/interfaces:logger",
+    ],
+)
+
+rust_library(
+    name = "logger",
+    srcs = [
+        "logger.rs",
+    ],
+    visibility = ["//rust/interfaces:__pkg__"],
+    deps = [
+        "//interfaces:stream",
+        "//rust/bzd",
+    ],
 )
 
 rust_library(
@@ -30,6 +45,6 @@ rust_library(
     ],
     visibility = ["//interfaces:__pkg__"],
     deps = [
-        "//rust/bzd/base/error",
+        "//rust/bzd",
     ],
 )

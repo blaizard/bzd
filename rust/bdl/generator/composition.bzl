@@ -137,7 +137,10 @@ def _generator_rust_composition_impl(name, visibility, target_name, target, comp
         deps = [
             Label("//rust/bdl/generator/impl/adapter:component"),
             Label("//rust/bzd"),
+            Label("//rust/components/generic/logger/backend/ostream"),
             Label("//rust/interfaces:executor"),
+            Label("//rust/interfaces:logger"),
+            Label("//rust/libs/logger"),
             "{}.composition".format(name),
         ],
         tags = ["manual"],

@@ -1,6 +1,6 @@
 use super::LogValue;
-use bzd_stream_impl::BzdOStreamInterface;
-use error::Error;
+use bzd::base::error::Error;
+use interfaces_stream::BzdOStreamInterface;
 
 impl LogValue for str {
     async fn write(&self, out: &mut impl BzdOStreamInterface) -> Result<(), Error> {

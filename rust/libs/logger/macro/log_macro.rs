@@ -139,7 +139,7 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
     let impl_generics = if argument_types.is_empty() {
         quote! {}
     } else {
-        quote! { <'a, #(#argument_types: ::bzd::base::logger::LogValue + ?Sized), *>}
+        quote! { <'a, #(#argument_types: logger::LogValue + ?Sized), *>}
     };
     let type_generics = if argument_types.is_empty() {
         quote! {}
@@ -165,9 +165,9 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
                 #(#struct_fields,)*
             }
 
-            impl #impl_generics ::bzd::base::logger::backend_interface::LogMessage for __BzdLogMessage #type_generics {
-                async fn write<__BzdOutput: ::bzd::base::logger::BzdOStreamInterface>(&self, out: &mut __BzdOutput) -> ::core::result::Result<(), ::bzd::base::error::Error> {
-                    use ::bzd::base::logger::{BzdOStreamInterface as _, LogValue as _};
+            impl #impl_generics rust_interfaces_logger::LogMessage for __BzdLogMessage #type_generics {
+                async fn write<__BzdOutput: logger::BzdOStreamInterface>(&self, out: &mut __BzdOutput) -> ::core::result::Result<(), ::bzd::base::error::Error> {
+                    use logger::{BzdOStreamInterface as _, LogValue as _};
                     #statements
                     Ok(())
                 }
@@ -177,7 +177,7 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
                 #(#message_fields,)*
             };
             let location = ::core::panic::Location::caller();
-            logger.log(::bzd::base::logger::backend_interface::LogRecord {
+            logger.log(rust_interfaces_logger::LogRecord {
                 level: #level,
                 file: location.file(),
                 line: location.line(),
@@ -192,32 +192,23 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
 /// Log an error message.
 #[proc_macro]
 pub fn log_error(input: TokenStream) -> TokenStream {
-    expand(
-        input,
-        "::bzd::base::logger::backend_interface::Level::Error",
-    )
+    expand(input, "rust_interfaces_logger::BzdLoggerLevel::Error")
 }
 
 /// Log a warning message.
 #[proc_macro]
 pub fn log_warning(input: TokenStream) -> TokenStream {
-    expand(
-        input,
-        "::bzd::base::logger::backend_interface::Level::Warning",
-    )
+    expand(input, "rust_interfaces_logger::BzdLoggerLevel::Warning")
 }
 
 /// Log an informational message.
 #[proc_macro]
 pub fn log_info(input: TokenStream) -> TokenStream {
-    expand(input, "::bzd::base::logger::backend_interface::Level::Info")
+    expand(input, "rust_interfaces_logger::BzdLoggerLevel::Info")
 }
 
 /// Log a debug message.
 #[proc_macro]
 pub fn log_debug(input: TokenStream) -> TokenStream {
-    expand(
-        input,
-        "::bzd::base::logger::backend_interface::Level::Debug",
-    )
+    expand(input, "rust_interfaces_logger::BzdLoggerLevel::Debug")
 }

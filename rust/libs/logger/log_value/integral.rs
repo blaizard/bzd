@@ -1,6 +1,6 @@
 use super::LogValue;
-use bzd_stream_impl::BzdOStreamInterface;
-use error::Error;
+use bzd::base::error::Error;
+use interfaces_stream::BzdOStreamInterface;
 
 /// Write the decimal representation of a value, most significant digit first,
 /// with no intermediate buffer.

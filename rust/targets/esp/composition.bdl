@@ -1,12 +1,14 @@
 use "rust/components/generic/executor/interface.bdl"
+use "rust/components/generic/logger/backend/ostream/interface.bdl"
 use "rust/components/esp/stream/uart/interface.bdl"
 use "rust/components/embassy/timer/interface.bdl"
 
 
 
 composition {
-	executor = bzd.components.generic.GenericExecutor() [executor];
 	out = bzd.components.esp.UartOut(device = bzd.components.esp.UartDevice.uart0, pin = 1, baudrate = 115200);
+	logger_backend = bzd.components.generic.OStreamLoggerBackend(out = out, min_level = bzd.logger.Level.Info);
+	executor = bzd.components.generic.GenericExecutor(logger_backend = logger_backend) [executor];
 	timer = bzd.components.embassy.Timer();
 	
 }

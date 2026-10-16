@@ -1,0 +1,14 @@
+use "interfaces/stream.bdl"
+use "rust/interfaces/logger.bdl"
+
+namespace bzd.components.generic;
+
+
+component OStreamLoggerBackend : bzd.logger.Backend {
+config:
+	out = bzd.OStream;
+	min_level = bzd.logger.Level;
+	
+}
+
+

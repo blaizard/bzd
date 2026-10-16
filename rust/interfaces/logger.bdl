@@ -1,0 +1,14 @@
+
+namespace bzd.logger;
+
+extern interface Backend;
+
+enum Level
+{
+	Debug
+,	Info
+,	Warning
+,	Error
+}
+
+

@@ -1,9 +1,13 @@
 use "rust/interfaces/executor.bdl"
+use "rust/interfaces/logger.bdl"
 
 namespace bzd.components.generic;
 
 
 component GenericExecutor : bzd.Executor {
+config:
+	logger_backend = bzd.logger.Backend;
+	
 interface:
 	
 }

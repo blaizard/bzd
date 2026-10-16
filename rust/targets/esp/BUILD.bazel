@@ -60,5 +60,6 @@ bdl_target(
         "//rust/components/embassy/timer",
         "//rust/components/esp/stream/uart",
         "//rust/components/generic/executor",
+        "//rust/components/generic/logger/backend/ostream",
     ],
 )

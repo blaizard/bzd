@@ -1,0 +1,29 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//interfaces:stream",
+        "//rust/interfaces:logger",
+    ],
+)
+
+rust_library(
+    name = "ostream",
+    srcs = [
+        "ostream.rs",
+    ],
+    crate_name = "rust_components_generic_logger_backend_ostream",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:stream",
+        "//rust/bzd",
+        "//rust/interfaces:logger",
+        "//rust/libs/logger",
+    ],
+)

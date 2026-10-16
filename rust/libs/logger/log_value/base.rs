@@ -1,5 +1,5 @@
-use bzd_stream_impl::BzdOStreamInterface;
-use error::Error;
+use bzd::base::error::Error;
+use interfaces_stream::BzdOStreamInterface;
 
 /// Write a value directly to a stream without any intermediate buffer.
 #[allow(async_fn_in_trait)]

@@ -37,7 +37,7 @@ class Transform:
 
 	def toCamelCase(self, string: str) -> str:
 		assert len(string), "String cannot be empty."
-		return string[0].upper() + string[1:]
+		return "".join(part[0].upper() + part[1:] for part in string.split("_"))
 
 	def symbolToStr(self, symbol: Optional[Symbol]) -> str:
 		return symbolRustToStr(symbol)
@@ -151,27 +151,21 @@ class Transform:
 
 		return str(literalNative)
 
-	def outFqn(self, context: Context) -> str:
-		fqn = "{}.out".format(context.target)
-		assert self.composition is not None
-		return fqn if fqn in self.composition.registry[context] else ""
-
 	def entryStructNameToStr(self, fqn: str) -> str:
-		return "{}Entry".format(self.fqnToCapitalized(fqn))
+		return "{}Entry".format("".join(self.toCamelCase(part) for part in FQN.toNamespace(fqn)))
 
 	def runFunctionNameToStr(self, context: Context) -> str:
 		return "run{}".format(self.fqnToCapitalized(context.executorWithoutTarget))
 
-	def isExecutorEntry(self, entity: ExpressionEntry, context: Context) -> bool:
-		return entity.expression.fqn == context.executor
+	def executorConstructorToStr(self, context: Context) -> str:
+		assert self.composition is not None
+		return self.entryConstructorToStr(self.composition.registry[context][context.executor], context)
 
 	def configDependencyItems(self, entity: ExpressionEntry) -> typing.List[ParametersResolvedItem]:
 		"""Get the resolved config items that reference a dependency (component or interface)."""
 
 		return [
-			item
-			for item in entity.expression.parametersResolved
-			if item.param.isSymbol and self.configDependencySymbol(item.param) is not None
+			item for item in entity.expression.parametersResolved if self.configDependencySymbol(item.expected) is not None
 		]
 
 	def configParamValueToStr(self, item: ParametersResolvedItem) -> str:
@@ -202,7 +196,7 @@ class Transform:
 			assert self.composition is not None
 			entry = self.composition.registry[context].get(fqn)
 			if entry is not None:
-				return self.symbolToStr(entry.expression.symbol)
+				return self.entryTypeToStr(entry, context)
 		dependencySymbol = self.configDependencySymbol(param)
 		return self.symbolToStr(dependencySymbol) if dependencySymbol is not None else None
 
@@ -222,8 +216,6 @@ class Transform:
 	def entryTypeToStr(self, entity: ExpressionEntry, context: Context) -> str:
 		"""Generate the concrete component type of a registry entry."""
 
-		if self.isExecutorEntry(entity, context):
-			return entity.expression.symbol.propertyName
 		baseType = self.symbolToStr(entity.expression.symbol)
 		constraint = self.constraintTypesToStr(entity, context)
 		return "{}<{}>".format(baseType, constraint) if constraint else baseType
@@ -232,7 +224,7 @@ class Transform:
 		"""Generate the construction call of a registry entry instance."""
 
 		entryType = self.entryTypeToStr(entity, context)
-		if self.isExecutorEntry(entity, context) or not entity.expression.parametersResolved:
+		if not entity.expression.parametersResolved:
 			return "{}::new()".format(entryType)
 		# In expression position, generic arguments must be given with turbofish.
 		constructorType = entryType.replace("<", "::<", 1) if "<" in entryType else entryType
