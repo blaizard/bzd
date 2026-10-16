@@ -12,13 +12,13 @@ pub use log_value::LogValue;
 use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogMessage, LogRecord};
 
 /// Frontend that dispatches log events to a backend.
-pub struct Logger<B: BzdLoggerBackendInterface<Level = BzdLoggerLevel>> {
-    backend: B,
+pub struct Logger<'a, B: BzdLoggerBackendInterface<Level = BzdLoggerLevel>> {
+    backend: &'a mut B,
 }
 
-impl<B: BzdLoggerBackendInterface<Level = BzdLoggerLevel>> Logger<B> {
+impl<'a, B: BzdLoggerBackendInterface<Level = BzdLoggerLevel>> Logger<'a, B> {
     /// Create a new logger.
-    pub fn new(backend: B) -> Self {
+    pub fn new(backend: &'a mut B) -> Self {
         Self { backend }
     }
 

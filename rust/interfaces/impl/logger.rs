@@ -23,11 +23,3 @@ pub trait BzdLoggerBackendInterface {
 
     async fn log<M: LogMessage>(&mut self, record: LogRecord<Self::Level, M>) -> Result<(), Error>;
 }
-
-impl<B: BzdLoggerBackendInterface + ?Sized> BzdLoggerBackendInterface for &mut B {
-    type Level = B::Level;
-
-    async fn log<M: LogMessage>(&mut self, record: LogRecord<Self::Level, M>) -> Result<(), Error> {
-        (**self).log(record).await
-    }
-}
