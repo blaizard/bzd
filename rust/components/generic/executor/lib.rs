@@ -179,9 +179,7 @@ mod tests {
     struct NullBackend;
 
     impl BzdLoggerBackendInterface for NullBackend {
-        type Level = ();
-
-        async fn log<M: LogMessage>(&mut self, _: LogRecord<Self::Level, M>) -> Result<(), Error> {
+        async fn log<M: LogMessage>(&mut self, _: LogRecord<M>) -> Result<(), Error> {
             Ok(())
         }
     }

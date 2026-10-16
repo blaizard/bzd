@@ -35,6 +35,7 @@ rust_library(
     deps = [
         "//interfaces:stream",
         "//rust/bzd",
+        "//rust/interfaces:logger_level",
     ],
 )
 

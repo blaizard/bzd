@@ -1,14 +1,7 @@
+use "rust/interfaces/logger_level.bdl"
 
 namespace bzd.logger;
 
 extern interface Backend;
-
-enum Level
-{
-	Debug
-,	Info
-,	Warning
-,	Error
-}
 
 

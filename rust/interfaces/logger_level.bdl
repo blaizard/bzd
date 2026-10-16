@@ -1,0 +1,13 @@
+
+namespace bzd.logger;
+
+
+enum Level
+{
+	Debug
+,	Info
+,	Warning
+,	Error
+}
+
+

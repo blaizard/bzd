@@ -56,9 +56,7 @@ fn level_priority(level: BzdLoggerLevel) -> u8 {
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBackendInterface
     for BzdOStreamBackend<C>
 {
-    type Level = BzdLoggerLevel;
-
-    async fn log<M: LogMessage>(&mut self, record: LogRecord<Self::Level, M>) -> Result<(), Error> {
+    async fn log<M: LogMessage>(&mut self, record: LogRecord<M>) -> Result<(), Error> {
         if !self.is_enabled(record.level) {
             return Ok(());
         }

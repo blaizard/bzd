@@ -4,9 +4,11 @@
 use bzd::base::error::Error;
 use interfaces_stream::BzdOStreamInterface;
 
+pub use rust_interfaces_logger_level::BzdLoggerLevel;
+
 /// One log event, including its source and lazy formatter message.
-pub struct LogRecord<L, M: LogMessage> {
-    pub level: L,
+pub struct LogRecord<M: LogMessage> {
+    pub level: BzdLoggerLevel,
     pub file: &'static str,
     pub line: u32,
     pub message: M,
@@ -19,7 +21,5 @@ pub trait LogMessage {
 
 /// A backend that decides how a log event is formatted and emitted.
 pub trait BzdLoggerBackendInterface {
-    type Level;
-
-    async fn log<M: LogMessage>(&mut self, record: LogRecord<Self::Level, M>) -> Result<(), Error>;
+    async fn log<M: LogMessage>(&mut self, record: LogRecord<M>) -> Result<(), Error>;
 }

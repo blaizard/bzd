@@ -17,7 +17,18 @@ bdl_library(
         "logger.bdl",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        ":logger_level",
+    ],
     implementation = {
         "rust": "//rust/interfaces/impl:logger",
     },
+)
+
+bdl_library(
+    name = "logger_level",
+    srcs = [
+        "logger_level.bdl",
+    ],
+    visibility = ["//visibility:public"],
 )
