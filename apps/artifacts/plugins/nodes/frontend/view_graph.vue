@@ -49,8 +49,7 @@
 			},
 			timeRange(value, previous) {
 				this.applyTimeRange();
-				const span = (range) => (range[0] === null || range[1] === null ? null : range[1] - range[0]);
-				if (span(value) !== span(previous)) {
+				if (value[1] - value[0] !== previous[1] - previous[0]) {
 					this.initialize();
 				}
 			},
@@ -180,7 +179,7 @@
 		},
 		methods: {
 			async initialize() {
-				if (this.fetching || this.timeRange[0] === null || this.timeRange[1] === null) {
+				if (this.fetching) {
 					return;
 				}
 				this.fetching = true;
@@ -276,7 +275,7 @@
 				}
 			},
 			applyTimeRange() {
-				if (this.chart && this.timeRange[0] && this.timeRange[1]) {
+				if (this.chart) {
 					// Extend the window to include the newest fetched data, otherwise newly
 					// arrived samples would be clipped until the next time range update.
 					const [, timestampNewest] = this.collection.timeRange;

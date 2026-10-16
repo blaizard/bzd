@@ -20,7 +20,7 @@
 				v-heartbeat="heartbeat(dashboard)"
 			>
 				<h2 class="dashboard-component-title">{{ dashboard.title || "Missing title" }}</h2>
-				<div v-if="!viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
+				<div v-if="!ready || !viewport.dashboards.includes(dashboard)" class="dashboard-component-loading">...</div>
 				<component
 					v-else-if="viewComponent(dashboard)"
 					:is="viewComponent(dashboard)"
@@ -201,6 +201,9 @@
 			endpoint() {
 				const [volume, uid, ..._] = this.pathList;
 				return "/x/" + encodeURIComponent(volume) + "/" + encodeURIComponent(uid);
+			},
+			ready() {
+				return this.timeRange[0] !== null && this.timeRange[1] !== null;
 			},
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;

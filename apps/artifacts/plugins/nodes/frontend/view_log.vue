@@ -117,7 +117,7 @@
 				},
 			},
 			windowStart() {
-				return this.timeRange[0] ?? null;
+				return this.timeRange[0];
 			},
 			hoveredIndex() {
 				if (this.hoverTimestamp === null || this.hoverTimestamp === undefined || this.lines.length === 0) {
@@ -180,8 +180,7 @@
 							: await this.fetchEntries({ before: reference });
 					if (direction === "prepend") {
 						// Discard entries before the time window, so older paging stops at its boundary.
-						entries =
-							this.windowStart === null ? entries : entries.filter(([timestamp]) => timestamp >= this.windowStart);
+						entries = entries.filter(([timestamp]) => timestamp >= this.windowStart);
 					}
 					await this.addEntries(entries, { prepend: direction === "prepend" });
 				} finally {
