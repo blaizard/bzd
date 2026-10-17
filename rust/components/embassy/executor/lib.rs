@@ -4,20 +4,18 @@
 use bzd::sync::mutex::Mutex;
 use core::future::Future;
 use embassy_futures::join::join;
-pub use rust_components_generic_executor_interface::{
-    BzdComponentsGenericGenericExecutorContext,
-    BzdComponentsGenericGenericExecutorContextConstraint,
-    BzdComponentsGenericGenericExecutorContextConstraintTypes,
-    BzdComponentsGenericGenericExecutorInterface,
+pub use rust_components_embassy_executor_interface::{
+    BzdComponentsEmbassyExecutorContext, BzdComponentsEmbassyExecutorContextConstraint,
+    BzdComponentsEmbassyExecutorContextConstraintTypes, BzdComponentsEmbassyExecutorInterface,
 };
 use rust_interfaces_executor::BzdExecutorInterface;
 
-pub struct BzdComponentsGenericGenericExecutor<
-    C: BzdComponentsGenericGenericExecutorContextConstraint,
+pub struct BzdComponentsEmbassyExecutor<
+    C: BzdComponentsEmbassyExecutorContextConstraint,
     W = (),
     S = (),
 > {
-    context: BzdComponentsGenericGenericExecutorContext<C>,
+    context: BzdComponentsEmbassyExecutorContext<C>,
     workloads: W,
     services: S,
 }
@@ -48,10 +46,8 @@ where
     }
 }
 
-impl<C: BzdComponentsGenericGenericExecutorContextConstraint>
-    BzdComponentsGenericGenericExecutor<C>
-{
-    pub fn new(context: BzdComponentsGenericGenericExecutorContext<C>) -> Self {
+impl<C: BzdComponentsEmbassyExecutorContextConstraint> BzdComponentsEmbassyExecutor<C> {
+    pub fn new(context: BzdComponentsEmbassyExecutorContext<C>) -> Self {
         Self {
             context,
             workloads: (),
@@ -60,9 +56,9 @@ impl<C: BzdComponentsGenericGenericExecutorContextConstraint>
     }
 }
 
-impl<C, W, S> BzdExecutorInterface for BzdComponentsGenericGenericExecutor<C, W, S>
+impl<C, W, S> BzdExecutorInterface for BzdComponentsEmbassyExecutor<C, W, S>
 where
-    C: BzdComponentsGenericGenericExecutorContextConstraint,
+    C: BzdComponentsEmbassyExecutorContextConstraint,
     W: Tasks,
     S: Tasks,
 {
@@ -79,7 +75,7 @@ where
     where
         F: Future<Output = i32>,
     {
-        BzdComponentsGenericGenericExecutor {
+        BzdComponentsEmbassyExecutor {
             context: self.context,
             workloads: (self.workloads, future),
             services: self.services,
@@ -93,7 +89,7 @@ where
     where
         F: Future<Output = i32>,
     {
-        BzdComponentsGenericGenericExecutor {
+        BzdComponentsEmbassyExecutor {
             context: self.context,
             workloads: self.workloads,
             services: (self.services, future),
@@ -121,10 +117,9 @@ where
     }
 }
 
-impl<C, W, S> BzdComponentsGenericGenericExecutorInterface
-    for BzdComponentsGenericGenericExecutor<C, W, S>
+impl<C, W, S> BzdComponentsEmbassyExecutorInterface for BzdComponentsEmbassyExecutor<C, W, S>
 where
-    C: BzdComponentsGenericGenericExecutorContextConstraint,
+    C: BzdComponentsEmbassyExecutorContextConstraint,
     W: Tasks,
     S: Tasks,
 {
@@ -190,12 +185,10 @@ mod tests {
 
     static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
 
-    fn executor() -> BzdComponentsGenericGenericExecutor<
-        BzdComponentsGenericGenericExecutorContextConstraintTypes<NullBackend>,
-    > {
-        BzdComponentsGenericGenericExecutor::new(BzdComponentsGenericGenericExecutorContext::new(
-            &BACKEND,
-        ))
+    fn executor(
+    ) -> BzdComponentsEmbassyExecutor<BzdComponentsEmbassyExecutorContextConstraintTypes<NullBackend>>
+    {
+        BzdComponentsEmbassyExecutor::new(BzdComponentsEmbassyExecutorContext::new(&BACKEND))
     }
 
     #[test]

@@ -18,7 +18,7 @@ rust_library(
     srcs = [
         "lib.rs",
     ],
-    crate_name = "rust_components_generic_executor",
+    crate_name = "rust_components_embassy_executor",
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
