@@ -12,14 +12,15 @@ pub use rust_components_generic_executor_interface::{
 };
 use rust_interfaces_executor::BzdExecutorInterface;
 
-pub struct GenericExecutor<C: BzdComponentsGenericGenericExecutorContextConstraint, W = (), S = ()>
-{
+pub struct BzdComponentsGenericGenericExecutor<
+    C: BzdComponentsGenericGenericExecutorContextConstraint,
+    W = (),
+    S = (),
+> {
     context: BzdComponentsGenericGenericExecutorContext<C>,
     workloads: W,
     services: S,
 }
-
-pub type BzdComponentsGenericGenericExecutor<C> = GenericExecutor<C>;
 
 #[allow(async_fn_in_trait)] // Tasks are polled locally and do not require Send bounds.
 pub trait Tasks {
@@ -47,7 +48,9 @@ where
     }
 }
 
-impl<C: BzdComponentsGenericGenericExecutorContextConstraint> GenericExecutor<C> {
+impl<C: BzdComponentsGenericGenericExecutorContextConstraint>
+    BzdComponentsGenericGenericExecutor<C>
+{
     pub fn new(context: BzdComponentsGenericGenericExecutorContext<C>) -> Self {
         Self {
             context,
@@ -57,7 +60,7 @@ impl<C: BzdComponentsGenericGenericExecutorContextConstraint> GenericExecutor<C>
     }
 }
 
-impl<C, W, S> BzdExecutorInterface for GenericExecutor<C, W, S>
+impl<C, W, S> BzdExecutorInterface for BzdComponentsGenericGenericExecutor<C, W, S>
 where
     C: BzdComponentsGenericGenericExecutorContextConstraint,
     W: Tasks,
@@ -76,7 +79,7 @@ where
     where
         F: Future<Output = i32>,
     {
-        GenericExecutor {
+        BzdComponentsGenericGenericExecutor {
             context: self.context,
             workloads: (self.workloads, future),
             services: self.services,
@@ -90,7 +93,7 @@ where
     where
         F: Future<Output = i32>,
     {
-        GenericExecutor {
+        BzdComponentsGenericGenericExecutor {
             context: self.context,
             workloads: self.workloads,
             services: (self.services, future),
@@ -118,7 +121,8 @@ where
     }
 }
 
-impl<C, W, S> BzdComponentsGenericGenericExecutorInterface for GenericExecutor<C, W, S>
+impl<C, W, S> BzdComponentsGenericGenericExecutorInterface
+    for BzdComponentsGenericGenericExecutor<C, W, S>
 where
     C: BzdComponentsGenericGenericExecutorContextConstraint,
     W: Tasks,
@@ -186,10 +190,12 @@ mod tests {
 
     static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
 
-    fn executor(
-    ) -> GenericExecutor<BzdComponentsGenericGenericExecutorContextConstraintTypes<NullBackend>>
-    {
-        GenericExecutor::new(BzdComponentsGenericGenericExecutorContext::new(&BACKEND))
+    fn executor() -> BzdComponentsGenericGenericExecutor<
+        BzdComponentsGenericGenericExecutorContextConstraintTypes<NullBackend>,
+    > {
+        BzdComponentsGenericGenericExecutor::new(BzdComponentsGenericGenericExecutorContext::new(
+            &BACKEND,
+        ))
     }
 
     #[test]

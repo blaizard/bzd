@@ -12,13 +12,15 @@ pub use rust_components_generic_logger_backend_ostream_interface::{
 use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogMessage, LogRecord};
 
 /// A logger writing formatted messages to a shared stream sink.
-pub struct BzdOStreamBackend<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> {
+pub struct BzdComponentsGenericOStreamLoggerBackend<
+    C: BzdComponentsGenericOStreamLoggerBackendContextConstraint,
+> {
     context: BzdComponentsGenericOStreamLoggerBackendContext<C>,
 }
 
-pub type BzdComponentsGenericOStreamLoggerBackend<C> = BzdOStreamBackend<C>;
-
-impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdOStreamBackend<C> {
+impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint>
+    BzdComponentsGenericOStreamLoggerBackend<C>
+{
     /// Create a new logger.
     pub fn new(context: BzdComponentsGenericOStreamLoggerBackendContext<C>) -> Self {
         Self { context }
@@ -54,7 +56,7 @@ fn level_priority(level: BzdLoggerLevel) -> u8 {
 }
 
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBackendInterface
-    for BzdOStreamBackend<C>
+    for BzdComponentsGenericOStreamLoggerBackend<C>
 {
     async fn log<M: LogMessage>(&mut self, record: LogRecord<M>) -> Result<(), Error> {
         if !self.is_enabled(record.level) {
@@ -78,6 +80,7 @@ impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBack
 }
 
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint>
-    BzdComponentsGenericOStreamLoggerBackendInterface for BzdOStreamBackend<C>
+    BzdComponentsGenericOStreamLoggerBackendInterface
+    for BzdComponentsGenericOStreamLoggerBackend<C>
 {
 }
