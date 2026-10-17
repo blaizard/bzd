@@ -9,7 +9,7 @@ mod tests {
     use interfaces_stream::BzdOStreamInterface;
     use logger::{log_debug, log_error, log_info, log_warning, Logger};
     use rust_components_generic_logger_backend_ostream::{
-        BzdComponentsGenericOStreamLoggerBackendContext, BzdOStreamBackend,
+        BzdComponentsGenericOStreamLoggerBackend, BzdComponentsGenericOStreamLoggerBackendContext,
     };
     use rust_interfaces_logger::BzdLoggerLevel;
 
@@ -48,7 +48,7 @@ mod tests {
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdOStreamBackend::new(context);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
             log_info!(logger, "count = {}, name = {}", 42, "Alex").await?;
             log_warning!(logger, "careful").await?;
@@ -74,7 +74,7 @@ mod tests {
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdOStreamBackend::new(context);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
             let error = error::failure("boom");
             log_error!(logger, "{}", error).await?;
@@ -91,7 +91,7 @@ mod tests {
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdOStreamBackend::new(context);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
             let long = core::str::from_utf8(&[b'x'; 600]).unwrap();
             log_info!(logger, "{}", long).await?;
@@ -109,7 +109,7 @@ mod tests {
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdOStreamBackend::new(context);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             backend.set_minimum_level(BzdLoggerLevel::Error);
             let mut logger = Logger::new(&mut backend);
             log_error!(logger, "shown").await?;
@@ -129,7 +129,7 @@ mod tests {
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdOStreamBackend::new(context);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
             log_info!(logger, "hello").await?;
         }
