@@ -21,6 +21,7 @@ def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) 
 		[
 			"opencode",
 			"run",
+			"--standalone",
 			"--auto",
 			"--agent",
 			agent,

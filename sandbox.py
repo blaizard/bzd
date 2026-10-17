@@ -180,7 +180,7 @@ class FeatureOpenCode(Feature):
 		]
 		self.dockerFile += [
 			f"RUN sudo apt install -y nodejs npm {' '.join(llmEssentials)}",
-			"RUN sudo npm install -g opencode-ai@latest",
+			"RUN sudo npm install -g @opencode/cli",
 		]
 
 		if "host-config" in self.args.opencode:
@@ -204,10 +204,6 @@ class FeatureOpenCode(Feature):
 			self.includes(".opencode/commands", f"{context.home}/.config/opencode/commands", context)
 			for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture", "write-tests"]:
 				self.includes(f".opencode/skills/{skill}", f"{context.home}/.config/opencode/skills/{skill}", context)
-			self.dockerFile += [
-				# This ensure the migration of the database.
-				"RUN opencode db path",
-			]
 
 		if "playwright" in self.args.opencode:
 			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.config/opencode/skills/playwright-cli", context)
