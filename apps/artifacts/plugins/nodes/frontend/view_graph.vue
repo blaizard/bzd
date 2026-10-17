@@ -1,5 +1,5 @@
 <template>
-	<div class="graph-container">
+	<div class="graph-container" v-loading="loading">
 		<canvas ref="graph"></canvas>
 	</div>
 </template>
@@ -9,6 +9,7 @@
 	import "chartjs-adapter-date-fns";
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
+	import DirectiveLoading from "#bzd/nodejs/vue/directives/loading.js";
 	import TimeseriesCollection from "#bzd/apps/artifacts/plugins/nodes/frontend/timeseries_collection.js";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
 	import { UCUMToString } from "#bzd/nodejs/utils/to_string.js";
@@ -21,6 +22,9 @@
 
 	export default {
 		mixins: [Base, Component],
+		directives: {
+			loading: DirectiveLoading,
+		},
 		props: {
 			options: { mandatory: true, type: Object },
 			endpoint: { mandatory: true, type: String },
@@ -190,7 +194,7 @@
 					this.refreshPeriodMs = Math.max(Math.round(periodUs / 1000 / width), 3000);
 					this.collection.reset({ periodLimit: periodUs });
 					this.collection.add(
-						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }),
+						await this.fetchData({ before: this.timeRange[1], after: this.timeRange[0], count: count }, true),
 					);
 					this.applyTimeRange();
 					this.emitTimestamp();
@@ -221,7 +225,7 @@
 					this.fetching = false;
 				}
 			},
-			async fetchData({ count, before = null, after = null, sampling = null }) {
+			async fetchData({ count, before = null, after = null, sampling = null }, updateLoading = false) {
 				this.$emit("fetch", this.refreshPeriodMs);
 				return await this.handleSubmit(
 					async () => {
@@ -242,7 +246,7 @@
 						});
 						return Object.fromEntries(result.data.map(([key, data]) => [Utils.keyToPath(key), data]));
 					},
-					{ updateLoading: false },
+					{ updateLoading: updateLoading },
 				);
 			},
 			emitTimestamp() {
