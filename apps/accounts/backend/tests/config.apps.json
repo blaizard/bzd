@@ -1165,6 +1165,21 @@
                     }
                 }
             ]
+        },
+        {
+            "doc": "Wrong-typed refresh_token (number) is rejected with 400 (not 500).",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "post",
+                "/api/v1/auth/refresh",
+                {
+                    "data": {
+                        "refresh_token": 123
+                    }
+                }
+            ]
         }
     ]
 }

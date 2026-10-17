@@ -309,6 +309,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 
 	/// Read the data embedded inside a token. This data contains a UID + a hash.
 	_readToken(token) {
+		Exception.assertPrecondition(typeof token === "string", "The token must be a string.");
 		const split = token.split("_");
 		if (split.length == 2) {
 			return split;
