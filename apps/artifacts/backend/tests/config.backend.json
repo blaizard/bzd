@@ -83,6 +83,26 @@
                 "get",
                 "/api/v1/file?path=nodes_mirror/testnode"
             ]
+        },
+        {
+            "doc": "Check that a malformed continuation on the public nodes endpoint does not disclose internal errors.",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/x/nodes/testnode?continuation=badjson"
+            ]
+        },
+        {
+            "doc": "Check that a malformed include on the public nodes endpoint does not disclose internal errors.",
+            "expects": {
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/x/nodes/testnode?include=%zz"
+            ]
         }
     ]
 }

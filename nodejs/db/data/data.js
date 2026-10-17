@@ -316,7 +316,11 @@ export default class Data {
 
 		// Decode the opaque continuation string into the per-key cursor dictionary.
 		if (typeof continuation === "string") {
-			continuation = JSON.parse(continuation);
+			try {
+				continuation = JSON.parse(continuation);
+			} catch (e) {
+				Exception.errorPrecondition("The continuation cannot be parsed, it is malformed.");
+			}
 		}
 
 		const valuesToResult = (key, internal, values) => {

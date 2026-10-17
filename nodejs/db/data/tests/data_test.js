@@ -923,5 +923,10 @@ describe("Nodes", () => {
 				Exception.assertEqual(result, null);
 			}
 		});
+
+		it("continuation malformed", async () => {
+			const data = new Data();
+			await Exception.assertThrows(() => data.get({ uid: "hello", key: ["a"], count: 1, continuation: "badjson" }));
+		});
 	});
 });

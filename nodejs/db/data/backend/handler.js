@@ -6,7 +6,11 @@ const Exception = ExceptionFactory("db", "data");
 const Log = LogFactory("db", "data");
 
 function pathToKey(path) {
-	return path.split("/").filter(Boolean).map(decodeURIComponent);
+	try {
+		return path.split("/").filter(Boolean).map(decodeURIComponent);
+	} catch (e) {
+		Exception.errorPrecondition("The path is malformed, it cannot be decoded.");
+	}
 }
 
 /// Retrieve values from the data.

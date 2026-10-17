@@ -168,4 +168,9 @@ describe("getDataGetInputsFromQuery", () => {
 		];
 		Exception.assertEqual(JSON.stringify(out.include), JSON.stringify(expected));
 	});
+
+	it("rejects an include with an invalid percent-encoding", async () => {
+		const ctx = MockServerContext.make({ query: { include: "%zz" } });
+		await Exception.assertThrowsWithMatch(() => getDataGetInputsFromQuery(ctx), "cannot be decoded");
+	});
 });
