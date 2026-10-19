@@ -239,12 +239,7 @@ export default class DatabaseInfluxDB extends Database {
 				const [values, remainingFields] = await gatherViaChunks(uid, useFields, 100);
 				nbValues += values.length;
 				for (const [key, value, timestamp] of values) {
-					this.plugin.write(
-						uid,
-						[key, DatabaseInfluxDB.fromDBValueToValue(value)],
-						timestamp,
-						/*skipIfSameTimestamp*/ true,
-					);
+					this.plugin.write(uid, [key, DatabaseInfluxDB.fromDBValueToValue(value)], timestamp);
 				}
 				useFields = remainingFields;
 			}

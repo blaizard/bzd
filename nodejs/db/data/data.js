@@ -467,10 +467,9 @@ export default class Data {
 	/// \param uid The uid to update.
 	/// \param fragments An iterable of tuples, which first element is the absolute key and second the value to be inserted.
 	/// \param timestamp The timestamp to be used.
-	/// \param skipIfSameTimestamp If true, fragments for which an entry already exists at the same timestamp are skipped.
 	///
 	/// \return The timestamp actually written.
-	insert(uid, fragments, timestamp = null, skipIfSameTimestamp = false) {
+	insert(uid, fragments, timestamp = null) {
 		timestamp = Math.floor(timestamp === null ? timestampUs() : timestamp);
 
 		// Identify the path of the fragments and their values.
@@ -499,7 +498,7 @@ export default class Data {
 						index = data.values.length;
 					}
 					// Skip if an entry already exists at this exact timestamp.
-					else if (skipIfSameTimestamp && data.values[index][0] == timestamp) {
+					else if (data.values[index][0] == timestamp) {
 						continue;
 					}
 				}

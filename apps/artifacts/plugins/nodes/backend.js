@@ -780,8 +780,7 @@ export default class Plugin extends PluginBase {
 	/// \param uid The identifier of the node.
 	/// \param data The data to be written.
 	/// \param timestamp The timestamp in microseconds of this value.
-	/// \param skipIfSameTimestamp If true, the value is skipped if an entry already exists at the same timestamp.
-	write(uid, data, timestamp, skipIfSameTimestamp = false) {
-		this.nodes.insertFromRecord(Nodes.recordFromSingleEntry(uid, data, timestamp), skipIfSameTimestamp);
+	write(uid, data, timestamp) {
+		this.nodes.insertFromRecord(Nodes.recordFromSingleEntry(uid, data, timestamp));
 	}
 }
