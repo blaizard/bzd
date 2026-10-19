@@ -104,22 +104,8 @@ describe("Influxdb", () => {
 		it("converts microseconds to nanoseconds", () => {
 			const database = makeDatabase();
 			Exception.assertEqual(database.timestampToInflux(1), "1000");
-			Exception.assertEqual(database.timestampToInflux(1000), "1000001");
-			Exception.assertEqual(database.timestampToInflux(1000.4), "1000002");
-		});
-
-		it("increments the offset for identical timestamps", () => {
-			const database = makeDatabase();
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234001");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234002");
-		});
-
-		it("wraps the offset around after a thousand records", () => {
-			const database = makeDatabase();
-			database.offset = 999;
-			Exception.assertEqual(database.timestampToInflux(1234), "1234999");
-			Exception.assertEqual(database.timestampToInflux(1234), "1234000");
+			Exception.assertEqual(database.timestampToInflux(1000), "1000000");
+			Exception.assertEqual(database.timestampToInflux(1000.4), "1000000");
 		});
 	});
 

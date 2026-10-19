@@ -816,6 +816,63 @@ describe("Nodes", () => {
 			}
 		});
 
+		it("external no-bound", async () => {
+			let useExternal = false;
+			let externalArgs = null;
+			let externalData = [];
+			const data = new Data({
+				external: (uid, key, count, after, before) => {
+					useExternal = true;
+					externalArgs = { uid, key, count, after, before };
+					return externalData === null ? null : externalData.slice(0, count);
+				},
+			});
+			const timestamp = timestampUs();
+
+			data.insert("hello", [[["a"], 1]], timestamp + 1);
+			data.insert("hello", [[["a"], 2]], timestamp + 2);
+			data.insert("hello", [[["a"], 3]], timestamp + 3);
+
+			// Enough local data, the external source is not used.
+			{
+				useExternal = false;
+				const result = await data.get({ uid: "hello", key: ["a"], count: 3 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data, [3, 2, 1]);
+				Exception.assert(!useExternal);
+			}
+
+			// Not enough local data, the external source is queried for entries older than
+			// the oldest local one, so the local and external entries never overlap.
+			{
+				useExternal = false;
+				externalArgs = null;
+				externalData = [
+					[timestamp, 0],
+					[timestamp - 1, -1],
+				];
+				const result = await data.get({ uid: "hello", key: ["a"], count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data, [3, 2, 1, 0, -1]);
+				Exception.assert(useExternal);
+				Exception.assertEqual(externalArgs.after, null);
+				Exception.assertEqual(externalArgs.before, timestamp + 1);
+				Exception.assertEqual(externalArgs.count, 2);
+			}
+
+			// External returns nothing, only the local data is returned.
+			{
+				useExternal = false;
+				externalArgs = null;
+				externalData = null;
+				const result = await data.get({ uid: "hello", key: ["a"], count: 5 });
+				Exception.assert(result.hasValue());
+				Exception.assertEqual(result.value().data, [3, 2, 1]);
+				Exception.assert(useExternal);
+				Exception.assertEqual(externalArgs.before, timestamp + 1);
+			}
+		});
+
 		it("prototype pollution", async () => {
 			const data = new Data();
 

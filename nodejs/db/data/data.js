@@ -288,7 +288,12 @@ export default class Data {
 
 			let result = value.slice(0, count);
 			if (result.length < count) {
-				const external = await this.getExternal_({ uid, key, count: count - result.length });
+				const external = await this.getExternal_({
+					uid,
+					key,
+					count: count - result.length,
+					before: result.at(-1)[0],
+				});
 				result = external === null ? result : result.concat(external);
 			}
 			return result;

@@ -7,10 +7,6 @@ import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 const Exception = ExceptionFactory("artifacts", "nodes", "database", "influxdb");
 const Log = LogFactory("artifacts", "nodes", "database", "influxdb");
 
-/// The number of records that can share the same microsecond timestamp before
-/// their nanosecond timestamp collides in the database.
-const OFFSET_MODULUS = 1000;
-
 export default class DatabaseInfluxDB extends Database {
 	constructor(...args) {
 		super(...args);
@@ -58,7 +54,6 @@ export default class DatabaseInfluxDB extends Database {
 		});
 
 		this.retentionS = this.options.retentionS || null;
-		this.offset = 0;
 	}
 
 	/// Convert a value into influxdb fields.
@@ -123,20 +118,19 @@ export default class DatabaseInfluxDB extends Database {
 		return value;
 	}
 
+	/// Convert a timestamp in microseconds into its nanosecond representation.
 	timestampToInflux(timestamp) {
-		const timestampInflux = (BigInt(Math.round(timestamp)) * BigInt(OFFSET_MODULUS) + BigInt(this.offset)).toString();
-		this.offset = (this.offset + 1) % OFFSET_MODULUS;
-		return timestampInflux;
+		return (BigInt(Math.round(timestamp)) * 1000n).toString();
 	}
 
 	/// Convert an 'after' timestamp (in microseconds) into the nanosecond boundary just after it.
 	afterToInflux(after) {
-		return (BigInt(Math.round(after)) * BigInt(OFFSET_MODULUS) + BigInt(OFFSET_MODULUS) - 1n).toString();
+		return (BigInt(Math.round(after)) * 1000n + 999n).toString();
 	}
 
 	/// Convert a 'before' timestamp (in microseconds) into the nanosecond boundary just before it.
 	beforeToInflux(before) {
-		return (BigInt(Math.round(before)) * BigInt(OFFSET_MODULUS)).toString();
+		return (BigInt(Math.round(before)) * 1000n).toString();
 	}
 
 	installServices(provider) {
