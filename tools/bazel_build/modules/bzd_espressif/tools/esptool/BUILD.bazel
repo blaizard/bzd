@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "executor_uart",
     srcs = [
+        "__init__.py",
         ":executor_uart.py",
     ],
     visibility = ["//visibility:public"],

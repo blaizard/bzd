@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
     name = "coverage",
-    srcs = ["coverage.py"],
+    srcs = [
+        "__init__.py",
+        "coverage.py",
+    ],
     args = [
         "--genhtml",
         "$(location @lcov//:genhtml)",

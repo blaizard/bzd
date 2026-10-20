@@ -18,6 +18,7 @@ bzd_nodejs_web_library(
 py_binary(
     name = "markdown",
     srcs = [
+        "__init__.py",
         "markdown.py",
     ],
 )

@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "mutex",
-    srcs = ["mutex.py"],
+    srcs = [
+        "__init__.py",
+        "mutex.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//bzd/logging",
@@ -11,6 +14,9 @@ py_library(
 
 py_library(
     name = "singleton",
-    srcs = ["singleton.py"],
+    srcs = [
+        "__init__.py",
+        "singleton.py",
+    ],
     visibility = ["//visibility:public"],
 )

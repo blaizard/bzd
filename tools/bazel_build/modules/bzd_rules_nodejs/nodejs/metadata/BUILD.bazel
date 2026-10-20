@@ -7,6 +7,9 @@ exports_files([
 
 py_binary(
     name = "metadata",
-    srcs = ["metadata.py"],
+    srcs = [
+        "__init__.py",
+        "metadata.py",
+    ],
     visibility = ["//visibility:public"],
 )

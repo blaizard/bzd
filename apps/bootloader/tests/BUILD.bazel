@@ -6,6 +6,7 @@ load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 py_binary(
     name = "noop",
     srcs = [
+        "__init__.py",
         "noop.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
@@ -14,6 +15,7 @@ py_binary(
 py_binary(
     name = "error",
     srcs = [
+        "__init__.py",
         "error.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
@@ -22,6 +24,7 @@ py_binary(
 py_binary(
     name = "sleep",
     srcs = [
+        "__init__.py",
         "sleep.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
@@ -30,6 +33,7 @@ py_binary(
 py_binary(
     name = "square",
     srcs = [
+        "__init__.py",
         "square.py",
     ],
     visibility = ["//apps/bootloader:__pkg__"],
@@ -37,7 +41,10 @@ py_binary(
 
 py_test(
     name = "utils_test",
-    srcs = ["utils_test.py"],
+    srcs = [
+        "__init__.py",
+        "utils_test.py",
+    ],
     deps = [
         "//apps/bootloader:utils",
     ],
@@ -46,7 +53,10 @@ py_test(
 py_binary(
     name = "update",
     testonly = True,
-    srcs = ["update.py"],
+    srcs = [
+        "__init__.py",
+        "update.py",
+    ],
     deps = [
         "//apps/bootloader",
     ],

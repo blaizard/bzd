@@ -17,6 +17,7 @@ bzl_library(
 py_binary(
     name = "json_merge",
     srcs = [
+        "__init__.py",
         "json_merge.py",
     ],
     visibility = ["//visibility:public"],
@@ -35,7 +36,10 @@ bzl_library(
 
 py_binary(
     name = "web_server",
-    srcs = ["web_server.py"],
+    srcs = [
+        "__init__.py",
+        "web_server.py",
+    ],
     visibility = ["//visibility:public"],
 )
 

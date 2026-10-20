@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "node",
-    srcs = ["node_test.py"],
+    srcs = [
+        "__init__.py",
+        "node_test.py",
+    ],
     main = "node_test.py",
     visibility = ["//visibility:public"],
     deps = [

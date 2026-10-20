@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
     name = "config_generator",
-    srcs = ["config_generator.py"],
+    srcs = [
+        "__init__.py",
+        "config_generator.py",
+    ],
     deps = [
         "@bzd_lib//config:reader",
     ],

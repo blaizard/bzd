@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "repackage",
     srcs = [
+        "__init__.py",
         "repackage.py",
     ],
     visibility = ["//nodejs:__pkg__"],
@@ -11,6 +12,7 @@ py_binary(
 py_binary(
     name = "node_modules",
     srcs = [
+        "__init__.py",
         "node_modules.py",
     ],
     visibility = ["//nodejs:__pkg__"],

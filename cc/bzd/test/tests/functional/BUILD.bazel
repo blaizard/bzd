@@ -26,6 +26,7 @@ bzd_cc_test(
 py_test(
     name = "test",
     srcs = [
+        "__init__.py",
         "test.py",
     ],
     args = [

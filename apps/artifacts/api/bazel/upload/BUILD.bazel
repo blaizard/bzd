@@ -4,6 +4,7 @@ load(":defs.bzl", "bzd_artifacts_upload")
 py_binary(
     name = "upload",
     srcs = [
+        "__init__.py",
         "upload.py",
     ],
     deps = [

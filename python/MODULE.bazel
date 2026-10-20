@@ -8,12 +8,16 @@ bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_rules_oci", version = "1.0")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_python", version = "2.4.2")
 
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "bzd_python_pip",
     python_version = "3.13",
     requirements_lock = "@bzd_python//:requirements.txt",
+    target_platforms = [
+        "linux_aarch64",
+        "linux_x86_64",
+    ],
 )
 use_repo(pip, "bzd_python_pip")

@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "clang_format",
     srcs = [
+        "__init__.py",
         "clang_format.py",
     ],
     visibility = ["//visibility:public"],

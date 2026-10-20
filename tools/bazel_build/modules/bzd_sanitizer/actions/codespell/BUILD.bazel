@@ -12,6 +12,7 @@ py_console_script_binary(
 py_binary(
     name = "cli",
     srcs = [
+        "__init__.py",
         "cli.py",
     ],
     main = "cli.py",

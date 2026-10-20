@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "context",
     srcs = [
+        "__init__.py",
         "context.py",
         "filter.py",
     ],
@@ -15,6 +16,7 @@ py_library(
 py_library(
     name = "worker",
     srcs = [
+        "__init__.py",
         "worker.py",
     ],
     imports = [".."],

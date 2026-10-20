@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "generate_dockerfile",
     srcs = [
+        "__init__.py",
         "generate_dockerfile.py",
     ],
     deps = [

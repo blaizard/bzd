@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "json",
     srcs = [
+        "__init__.py",
         "cli.py",
     ],
     main = "cli.py",

@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 py_test(
     name = "metadata",
-    srcs = ["metadata_test.py"],
+    srcs = [
+        "__init__.py",
+        "metadata_test.py",
+    ],
     data = [
         ":data/sample1.epub",
     ],
@@ -18,6 +21,7 @@ py_test(
 py_library(
     name = "driver_mock",
     srcs = [
+        "__init__.py",
         "driver_mock.py",
     ],
     visibility = ["//apps/ebook:__subpackages__"],

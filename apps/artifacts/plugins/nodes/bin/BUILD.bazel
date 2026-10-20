@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "export",
     srcs = [
+        "__init__.py",
         "export.py",
     ],
     deps = [

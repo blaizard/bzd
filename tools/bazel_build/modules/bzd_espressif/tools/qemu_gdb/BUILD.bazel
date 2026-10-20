@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "executor_qemu_gdb",
     srcs = [
+        "__init__.py",
         ":executor_qemu_gdb.py",
     ],
     deps = [

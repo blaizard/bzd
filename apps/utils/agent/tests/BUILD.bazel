@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "json",
-    srcs = ["json_test.py"],
+    srcs = [
+        "__init__.py",
+        "json_test.py",
+    ],
     main = "json_test.py",
     deps = [
         "//apps/utils/agent:agent_lib",

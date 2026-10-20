@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 py_library(
     name = "agent_lib",
     srcs = [
+        "__init__.py",
         "agent.py",
         "json.py",
     ],
@@ -17,6 +18,7 @@ py_library(
 py_binary(
     name = "agent",
     srcs = [
+        "__init__.py",
         "agent.py",
     ],
     deps = [

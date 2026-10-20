@@ -12,7 +12,10 @@ bzl_library(
 
 py_binary(
     name = "executable_test",
-    srcs = ["executable_test.py"],
+    srcs = [
+        "__init__.py",
+        "executable_test.py",
+    ],
     deps = [
         "@bzd_python//bzd/utils:run",
     ],

@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "terminal_non_hermetic",
     srcs = [
+        "__init__.py",
         "terminal.py",
     ],
     main = "terminal.py",

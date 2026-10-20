@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "cbz",
-    srcs = ["cbz_test.py"],
+    srcs = [
+        "__init__.py",
+        "cbz_test.py",
+    ],
     data = [
         ":data/sample1.cbz",
         ":data/sample2.cbz",

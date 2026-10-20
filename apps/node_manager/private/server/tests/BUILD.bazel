@@ -2,7 +2,10 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "workload_test",
-    srcs = ["workload_test.py"],
+    srcs = [
+        "__init__.py",
+        "workload_test.py",
+    ],
     main = "workload_test.py",
     deps = [
         "//apps/node_manager/private/server:workload",

@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "comics",
     srcs = [
+        "__init__.py",
         "comics.py",
     ],
     visibility = ["//apps/ebook:__subpackages__"],
@@ -17,6 +18,7 @@ py_library(
 py_library(
     name = "cbr",
     srcs = [
+        "__init__.py",
         "cbr.py",
     ],
     visibility = ["//apps/ebook:__subpackages__"],
@@ -31,6 +33,7 @@ py_library(
 py_library(
     name = "cbz",
     srcs = [
+        "__init__.py",
         "cbz.py",
     ],
     visibility = ["//apps/ebook:__subpackages__"],

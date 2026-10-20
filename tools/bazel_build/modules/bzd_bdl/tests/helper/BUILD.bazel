@@ -12,6 +12,7 @@ bdl_library(
 py_binary(
     name = "print_json",
     srcs = [
+        "__init__.py",
         "print_json.py",
     ],
 )

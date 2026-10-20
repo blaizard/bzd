@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "factory",
     srcs = [
+        "__init__.py",
         "factory.py",
     ],
     data = [

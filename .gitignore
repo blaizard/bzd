@@ -37,7 +37,7 @@ temp/
 *-backups/
 *-cache
 \#*\#
-_*
+_autosave-*
 *.bak
 .history
 

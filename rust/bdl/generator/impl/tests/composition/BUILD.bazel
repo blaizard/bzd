@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_test")
 py_test(
     name = "test_composition",
     srcs = [
+        "__init__.py",
         "test_composition.py",
     ],
     deps = [

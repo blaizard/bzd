@@ -3,13 +3,17 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 py_binary(
     name = "binary_builder",
-    srcs = ["binary_builder.py"],
+    srcs = [
+        "__init__.py",
+        "binary_builder.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "secret",
     srcs = [
+        "__init__.py",
         "secret.py",
     ],
     visibility = ["//visibility:public"],
@@ -20,19 +24,26 @@ py_library(
 
 py_library(
     name = "run",
-    srcs = ["run.py"],
+    srcs = [
+        "__init__.py",
+        "run.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "semver",
-    srcs = ["semver.py"],
+    srcs = [
+        "__init__.py",
+        "semver.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "ssh",
     srcs = [
+        "__init__.py",
         "ssh.py",
     ],
     visibility = ["//visibility:public"],
@@ -47,6 +58,7 @@ py_library(
 py_library(
     name = "to_yaml",
     srcs = [
+        "__init__.py",
         "to_yaml.py",
     ],
     visibility = ["//visibility:public"],
@@ -55,6 +67,7 @@ py_library(
 py_library(
     name = "runfiles",
     srcs = [
+        "__init__.py",
         "runfiles.py",
     ],
     visibility = ["//visibility:public"],
@@ -65,49 +78,73 @@ py_library(
 
 py_library(
     name = "worker",
-    srcs = ["worker.py"],
+    srcs = [
+        "__init__.py",
+        "worker.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "file",
-    srcs = ["file.py"],
+    srcs = [
+        "__init__.py",
+        "file.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "decorators",
-    srcs = ["decorators.py"],
+    srcs = [
+        "__init__.py",
+        "decorators.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "dict",
-    srcs = ["dict.py"],
+    srcs = [
+        "__init__.py",
+        "dict.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "match",
-    srcs = ["match.py"],
+    srcs = [
+        "__init__.py",
+        "match.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "timeout",
-    srcs = ["timeout.py"],
+    srcs = [
+        "__init__.py",
+        "timeout.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "result",
-    srcs = ["result.py"],
+    srcs = [
+        "__init__.py",
+        "result.py",
+    ],
     visibility = ["//visibility:public"],
 )
 
 py_library(
     name = "scheduler",
-    srcs = ["scheduler.py"],
+    srcs = [
+        "__init__.py",
+        "scheduler.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//bzd/logging",
@@ -116,7 +153,10 @@ py_library(
 
 py_library(
     name = "uart",
-    srcs = ["uart.py"],
+    srcs = [
+        "__init__.py",
+        "uart.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         requirement("pyserial"),
@@ -125,6 +165,9 @@ py_library(
 
 py_library(
     name = "timestamp",
-    srcs = ["timestamp.py"],
+    srcs = [
+        "__init__.py",
+        "timestamp.py",
+    ],
     visibility = ["//visibility:public"],
 )

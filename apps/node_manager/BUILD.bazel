@@ -7,6 +7,7 @@ load("//apps/bootloader:defs.bzl", "bzd_bootloader_binary")
 py_binary(
     name = "client",
     srcs = [
+        "__init__.py",
         "client.py",
     ],
     visibility = [
@@ -26,6 +27,7 @@ py_binary(
 py_binary(
     name = "node_manager",
     srcs = [
+        "__init__.py",
         "node_manager.py",
     ],
     deps = [
@@ -45,6 +47,7 @@ py_binary(
 py_binary(
     name = "proxy",
     srcs = [
+        "__init__.py",
         "proxy.py",
     ],
     deps = [

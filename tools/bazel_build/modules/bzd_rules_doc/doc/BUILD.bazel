@@ -10,6 +10,7 @@ exports_files(
 py_binary(
     name = "builder",
     srcs = [
+        "__init__.py",
         "builder.py",
     ],
     data = [
@@ -34,6 +35,9 @@ py_console_script_binary(
 
 py_binary(
     name = "preprocessor",
-    srcs = ["preprocessor.py"],
+    srcs = [
+        "__init__.py",
+        "preprocessor.py",
+    ],
     visibility = ["//visibility:public"],
 )

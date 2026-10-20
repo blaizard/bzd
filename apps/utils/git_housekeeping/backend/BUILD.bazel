@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "backend",
     srcs = [
+        "__init__.py",
         "gitea.py",
     ],
     visibility = ["//visibility:public"],

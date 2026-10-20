@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 py_binary(
     name = "binary",
     srcs = [
+        "__init__.py",
         "binary.py",
     ],
     visibility = ["//visibility:public"],
@@ -15,6 +16,7 @@ py_binary(
 py_library(
     name = "node",
     srcs = [
+        "__init__.py",
         "node.py",
     ],
     visibility = ["//visibility:public"],

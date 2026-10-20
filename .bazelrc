@@ -37,6 +37,18 @@ common --reuse_sandbox_directories
 # Local copy of all dependencies
 common --vendor_dir=vendor_src
 
+# Should be default in new rules_python verions
+build --incompatible_default_to_explicit_init_py
+
+# TODO: Remove this workaround once bzd_bundle supports declare_symlink().
+# rules_python creates the venv interpreter (_<binary>.venv/bin/python3) as a
+# relative declare_symlink() that is only valid inside the runfiles tree. It is
+# dangling in the output tree, so bzd_bundle lists it as a file and bundler.py
+# fails with "neither a file nor a directory". Affected: bundle_tar.bzl and
+# private/python/bundler.py, used by all bzd_bundle_binary and bzd_python_oci
+# targets.
+build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
 # This keeps a bit of resources when building locally. More importantly, it prevents the local execution
 # from being starved of resources when running alongside a remote execution, which can cause timeouts and other issues.
 build --local_resources=cpu=HOST_CPUS*.9

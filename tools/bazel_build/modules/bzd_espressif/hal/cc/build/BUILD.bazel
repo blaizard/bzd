@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "build",
     srcs = [
+        "__init__.py",
         "build.py",
     ],
     data = [

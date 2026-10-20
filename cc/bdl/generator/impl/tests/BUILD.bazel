@@ -23,6 +23,7 @@ bzd_cc_test(
 py_test(
     name = "template",
     srcs = [
+        "__init__.py",
         "template.py",
     ],
     deps = [

@@ -31,6 +31,7 @@ py_console_script_binary(
 py_library(
     name = "lib",
     srcs = [
+        "__init__.py",
         "octodns.py",
         "record.py",
         "zones.py",
@@ -44,6 +45,7 @@ py_library(
 py_binary(
     name = "aggregator",
     srcs = [
+        "__init__.py",
         "aggregator.py",
     ],
     visibility = ["//visibility:public"],
@@ -55,6 +57,7 @@ py_binary(
 py_binary(
     name = "build",
     srcs = [
+        "__init__.py",
         "build.py",
     ],
     visibility = ["//visibility:public"],

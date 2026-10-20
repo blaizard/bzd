@@ -23,6 +23,7 @@ bzd_python_config(
 py_binary(
     name = "config_to_env",
     srcs = [
+        "__init__.py",
         "config_to_env.py",
     ],
     visibility = [

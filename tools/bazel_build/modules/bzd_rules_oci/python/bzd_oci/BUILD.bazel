@@ -3,7 +3,10 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "run",
-    srcs = ["run.py"],
+    srcs = [
+        "__init__.py",
+        "run.py",
+    ],
     imports = [".."],
     visibility = ["//visibility:public"],
     deps = [

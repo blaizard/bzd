@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "release",
     srcs = [
+        "__init__.py",
         "release.py",
     ],
     visibility = ["//visibility:public"],
@@ -16,6 +17,7 @@ py_library(
 py_library(
     name = "mock",
     srcs = [
+        "__init__.py",
         "mock.py",
     ],
     visibility = ["//visibility:public"],

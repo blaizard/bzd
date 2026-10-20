@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 py_library(
     name = "factory",
     srcs = [
+        "__init__.py",
         "factory.py",
     ],
     data = [
@@ -19,6 +20,7 @@ py_library(
 py_binary(
     name = "generate",
     srcs = [
+        "__init__.py",
         "generate.py",
     ],
     deps = [

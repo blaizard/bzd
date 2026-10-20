@@ -6,6 +6,9 @@ exports_files([
 
 py_binary(
     name = "doxygen_parser",
-    srcs = ["doxygen_parser.py"],
+    srcs = [
+        "__init__.py",
+        "doxygen_parser.py",
+    ],
     visibility = ["//doc:__pkg__"],
 )

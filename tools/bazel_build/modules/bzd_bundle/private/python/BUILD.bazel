@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "archive_to_script",
     srcs = [
+        "__init__.py",
         "archive_to_script.py",
     ],
     visibility = ["//visibility:public"],
@@ -11,6 +12,7 @@ py_binary(
 py_binary(
     name = "bundler",
     srcs = [
+        "__init__.py",
         "bundler.py",
     ],
     visibility = ["//private:__pkg__"],
@@ -19,6 +21,7 @@ py_binary(
 py_binary(
     name = "copy_binary",
     srcs = [
+        "__init__.py",
         "copy_binary.py",
     ],
     args = [

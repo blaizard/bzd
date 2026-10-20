@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_library")
 py_library(
     name = "wake_on_lan",
     srcs = [
+        "__init__.py",
         "wake_on_lan.py",
     ],
     visibility = [
@@ -18,6 +19,7 @@ py_library(
 py_library(
     name = "suspend",
     srcs = [
+        "__init__.py",
         "suspend.py",
     ],
     visibility = [
@@ -34,6 +36,7 @@ py_library(
 py_library(
     name = "shutdown",
     srcs = [
+        "__init__.py",
         "shutdown.py",
     ],
     visibility = [
@@ -50,6 +53,7 @@ py_library(
 py_library(
     name = "lease",
     srcs = [
+        "__init__.py",
         "lease.py",
     ],
     visibility = [
@@ -67,6 +71,7 @@ py_library(
 py_library(
     name = "lease_period",
     srcs = [
+        "__init__.py",
         "lease_period.py",
     ],
     visibility = [

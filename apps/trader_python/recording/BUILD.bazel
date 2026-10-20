@@ -24,6 +24,7 @@ bzd_python_config(
 py_binary(
     name = "generator_yfinance",
     srcs = [
+        "__init__.py",
         "generator_yfinance.py",
     ],
     tags = ["manual"],
@@ -39,6 +40,7 @@ py_binary(
 py_binary(
     name = "generator_polygon",
     srcs = [
+        "__init__.py",
         "generator_polygon.py",
     ],
     tags = ["manual"],
@@ -57,6 +59,7 @@ py_binary(
 py_library(
     name = "recording_from_data",
     srcs = [
+        "__init__.py",
         "recording_from_data.py",
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
@@ -68,6 +71,7 @@ py_library(
 py_library(
     name = "recording_from_path",
     srcs = [
+        "__init__.py",
         "recording_from_path.py",
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
@@ -77,6 +81,7 @@ py_library(
 py_library(
     name = "recording_to_path",
     srcs = [
+        "__init__.py",
         "recording_to_path.py",
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
@@ -90,6 +95,7 @@ py_library(
 py_library(
     name = "recording",
     srcs = [
+        "__init__.py",
         "recording.py",
     ],
     visibility = ["//apps/trader_python:__subpackages__"],
@@ -98,6 +104,7 @@ py_library(
 py_binary(
     name = "sp500",
     srcs = [
+        "__init__.py",
         "sp500.py",
     ],
     visibility = [

@@ -9,6 +9,7 @@ exports_files([
 py_binary(
     name = "dyson_fetch",
     srcs = [
+        "__init__.py",
         "dyson_fetch.py",
     ],
     deps = [

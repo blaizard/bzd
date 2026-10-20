@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "images",
     srcs = [
+        "__init__.py",
         "converter.py",
         "images.py",
         "pillow.py",

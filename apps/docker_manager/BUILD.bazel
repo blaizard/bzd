@@ -4,6 +4,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "docker_manager",
     srcs = [
+        "__init__.py",
         "docker_manager.py",
     ],
     visibility = [

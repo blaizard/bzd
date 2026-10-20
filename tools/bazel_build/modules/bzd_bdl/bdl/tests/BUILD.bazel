@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_test")
 [py_test(
     name = path.replace(".py", ""),
     srcs = [
+        "__init__.py",
         path,
     ],
     deps = [
@@ -11,12 +12,18 @@ load("@rules_python//python:defs.bzl", "py_test")
     ],
 ) for path in glob(
     ["*.py"],
-    exclude = ["preset.py"],
+    exclude = [
+        "__init__.py",
+        "preset.py",
+    ],
 )]
 
 py_test(
     name = "preset",
-    srcs = ["preset.py"],
+    srcs = [
+        "__init__.py",
+        "preset.py",
+    ],
     data = ["fixtures/test_preset.json"],
     deps = [
         "//bdl:generators",

@@ -8,6 +8,7 @@ exports_files([
 py_binary(
     name = "ebook",
     srcs = [
+        "__init__.py",
         "ebook.py",
     ],
     deps = [
@@ -28,6 +29,7 @@ py_binary(
 py_library(
     name = "utils",
     srcs = [
+        "__init__.py",
         "utils.py",
     ],
     visibility = [
@@ -38,6 +40,7 @@ py_library(
 py_library(
     name = "providers",
     srcs = [
+        "__init__.py",
         "providers.py",
     ],
     visibility = [
@@ -48,6 +51,7 @@ py_library(
 py_library(
     name = "flow",
     srcs = [
+        "__init__.py",
         "flow.py",
     ],
     visibility = [

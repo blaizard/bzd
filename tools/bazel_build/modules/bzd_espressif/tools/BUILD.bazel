@@ -3,6 +3,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 py_binary(
     name = "executor",
     srcs = [
+        "__init__.py",
         ":executor.py",
     ],
     visibility = [
