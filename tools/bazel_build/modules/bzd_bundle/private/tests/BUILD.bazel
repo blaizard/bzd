@@ -2,6 +2,7 @@ load("@bzd_lib//:defs.bzl", "bzd_diff_test", "bzd_executable_test")
 load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("//private:bundle_binary.bzl", "bzd_bundle_binary")
 load("//private:bundle_tar.bzl", "bzd_bundle_tar")
+load(":symlink_runfiles.bzl", "symlink_runfiles")
 
 sh_binary(
     name = "dummy",
@@ -54,3 +55,20 @@ _binaries_to_compression = {
     expected_output = "from dummy.sh\nfrom dummy.txt",
     expected_returncode = "0",
 ) for name, _ in _binaries_to_compression.items()]
+
+symlink_runfiles(
+    name = "symlink_runfiles",
+    data = "dummy.txt",
+)
+
+bzd_bundle_binary(
+    name = "symlink_bundle",
+    executable = ":symlink_runfiles",
+)
+
+bzd_executable_test(
+    name = "test_symlink_bundle",
+    executable = ":symlink_bundle",
+    expected_output = "from dummy.txt",
+    expected_returncode = "0",
+)
