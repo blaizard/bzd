@@ -79,7 +79,7 @@
 						const value = await this.apiGet({
 							metadata: 1,
 							count: this.pageSize,
-							continuation: JSON.stringify(this.historyContinuation),
+							continuation: this.historyContinuation,
 						});
 						this.historyValue = this.historyValue.concat(value.data ?? []);
 						this.historyContinuation = value.continuation ?? null;
