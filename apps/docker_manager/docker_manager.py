@@ -102,8 +102,9 @@ class Docker:
 			# Get the list of running containers
 			request = f"{method} {endpoint} HTTP/1.1\r\nHost: docker\r\n\r\n"
 			sock.sendall(request.encode())
+			sock.settimeout(timeoutS)
 
-			parser = HttpParser(lambda: sock.recv(4096), timeoutS=timeoutS)
+			parser = HttpParser(lambda: sock.recv(4096))
 			content = parser.readAll().decode()
 			return json.loads(content)
 

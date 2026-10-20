@@ -46,9 +46,6 @@ py_library(
         "parser.py",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//bzd/utils:timeout",
-    ],
 )
 
 py_library(

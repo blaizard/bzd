@@ -122,15 +122,6 @@ py_library(
 )
 
 py_library(
-    name = "timeout",
-    srcs = [
-        "__init__.py",
-        "timeout.py",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
     name = "result",
     srcs = [
         "__init__.py",

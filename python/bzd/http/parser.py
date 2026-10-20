@@ -2,8 +2,6 @@ import typing
 import enum
 import re
 
-from bzd.utils.timeout import Timeout
-
 
 class TransferMode(enum.Enum):
 	normal = enum.auto()
@@ -11,17 +9,14 @@ class TransferMode(enum.Enum):
 
 
 class HttpParser:
-	def __init__(self, reader: typing.Callable[[], bytes], timeoutS: int = 10) -> None:
+	def __init__(self, reader: typing.Callable[[], bytes]) -> None:
 		"""Generic HTTP Parser.
 
 		Args:
 		        reader: A callable to read a chunk of data.
-		        timeoutS: Timeout in seconds of a single read request. The whole reading can take longer as long as every read is satisfied within the
-		        provided timeout.
 		"""
 
 		self.reader = reader
-		self.timeoutS = timeoutS
 		self.buffer = b""
 		self.transferMode: typing.Optional[TransferMode] = None
 		self.bodyLengthLeft: typing.Optional[int] = None
@@ -46,7 +41,7 @@ class HttpParser:
 		return defaultValue
 
 	def _read(self) -> bytes:
-		return Timeout(self.timeoutS).run(self.reader)
+		return self.reader()
 
 	def _readHeaders(self) -> None:
 		"""Process the data and parse the headers.
