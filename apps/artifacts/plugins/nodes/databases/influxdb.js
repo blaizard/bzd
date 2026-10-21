@@ -92,6 +92,19 @@ export default class DatabaseInfluxDB extends Database {
 			.replace(/^_/, "|x5f");
 	}
 
+	/// Convert a uid to an InfluxDB measurement name.
+	///
+	/// The uid is base64url-encoded, which restricts the measurement name to a
+	/// safe alphabet and makes the encoding reversible.
+	static fromUidToMeasurement(uid) {
+		return Buffer.from(uid, "utf8").toString("base64url");
+	}
+
+	/// Convert an InfluxDB measurement name to the uid it stores.
+	static fromMeasurementToUid(measurement) {
+		return Buffer.from(measurement, "base64url").toString("utf8");
+	}
+
 	/// Convert a field to a key.
 	static fromFieldToKey(field) {
 		return field.split(".").map((part) =>
@@ -189,9 +202,9 @@ export default class DatabaseInfluxDB extends Database {
 		const measurements = result.results[0]?.series?.[0]?.values ?? [];
 
 		// Gather the data.
-		const gatherFieldAndValues = async (uid, useFields) => {
+		const gatherFieldAndValues = async (measurement, useFields) => {
 			const selector = useFields ? useFields.map((field) => '"' + field + '"').join(",") : "*";
-			const result = await this._sql("SELECT " + selector + ' FROM "' + uid + '" ORDER BY time DESC LIMIT 1');
+			const result = await this._sql("SELECT " + selector + ' FROM "' + measurement + '" ORDER BY time DESC LIMIT 1');
 			const data = result?.series?.[0] ?? {};
 			const [_time, ...fields] = data.columns;
 			const values = data.values
@@ -209,14 +222,14 @@ export default class DatabaseInfluxDB extends Database {
 		};
 
 		// Gather the data as chunks.
-		const gatherViaChunks = async (uid, useFields, chunkSize) => {
+		const gatherViaChunks = async (measurement, useFields, chunkSize) => {
 			if (useFields === null) {
-				return await gatherFieldAndValues(uid, useFields);
+				return await gatherFieldAndValues(measurement, useFields);
 			} else {
 				let promises = [];
 				while (useFields.length) {
 					const chunk = useFields.splice(0, chunkSize);
-					promises.push(gatherFieldAndValues(uid, chunk));
+					promises.push(gatherFieldAndValues(measurement, chunk));
 				}
 				const result = await Promise.all(promises);
 				return result.reduce(
@@ -233,10 +246,11 @@ export default class DatabaseInfluxDB extends Database {
 
 		// Read all measurements of each uid and their values.
 		let nbValues = 0;
-		for (const [uid] of measurements) {
+		for (const [measurement] of measurements) {
+			const uid = DatabaseInfluxDB.fromMeasurementToUid(measurement);
 			let useFields = null;
 			while (useFields === null || useFields.length > 0) {
-				const [values, remainingFields] = await gatherViaChunks(uid, useFields, 100);
+				const [values, remainingFields] = await gatherViaChunks(measurement, useFields, 100);
 				nbValues += values.length;
 				for (const [key, value, timestamp] of values) {
 					this.plugin.write(uid, [key, DatabaseInfluxDB.fromDBValueToValue(value)], timestamp);
@@ -257,6 +271,7 @@ export default class DatabaseInfluxDB extends Database {
 		const timestampMin = this.retentionS ? timestampUs() - this.retentionS * 1000000 + 86400 * 1000000 : 0;
 		for (const [uid, data, timestamp] of records) {
 			const [key, value] = data;
+			const measurement = DatabaseInfluxDB.fromUidToMeasurement(uid);
 			// InfluxDB doesn't support numbers with comma.
 			const timestampNanoseconds = this.timestampToInflux(timestamp);
 			for (const field of DatabaseInfluxDB.fromValueToFields(DatabaseInfluxDB.fromKeyToField(key), value)) {
@@ -277,7 +292,7 @@ export default class DatabaseInfluxDB extends Database {
 					++skipped;
 					continue;
 				}
-				content.push(uid + " " + field + " " + timestampNanoseconds);
+				content.push(measurement + " " + field + " " + timestampNanoseconds);
 			}
 		}
 
@@ -315,32 +330,33 @@ export default class DatabaseInfluxDB extends Database {
 	/// Get external data on demand.
 	async onExternal(uid, key, count, after, before) {
 		const field = DatabaseInfluxDB.fromKeyToField(key);
+		const measurement = DatabaseInfluxDB.fromUidToMeasurement(uid);
 
 		let influxQL = "";
 
 		if (after !== null && before !== null) {
 			const periodMs = Math.round((before - after) / count / 1000) || 1;
 			influxQL += 'SELECT FIRST("' + field + '") ';
-			influxQL += 'FROM "' + uid + '" ';
+			influxQL += 'FROM "' + measurement + '" ';
 			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns AND time < " + this.beforeToInflux(before) + "ns ";
 			// ORDER BY is not supported with GROUP BY, but the buckets are
 			// guaranteed to be returned in ascending time order.
 			influxQL += "GROUP BY time(" + periodMs + "ms)\n";
 		} else if (after !== null) {
 			influxQL += 'SELECT "' + field + '" ';
-			influxQL += 'FROM "' + uid + '" ';
+			influxQL += 'FROM "' + measurement + '" ';
 			influxQL += "WHERE time > " + this.afterToInflux(after) + "ns ";
 			influxQL += "ORDER BY time ASC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else if (before !== null) {
 			influxQL += 'SELECT "' + field + '" ';
-			influxQL += 'FROM "' + uid + '" ';
+			influxQL += 'FROM "' + measurement + '" ';
 			influxQL += "WHERE time < " + this.beforeToInflux(before) + "ns ";
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		} else {
 			influxQL += 'SELECT "' + field + '" ';
-			influxQL += 'FROM "' + uid + '" ';
+			influxQL += 'FROM "' + measurement + '" ';
 			influxQL += "ORDER BY time DESC ";
 			influxQL += "LIMIT " + count + "\n";
 		}

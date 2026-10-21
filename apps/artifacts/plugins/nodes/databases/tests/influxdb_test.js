@@ -3,7 +3,7 @@ import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influx
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "influxdb");
 
-const makeDatabase = ({ queries = [], values = [] } = {}) => {
+const makeDatabase = ({ queries = [], writes = [], values = [] } = {}) => {
 	return new DatabaseInfluxDB(
 		null,
 		{
@@ -22,6 +22,9 @@ const makeDatabase = ({ queries = [], values = [] } = {}) => {
 					if (url === "/query") {
 						queries.push(body.data);
 						return { results: [{ series: [{ columns: ["time", "a"], values: values }] }] };
+					}
+					if (url === "/api/v2/write") {
+						writes.push(body.data);
 					}
 					return {};
 				}
@@ -63,6 +66,24 @@ describe("Influxdb", () => {
 				key,
 			);
 		}
+	});
+
+	describe("uid measurement", () => {
+		it("base64url-encodes the uid and uses it in queries and writes", async () => {
+			const uid = 'x"; SHOW MEASUREMENTS; --';
+			const measurement = DatabaseInfluxDB.fromUidToMeasurement(uid);
+			Exception.assertEqual(measurement, "eCI7IFNIT1cgTUVBU1VSRU1FTlRTOyAtLQ");
+			Exception.assertEqual(DatabaseInfluxDB.fromMeasurementToUid(measurement), uid);
+
+			const queries = [];
+			const writes = [];
+			const database = makeDatabase({ queries: queries, writes: writes });
+			await database.onExternal(uid, ["a"], 1, null, null);
+			await database.onRecords([[uid, [["a"], 1], 1000]]);
+
+			Exception.assertEqual(queries[0], 'SELECT "a" FROM "' + measurement + '" ORDER BY time DESC LIMIT 1\n');
+			Exception.assertEqual(writes[0], measurement + " a=1 1000000");
+		});
 	});
 
 	describe("fromValueToFields", () => {
