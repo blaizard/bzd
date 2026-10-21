@@ -1,0 +1,7 @@
+module(
+    name = "bzd_dependencies",
+    version = "1.0",
+)
+
+bazel_dep(name = "bzd_python", version = "1.0")
+bazel_dep(name = "rules_python", version = "2.4.2")

@@ -1,0 +1,10 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "bazel_dep",
+    srcs = [
+        "__init__.py",
+        "bazel_dep.py",
+    ],
+    visibility = ["//visibility:public"],
+)
