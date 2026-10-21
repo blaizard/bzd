@@ -1190,8 +1190,9 @@ describe("Plugin", () => {
 						],
 					};
 				} else if (url.endsWith("/api/v2/write")) {
-					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
-					Exception.assert(!options.data.includes("uid01 hello.fixed.c=3"));
+					// InfluxDB measurements are base64url-encoded uids.
+					Exception.assert(options.data.includes("dWlkMDE hello.dict.a=1"));
+					Exception.assert(!options.data.includes("dWlkMDE hello.fixed.c=3"));
 					resolve();
 				} else if (url.endsWith("/query")) {
 					return {
@@ -1215,8 +1216,8 @@ describe("Plugin", () => {
 						],
 					};
 				} else if (url.endsWith("/api/v2/write")) {
-					Exception.assert(options.data.includes("uid01 hello.dict.a=1"));
-					Exception.assert(options.data.includes("uid01 hello.fixed.c=3 1234"));
+					Exception.assert(options.data.includes("dWlkMDE hello.dict.a=1"));
+					Exception.assert(options.data.includes("dWlkMDE hello.fixed.c=3 1234"));
 					resolve();
 				} else if (url.endsWith("/query")) {
 					return {
