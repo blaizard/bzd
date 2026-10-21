@@ -118,7 +118,7 @@ class _NoopTimer:
 
 
 class Cancellation:
-	"""Cancel the given process."""
+	"""Track a running process so it can be cancelled later."""
 
 	def __init__(self, timeBeforeKillS: float = 5.0) -> None:
 		self.mutex = threading.Lock()
@@ -148,7 +148,7 @@ class Cancellation:
 	def killall(
 		gid: int, sig: signal.Signals, proc: Optional[subprocess.Popen[Any]] = None, timeoutS: float = 5.0
 	) -> bool:
-		"""Try to kill all process from the given group.
+		"""Try to kill all processes in the given group.
 
 		Args:
 		        gid: Group identifier.
@@ -157,7 +157,7 @@ class Cancellation:
 		        timeoutS: The timeout in seconds.
 
 		Returns:
-		        True if all processes have been killed, False otherwise or if we don't know.
+		        True if the target process exited before the timeout, False otherwise.
 		"""
 
 		try:
@@ -202,12 +202,11 @@ def localCommand(
 	                cmds: The list of commands to be executed.
 	                ignoreFailure: If set to True, failures (return code != 0) are ignored. Otherwise, it will throw.
 	                cwd: The current working directory.
-	                env: The set of environment variable to be injected to the process.
-	                timeoutS: The timeout in seconds until when the command terminates.
-	                                  A value of None, give an unlimited timeout.
-	                stdin: If set to True, the input stream will also be streamed to stdin. If set to False, the input stream will be closed.
-	                stdout: If set to True, the output will also be streamed to stdout.
-	                stderr: If set to True, the errors will also be streamed to stderr.
+	                env: The environment variables to inject into the process.
+	                timeoutS: Maximum time to wait for the command, in seconds. None disables the timeout.
+	                stdin: If True, inherit the parent's stdin; otherwise stdin is set to /dev/null.
+	                stdout: If True, stream to stdout; a file-like object receives the output instead.
+	                stderr: If True, stream to stderr; a file-like object receives the errors instead.
 	                maxOutputSize: The maximum size of the output, if larger, only the most recent output will be kept.
 	"""
 
@@ -249,11 +248,11 @@ def localCommand(
 			if not timer.is_alive():
 				stream.addStderr(f"Execution of '{' '.join(cmds)}' timed out after {timeoutS}s, terminating process.\n".encode())
 			else:
-				# Process completed successfully, no need to send a termination signal.
+				# Process finished before the timeout, no need to send a termination signal.
 				terminationSignal = None
 
 		except KeyboardInterrupt:
-			# Exit gracefully on keyboard interrupt.
+			# Forward the interrupt to the process group and exit.
 			terminationSignal = signal.SIGINT
 			sys.exit(1)
 
@@ -290,7 +289,7 @@ def localBazelBinary(
 	env: Optional[Dict[str, str]] = None,
 	**kwargs: Any,
 ) -> ExecuteResult:
-	"""Execute a bazel binary locally. The caller must run bazel and all runfiles must be already available."""
+	"""Execute a Bazel-built binary locally; all runfiles must already be available."""
 
 	env = dict(os.environ) if env is None else env
 	env["RUNFILES_DIR"] = os.environ["RUNFILES_DIR"] if "RUNFILES_DIR" in os.environ else Path.cwd().parent.as_posix()
@@ -311,7 +310,7 @@ def localBazelTarget(
 ) -> ExecuteResult:
 	"""Execute a bazel target locally.
 
-	Note, only the PATH variable of the current environment is propagated, together with the provided env.
+	Only the PATH variable of the current environment is propagated, together with the provided env.
 	"""
 
 	defaultEnv = {

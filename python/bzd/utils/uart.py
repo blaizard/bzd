@@ -26,7 +26,7 @@ class Devices:
 		return Devices([info for info in self.devices if os.access(info.device, os.R_OK | os.W_OK)])
 
 	def get(self) -> typing.List[Device]:
-		"""Get the list of devices that remains."""
+		"""Get the remaining device paths."""
 		return [info.device for info in self.devices]
 
 	def getInfo(self) -> typing.Dict[Device, str]:
@@ -34,12 +34,12 @@ class Devices:
 		return {info.device: "{}, {}".format(info.description, info.hwid) for info in self.devices}
 
 	def empty(self) -> bool:
-		"""Check if the set of remaining devices is empty or not."""
+		"""Return True if no devices remain."""
 		return len(self.devices) == 0
 
 
 class Uart:
-	"""Creates a terminal as a proxy of a UART serial port."""
+	"""Proxy a UART serial port to the standard output."""
 
 	dataBitsMapping = {
 		5: serial.FIVEBITS,

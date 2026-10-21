@@ -5,9 +5,9 @@ Yaml = typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]]
 
 
 def _valueToYaml(value: typing.Any) -> str:
-	"""Formats simple Python types into YAML-compatible strings.
-	Handles None, booleans, numbers, and basic strings.
-	Adds quotes to strings that look like other types or contain special characters.
+	"""Format a simple Python value as a YAML scalar.
+
+	Strings are JSON-encoded, which is valid YAML.
 	"""
 	if value is None:
 		return "null"
@@ -22,14 +22,14 @@ def _valueToYaml(value: typing.Any) -> str:
 
 
 def _toYaml(data: Yaml, indent: int) -> typing.List[str]:
-	"""Recursively converts a Python data structure (from JSON) into a list of YAML lines.
+	"""Recursively convert a JSON-like data structure into YAML lines.
 
 	Args:
-	        data: The Python data (dict, list, simple type) to convert.
-	        indent (int): The current indentation level.
+	        data: The dict or list to convert.
+	        indent: The current indentation level.
 
 	Returns:
-	        list: A list of strings, where each string is a line of YAML.
+	        A list of strings, where each string is a line of YAML.
 	"""
 
 	lines: typing.List[str] = []
@@ -65,7 +65,7 @@ def _toYaml(data: Yaml, indent: int) -> typing.List[str]:
 
 
 def toYaml(data: Yaml) -> str:
-	"""Main function to convert a data structure to a YAML string."""
+	"""Convert a data structure to a YAML string."""
 
 	yamlLines = _toYaml(data, indent=0)
 	return "\n".join(yamlLines)

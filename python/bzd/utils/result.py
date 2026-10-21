@@ -5,9 +5,7 @@ E = typing.TypeVar("E")
 
 
 class Result(typing.Generic[V, E]):
-	"""
-	Result class.
-	"""
+	"""Container for either a value or an error."""
 
 	def __init__(self, value: V) -> None:
 		self.value_: typing.Optional[V] = value

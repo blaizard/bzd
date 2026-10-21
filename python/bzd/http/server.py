@@ -47,7 +47,7 @@ class RESTServerContext:
 		"""Decode the request body in JSON.
 
 		Raises:
-			json.JSONDecodeError: if the body is not a valid JSON.
+			json.JSONDecodeError: if the body is not valid JSON.
 		"""
 
 		return json.loads(self.read().decode("utf-8"))
@@ -55,7 +55,7 @@ class RESTServerContext:
 	# ---- Response Specific interface ----
 
 	def header(self, key: str, value: str) -> None:
-		"""Set a new header for the response."""
+		"""Add a header to the response."""
 
 		self.response.headers.append((key, value))
 
@@ -168,7 +168,7 @@ class HttpServer(socketserver.TCPServer):
 		super().__init__((bind, port), partial(Handler, self.handlers, self.staticRoutes))
 
 	def server_bind(self) -> None:
-		"""Bind the server socket to an address."""
+		"""Bind the socket and record the actual address."""
 
 		super().server_bind()
 		self.bind, self.port = self.socket.getsockname()

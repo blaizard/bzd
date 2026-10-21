@@ -26,11 +26,11 @@ def isEqual(
 
 
 class UpdatePolicy(enum.Enum):
-	# Override any value if previously existing.
+	# Override existing values.
 	override = enum.auto()
-	# Raise an error if there is a value conflict.
+	# Raise an error when an existing value is overridden.
 	raiseOnConflict = enum.auto()
-	# Raise an error if there was no conflict (no override).
+	# Raise an error when a new key is added.
 	raiseOnNonConflict = enum.auto()
 
 
@@ -43,7 +43,7 @@ def updateDeep(
 	policy: typing.Union[UpdatePolicy, UpdatePolicyCallable] = UpdatePolicy.override,
 	extendLists: bool = False,
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
-	"""Deep update of 2 dictionaries.
+	"""Deep merge two dictionaries.
 
 	Args:
 	        d: Dictionary to merge, the merge happens in-place, so this dictionary will be modified.

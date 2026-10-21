@@ -35,7 +35,7 @@ class Cache(typing.Generic[T]):
 		"""Trigger the function.
 
 		Args:
-		        waitMaxS: Wait for a maximum of seconds for the result.
+		        waitMaxS: Maximum time to wait for the result, in seconds.
 
 		Returns:
 		        True if the function was triggered, False if it is already running from a previous trigger.
@@ -54,7 +54,7 @@ class Cache(typing.Generic[T]):
 		return False
 
 	def get(self, waitMaxS: int = 0) -> T:
-		"""Get the result."""
+		"""Get the cached value, refreshing it in the background if expired."""
 
 		if self.lastRunS + self.expireS < time.time():
 			self.trigger(waitMaxS)
@@ -99,7 +99,7 @@ class Docker:
 		with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
 			sock.connect(self.socket.as_posix())
 
-			# Get the list of running containers
+			# Send the request to the Docker Engine API.
 			request = f"{method} {endpoint} HTTP/1.1\r\nHost: docker\r\n\r\n"
 			sock.sendall(request.encode())
 			sock.settimeout(timeoutS)
@@ -135,7 +135,7 @@ class Docker:
 
 	def getDiskSpace(self) -> DiskSpace:
 
-		# This takes time.
+		# Disk usage is expensive to compute, so the result is cached by self.diskSpace.
 		raw = self.request("GET", "/system/df?type=volume", timeoutS=600)
 
 		output: DiskSpace = {"volumes": {}}
@@ -149,7 +149,7 @@ class Docker:
 		Args:
 		        stats: The Docker stats dictionary.
 
-		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
+		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerStats
 
 		Returns:
 		        A dictionary containing CPU usage stats.
@@ -175,7 +175,7 @@ class Docker:
 	def _memoryInfo(self, containerId: str, stats: typing.Any) -> typing.Any:
 		"""Extracts memory usage stats from the Docker stats dictionary.
 
-		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerExport
+		See: https://docs.docker.com/reference/api/engine/version/v1.44/#tag/Container/operation/ContainerStats
 
 		Args:
 		        stats: The Docker stats dictionary.
@@ -196,7 +196,7 @@ class Docker:
 		return None
 
 	def _returnRate(self, previousData: typing.Any, data: typing.Any) -> typing.Any:
-		"""Calculate the rate from a dictionary containing in/out numbers."""
+		"""Convert cumulative in/out counters into per-second rates."""
 
 		timestampS = time.time()
 		previousTimestampS = previousData.get("_timestampS", timestampS)
@@ -234,7 +234,7 @@ class Docker:
 			readBytes = 0
 			writeBytes = 0
 
-			# This can be None.
+			# The list can be None when block I/O stats are unavailable.
 			if stats["blkio_stats"]["io_service_bytes_recursive"]:
 				for entry in stats["blkio_stats"]["io_service_bytes_recursive"]:
 					if entry["op"] == "read":
@@ -308,7 +308,7 @@ class Docker:
 		        container: The Docker container.
 
 		Returns:
-		        A float representing the container's uptime in seconds, or None if an error occurs.
+		        The container's uptime in seconds, or None if its start time is unavailable.
 		"""
 		raw = self.request("GET", f"/containers/{container['id']}/json", timeoutS=600)
 
@@ -378,7 +378,7 @@ if __name__ == "__main__":
 
 	node = Node(uid=args.uid, token=args.node_token)
 
-	# Start the thread to monitor the node.
+	# Publish the Docker stats for this node.
 	def monitorWorkload() -> None:
 		data = docker.getDockerData()
 		updatedData = {f"{args.uid}.{key}": value for key, value in data.items()}

@@ -157,7 +157,7 @@ def _request(
 	headers: typing.Dict[str, str],
 	timeoutS: int,
 ) -> HttpResponse:
-	"""Processor of a request using urllib."""
+	"""Send an HTTP request using urllib."""
 
 	context = ssl.create_default_context(cafile=certifi.where())
 	request = urllib.request.Request(url, data=body, headers=headers, method=method)

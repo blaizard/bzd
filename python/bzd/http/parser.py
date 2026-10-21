@@ -57,7 +57,7 @@ class HttpParser:
 				break
 		header, self.buffer = self.buffer.split(b"\r\n\r\n", 1)
 
-		# Read information of the payload.
+		# Determine the payload transfer mode.
 		transferEncoding = self.getHeader(header, "transfer-encoding")
 		if transferEncoding is None:
 			self.transferMode = TransferMode.normal
@@ -65,14 +65,14 @@ class HttpParser:
 			self.transferMode = TransferMode.chunked
 		assert self.transferMode is not None, "Unsupported transfer mode."
 
-		# Read the payload length.
+		# Determine the body length from the Content-Length header.
 		if self.transferMode == TransferMode.normal:
 			contentLength = self.getHeader(header, "content-length")
 			assert contentLength is not None, "Content-length header is missing."
 			self.bodyLengthLeft = int(contentLength)
 
 	def _readChunk(self, size: int) -> typing.Generator[bytes, None, None]:
-		"""Read a chunk of data by size."""
+		"""Yield data until size bytes have been emitted, reading more as needed."""
 
 		while True:
 			if self.buffer:
@@ -97,7 +97,7 @@ class HttpParser:
 				while True:
 					if b"\r\n" in self.buffer:
 						line, self.buffer = self.buffer.split(b"\r\n", 1)
-						# It can be that we read a empty line.
+						# An empty line can appear before the next chunk size.
 						if line:
 							self.bodyLengthLeft = int(line, 16)
 							break
@@ -112,5 +112,5 @@ class HttpParser:
 			assert False, f"Transfer mode {self.transferMode} is not supported."
 
 	def readAll(self) -> bytes:
-		"""Helper to read the whole content."""
+		"""Read and concatenate the whole body."""
 		return b"".join([chunk for chunk in self.read()])

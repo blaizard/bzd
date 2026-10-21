@@ -29,7 +29,7 @@ class _WorkerResult:
 
 
 class _WorkloadContext:
-	"""Context related to a specific work."""
+	"""Context for a specific workload."""
 
 	def __init__(self, data: Any, timeoutS: int) -> None:
 		self.data = data
@@ -37,7 +37,7 @@ class _WorkloadContext:
 
 
 class _Context:
-	"""Global context for the worker."""
+	"""Shared context for all workers."""
 
 	def __init__(self) -> None:
 		self.stop = multiprocessing.Value(ctypes.c_int, 0)
@@ -103,7 +103,7 @@ class Worker:
 
 	@staticmethod
 	def _taskWrapper(task: Callable[[Any, TextIO], Any], context: _Context) -> None:
-		# Loop unless the workers are notified to be stopped by the master process
+		# Loop until there is no work left or the master process requests a stop.
 		while context.count.value > 0 or context.stop.value == 0:
 			# Wait until there is data available or stop is raised
 			try:

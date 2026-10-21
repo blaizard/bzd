@@ -2,10 +2,10 @@ import typing
 
 
 def getMatchingWeight(word: str, compareWith: str) -> float:
-	"""Calculate the matching weight of a word into another.
+	"""Calculate the matching weight of a word against another string.
 
 	It performs a fuzzy search on the word using a fast algorithm.
-	The word can be a subset of the word to compare.
+	The word can be a subset of the compared string.
 	"""
 
 	if len(word) == 0 or len(compareWith) == 0:
@@ -22,10 +22,10 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 		start = compareWith.find(firstChar, start + 1)
 		if start == -1:
 			break
-		# If this is the first character of a word, add a weight to prioritize this word
+		# Prioritize matches at the beginning of the compared string.
 		curWeight = 1.0 if start == 0 else 0.9
 		iSentence = start
-		# Check if the word is +/- 1 character far away
+		# Allow the next character to match one position ahead or behind.
 		for i in range(1, len(word)):
 			c = word[i]
 			if compareWithGetCharAtOrNone(iSentence + 1) == c:
