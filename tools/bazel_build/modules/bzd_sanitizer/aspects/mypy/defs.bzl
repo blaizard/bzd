@@ -61,40 +61,17 @@ def _apply_root(path, root):
         return root + "/" + path
     return path
 
-def _get_third_party_top_level_modules(all_srcs):
-    """Collect unique top-level module name sform 3rd party site-packages sources."""
-    modules = sets.make()
-    for src in all_srcs.to_list():
-        parts = src.path.split("/")
-        for i, part in enumerate(parts):
-            if part == "site-packages" and i + 1 < len(parts):
-                name = parts[i + 1]
-
-                # Skip __pycache__ and other non-importable entries.
-                if name.startswith("__") or name.endswith(".dist-info") or name.endswith(".data"):
-                    break
-
-                # Strip file extension.
-                if "." in name:
-                    name = name.rsplit(".", 1)[0]
-
-                sets.insert(modules, name)
-                break
-    return sorted(sets.to_list(modules))
-
-def _generate_mypy_ini(python_version, modules):
+def _generate_mypy_ini(python_version):
     """Generate *.mypy.ini per module."""
 
-    lines = [
+    return "\n".join([
         "[mypy]",
         "python_version = {}".format(python_version),
         "exclude = rules_python_entry_point_.*\\.py",
-    ]
-    for module in modules:
-        lines.append("")
-        lines.append("[mypy-{}.*]".format(module))
-        lines.append("follow_imports = silent")
-    return "\n".join(lines)
+
+        # Only report errors from the sources passed on the command line, each target checks its own sources.
+        "follow_imports = silent",
+    ])
 
 def _mypy_aspect_impl(target, ctx):
     """Run mypy on the target."""
@@ -153,8 +130,7 @@ def _mypy_aspect_impl(target, ctx):
             python_version = "{}.{}".format(v.major, v.minor)
 
     # Generate a per-action *.mypy.ini.
-    third_party_modules = _get_third_party_top_level_modules(all_srcs)
-    config_content = _generate_mypy_ini(python_version, third_party_modules)
+    config_content = _generate_mypy_ini(python_version)
     config_file = ctx.actions.declare_file("{}.mypy.ini".format(ctx.label.name))
     ctx.actions.write(
         output = config_file,
@@ -175,7 +151,7 @@ def _mypy_aspect_impl(target, ctx):
     # --package-root: Specifies alternate root trees.
     args.add("--bazel")
 
-    # Pass the per-action generated config mypy to silence 3rd party errors.
+    # Pass the per-action generated config mypy to silence imported modules.
     args.add("--config-file", config_file)
 
     args.add_all(mypy_srcs)

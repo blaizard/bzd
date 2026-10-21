@@ -149,7 +149,6 @@ class TreeBuilder:
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		assert not target.is_absolute(), f"Link target '{target}' must be a relative path."
 
 		self.links[path] = target
 		self._addEntry(path, f"link -> {target}")
@@ -290,8 +289,11 @@ if __name__ == "__main__":
 				builder.addFile(path)
 			elif path.is_dir():
 				builder.addDirectory(path)
+			elif path.is_symlink():
+				# Dangling symlink, such as a declare_symlink() file, it is handled through the symlink entries.
+				continue
 			else:
-				raise Exception(f"Path '{path}' is neither a file nor a directory.")
+				raise Exception(f"Path '{path}' is neither a file, a directory or a symlink.")
 
 		# Process the symlinks, this will add the link entries to the mtree.
 		for path, info in layer["symlinks"].items():
@@ -301,6 +303,10 @@ if __name__ == "__main__":
 				builder.addLink(symlink, target)
 			elif info["type"] == "absolute":
 				builder.addAbsoluteLink(symlink, target)
+			elif info["type"] == "symlink":
+				# The target is a declare_symlink() file, which is dangling in the output
+				# tree, resolve the actual target at execution time.
+				builder.addLink(symlink, target.readlink())
 			else:
 				raise Exception(f"Unsupported symlink type '{info['type']}' for path '{path}'.")
 

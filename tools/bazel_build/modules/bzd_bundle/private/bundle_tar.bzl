@@ -25,7 +25,12 @@ def _gather_files_and_symlinks(ctx, targets):
             runfiles = info.default_runfiles
             if runfiles:
                 for f in runfiles.files.to_list():
-                    symlinks["{}/{}".format(base_path, f.short_path)] = {"target": f.path, "type": "absolute"}
+                    if f.is_symlink:
+                        # declare_symlink() files are dangling in the output tree, their
+                        # target can only be resolved at execution time.
+                        symlinks["{}/{}".format(base_path, f.short_path)] = {"target": f.path, "type": "symlink"}
+                    else:
+                        symlinks["{}/{}".format(base_path, f.short_path)] = {"target": f.path, "type": "absolute"}
                 for symlink in runfiles.symlinks.to_list():
                     if symlink.target_file:
                         symlinks["{}/{}".format(base_path, symlink.path)] = {"target": symlink.target_file.path, "type": "absolute"}
