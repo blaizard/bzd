@@ -5,26 +5,33 @@ import Scopes from "#bzd/nodejs/core/authentication/scopes.js";
 const Exception = ExceptionFactory("token");
 const Log = LogFactory("token");
 
+const defaultClock = { getTimeMs: () => Date.now() };
+
 /// A token has the following data:
 ///
 /// scopes: The scopes associated with this token.
 /// expiration: The expiration date.
 /// rolling: Whether it is a rolling token or not.
 export default class TokenInfo {
-	constructor(value) {
+	constructor(value, clock = defaultClock) {
 		Exception.assert("expiration" in value, "A token must have 'expiration' in its attributes: {}", value);
 		this.value = value;
+		this.clock = clock;
 	}
 
-	static make(identifier, scopes, timeoutS, rolling) {
-		return new TokenInfo({
-			identifier: identifier,
-			scopes: scopes,
-			creation: Date.now(),
-			expiration: Date.now() + timeoutS * 1000,
-			lifetime: timeoutS,
-			rolling: rolling,
-		});
+	static make(identifier, scopes, timeoutS, rolling, clock = defaultClock) {
+		const nowMs = clock.getTimeMs();
+		return new TokenInfo(
+			{
+				identifier: identifier,
+				scopes: scopes,
+				creation: nowMs,
+				expiration: nowMs + timeoutS * 1000,
+				lifetime: timeoutS,
+				rolling: rolling,
+			},
+			clock,
+		);
 	}
 
 	data() {
@@ -47,17 +54,17 @@ export default class TokenInfo {
 		const lifetime = this.value.lifetime ?? (this.value.expiration - this.value.creation) / 1000;
 		const bounded = Math.min(minDuration, lifetime);
 		if (this.duration() < bounded) {
-			this.value.expiration = Date.now() + bounded * 1000;
+			this.value.expiration = this.clock.getTimeMs() + bounded * 1000;
 		}
 	}
 
 	// Duration left for this token.
 	duration() {
-		return Math.max((this.value.expiration - Date.now()) / 1000, 0);
+		return Math.max((this.value.expiration - this.clock.getTimeMs()) / 1000, 0);
 	}
 
 	isExpired() {
-		return Date.now() > this.value.expiration;
+		return this.clock.getTimeMs() > this.value.expiration;
 	}
 
 	getScopes() {

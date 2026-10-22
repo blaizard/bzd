@@ -18,5 +18,6 @@ bzd_nodejs_test(
     deps = [
         "//apps/accounts/backend/users",
         "//nodejs/core:exception",
+        "//nodejs/core/clock:mock",
     ],
 )
