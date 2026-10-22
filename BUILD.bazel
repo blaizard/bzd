@@ -55,15 +55,6 @@ sh_binary_wrapper(
     binary = "@bzd_sanitizer//:sanitizer",
 )
 
-sh_binary_wrapper(
-    name = "dependencies",
-    args = [
-        "--action",
-        "@bzd_dependencies//actions/bazel_dep",
-    ],
-    binary = "@bzd_dependencies//:dependencies",
-)
-
 py_binary(
     name = "sandbox",
     srcs = ["sandbox.py"],

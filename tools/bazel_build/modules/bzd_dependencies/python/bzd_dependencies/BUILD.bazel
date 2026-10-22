@@ -1,0 +1,12 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "files",
+    srcs = [
+        "__init__.py",
+        "utils/__init__.py",
+        "utils/files.py",
+    ],
+    imports = [".."],
+    visibility = ["//visibility:public"],
+)

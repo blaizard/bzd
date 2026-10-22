@@ -1,13 +1,15 @@
 load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
-    name = "dependencies",
+    name = "bzd_dependencies",
     srcs = [
         "__init__.py",
         "dependencies.py",
     ],
+    main = "dependencies.py",
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_python//bzd/utils:run",
+        "//dependencies:interface",
+        "//dependencies/bazel_dep",
     ],
 )

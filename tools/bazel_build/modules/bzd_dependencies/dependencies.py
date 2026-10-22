@@ -3,12 +3,30 @@ import os
 import pathlib
 import sys
 import time
+import typing
 
-from bzd.utils.run import localBazelTarget
+from dependencies.bazel_dep.bazel_dep import BazelDep
+from dependencies.interface import DependencyInterface
+
+AllDependencies: typing.Dict[str, typing.Type[DependencyInterface]] = {"bazel_dep": BazelDep}
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Workspace dependencies updater.")
-	parser.add_argument("--action", type=str, action="append", default=[], help="Actions to be used.")
+	parser.add_argument(
+		"--use",
+		type=str,
+		action="append",
+		choices=list(AllDependencies),
+		default=[],
+		metavar="<dependency>",
+		help="The type of dependency to use, all are used by default.",
+	)
+	parser.add_argument(
+		"--upgrade",
+		action="store_true",
+		help="Upgrade the dependencies.",
+	)
 	parser.add_argument(
 		"--workspace",
 		type=pathlib.Path,
@@ -18,24 +36,24 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	success = True
-	for action in args.action:
-		print(f"{action}...", end="", flush=True)
+	for name in args.use if args.use else AllDependencies.keys():
 		startTime = time.monotonic()
+		try:
+			dependency = AllDependencies[name](args.workspace)
+			dependencies = dependency.get()
+			if args.upgrade:
+				dependency.upgrade()
+				dependencies = dependency.get()
+				print(f"{name}... UPGRADED ({time.monotonic() - startTime:.1f}s)")
+			else:
+				print(f"{name}:")
+			print(dependencies)
+			passed = True
+		except Exception as error:
+			print(f"{name}... FAILED ({time.monotonic() - startTime:.1f}s)")
+			print(str(error))
+			passed = False
 
-		result = localBazelTarget(
-			action,
-			[str(args.workspace)],
-			ignoreFailure=True,
-			timeoutS=600,
-			cwd=args.workspace,
-		)
-
-		passed = result.getReturnCode() == 0
-		elapsedTime = time.monotonic() - startTime
-		print(f" {'PASSED' if passed else 'FAILED'} ({elapsedTime:.1f}s)")
-
-		if not passed:
-			print(result.getOutput(), end="")
-			success = False
+		success = success and passed
 
 	sys.exit(0 if success else 1)
