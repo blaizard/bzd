@@ -7,6 +7,11 @@ from sandbox import SandboxContainer, Feature
 class FeatureLinux(Feature):
 	def process(self, context: SandboxContainer) -> None:
 		self.dockerFile += [
+			# Setup git.
+			"RUN git config --global user.name 'agent'",
+			"RUN git config --global user.email 'agent@blaizard.com'",
+		]
+		self.dockerFile += [
 			"RUN sudo apt-get install -y"
 			+ " jq"  # For workflow
 			+ " openssh-client",  # For ssh-keyscan
@@ -25,15 +30,6 @@ class FeatureLinux(Feature):
 			'RUN curl -sSfL https://artifacts.nixos.org/nix-installer | sh -s -- install linux --extra-conf "sandbox = false" --enable-flakes --init none --no-confirm',
 			f"RUN sudo chown -R {context.uid}:{context.gid} /nix",
 			'ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"',
-		]
-
-
-class FeatureOpencode(Feature):
-	def process(self, context: SandboxContainer) -> None:
-		self.dockerFile += [
-			# Setup git.
-			"RUN git config --global user.name 'agent'",
-			"RUN git config --global user.email 'agent@blaizard.com'",
 		]
 
 
@@ -65,7 +61,7 @@ if __name__ == "__main__":
 				"--enable=opencode",
 				"--opencode=playwright",
 			],
-			additionalFeatures=[FeatureLinux, FeatureOpencode],
+			additionalFeatures=[FeatureLinux],
 		)
 
 	else:

@@ -39,7 +39,7 @@ runs:
           shell: bash
           run: |
               set -euo pipefail
-              bzd-lease ./tools/bazel run //:sanitizer
+              bzd-lease ./tools/bazel run //:sanitizer -- --all
 
         - name: "Commit changes to a new branch"
           id: commit
