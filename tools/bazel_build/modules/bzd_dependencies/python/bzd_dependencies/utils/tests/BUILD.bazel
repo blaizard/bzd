@@ -1,0 +1,10 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+[py_test(
+    name = path.replace(".py", ""),
+    srcs = [path],
+    main = path,
+    deps = ["//python/bzd_dependencies:utils"],
+) for path in glob(
+    ["*_test.py"],
+)]

@@ -37,17 +37,20 @@ if __name__ == "__main__":
 
 	success = True
 	for name in args.use if args.use else AllDependencies.keys():
+		print(f"==== {name}...", flush=True, end="")
 		startTime = time.monotonic()
 		try:
 			dependency = AllDependencies[name](args.workspace)
 			dependencies = dependency.get()
 			if args.upgrade:
-				dependency.upgrade()
-				dependencies = dependency.get()
-				print(f"{name}... UPGRADED ({time.monotonic() - startTime:.1f}s)")
+				dependency.upgrade(dependencies)
+				upgraded = dependency.get()
+				print(f" UPGRADED ({time.monotonic() - startTime:.1f}s)")
+				for change in dependencies.diff(upgraded):
+					print(change)
 			else:
-				print(f"{name}:")
-			print(dependencies)
+				print(f" ({time.monotonic() - startTime:.1f}s)")
+				print(dependencies)
 			passed = True
 		except Exception as error:
 			print(f"{name}... FAILED ({time.monotonic() - startTime:.1f}s)")

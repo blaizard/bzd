@@ -5,10 +5,12 @@ py_library(
     srcs = [
         "__init__.py",
         "bazel_dep.py",
+        "bcr.py",
     ],
-    visibility = ["//:__pkg__"],
+    visibility = ["//:__subpackages__"],
     deps = [
         "//dependencies:interface",
-        "//python/bzd_dependencies:files",
+        "//python/bzd_dependencies:utils",
+        "@bzd_python//bzd/http:client",
     ],
 )

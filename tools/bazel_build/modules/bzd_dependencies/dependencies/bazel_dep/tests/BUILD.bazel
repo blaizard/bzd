@@ -1,0 +1,13 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+[py_test(
+    name = path.replace(".py", ""),
+    srcs = [path],
+    main = path,
+    deps = [
+        "//dependencies/bazel_dep",
+        "@bzd_python//bzd/http:client_mock",
+    ],
+) for path in glob(
+    ["*_test.py"],
+)]

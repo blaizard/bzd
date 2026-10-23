@@ -1,0 +1,8 @@
+load("@rules_python//python:defs.bzl", "py_test")
+
+py_test(
+    name = "diff",
+    srcs = ["diff_test.py"],
+    main = "diff_test.py",
+    deps = ["//dependencies:interface"],
+)
