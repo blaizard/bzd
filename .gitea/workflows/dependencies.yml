@@ -1,0 +1,42 @@
+name: Dependencies
+
+on:
+    workflow_dispatch: # allows manual triggering
+
+jobs:
+    lease_linux:
+        runs-on: node_manager_client
+        steps:
+            - name: "Lease Linux"
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/lease_linux@main
+              with:
+                  name: "ci"
+                  ttl: "300"
+
+    dependencies:
+        needs: lease_linux
+        runs-on: linux
+        steps:
+            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+              with:
+                  key: ${{ secrets.BZD_KEY }}
+                  lease: "true"
+
+            - name: "Update dependencies"
+              run: |
+                  set -o pipefail
+                  {
+                      echo '## Automated dependency upgrade'
+                      echo
+                      echo '```'
+                  } > /tmp/pr-body.txt
+                  bzd-lease ./tools/bazel run @bzd_dependencies -- --upgrade | tee -a /tmp/pr-body.txt
+                  echo '```' >> /tmp/pr-body.txt
+
+            - uses: ./.gitea/actions/create_pr_on_changes
+              with:
+                  token: ${{ secrets.BZD_AGENT_TOKEN }}
+                  title: "[DEPENDENCIES] Automated dependency upgrade"
+                  body_file: /tmp/pr-body.txt
+                  branch_prefix: "deps/auto-update-"
+                  commit_message: "deps: automated dependency upgrade"

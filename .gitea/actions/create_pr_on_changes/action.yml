@@ -1,0 +1,75 @@
+name: create_pr_on_changes
+description: "Sanitize the workspace, and if changes are detected, commit them to a new branch, push it and create a PR."
+
+inputs:
+    token:
+        description: "Gitea personal access token with permissions to create a PR."
+        required: true
+    title:
+        description: "Title of the PR."
+        required: true
+    body_file:
+        description: "Path to a file containing the PR description (supports markdown)."
+        required: true
+    branch_prefix:
+        description: "Prefix of the branch to create, a unique suffix is appended."
+        required: false
+        default: "auto/update-"
+    commit_message:
+        description: "The commit message to use."
+        required: true
+    sanitize:
+        description: "Whether to run the sanitizer before looking for changes."
+        required: false
+        default: "true"
+
+outputs:
+    has_changes:
+        description: "Whether changes were detected, committed and pushed."
+        value: ${{ steps.commit.outputs.has_changes }}
+    branch_name:
+        description: "The name of the branch created."
+        value: ${{ steps.commit.outputs.branch_name }}
+
+runs:
+    using: composite
+    steps:
+        - name: "Sanitize"
+          if: inputs.sanitize == 'true'
+          shell: bash
+          run: |
+              set -euo pipefail
+              bzd-lease ./tools/bazel run //:sanitizer
+
+        - name: "Commit changes to a new branch"
+          id: commit
+          shell: bash
+          env:
+              BRANCH_PREFIX: ${{ inputs.branch_prefix }}
+              COMMIT_MESSAGE: ${{ inputs.commit_message }}
+          run: |
+              set -euo pipefail
+
+              if [ -z "$(git status --porcelain)" ]; then
+                  echo "No changes detected, nothing to commit."
+                  echo "has_changes=false" >> "$GITHUB_OUTPUT"
+                  exit 0
+              fi
+              echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+              BRANCH_NAME="${BRANCH_PREFIX}$(date +%Y%m%d%H%M%S)"
+              echo "branch_name=${BRANCH_NAME}" >> "$GITHUB_OUTPUT"
+              git checkout -b "$BRANCH_NAME"
+              git add .
+              git commit -m "$COMMIT_MESSAGE"
+              git push origin "$BRANCH_NAME"
+              echo "Pushed ${BRANCH_NAME}"
+
+        - name: "Create a PR"
+          if: steps.commit.outputs.has_changes == 'true'
+          uses: ./.gitea/actions/pr
+          with:
+              token: ${{ inputs.token }}
+              title: ${{ inputs.title }}
+              head_branch: ${{ steps.commit.outputs.branch_name }}
+              body_file: ${{ inputs.body_file }}
