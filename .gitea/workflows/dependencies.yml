@@ -1,6 +1,8 @@
 name: Dependencies
 
 on:
+    schedule:
+        - cron: "0 18 * * 5" # runs every friday at 18:00 UTC (saturday 03:00 JST)
     workflow_dispatch: # allows manual triggering
 
 jobs:
