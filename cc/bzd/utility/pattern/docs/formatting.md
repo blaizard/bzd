@@ -38,7 +38,7 @@ of bytes written, propagating errors with the `!` operator.
 #include "cc/bzd/utility/pattern/to_stream.hh"
 
 bzd::StringStream<N> stream;
-co_await bzd::toStream(stream, "Hello {}"_csv, name);
+co_await !bzd::toStream(stream, "Hello {}"_csv, name);
 ```
 
 Asynchronous byte ranges (async generators) are also supported as arguments.

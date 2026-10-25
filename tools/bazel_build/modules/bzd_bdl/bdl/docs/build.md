@@ -15,7 +15,7 @@ The `preprocess` and `composition` stages output artifacts, and the `composition
 The parser analyzes a `bdl` file and extracts entities out of the file, decomposing the raw text into a visitable tree.
 This is the only step in direct contact with the `bdl` file, it must therefore extract all useful information from this file.
 
-Part of this process, the parser also goes through a basic validation step and a build step.
+As part of this process, the parser also performs basic validation and a build step.
 
 The build step has the responsibility to gather dependencies and resolve symbols if the dependency flag is set.
 
@@ -34,8 +34,8 @@ A bdl file is serialized into a `.bdl.o` file for caching purposes. Each `.bdl` 
 
 During the file `preprocessing` stage, all symbols are resolved and are matched with the previously discovered symbols.
 These symbols are stored into the `Symbol Map`.
-In other words, all symbols used must have been previously defined. However, there are few exceptions that do
-not follow this rule, which are any symbol within a `composition` scope or within a `config` section.
+In other words, all symbols used must have been previously defined. However, there are a few exceptions to this
+rule: any symbol within a `composition` scope or within a `config` section.
 
 In a `composition` scope, only the name of the entity is registered, but the entity itself is not resolved, in other
 words, in `hello = my.func(a = 1);`, the name `hello` is registered but the function `my.func` is not resolved, so it can
@@ -56,7 +56,7 @@ only resolved if the corresponding component is instantiated. Unused components 
 
 The composition stage is done in 2 sub-stages, the first one that only processes certain types of builtin expressions, such as `bind`
 for example. This assigns contracts to expressions before being evaluated.
-The second stage processes all the rest of top level elements and their dependencies.
+The second stage processes the remaining top-level elements and their dependencies.
 
 ## Generators
 

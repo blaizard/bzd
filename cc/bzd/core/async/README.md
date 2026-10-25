@@ -139,8 +139,9 @@ bzd::Generator<int> myFunc() { ... }
 Generators are not intended to be used directly with `co_await`. Instead, they should be used as ranges using the following pattern:
 
 ```c++
-auto it = co_await !myFunc.begin();
-while (it != myFunc.end()) {
+auto generator = myFunc();
+auto it = co_await !generator.begin();
+while (it != generator.end()) {
     auto value = *it;
     // do something with value.
     co_await !++it;
@@ -207,7 +208,7 @@ const auto value = co_await bzd::async::any(timeout(1_s), myFunc()).assertHasVal
 ### Suspend
 
 Suspending the execution of an async can be done with `bzd::async::suspend(...)`. This function takes 2 callables as arguments:
-the first, which is guaranteed to be called, receives a movable-only suspended executable object as an argument.
+the first, which is guaranteed to be called, receives a move-only suspended executable object as an argument.
 The user needs to dispose of it within this callback. Once the callback completes, the suspended executable object
 cannot be moved anymore.
 It is also guaranteed that no cancellation can occur during the lifetime of this callback.

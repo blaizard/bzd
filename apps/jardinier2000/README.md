@@ -17,7 +17,7 @@
 - v0.3: (wip)
   - Step down:
     - Updated coil 3.3uH 6x6mm -> 4.7uH 8x8mm.
-    - Adding C21 & C22 at VIN to damp voltage spike.
+    - Adding C21 & C22 at VIN to damp voltage spikes.
   - Moved SW1 from IO45 -> IO47 (IO45 is a special pin).
   - Reset capacitor (C6) 0.1uF -> 1uF as recommended by Espressif.
 

@@ -21,7 +21,7 @@ efficient and safe manner.
 It features the following:
 
 - No dynamic allocations. All storage is declared either at compile time or on the stack.
-- The core library is self-contained, with no reliance on third-party libraries, only on the freestanding STL.
+- The core library is self-contained, with no reliance on third-party libraries, only on the freestanding C++ standard library.
 - Flexible error handling model.
 - Based on C++ coroutines.
 - Compile-time string formatting tool.

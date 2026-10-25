@@ -27,7 +27,7 @@ rust_library(
 
 ## Library
 
-The Rust generator converts BDL definitions into a `no_std` Rust file. Symbols are prefixed with the BDL namespace of the file, joined with `_`, and formatted as CamelCase. For example, given the following interface in `interface.bdl`:
+The Rust generator converts BDL definitions into a `no_std` Rust file. Symbols are prefixed with the BDL namespace of the file, with each namespace part capitalized and concatenated. For example, given the following interface in `interface.bdl`:
 
 ```bdl
 namespace bzd.test;
@@ -100,7 +100,7 @@ bdl_library(
 )
 ```
 
-The generated code for `file_b` starts with `use file_a::*;`, importing `file_a`'s symbols for internal use without re-exporting them. Downstream users must depend on `file_a` directly to access its symbols.
+The generated code for `file_b` includes `use file_a::*;`, importing `file_a`'s symbols for internal use without re-exporting them. Downstream users must depend on `file_a` directly to access its symbols.
 
 ## Components
 
@@ -132,7 +132,7 @@ pub struct BzdComponentsUserContext {
 }
 ```
 
-When a `config:` entry references another component or interface, the context is generic over a `ContextConstraint` trait and stores the dependency as `&'static mut`:
+When a `config:` entry references another component or interface, the context is generic over a `ContextConstraint` trait and stores the dependency as a `component::ComponentHandle`:
 
 ```rust
 pub trait BzdComponentsManagerContextConstraint {
@@ -143,11 +143,11 @@ pub struct BzdComponentsManagerContext<C>
 where
     C: BzdComponentsManagerContextConstraint,
 {
-    pub user: &'static mut C::User,
+    pub user: component::ComponentHandle<C::User>,
 }
 ```
 
-The component implementation provides the concrete struct and implements the trait. The runtime support crate `//rust/bdl/generator/impl/adapter:component` provides `LocalStatic` (single-threaded `&'static mut` registry), `Wrapper`, and `Lifecycle`.
+The component implementation provides the concrete struct and implements the trait. The runtime support crate `//rust/bdl/generator/impl/adapter:component` provides `Component`, `CompositionComponent`, `StaticComponent`, `ComponentHandle`, and the `Lifecycle` trait.
 
 ## Implementation dependencies
 

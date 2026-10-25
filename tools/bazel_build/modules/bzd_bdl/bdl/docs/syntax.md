@@ -13,7 +13,7 @@ The following built-in types are made available by the implementation as built-i
 | Void      | Empty type, usually used for return statements.                                                 |
 | Boolean   | Binary type evaluating to `true` or `false`.                                                    |
 | Integer   | Represents an arithmetic integer. Its size can be defined with contracts.                       |
-| Float     | Represents an arithmetic floating point. Its size can be defined with contracts.                |
+| Float     | Represents a 32-bit arithmetic floating point.                                                  |
 | Byte      | Type representing a byte.                                                                       |
 | String    | Type representing a string.                                                                     |
 | Result<T> | Templated type that contains either a value of type `T` or an error.                            |

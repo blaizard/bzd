@@ -1,6 +1,6 @@
 # Algorithm
 
-A collection of `constexpr`, allocation-free algorithms operating on ranges (iterators or range objects).
+A collection of allocation-free algorithms, most of which are `constexpr`, operating on ranges (iterators or range objects).
 
 ## Algorithms
 

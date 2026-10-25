@@ -1,33 +1,33 @@
 # Executors
 
-An executor is a group of computation units (cores) that can share workloads between each other (by work-stealing strategy).
-They share the same work queue and a component gets executed on an arbitrary core.
+An executor is a group of computation units (cores) that share the same work queue.
+A component gets executed on an arbitrary core.
 
 ```mermaid
 classDiagram
    Executor "1" --> "*" Core
 ```
 
-Cores can be assigned with a maximum load or other specific attributes (to be implemented).
+Cores can be assigned specific attributes, such as stack size, CPU and priority.
 
 ```bdl
 // A workload will run on either core0 or core1.
 composition
 {
-   core0 = FreeRTOS(stackSize = 4000, load = 20%);
-   core1 = FreeRTOS(stackSize = 10000);
-   esp32 = Executor(core0, core1) [executor];
+   core0 = bzd.components.esp32.Core(stackSize = 16000, name = "core[0]", cpu = 0, priority = 50);
+   core1 = bzd.components.esp32.Core(stackSize = 16000, name = "core[1]", cpu = 1, priority = 100);
+   executor = bzd.components.generic.Executor(cores = list(core0, core1)) [executor];
 }
 ```
 
-Sometimes, for portability purposes, you might want to inject the knowledge of cores at runtime.
-To do so, a platform specific executor can be made, abstracting the notion of cores.
-For example, a linux machine can be composed as follows:
+Sometimes, for portability purposes, you might want to use a platform-specific core while keeping the executor generic.
+For example, a Linux machine can be composed as follows:
 
 ```bdl
 composition
 {
-   linux = LinuxExecutor [executor];
+   core = bzd.components.linux.Core(stackSize = 200000);
+   executor = bzd.components.generic.Executor(cores = list(core)) [executor];
 }
 ```
 
@@ -48,7 +48,7 @@ Components have various ways to interact with each other.
 
 To identify on which core a component should run, it depends on its dependency with others.
 If a non-thread safe component is a dependency of another component, they will both run on the same core.
-However, if it is marked with the tag `[threadsafe]`, it will be scheduled on any available core.
+A `[threadsafe]` tag to schedule a component on any available core is not implemented yet.
 
 If the only dependency is through variables, it is also considered as thread safe.
 
@@ -67,7 +67,7 @@ This can be done in 2 different ways: either by specifying it at component insta
 ```bdl
 composition
 {
-   comp1 = Component [executor(linux)];
+   comp1 = Component [executor(linux.executor)];
 }
 ```
 
@@ -76,8 +76,8 @@ or separately from the component, using the builtin function `bind`, to bind a f
 ```bdl
 composition
 {
-   bind(/comp1.*/) [executor(linux)];
+   bind(/comp1.*/) [executor(linux.executor)];
 }
 ```
 
-This tells that all fqn starting with `comp1` will be assigned to the executor `linux`.
+This tells that all fqn starting with `comp1` will be assigned to the executor `linux.executor`.
