@@ -8,7 +8,6 @@ bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "rules_cc", version = "0.2.27")
-bazel_dep(name = "rules_rust", version = "0.74.0")
 bazel_dep(name = "rules_python", version = "2.4.5")
 
 load_dependencies = use_extension("//:extensions.bzl", "load_dependencies")
@@ -21,10 +20,6 @@ pip.parse(
     requirements_lock = "//:requirements.txt",
 )
 use_repo(pip, pip = "bzd_espressif_pip")
-
-# Rust SDK
-include("//hal/rust:esp32_hal.MODULE.bazel")
-include("//hal/rust:esp32s3_hal.MODULE.bazel")
 
 # Default runners are QEMU.
 register_toolchains("//runner/esp32:qemu_toolchain", "//runner/esp32s3:esp_emu_toolchain", "//runner/esp32:qemu_gdb_toolchain", "//runner/esp32s3:qemu_toolchain")

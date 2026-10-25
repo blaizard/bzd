@@ -10,7 +10,7 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/bzd",
-        "@bzd_espressif//hal/rust",
+        "//rust/libs/esp:rust",
     ],
     alwayslink = True,
 )
@@ -22,8 +22,8 @@ rust_binary(
     ],
     deps = [
         "//rust/bzd",
-        "@bzd_espressif//hal/rust",
-        "@bzd_espressif//hal/rust:embassy",
+        "//rust/libs/embassy",
+        "//rust/libs/esp:rust",
     ],
 )
 
@@ -34,7 +34,7 @@ rust_binary(
     ],
     deps = [
         "//rust/bzd",
-        "@bzd_espressif//hal/rust",
+        "//rust/libs/esp:rust",
     ],
 )
 
@@ -48,7 +48,7 @@ bdl_target(
             "//rust/bzd",
             "//rust/libs/embassy",
             "//rust/components/esp/hal",
-            "@bzd_espressif//hal/rust",
+            "//rust/libs/esp:rust",
         ],
         "main": [
             "embassy.rs",

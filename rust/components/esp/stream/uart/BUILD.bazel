@@ -23,6 +23,6 @@ rust_library(
         "//interfaces:stream",
         "//rust/bzd",
         "//rust/components/esp/hal",
-        "@bzd_espressif//hal/rust",
+        "//rust/libs/esp:rust",
     ],
 )

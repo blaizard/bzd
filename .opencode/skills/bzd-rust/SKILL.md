@@ -368,8 +368,8 @@ rust_library(
 	name = "lib",
 	srcs = ["lib.rs"],
 	deps = ["//rust/bzd"] + select({
-		"@bzd_platforms//al_isa:esp32-xtensa_lx6": ["@bzd_espressif//hal/rust:embassy"],
-		"@bzd_platforms//al_isa:esp32s3-xtensa_lx7": ["@bzd_espressif//hal/rust:embassy"],
+		"@bzd_platforms//al_isa:esp32-xtensa_lx6": ["//rust/libs/embassy"],
+		"@bzd_platforms//al_isa:esp32s3-xtensa_lx7": ["//rust/libs/embassy"],
 		"//conditions:default": ["@crates//:embassy-executor"],
 	}),
 )

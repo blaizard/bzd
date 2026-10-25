@@ -8,6 +8,6 @@ rust_library(
     crate_name = "rust_components_esp_hal",
     visibility = ["//visibility:public"],
     deps = [
-        "@bzd_espressif//hal/rust",
+        "//rust/libs/esp:rust",
     ],
 )

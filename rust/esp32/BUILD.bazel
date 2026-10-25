@@ -6,6 +6,6 @@ rust_binary(
         "main.rs",
     ],
     deps = [
-        "@bzd_espressif//hal/rust",
+        "//rust/libs/esp:rust",
     ],
 )

@@ -30,7 +30,8 @@ rust_library_group(
 # Create an empty library only to propagate the -Tlinkall.x flag.
 rust_library(
     name = "crate_linker",
-    srcs = ["lib.rs"],
+    srcs = ["crate_linker.rs"],
+    visibility = ["//visibility:public"],
     deps = [":linker"],
 )
 
@@ -41,39 +42,5 @@ cc_library(
         # The -Wl,--no-relax option is required to prevent the linker from relaxing the jump instructions,
         # which can cause segfault with the linker.
         "-Wl,--no-relax",
-    ],
-)
-
-rust_library_group(
-    name = "embassy",
-    target_compatible_with = select({
-        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [],
-        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [],
-        "//conditions:default": ["@platforms//:incompatible"],
-    }),
-    visibility = ["//visibility:public"],
-    deps = select({
-        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
-            "@crates_esp32//:critical-section",
-            "@crates_esp32//:embassy-executor",
-            "@crates_esp32//:embassy-futures",
-            "@crates_esp32//:embassy-sync",
-            "@crates_esp32//:embassy-time",
-            "@crates_esp32//:embedded-io-async",
-            "@crates_esp32//:esp-rtos",
-            "@crates_esp32//:static_cell",
-        ],
-        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
-            "@crates_esp32s3//:critical-section",
-            "@crates_esp32s3//:embassy-executor",
-            "@crates_esp32s3//:embassy-futures",
-            "@crates_esp32s3//:embassy-sync",
-            "@crates_esp32s3//:embassy-time",
-            "@crates_esp32s3//:embedded-io-async",
-            "@crates_esp32s3//:esp-rtos",
-            "@crates_esp32s3//:static_cell",
-        ],
-    }) + [
-        ":crate_linker",
     ],
 )

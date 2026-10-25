@@ -178,50 +178,10 @@ rust.toolchain(
 )
 use_repo(rust, "rust_toolchains")
 
-crates = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
-crates.from_specs(
-    name = "crates",
-)
-crates.spec(
-    features = ["full"],
-    package = "syn",
-    version = "2.0",
-)
-crates.spec(
-    package = "quote",
-    version = "1.0",
-)
-crates.spec(
-    features = [
-        "platform-std",
-        "executor-thread",
-    ],
-    package = "embassy-executor",
-    version = "0.10.0",
-)
-crates.spec(
-    package = "embassy-futures",
-    version = "0.1.2",
-)
-crates.spec(
-    package = "embassy-sync",
-    version = "0.7.2",
-)
-crates.spec(
-    features = ["std"],
-    package = "embassy-time",
-    version = "0.5.1",
-)
-crates.spec(
-    features = ["std"],
-    package = "critical-section",
-    version = "1.2.0",
-)
-crates.spec(
-    package = "static_cell",
-    version = "2.1.1",
-)
-use_repo(crates, "crates")
+# Rust crate universes.
+include("//rust/third_party/host:host.MODULE.bazel")
+include("//rust/third_party/esp32:esp32.MODULE.bazel")
+include("//rust/third_party/esp32s3:esp32s3.MODULE.bazel")
 
 # Register the default toolchain last to have the least priority.
 register_toolchains("@rust_toolchains//:all")

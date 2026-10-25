@@ -4,6 +4,8 @@
 **/*.MODULE.bazel
 **WORKSPACE.bazel
 **README.md
+**Cargo.lock
+**Cargo.toml
 **LICENSE.md
 **Jenkinsfile
 **Dockerfile

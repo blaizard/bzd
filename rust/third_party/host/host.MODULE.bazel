@@ -1,0 +1,9 @@
+# Host crate universe, included by the root MODULE.bazel.
+
+crates = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crates.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//rust/third_party/host:Cargo.lock",
+    manifests = ["//rust/third_party/host:Cargo.toml"],
+)
+use_repo(crates, "crates")
