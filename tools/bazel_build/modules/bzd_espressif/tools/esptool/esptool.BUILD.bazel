@@ -5,14 +5,14 @@ load("@rules_python//python:defs.bzl", "py_binary")
 
 py_binary(
     name = "esptool_binary",
-    main = "esptool.py",
     srcs = [
         "esptool.py",
     ],
+    data = glob(["esptool/**"]),
+    main = "esptool.py",
+    tags = ["mypy-ignore"],
     visibility = ["//visibility:public"],
     deps = [
         requirement("pyserial"),
     ],
-    data = glob(["esptool/**"]),
-    tags = ["mypy-ignore"],
 )

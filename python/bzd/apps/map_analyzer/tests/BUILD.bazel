@@ -6,9 +6,9 @@ py_test(
         "parser.py",
     ],
     args = [
-        "$(location clang.map)",
-        "$(location gcc.map)",
-        "$(location esp32_xtensa_lx6_gcc.map)",
+        "$(rootpath clang.map)",
+        "$(rootpath gcc.map)",
+        "$(rootpath esp32_xtensa_lx6_gcc.map)",
     ],
     data = [
         "clang.map",

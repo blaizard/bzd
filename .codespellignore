@@ -7,3 +7,4 @@ BUILD
 *.bazel
 *.bzl
 **/*.raw
+**/*.lock

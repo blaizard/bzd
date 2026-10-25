@@ -12,7 +12,7 @@ bzd_config(
     ],
     values = {
         "d.value": "hello",
-        "data": "$(location data.txt)",
+        "data": "$(execpath data.txt)",
     },
 )
 

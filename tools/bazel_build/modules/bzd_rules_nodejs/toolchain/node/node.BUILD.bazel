@@ -20,12 +20,12 @@ sh_binary(
 
 sh_binary_wrapper(
     name = "npm",
-    locations = {
-        ":bin": "node",
-        ":bin/npm": "npm",
-    },
     command = "PATH={node}:$PATH {npm} $@",
     data = glob([
         "lib/**/*",
     ]),
+    locations = {
+        ":bin": "node",
+        ":bin/npm": "npm",
+    },
 )

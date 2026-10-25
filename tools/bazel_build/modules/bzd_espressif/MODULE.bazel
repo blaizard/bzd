@@ -3,13 +3,13 @@ module(
     version = "1.0",
 )
 
-bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
-bazel_dep(name = "rules_cc", version = "0.1.2")
-bazel_dep(name = "rules_rust", version = "0.68.1")
-bazel_dep(name = "rules_python", version = "2.4.2")
+bazel_dep(name = "rules_cc", version = "0.2.27")
+bazel_dep(name = "rules_rust", version = "0.74.0")
+bazel_dep(name = "rules_python", version = "2.4.5")
 
 load_dependencies = use_extension("//:extensions.bzl", "load_dependencies")
 use_repo(load_dependencies, "esp32_xtensa_lx6_sdk", "esp32s3_xtensa_lx7_sdk", "esp_emu", "esptool", "gdb", "qemu")

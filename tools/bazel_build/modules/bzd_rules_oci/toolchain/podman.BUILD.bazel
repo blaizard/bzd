@@ -9,10 +9,10 @@ export CONTAINERS_HELPER_BINARY_DIR="$(dirname {conmon})"
 export PATH="${{PATH}}"
 exec {podman} --conmon {conmon} run --rm "$@"
 """,
+    data = glob(["**/*"]),
     locations = {
         "usr/local/bin/podman": "podman",
         "usr/local/lib/podman/conmon": "conmon",
     },
-    data = glob(["**/*"]),
     visibility = ["//visibility:public"],
 )

@@ -17,11 +17,11 @@ filegroup(
 filegroup(
     name = "compiler_files",
     srcs = [
+        "bin/xtensa-esp-elf-gcc",
+        "bin/xtensa-esp32-elf-gcc",
         ":cc",
         ":cpp",
         ":header_files",
-        "bin/xtensa-esp32-elf-gcc",
-        "bin/xtensa-esp-elf-gcc",
     ] + glob([
         "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",
@@ -32,12 +32,12 @@ filegroup(
 filegroup(
     name = "linker_files",
     srcs = [
-        ":cc",
-        ":ld",
-        ":dynamic_libraries_files",
-        ":static_libraries_files",
-        "bin/xtensa-esp32-elf-gcc",
         "bin/xtensa-esp-elf-gcc",
+        "bin/xtensa-esp32-elf-gcc",
+        ":cc",
+        ":dynamic_libraries_files",
+        ":ld",
+        ":static_libraries_files",
     ] + glob([
         "lib/**",
         "libexec/gcc/xtensa-esp-elf/14.2.0/*",

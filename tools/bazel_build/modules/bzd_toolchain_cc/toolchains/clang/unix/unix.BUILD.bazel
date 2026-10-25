@@ -26,10 +26,10 @@ filegroup(
 filegroup(
     name = "linker_files",
     srcs = [
-        ":cc",
-        ":ld",
         "bin/lld",
+        ":cc",
         ":dynamic_libraries_files",
+        ":ld",
         ":static_libraries_files",
     ] + glob(["bin/*.lld"]),
 )
@@ -66,9 +66,9 @@ filegroup(
     name = "extra_files",
     srcs = [
         ":clang_format",
-        ":llvm_symbolizer",
         ":clang_tidy",
         ":cov",
+        ":llvm_symbolizer",
         ":objdump",
     ],
 )
@@ -85,10 +85,6 @@ filegroup(
 
 sh_binary_wrapper(
     name = "clang_tidy",
-    locations = {
-        ":llvm_symbolizer": "llvm_symbolizer",
-        "bin/clang-tidy": "clang_tidy",
-    },
     command = """
 export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
 {clang_tidy} $@
@@ -96,18 +92,22 @@ export LLVM_SYMBOLIZER_PATH="{llvm_symbolizer}"
     data = [
         ":header_files",
     ],
+    locations = {
+        ":llvm_symbolizer": "llvm_symbolizer",
+        "bin/clang-tidy": "clang_tidy",
+    },
     visibility = ["//visibility:public"],
 )
 
 # Note, setting LLVM_SYMBOLIZER_PATH doesn't seem to work anymore.
 sh_binary_wrapper(
     name = "executor_host",
-    locations = {
-        ":llvm_symbolizer": "llvm_symbolizer",
-    },
     command = """
 export PATH=$(dirname {llvm_symbolizer}):$PATH
 "$@"
     """,
+    locations = {
+        ":llvm_symbolizer": "llvm_symbolizer",
+    },
     visibility = ["//visibility:public"],
 )

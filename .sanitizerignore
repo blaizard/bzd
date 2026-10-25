@@ -1,0 +1,2 @@
+# The deployment submodule is maintained in its own repository.
+deployment/nixos/BUILD.bazel

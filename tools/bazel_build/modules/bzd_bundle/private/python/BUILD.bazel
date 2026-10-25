@@ -26,7 +26,7 @@ py_binary(
     ],
     args = [
         "--bundle",
-        "$(location //private:binary_factory)",
+        "$(rootpath //private:binary_factory)",
     ],
     data = [
         "//private:binary_factory",

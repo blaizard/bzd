@@ -5,8 +5,8 @@ module(
 
 bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
-bazel_dep(name = "rules_python", version = "2.4.2")
-bazel_dep(name = "rules_shell", version = "0.6.1")
+bazel_dep(name = "rules_python", version = "2.4.5")
+bazel_dep(name = "rules_shell", version = "0.8.0")
 
 # Python
 

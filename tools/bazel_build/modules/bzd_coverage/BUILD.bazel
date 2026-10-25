@@ -8,7 +8,7 @@ py_binary(
     ],
     args = [
         "--genhtml",
-        "$(location @lcov//:genhtml)",
+        "$(rootpath @lcov//:genhtml)",
     ],
     data = [
         "@lcov//:genhtml",

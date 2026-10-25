@@ -10,7 +10,7 @@ rust_library(
 [rust_binary(
     name = name,
     srcs = ["src/{}.rs".format(name)],
-    args = ["$(location :src/{}.txt)".format(name)],
+    args = ["$(rootpath :src/{}.txt)".format(name)],
     data = [
         ":src/{}.txt".format(name),
     ],

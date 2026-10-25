@@ -7,11 +7,11 @@ bazel_dep(name = "bzd_lib", version = "1.0")
 bazel_dep(name = "bzd_python", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
 bazel_dep(name = "bzd_bdl", version = "1.0")
-bazel_dep(name = "rules_python", version = "2.4.2")
-bazel_dep(name = "rules_cc", version = "0.1.2")
-bazel_dep(name = "bazel_skylib", version = "1.9.0")
-bazel_dep(name = "buildifier_prebuilt", version = "8.2.0.2")
-bazel_dep(name = "rules_rust", version = "0.61.0")
+bazel_dep(name = "rules_python", version = "2.4.5")
+bazel_dep(name = "rules_cc", version = "0.2.27")
+bazel_dep(name = "bazel_skylib", version = "1.9.2")
+bazel_dep(name = "buildifier_prebuilt", version = "10.1.0")
+bazel_dep(name = "rules_rust", version = "0.74.0")
 
 # Configuration
 

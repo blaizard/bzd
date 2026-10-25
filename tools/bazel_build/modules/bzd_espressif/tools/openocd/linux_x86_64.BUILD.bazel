@@ -4,13 +4,13 @@ load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "openocd",
-    visibility = [
-        "//visibility:public",
-    ],
+    command = "exec {openocd} -s {scripts} \"$@\"",
+    data = glob(["**"]),
     locations = {
         "//:bin/openocd": "openocd",
         "//:share/openocd/scripts": "scripts",
     },
-    command = "exec {openocd} -s {scripts} \"$@\"",
-    data = glob(["**"]),
+    visibility = [
+        "//visibility:public",
+    ],
 )

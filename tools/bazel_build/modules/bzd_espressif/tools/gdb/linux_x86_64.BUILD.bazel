@@ -4,24 +4,24 @@ load("@bzd_lib//:sh_binary_wrapper.bzl", "sh_binary_wrapper")
 
 sh_binary_wrapper(
     name = "xtensa-esp32-elf-gdb",
-    visibility = [
-        "//visibility:public",
-    ],
+    command = "exec {gdb} \"$@\"",
+    data = glob(["**"]),
     locations = {
         "//:bin/xtensa-esp32-elf-gdb": "gdb",
     },
-    command = "exec {gdb} \"$@\"",
-    data = glob(["**"]),
+    visibility = [
+        "//visibility:public",
+    ],
 )
 
 sh_binary_wrapper(
     name = "xtensa-esp32s3-elf-gdb",
-    visibility = [
-        "//visibility:public",
-    ],
+    command = "exec {gdb} \"$@\"",
+    data = glob(["**"]),
     locations = {
         "//:bin/xtensa-esp32s3-elf-gdb": "gdb",
     },
-    command = "exec {gdb} \"$@\"",
-    data = glob(["**"]),
+    visibility = [
+        "//visibility:public",
+    ],
 )

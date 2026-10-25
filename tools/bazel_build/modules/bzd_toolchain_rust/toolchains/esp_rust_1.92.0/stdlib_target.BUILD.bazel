@@ -29,11 +29,11 @@ rust_library(
         "mem",
     ],
     crate_name = "compiler_builtins",
-    #edition = "2024",
-    deps = [":core"],
     rustc_env = {
         "RUSTC_BOOTSTRAP": "1",
     },
+    #edition = "2024",
+    deps = [":core"],
 )
 
 rust_library(
@@ -53,13 +53,13 @@ rust_library(
         "no_std",
     ],
     crate_name = "core",
+    rustc_env = {
+        "RUSTC_BOOTSTRAP": "1",
+    },
     #edition = "2024",
     rustc_flags = [
         "--cfg=bootstrap",
         "--cap-lints=allow",
         "-Zmacro-backtrace",
     ],
-    rustc_env = {
-        "RUSTC_BOOTSTRAP": "1",
-    },
 )
