@@ -41,6 +41,40 @@ describe("Storage", () => {
 		});
 	});
 
+	describe("prototype pollution", () => {
+		const reservedNames = ["__proto__", "constructor", "toString", "valueOf", "hasOwnProperty", "isPrototypeOf"];
+
+		const assertNoPollution = () => {
+			Exception.assertEqual(Object.prototype.zzPolluted, undefined);
+			Exception.assertEqual({}.zzPolluted, undefined);
+			Exception.assertEqual(Object.prototype.constructor, Object);
+			Exception.assert(!Object.hasOwn(Object.prototype, "zzPolluted"));
+			Exception.assert(!Object.hasOwn(Object.prototype, "x"));
+		};
+
+		it("does not resolve inherited properties", async () => {
+			const storage = new StorageMemory({}, { write: true });
+			for (const name of reservedNames) {
+				Exception.assertEqual(await storage.is(name), false, "Entry '{}' must not exist.", name);
+				await Exception.assertThrows(async () => await storage.read(name));
+			}
+			assertNoPollution();
+		});
+
+		it("stores reserved names as regular entries", async () => {
+			const storage = new StorageMemory({}, { write: true });
+
+			await storage.writeFromChunk(["__proto__", "zzPolluted"], "GLOBAL_PWN", /*mkdir*/ true);
+			Exception.assertEqual(await storage.is(["__proto__"]), true);
+			Exception.assertEqual(await storage.readToString(["__proto__", "zzPolluted"]), "GLOBAL_PWN");
+			assertNoPollution();
+
+			await storage.mkdir(["constructor", "prototype", "x"]);
+			Exception.assertEqual(await storage.is(["constructor", "prototype", "x"]), true);
+			assertNoPollution();
+		});
+	});
+
 	describe("readAccess", () => {
 		class StorageListOnly extends Storage {
 			async _initialize() {}

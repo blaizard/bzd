@@ -38,7 +38,7 @@ export default class StorageMemory extends Storage {
 
 		const count = { "file(s)": 0, directories: 0 };
 		const initializeData = (init) => {
-			let data = {};
+			let data = Object.create(null);
 			for (const [key, value] of Object.entries(init)) {
 				if (value !== null && typeof value === "object") {
 					data[key] = initializeData(value);
@@ -89,7 +89,7 @@ export default class StorageMemory extends Storage {
 		let parent = this.data;
 		for (const part of pathList) {
 			Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' must be a directory.", part);
-			if (!(part in parent)) {
+			if (!Object.hasOwn(parent, part)) {
 				throw new FileNotFoundError(part);
 			}
 			parent = parent[part];
@@ -111,7 +111,7 @@ export default class StorageMemory extends Storage {
 		}
 		try {
 			const [parent, name] = this._getParentNamePair(pathList);
-			return name in parent;
+			return Object.hasOwn(parent, name);
 		} catch (e) {
 			if (e instanceof FileNotFoundError) {
 				return false;
@@ -137,7 +137,7 @@ export default class StorageMemory extends Storage {
 
 	async _readImpl(pathList) {
 		const [parent, name] = this._getParentNamePair(pathList);
-		if (!(name in parent)) {
+		if (!Object.hasOwn(parent, name)) {
 			throw new FileNotFoundError(name);
 		}
 		Exception.assertPrecondition(parent[name] instanceof File, "'{}' points to a directory.", name);
@@ -147,7 +147,7 @@ export default class StorageMemory extends Storage {
 	async _writeImpl(pathList, readStream) {
 		const [parent, name] = this._getParentNamePair(pathList);
 		const content = (await toBuffer(readStream)).toString("utf8");
-		if (name in parent) {
+		if (Object.hasOwn(parent, name)) {
 			Exception.assertPrecondition(parent[name] instanceof File, "'{}' points to a directory.", name);
 			parent[name].content = content;
 			parent[name].modified = this.options.date();
@@ -159,8 +159,8 @@ export default class StorageMemory extends Storage {
 	async _mkdirImpl(pathList) {
 		let parent = this.data;
 		for (const part of pathList) {
-			if (!(part in parent)) {
-				parent[part] = {};
+			if (!Object.hasOwn(parent, part)) {
+				parent[part] = Object.create(null);
 			}
 			parent = parent[part];
 			Exception.assertPrecondition(!(parent instanceof File), "Entry '{}' must be a directory.", part);
