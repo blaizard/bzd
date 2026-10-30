@@ -11,10 +11,8 @@ publish = false
 [dependencies]
 critical-section = "1.2.0"
 embassy-executor = "0.10.0"
-embassy-futures = "0.1.2"
 embassy-sync = "0.8.0"
 embassy-time = { version = "0.5.1", features = ["generic-queue-8"] }
-embedded-io-async = "0.7.0"
 esp-backtrace = { version = "0.19.0", features = ["esp32s3", "println"] }
 esp-bootloader-esp-idf = { version = "0.5.0", features = ["esp32s3"] }
 esp-hal = { version = "1.1.2", features = ["esp32s3", "rt", "unstable"] }
@@ -23,6 +21,5 @@ esp-rom-sys = "=0.1.4" # 0.1.5 needs unstable cfg_select.
 esp-rtos = { version = "0.3.0", features = ["embassy", "esp32s3"] }
 # 0.35.3 breaks.
 esp32s3 = "=0.35.2"
-static_cell = "2.1.1"
 xtensa-lx = "0.13.0"
 xtensa-lx-rt = "0.22.0"

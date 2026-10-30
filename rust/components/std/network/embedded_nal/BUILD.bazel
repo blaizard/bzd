@@ -30,9 +30,9 @@ rust_library(
         ":interface",
         "//rust/bzd",
         "//rust/interfaces:network",
-        "@crates_host//:embedded-io-async",
-        "@crates_host//:embedded-nal-async",
-        "@crates_host//:std-embedded-nal-async",
+        "@crates_std//:embedded-io-async",
+        "@crates_std//:embedded-nal-async",
+        "@crates_std//:std-embedded-nal-async",
     ],
 )
 

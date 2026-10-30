@@ -1,0 +1,13 @@
+# Std crate universe, included by the root MODULE.bazel.
+
+crates_std = use_extension(
+    "@rules_rust//crate_universe:extensions.bzl",
+    "crate",
+    isolate = True,
+)
+crates_std.from_cargo(
+    name = "crates_std",
+    cargo_lockfile = "//rust/third_party/std:Cargo.lock",
+    manifests = ["//rust/third_party/std:Cargo.toml"],
+)
+use_repo(crates_std, "crates_std")

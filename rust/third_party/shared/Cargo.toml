@@ -10,5 +10,7 @@ edition = "2024"
 publish = false
 
 [dependencies]
+embassy-futures = "0.1.2"
 embedded-io-async = "0.7.0"
 reqwless = { version = "0.14.0", default-features = false }
+static_cell = "2.1.1"

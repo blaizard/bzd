@@ -370,7 +370,7 @@ rust_library(
 	deps = ["//rust/bzd"] + select({
 		"@bzd_platforms//al_isa:esp32-xtensa_lx6": ["//rust/libs/embassy"],
 		"@bzd_platforms//al_isa:esp32s3-xtensa_lx7": ["//rust/libs/embassy"],
-		"//conditions:default": ["@crates_host//:embassy-executor"],
+		"//conditions:default": ["@crates_std//:embassy-executor"],
 	}),
 )
 ```

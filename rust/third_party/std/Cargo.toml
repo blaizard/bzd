@@ -1,6 +1,6 @@
-# Dependency carrier for the Bazel `@crates_host` universe.
+# Dependency carrier for the Bazel `@crates_std` universe.
 # This package is never compiled by Cargo, it only declares the dependencies
-# consumed through `crate.from_cargo` in host.MODULE.bazel.
+# consumed through `crate.from_cargo` in std.MODULE.bazel.
 
 [package]
 name = "bzd-rust-deps"
@@ -11,12 +11,10 @@ publish = false
 [dependencies]
 critical-section = { version = "1.2.0", features = ["std"] }
 embassy-executor = { version = "0.10.0", features = ["executor-thread", "platform-std"] }
-embassy-futures = "0.1.2"
-embassy-sync = "0.7.2"
+embassy-sync = "0.8.0"
 embassy-time = { version = "0.5.1", features = ["std"] }
 embedded-io-async = "0.7.0"
 embedded-nal-async = "0.9.0"
 quote = "1.0"
-static_cell = "2.1.1"
 std-embedded-nal-async = "0.4.0"
 syn = { version = "2.0", features = ["full"] }
