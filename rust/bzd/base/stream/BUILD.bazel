@@ -14,7 +14,7 @@ rust_library(
         "//rust/bzd/base/error",
     ] + selects.with_or({
         ("@bzd_platforms//al:linux", "@bzd_platforms//al:osx"): [
-            "@crates//:embedded-io-async",
+            "@crates_host//:embedded-io-async",
         ],
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
             "@crates_esp32//:embedded-io-async",

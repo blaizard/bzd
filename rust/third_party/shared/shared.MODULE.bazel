@@ -1,0 +1,19 @@
+# Shared no_std crate universe, included by the root MODULE.bazel.
+# Only platform-agnostic, no_std crates belong here. The generated targets are
+# made compatible with every platform so they can be used from linux, esp32,
+# and esp32s3 targets.
+
+crates = use_extension(
+    "@rules_rust//crate_universe:extensions.bzl",
+    "crate",
+    isolate = True,
+)
+crates.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//rust/third_party/shared:Cargo.lock",
+    manifests = ["//rust/third_party/shared:Cargo.toml"],
+)
+crates.render_config(
+    generate_target_compatible_with = False,
+)
+use_repo(crates, "crates")

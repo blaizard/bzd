@@ -180,6 +180,7 @@ use_repo(rust, "rust_toolchains")
 
 # Rust crate universes.
 include("//rust/third_party/host:host.MODULE.bazel")
+include("//rust/third_party/shared:shared.MODULE.bazel")
 include("//rust/third_party/esp32:esp32.MODULE.bazel")
 include("//rust/third_party/esp32s3:esp32s3.MODULE.bazel")
 

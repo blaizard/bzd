@@ -11,8 +11,8 @@ rust_proc_macro(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
-        "@crates//:quote",
-        "@crates//:syn",
+        "@crates_host//:quote",
+        "@crates_host//:syn",
     ],
 )
 

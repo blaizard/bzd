@@ -12,7 +12,7 @@ rust_proc_macro(
     }),
     visibility = ["//rust/libs/logger:__pkg__"],
     deps = [
-        "@crates//:quote",
-        "@crates//:syn",
+        "@crates_host//:quote",
+        "@crates_host//:syn",
     ],
 )

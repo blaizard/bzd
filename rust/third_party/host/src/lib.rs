@@ -1,1 +1,1 @@
-//! Dependency carrier for the Bazel `@crates` universe.
+//! Dependency carrier for the Bazel `@crates_host` universe.

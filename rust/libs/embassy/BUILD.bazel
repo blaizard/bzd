@@ -6,11 +6,11 @@ rust_library_group(
     visibility = ["//visibility:public"],
     deps = selects.with_or({
         ("@bzd_platforms//al:linux", "@bzd_platforms//al:osx"): [
-            "@crates//:embassy-futures",
-            "@crates//:embassy-executor",
-            "@crates//:static_cell",
-            "@crates//:embassy-sync",
-            "@crates//:embassy-time",
+            "@crates_host//:embassy-futures",
+            "@crates_host//:embassy-executor",
+            "@crates_host//:static_cell",
+            "@crates_host//:embassy-sync",
+            "@crates_host//:embassy-time",
         ],
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
             "@crates_esp32//:critical-section",

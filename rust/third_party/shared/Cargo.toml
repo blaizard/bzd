@@ -1,0 +1,14 @@
+# Dependency carrier for the Bazel `@crates` universe.
+# This package is never compiled by Cargo, it only declares the dependencies
+# consumed through `crate.from_cargo` in shared.MODULE.bazel.
+# Only no_std, platform-agnostic crates belong here.
+
+[package]
+name = "bzd-rust-shared-deps"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+embedded-io-async = "0.7.0"
+reqwless = { version = "0.14.0", default-features = false }

@@ -1,0 +1,23 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "http",
+    srcs = [
+        "adapter.rs",
+        "error.rs",
+        "lib.rs",
+    ],
+    crate_name = "bzd_http",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bzd",
+        "@crates//:embedded-io-async",
+        "@crates//:reqwless",
+    ],
+)
+
+rust_test(
+    name = "http_test",
+    crate = ":http",
+)

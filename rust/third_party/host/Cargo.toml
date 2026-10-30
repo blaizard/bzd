@@ -1,4 +1,4 @@
-# Dependency carrier for the Bazel `@crates` universe.
+# Dependency carrier for the Bazel `@crates_host` universe.
 # This package is never compiled by Cargo, it only declares the dependencies
 # consumed through `crate.from_cargo` in host.MODULE.bazel.
 
