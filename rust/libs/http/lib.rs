@@ -58,18 +58,19 @@ pub struct ResponseInfo {
     pub status: u16,
     /// Content length advertised by the server, if any.
     pub content_length: Option<usize>,
-    /// Number of bytes written into the body buffer.
+    /// Number of body bytes at the beginning of the buffer passed to [`request`].
     pub body_length: usize,
 }
 
 /// Send an HTTP request over a bzd stream and read the full response body.
 ///
-/// The response body is copied into `body_buffer`.
+/// The buffer is used as scratch space for the response headers and then holds the
+/// response body, available as `buffer[..body_length]`. It must be large enough to
+/// contain the whole body, otherwise `BufferTooSmall` is returned.
 pub async fn request<S>(
     stream: &mut S,
     request: Request<'_>,
-    rx_buffer: &mut [u8],
-    body_buffer: &mut [u8],
+    buffer: &mut [u8],
 ) -> Result<ResponseInfo, Error>
 where
     S: IOStream + ?Sized,
@@ -81,17 +82,17 @@ where
         .body(request.body)
         .build();
     let response = connection
-        .send(http_request, rx_buffer)
+        .send(http_request, buffer)
         .await
         .map_err(map_error)?;
     let status = response.status.0;
     let content_length = response.content_length;
     let body_length = response
         .body()
-        .reader()
-        .read_to_end(body_buffer)
+        .read_to_end()
         .await
-        .map_err(map_error)?;
+        .map_err(map_error)?
+        .len();
     Ok(ResponseInfo {
         status,
         content_length,
@@ -141,6 +142,7 @@ mod tests {
 
     impl IStream for MockStream {
         async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, bzd::base::error::Error> {
+            assert_eq!(buffer.is_empty(), false)?;
             let remaining = &self.input[self.input_offset..];
             let size = buffer.len().min(remaining.len());
             buffer[..size].copy_from_slice(&remaining[..size]);
@@ -151,6 +153,7 @@ mod tests {
 
     impl OStream for MockStream {
         async fn write(&mut self, data: &[u8]) -> Result<usize, bzd::base::error::Error> {
+            assert_eq!(data.is_empty(), false)?;
             let size = data.len().min(self.output.len() - self.output_length);
             self.output[self.output_length..self.output_length + size]
                 .copy_from_slice(&data[..size]);
@@ -162,8 +165,7 @@ mod tests {
     #[test]
     async fn test_get() -> TestResult {
         let mut stream = MockStream::new(b"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello");
-        let mut rx_buffer = [0u8; 256];
-        let mut body_buffer = [0u8; 16];
+        let mut buffer = [0u8; 256];
         let response = request(
             &mut stream,
             Request {
@@ -173,14 +175,13 @@ mod tests {
                 headers: &[],
                 body: &[],
             },
-            &mut rx_buffer,
-            &mut body_buffer,
+            &mut buffer,
         )
         .await?;
         assert_eq!(response.status, 200)?;
         assert_eq!(response.content_length, Some(5))?;
         assert_eq!(response.body_length, 5)?;
-        assert_eq!(&body_buffer[..response.body_length], &b"hello"[..])?;
+        assert_eq!(&buffer[..response.body_length], &b"hello"[..])?;
         assert_eq!(
             stream.output[..stream.output_length].starts_with(b"GET /status HTTP/1.1\r\n"),
             true
@@ -191,8 +192,7 @@ mod tests {
     #[test]
     async fn test_post() -> TestResult {
         let mut stream = MockStream::new(b"HTTP/1.1 204 No Content\r\n\r\n");
-        let mut rx_buffer = [0u8; 256];
-        let mut body_buffer = [0u8; 16];
+        let mut buffer = [0u8; 256];
         let response = request(
             &mut stream,
             Request {
@@ -202,8 +202,7 @@ mod tests {
                 headers: &[],
                 body: b"PING",
             },
-            &mut rx_buffer,
-            &mut body_buffer,
+            &mut buffer,
         )
         .await?;
         assert_eq!(response.status, 204)?;
@@ -216,6 +215,32 @@ mod tests {
             stream.output[..stream.output_length].ends_with(b"\r\n\r\nPING"),
             true
         )?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_body_buffer_too_small() -> TestResult {
+        let mut stream = MockStream::new(b"HTTP/1.1 200 OK\r\nContent-Length: 64\r\n\r\n");
+        let mut buffer = [0u8; 32];
+        match request(
+            &mut stream,
+            Request {
+                method: Method::Get,
+                host: "example.com",
+                path: "/",
+                headers: &[],
+                body: &[],
+            },
+            &mut buffer,
+        )
+        .await
+        {
+            Err(error) => {
+                assert_eq!(error.error_type(), ErrorType::Failure)?;
+                assert_eq!(error.message(), "http: buffer too small")?;
+            }
+            Ok(_) => return Err(bzd::base::error::failure("expected the request to fail")),
+        }
         Ok(())
     }
 
