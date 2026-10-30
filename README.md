@@ -120,5 +120,5 @@ The code in this repository follows several principles regarding naming conventi
 
 ## Memory Footprint
 
-All classes offered by this library have the same objective to have a fixed memory size. Their footprint or maximum size
+All classes offered by this library share the same objective: a fixed memory size. Their footprint or maximum size
 is determined at compile time, ensuring no memory allocation at runtime, making this library ideal for any safety-critical application.

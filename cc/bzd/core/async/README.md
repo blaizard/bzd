@@ -101,7 +101,7 @@ auto&& awaiter = get_awaiter(static_cast<decltype(awaitable)>(awaitable));
 
 ### To be aware
 
-- Coroutines in C++ together with lambda capture are nasty, better not use them: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp51-do-not-use-capturing-lambdas-that-are-coroutines
+- Coroutines in C++ together with lambda capture are problematic; it is better not to use them: https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp51-do-not-use-capturing-lambdas-that-are-coroutines
 - Generators should not use the error propagation syntax, otherwise the generator async is considered terminated, while it might be reused.
 
 ### Task
@@ -219,9 +219,9 @@ This can be used in the context of an ISR.
 
 ### Executor
 
-The executors are used to run and schedule asyncs (aka coroutines).
+The executors are used to run and schedule asyncs (also known as coroutines).
 
-This is what the executor flowchart looks like:
+The executor flowchart looks like this:
 
 ```mermaid
 flowchart TD

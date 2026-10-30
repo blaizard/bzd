@@ -1,6 +1,6 @@
 # Library
 
-A library is a group of `bdl` files that are pre-compiled once into a language agnostic intermediate format, and made
+A library is a group of `bdl` files that are pre-compiled once into a language-agnostic intermediate format, and made
 available to other rules, such as a composition or another library.
 
 ## Definition
@@ -36,7 +36,7 @@ implementation of the entities declared in the BDL files, for example a C++ libr
 implementation is added to the generated code of the corresponding language so that the generated interface can be
 linked against it.
 
-A library always exposes a `BdlInfo` provider, together with the language specific providers of the generated code for
+A library always exposes a `BdlInfo` provider, together with the language-specific providers of the generated code for
 each registered language, for example `CcInfo` for C++.
 
 ## Process
@@ -49,7 +49,7 @@ flowchart TB
     direction TB
     A[`bdl` tool parses each `srcs` file]
     B[Each file is validated and its symbols resolved]
-    C[Each file is serialized into a language agnostic `.bdl.o` object]
+    C[Each file is serialized into a language-agnostic `.bdl.o` object]
     end
     subgraph ide2 [Language specific generators]
     direction TB
@@ -67,7 +67,7 @@ flowchart TB
     F --> G
 ```
 
-The precompile stage is language agnostic and happens only once per library. Its output, a `.bdl.o` object per input
+The precompile stage is language-agnostic and happens only once per library. Its output, a `.bdl.o` object per input
 file, is cached and reused by every consumer. This stage is the same as the one described in the
 [build](build.md) documentation.
 

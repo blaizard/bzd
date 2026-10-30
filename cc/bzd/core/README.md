@@ -6,7 +6,7 @@ Platform-agnostic building blocks used across all bzd applications: error handli
 
 - **Async-first** - built around C++20 coroutines (`bzd::Async`).
 - **Zero allocation** - relies on fixed-capacity containers.
-- **Platform agnostic** - platform-specific behavior is provided by backends.
+- **Platform-agnostic** - platform-specific behavior is provided by backends.
 
 ## Components
 

@@ -24,7 +24,7 @@ Bzd templating language (`btl`) library with the following features:
 - Support arrays and nested arrays, ex: `{{ a[b.c[d]].u }}`
 - Support a combination of all of this.
 
-Piped data can be of arbitrary type but the final substituted value must be either a number or a string.
+Piped data can be of arbitrary type but the final substituted value must be a number, a string, or a path.
 
 ### For loops
 
@@ -38,7 +38,7 @@ Piped data can be of arbitrary type but the final substituted value must be eith
 - Bool evaluation of condition, ex: `{% if value %} ... {% end %}`
 - Comparison operators (`==`, `!=`, `<`, `>`, `>=`, `<=`, `in`), ex: `{% if value == 12 %} ... {% end %}`
 - Negation operator (`not`), ex: `{% if not value %} ... {% end %}`
-- Consecutive `else` and `elif` statement, ex: `{% if value1 %} ... {% elif value2 %} ... {% else %} ... {% end %}`
+- Consecutive `else` and `elif` statements, ex: `{% if value1 %} ... {% elif value2 %} ... {% else %} ... {% end %}`
 
 ### Macro blocks
 
@@ -49,11 +49,11 @@ Piped data can be of arbitrary type but the final substituted value must be eith
 
 - Include another btl file as if it was part of the document, ex: `{% include "my/path.btl" %}`
 
-### Builtins utility functions
+### Builtin utility functions
 
 - `btl.merge`: merge different types together, ex: `btl.merge(a, b, c)`
 - `btl.set`: create a set from inputs passed into arguments, ex: `btl.set(a, b, c)`
-- `btl.any`: checks that any of the argument evaluates to `true`, ex: `btl.any(a, b, c)`
-- `btl.all`: checks that all of the argument evaluates to `true`, ex: `btl.all(a, b, c)`
-- `btl.assertTrue`: asserts that a condition evaluates to `true` otherwise print an error message and terminates, ex: `btl.assertTrue(a == 1, "'a' is not equal to 1.")`
-- `btl.error`: print an unconditional error message and terminates, ex: `btl.error("This path is unreachable.")`
+- `btl.any`: checks that any of the arguments evaluates to `true`, ex: `btl.any(a, b, c)`
+- `btl.all`: checks that all of the arguments evaluate to `true`, ex: `btl.all(a, b, c)`
+- `btl.assertTrue`: asserts that a condition evaluates to `true`, otherwise prints an error message and terminates, ex: `btl.assertTrue(a == 1, "'a' is not equal to 1.")`
+- `btl.error`: prints an unconditional error message and terminates, ex: `btl.error("This path is unreachable.")`

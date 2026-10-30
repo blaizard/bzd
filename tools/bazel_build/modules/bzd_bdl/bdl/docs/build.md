@@ -4,7 +4,7 @@ Resolving symbols within a `bdl` file is done at different build stages to allow
 
 ## Overview
 
-The build process consists of 3 main stages: the `preprocess`, `composition` and `generators` stages.
+The build process consists of three main stages: the `preprocess`, `composition` and `generators` stages.
 
 The `preprocess` and `composition` stages output artifacts, and the `composition` process consumes the `preprocess` artifact; this gives the possibility to cache and reuse outputs for various composition processes.
 
@@ -13,7 +13,7 @@ The `preprocess` and `composition` stages output artifacts, and the `composition
 ### Parser
 
 The parser analyzes a `bdl` file and extracts entities out of the file, decomposing the raw text into a visitable tree.
-This is the only step in direct contact with the `bdl` file, it must therefore extract all useful information from this file.
+This is the only step in direct contact with the `bdl` file, so it must extract all useful information from it.
 
 As part of this process, the parser also performs basic validation and a build step.
 
@@ -28,7 +28,7 @@ A `Symbol Map` links symbols with their actual definition. It consists of a dict
 A `Symbol Tree` is a hierarchical view of the file, it can be used to recreate a given file and should contain all the necessary
 information. It only uses symbols defined in the `Symbol Map`. In short it is a hierarchical view of a `Symbol Map`.
 
-A bdl file is serialized into a `.bdl.o` file for caching purposes. Each `.bdl` should have its corresponding `.bdl.o` file after the build process.
+A `bdl` file is serialized into a `.bdl.o` file for caching purposes. Each `.bdl` should have its corresponding `.bdl.o` file after the build process.
 
 ### Symbol Resolution
 
@@ -54,7 +54,7 @@ Components might come from the platform used, others are functional to perform t
 During the `composition` stage, all top level composition elements are being resolved. Nested composition elements are
 only resolved if the corresponding component is instantiated. Unused components in the build tree are automatically removed.
 
-The composition stage is done in 2 sub-stages, the first one that only processes certain types of builtin expressions, such as `bind`
+The composition stage is done in two sub-stages, the first one that only processes certain types of builtin expressions, such as `bind`
 for example. This assigns contracts to expressions before being evaluated.
 The second stage processes the remaining top-level elements and their dependencies.
 

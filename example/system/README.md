@@ -1,6 +1,6 @@
 # System
 
-This example shows how communication between 2 nodes can be modeled.
+This example shows how communication between two nodes can be modeled.
 
 ## Architecture
 

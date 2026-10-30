@@ -92,7 +92,7 @@ Interfaces defined in the BDL language are guaranteed to be accessible and calla
 
 #### External interfaces
 
-Sometimes an interface must be defined in C++ directly, for example to benefit from features not available in the BDL language. This is done with an `extern` declaration:
+Sometimes, an interface must be defined in C++ directly, for example to benefit from features not available in the BDL language. This is done with an `extern` declaration:
 
 ```bdl
 namespace bzd.example;
@@ -100,7 +100,7 @@ namespace bzd.example;
 extern interface MyInterface;
 ```
 
-The user is then tasked to provide the C++ symbol within the declared namespace. The interface must use the CRTP pattern. To also validate that the implementation signature matches the interface, use the checked helper:
+The user is then tasked to provide the C++ interface within the declared namespace. The interface must use the CRTP pattern. To also validate that the implementation signature matches the interface, use the checked helper:
 
 ```c++
 namespace bzd::example {
@@ -135,7 +135,7 @@ public:
 
 #### Casting
 
-Objects which implement an interface are cast down to their interface when used in the composition; this is done automatically by the code generator and ensures that the object is only used through its interface.
+Objects which implement an interface are cast to their interface when used in the composition; this is done automatically by the code generator and ensures that the object is only used through its interface.
 
 The code generator specializes the `bzd::Interface` type with the fully qualified name of the interface. It can then be used like this:
 

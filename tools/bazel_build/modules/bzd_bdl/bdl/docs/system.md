@@ -1,6 +1,6 @@
 # System
 
-A system is a group of targets. It constitutes one or multiple binaries that are ready for deployment.
+A system is a group of targets. It constitutes one or more binaries that are ready for deployment.
 It is the top-level view of the composition.
 
 ## Definition
@@ -32,8 +32,8 @@ bdl_system(
 )
 ```
 
-This means that this system contains 2 binaries, the first one runs on a C++ `esp32` target platform and its
-executors are referred to under the namespace `esp32`. Similarly the second one runs on a C++ `linux` platform and is defined
+This means that this system contains two binaries: the first one runs on a C++ `esp32` target platform and its
+executors are referred to under the namespace `esp32`. Similarly, the second one runs on a C++ `linux` platform and is defined
 under the namespace `hpc`.
 
 The `deps` are `bdl_library` targets that contain the composition BDL files shared by all the targets of the system.
@@ -151,8 +151,8 @@ might be needed for an ethernet-based gateway.
 This can be done via composition using the contract `override` to tell that this symbol is overriding an existing symbol.
 Not adding this contract will result in a symbol conflict and raise an error.
 
-Note that parameters are only overridable at composition stage. This information is passed top down to the component via its
-configuration. This is different from Bazel build settings mechanism for example where such variant is passed through the
+Note that parameters are only overridable at the composition stage. This information is passed top-down to the component via its
+configuration. This is different from the Bazel build settings mechanism, for example, where such a variant is passed through the
 build tree and available at all stages of the build.
 
 ```bdl

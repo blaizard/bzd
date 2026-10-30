@@ -5,7 +5,7 @@ Asynchronous byte buffers used to connect components in a composition. A buffer 
 ## Key Points
 
 - **Async** - readers suspend until data is available.
-- **Zero copy** - data is accessed in-place, without intermediate copies.
+- **In-place access** - data is stored in a fixed-capacity ring buffer and read directly, without intermediate copies.
 
 ## Usage
 

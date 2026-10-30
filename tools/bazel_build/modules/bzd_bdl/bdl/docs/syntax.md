@@ -1,30 +1,31 @@
 # Syntax
 
-The following describes the syntax of the Bzd Description Language (BDL) used to describe interfaces to communicate between components.
+The following describes the syntax of the Bzd Description Language (BDL) used to describe components, interfaces, and compositions.
 
 ## Types
 
 ### Built-in Types
 
-The following built-in types are made available by the implementation as built-in types.
+The implementation provides the following built-in types.
 
 | Syntax    | Description                                                                                     |
 | --------- | ----------------------------------------------------------------------------------------------- |
 | Void      | Empty type, usually used for return statements.                                                 |
 | Boolean   | Binary type evaluating to `true` or `false`.                                                    |
 | Integer   | Represents an arithmetic integer. Its size can be defined with contracts.                       |
-| Float     | Represents a 32-bit arithmetic floating point.                                                  |
+| Float     | Represents a 32-bit floating-point value.                                                       |
 | Byte      | Type representing a byte.                                                                       |
 | String    | Type representing a string.                                                                     |
+| Span<T>   | A non-owning view over a contiguous sequence of values of type `T`.                             |
 | Result<T> | Templated type that contains either a value of type `T` or an error.                            |
 | Async<T>  | Templated type that contains an asynchronous promise returning a value of type `T` or an error. |
 | Array<T>  | A fixed length array of type `T`. Its capacity may be defined with contracts.                   |
-| Vector<T> | A resizable and sequential container of type `T`. Its capacity may be defined with contracts.   |
+| Vector<T> | A sequential container of type `T`. Its capacity may be defined with contracts.                 |
 
 ### Literals
 
-Literals are a notation of a value that may define an arbitrary type, written in the bdl format.
-Available literals in bdl are:
+Literals are a notation for a value that may define an arbitrary type, written in the BDL format.
+Available literals in BDL are:
 
 - integers: `1`, `-4`, ...
 - floats: `0.23`, `-3.14`, ...
@@ -89,7 +90,7 @@ An expression is defined as follows:
 [<name> [: <interface>] =] <type>[(<values>)] [[<contracts>...]];
 ```
 
-where `values` can be an association of `value`, `symbol`, `regexpr` or `preset`.
+where `values` can be a combination of `value`, `symbol`, `regexpr` or `preset`.
 
 - `value` is a literal.
 - `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
@@ -111,9 +112,9 @@ Note that the definition does not imply a specific interface implementation.
 
 ## Components
 
-A component is the implementation of one or multiple interfaces. It can be instantiated and exposes
-the functionality of the interface it inherits from.
-In addition it describes its configuration and composition to the description language.
+A component is the implementation of one or more interfaces. It can be instantiated and exposes
+the functionality of the interfaces it inherits from.
+In addition, it describes its configuration and composition to the description language.
 
 ### Configuration
 
@@ -138,7 +139,7 @@ composition {
 
 ### Composition
 
-Similarly a predefined composition can be described for a component when instantiated. For example:
+Similarly, a predefined composition can be described for a component when instantiated. For example:
 
 ```bdl
 component MyModule

@@ -1,6 +1,6 @@
 # Gateway
 
-A Gateway is a 2-way communication port owned by an executor.
+A gateway is a two-way communication port owned by an executor.
 
 ```bdl
 // Target specific composition.

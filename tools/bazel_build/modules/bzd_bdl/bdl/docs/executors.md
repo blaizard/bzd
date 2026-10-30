@@ -1,7 +1,7 @@
 # Executors
 
 An executor is a group of computation units (cores) that share the same work queue.
-A component gets executed on an arbitrary core.
+A component is executed on an arbitrary core.
 
 ```mermaid
 classDiagram
@@ -31,7 +31,7 @@ composition
 }
 ```
 
-Multiple executors can be created and deployed on the same process/binary; this can be useful to have different task priorities for example.
+Multiple executors can be created and deployed on the same process/binary; for example, this can be useful to have different task priorities.
 
 ## Thread safety
 
@@ -46,13 +46,13 @@ Components have various ways to interact with each other.
 - They can be passed as argument through their interface.
 - They can use variables to communicate.
 
-To identify on which core a component should run, it depends on its dependency with others.
-If a non-thread safe component is a dependency of another component, they will both run on the same core.
+The core on which a component runs depends on its dependencies on other components.
+If a non-thread-safe component is a dependency of another component, they will both run on the same core.
 A `[threadsafe]` tag to schedule a component on any available core is not implemented yet.
 
-If the only dependency is through variables, it is also considered as thread safe.
+If the only dependency is through variables, it is also considered thread-safe.
 
-An error will be raised if there is no possible combination. For example, if 2 workloads executed on different executors depend on a 3rd component that is not threadsafe.
+An error will be raised if there is no possible combination. For example, if two workloads executed on different executors depend on a third component that is not thread-safe.
 
 ## Default executor
 
@@ -80,4 +80,4 @@ composition
 }
 ```
 
-This tells that all fqn starting with `comp1` will be assigned to the executor `linux.executor`.
+This tells that all FQNs starting with `comp1` will be assigned to the executor `linux.executor`.

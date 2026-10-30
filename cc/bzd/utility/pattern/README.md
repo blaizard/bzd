@@ -1,6 +1,6 @@
 # Pattern
 
-A compile-time framework for parsing and formatting strings with type specializations, enabling tools like `std::format`.
+A compile-time framework for parsing and formatting strings with type specializations and a syntax compatible with Python's format strings.
 
 It splits a compile-time string into literals and `{...}` replacement fields, dispatches each field to a type specialization with optional metadata, all validated at compile time.
 
