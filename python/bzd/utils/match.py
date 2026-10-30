@@ -25,7 +25,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 		# Prioritize matches at the beginning of the compared string.
 		curWeight = 1.0 if start == 0 else 0.9
 		iSentence = start
-		# Allow the next character to match one position ahead or behind.
+		# Allow the next character to match one or two positions ahead, or one position behind.
 		for i in range(1, len(word)):
 			c = word[i]
 			if compareWithGetCharAtOrNone(iSentence + 1) == c:
@@ -44,7 +44,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 	# Normalize the result by the length of the word.
 	weight /= len(word)
 
-	# Add a penalty on word size to ensure that an exact match always get more weight than a substring match
+	# Add a penalty on word size to ensure that an exact match always gets more weight than a substring match.
 	weight = weight if len(word) == len(compareWith) else (weight * 0.9)
 
 	return weight

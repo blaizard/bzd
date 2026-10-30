@@ -117,7 +117,7 @@ class Converters:
 		os.utime(path, (oldestTimestamp, oldestTimestamp))
 
 	def _moveFiles(self, original: pathlib.Path, file: pathlib.Path, output: pathlib.Path) -> None:
-		"""This function moves the files including their sidecar."""
+		"""Move the files, including their sidecars."""
 
 		originalTimes = (original.stat().st_atime, original.stat().st_mtime)
 

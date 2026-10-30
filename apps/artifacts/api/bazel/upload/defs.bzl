@@ -77,7 +77,7 @@ _bzd_artifacts_upload = rule(
 def _bzd_artifacts_upload_macro_impl(name, visibility, **kwargs):
     bzd_config(
         name = "{}.config".format(name),
-        # Note, STABLE_VERSION name was chosen to have it part of of the stable-info.txt file
+        # Note, STABLE_VERSION name was chosen to have it part of the stable-info.txt file
         # which is the one that trigger an action rebuild, the volatile-info.txt does not.
         # See: https://bazel.build/docs/user-manual#workspace-status
         include_workspace_status = ["STABLE_VERSION"],

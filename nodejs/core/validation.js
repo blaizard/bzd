@@ -103,21 +103,21 @@ class Constraint {
 /**
  * Data validation module
  *
- * Validation definition, can be done through json.
+ * Validation definitions can be provided as JSON.
  *
  * Here is an example:
  * {
  *     email: "mandatory email",
  *     password: "mandatory min(6)",
  *     confirm: "mandatory same(password)",
- *     stayConnnected: "type(bool)"
+ *     stayConnected: "type(bool)"
  * }
  *
- * To each key is associated a constraint. A constraint definition can be done
- * from a string. Each constraint is space separated and must follow the same format:
+ * Each key is associated with a constraint. A constraint definition can be
+ * expressed as a string. Each constraint is space-separated and must follow this format:
  * <name>(<argument>)?
- * If the optional argument contains a space, the argument must have brackets.
- * By default all keys are considered as optional unless mandatory is specified.
+ * If the optional argument contains a space, the argument must be enclosed in parentheses.
+ * By default all keys are optional unless mandatory is specified.
  */
 export default class Validation {
 	constructor(schema, singleValue = false) {
@@ -166,7 +166,7 @@ export default class Validation {
 		return processedSchema;
 	}
 
-	/// Create a string from the result object.
+	/// Create an error message from the validation result, or null if there are no errors.
 	static resultToString(result) {
 		const keys = Object.keys(result);
 		if (keys.length == 1) {
@@ -180,8 +180,8 @@ export default class Validation {
 		return null;
 	}
 
-	/// Validate the specific value passed into argument.
-	/// Value must be a dictionary.
+	/// Validate the given values.
+	/// The value must be a dictionary unless singleValue is enabled.
 	validate(values, options) {
 		// Convert the value into a dictionary
 		if (this.singleValue) {

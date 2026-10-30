@@ -4,7 +4,7 @@ load("@bazel_skylib//lib:sets.bzl", "sets")
 load("//cc:flags.bzl", "COPTS_CLANG", "COPTS_CLANG_COVERAGE", "COPTS_CLANG_DEV", "COPTS_CLANG_PROD", "COPTS_GCC", "COPTS_GCC_COVERAGE", "COPTS_GCC_DEV", "COPTS_GCC_PROD", "LINKOPTS_CLANG", "LINKOPTS_CLANG_COVERAGE", "LINKOPTS_GCC", "LINKOPTS_GCC_COVERAGE")
 
 def package_path_from_label(name):
-    """Convert the given label name its its package path.
+    """Convert the given label name to its package path.
 
     Args:
         name: The label string to be used.

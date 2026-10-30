@@ -57,8 +57,7 @@ private:
 /// Implementation of a non-owning forward list.
 ///
 /// Lock-free, multi-producer, multi-consumer.
-/// In addition it supports insertion and deletion from preemptive OS
-/// within a critical section.
+/// In addition, it supports insertion and deletion from a critical section on a preemptive OS.
 /// Elements can be moved from one list instance to another.
 ///
 /// \tparam T Element type.
@@ -241,7 +240,7 @@ public:
 			auto previous = findPreviousNode(&element);
 			if (!previous)
 			{
-				// If it doesn't find it anymore, it means that a concurrent removal happened.
+				// If it cannot find it anymore, it means that a concurrent removal happened.
 				// The previous pointer has already been updated, therefore, this node
 				// can be removed safely.
 
@@ -251,7 +250,7 @@ public:
 
 			bzd::test::InjectPoint<bzd::test::InjectPoint2, Args...>();
 
-			// Go to the left most element that is without the deletion mark.
+			// Go to the leftmost element that does not have the deletion mark.
 			// This is to handle concurrent deletion for preemptive systems with
 			// critical section behavior.
 			{
@@ -337,8 +336,8 @@ public:
 
 	/// Remove an element from the list. Unlike pop, the element can be immediately discarded.
 	///
-	/// Calling this function ensures that no user of the list is currently pointing to this element,
-	/// which could lead to a segfault situation.
+	/// This function waits until no other user of the list is pointing to the element;
+	/// discarding it earlier could lead to a segfault.
 	///
 	/// \param element Element to be removed.
 	/// \return An error in case of failure, void otherwise.
@@ -353,7 +352,7 @@ public:
 		return result;
 	}
 
-	/// Remove all elements associated with this list.
+	/// Remove all elements from this list.
 	constexpr void clear() noexcept
 	{
 		while (true)
@@ -374,7 +373,7 @@ protected:
 		/// Pointer of the previous node.
 		ElementPtrType node;
 		/// Raw pointer of the next pointer of the previous node.
-		/// Raw means without removing deletion mark.
+		/// Raw means the marks are left in place.
 		ElementPtrType nextRaw;
 	};
 
@@ -519,20 +518,20 @@ namespace bzd::threadsafe {
 
 /// Element for the non-owning list.
 ///
-/// \tparam supportMultiContainer Whether multicontainer should be supported or not.
-///        This means that an element can pop from one list and push a different one.
+/// \tparam supportMultiContainer Whether multi-container should be supported or not.
+///        This means that an element can be popped from one list and pushed to a different one.
 /// \tparam supportDiscard Allow elements to be discarded.
 template <bzd::Bool supportMultiContainer, bzd::Bool supportDiscard = false>
 using NonOwningForwardListElement = bzd::threadsafe::impl::NonOwningForwardListElement<supportMultiContainer, supportDiscard>;
 
-/// Implementation of a non-owning linked list.
+/// Implementation of a non-owning forward list.
 ///
-/// The implementation is based on a single linked list, which should be efficient
-/// enough for insertion and removal for small lists.
+/// The implementation is based on a singly linked list, which should be efficient
+/// enough for insertion and removal in small lists.
 ///
 /// Lock-free, multi-producer, multi-consumer.
-/// In addition it supports lock-free insertion and deletion from critical section,
-/// meaning that a call will always return without the need of task preemption.
+/// In addition, insertion and deletion are lock-free, so they can be called from a
+/// critical section on a preemptive OS without requiring task preemption.
 /// Elements can be moved from one list instance to another.
 ///
 /// \tparam T Element type.

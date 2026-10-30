@@ -58,7 +58,7 @@ class [[nodiscard]] Async
 {
 public: // Traits
 	using PromiseType = typename Traits<T>::PromiseType;
-	using promise_type = PromiseType; // Needed for the corountine compiler hooks.
+	using promise_type = PromiseType; // Needed for the coroutine compiler hooks.
 	using ResultType = typename PromiseType::ResultType;
 	using Self = Async;
 	static constexpr typeTraits::AsyncType type{Traits<T>::type};
@@ -434,7 +434,7 @@ constexpr auto suspend(Args&&... args) noexcept
 	return bzd::async::awaitable::Suspend{bzd::forward<Args>(args)...};
 }
 
-/// Executes multiple asynchronous functions according to the executor policy and returns once all are completed.
+/// Executes multiple asynchronous functions while preserving the caller's core affinity, and returns once all of them are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -443,7 +443,7 @@ all(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous functions according to the executor policy and returns once all are completed.
+/// Executes multiple asynchronous functions while allowing them to run on any core, and returns once all of them are completed.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAll<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -452,7 +452,8 @@ allParallel(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAll<Asyncs...>{/*parallel*/ true, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous functions according to the executor policy and returns once at least one of them is completed.
+/// Executes multiple asynchronous functions while preserving the caller's core affinity.
+/// Returns once at least one of them is completed and cancels the remaining ones.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>
@@ -461,7 +462,8 @@ any(Asyncs&&... asyncs) noexcept
 	co_return (co_await bzd::async::awaitable::EnqueueAny<Asyncs...>{/*parallel*/ false, bzd::forward<Asyncs>(asyncs)...});
 }
 
-/// Executes multiple asynchronous functions according to the executor policy and returns once at least one of them is completed.
+/// Executes multiple asynchronous functions while allowing them to run on any core.
+/// Returns once at least one of them is completed and cancels the remaining ones.
 template <concepts::async... Asyncs>
 requires(!concepts::lValueReference<Asyncs> &&
 		 ...)::bzd::impl::Async<typename bzd::async::awaitable::EnqueueAny<Asyncs...>::ResultType, ::bzd::impl::AsyncTaskTraits>

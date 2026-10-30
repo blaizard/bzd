@@ -250,8 +250,8 @@ private:
 		const bzd::Optional<Index> maybeIndex{};
 	};
 
-	/// Try to acquire a reading lock of the entry defined by the callable.
-	/// The callable also defines if the function should return a failure or not.
+	/// Try to acquire a reading lock on the first entry of the range selected by the callable.
+	/// The callable updates \b begin and \b end and returns whether the range is acceptable.
 	template <class Callable>
 	constexpr ResultForReading tryAcquireLockForReading(Callable&& callable) noexcept
 	{
@@ -272,7 +272,7 @@ private:
 		return {};
 	}
 
-	/// Create a Span of 2 as a range starting from \b begin to \b end.
+	/// Create a Spans object of size 2 as a range from \b begin to \b end.
 	template <class U>
 	static constexpr bzd::Spans<U, 2u> makeSpans(U* data, const Index begin, const Index end) noexcept
 	{

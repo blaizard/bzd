@@ -78,9 +78,9 @@ private:
 	Continuation continuation_{};
 };
 
-/// The executor concept is a workload scheduler that owns several executables
-/// and executes them.
-/// An executor is thread-safe and can be shared between multiple threads or cores.
+/// An executor is a workload scheduler that schedules several executables
+/// and runs them.
+/// It is thread-safe and can be shared between multiple threads or cores.
 template <class Executable>
 class Executor
 {
@@ -114,9 +114,9 @@ public: // Statistics.
 	[[nodiscard]] constexpr Int32 getWorkloadCount() const noexcept { return workloadCount_.load(); }
 
 public:
-	/// Run all the workload currently in the queue.
+	/// Run all the workloads currently in the queue.
 	///
-	/// Drain all workloads and exit only when the queue is empty.
+	/// Process workloads until there are none left or an abort is requested.
 	///
 	/// \param coreUId The core unique identifier on which this context is running.
 	/// \param profiler The profiler to be used to profile the activity on this context.
@@ -271,7 +271,7 @@ private:
 
 	/// Push a new workload to the queue.
 	///
-	/// It is pushed at the end of the queue, so it will be executed after all previous workloads are.
+	/// It is pushed at the back of the queue, after the entries already present.
 	///
 	/// \param executable The workload to be executed.
 	/// \param increment Increment the counters.

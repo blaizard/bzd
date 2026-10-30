@@ -103,8 +103,8 @@ public:
 		return bzd::nullopt;
 	}
 
-	/// Propagate the error to the first parent accepting errors and set the continuation
-	/// of this executable to this parent.
+	/// Propagate the error to the first parent that accepts it, and attach this
+	/// executable to that parent's continuation.
 	constexpr void propagateError(bzd::Error&& error) noexcept
 	{
 		// Look for the first caller that does not have the propagate flag.

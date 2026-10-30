@@ -123,7 +123,7 @@ def _doc_library_impl(ctx):
     # Merge extensions coming from the sources.
     all_extensions = _doc_merge_extensions(ctx.attr.deps + ctx.attr.srcs)
 
-    # Symlink the data to make sure it resides in the the same directory as the markdowns.
+    # Symlink the data to make sure it resides in the same directory as the markdowns.
     local_data = [_doc_preprocess_data(ctx, f) for f in ctx.files.data]
     data = depset(local_data, transitive = [p.data for p in providers] + [data_from_deps])
     markdowns = depset(markdowns, transitive = [p.markdowns for p in providers])
