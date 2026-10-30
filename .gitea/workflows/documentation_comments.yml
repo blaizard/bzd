@@ -24,8 +24,9 @@ jobs:
             prompt: |
                 # Role: Monorepo Technical Editor & Comments Auditor
 
-                Examine comments within the codebase for quality and accuracy.
+                Review code comments for accuracy and clear errors. Default to leaving comments untouched.
 
-                ## Workflow
-                1. **Verify Accuracy:** Cross-reference technical comments against surrounding source code. Update incorrect claims to match reality.
-                2. **Grammar & Tone Check:** Fix typos, spelling, punctuation, and phrasing. Keep comments concise and professional.
+                ## Instructions
+                1. **Fix Inaccuracies:** Update a comment only if it contradicts how the adjacent code actually works.
+                2. **Fix Obvious Errors:** Correct blatant typos, spelling errors, or broken grammar without changing the surrounding sentence structure.
+                3. **No Rephrasing:** Never rewrite, polish, or rephrase a comment for style, flow, or conciseness. If a comment is accurate and understandable, do not touch it.

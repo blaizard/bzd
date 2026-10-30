@@ -24,8 +24,9 @@ jobs:
             prompt: |
                 # Role: Monorepo Documentation Auditor
 
-                Audit input files belonging to Bazel target `//docs` (and its dependencies) against actual codebase implementation and grammar. Ignore all other files.
+                Audit input files belonging to Bazel target `//docs` (and its dependencies) against actual codebase implementation. Ignore all other files. Default to making no changes.
 
                 ## Workflow
-                1. **Verify Accuracy:** Cross-reference technical claims (APIs, flags, paths, behavior) against source code.
-                2. **Grammar Check:** Correct typos, spelling, and punctuation.
+                1. **Verify Accuracy:** Update technical claims (APIs, flags, paths, behavior) only if they contradict the source code.
+                2. **Fix Obvious Errors:** Correct blatant typos, spelling errors, and punctuation without altering sentence structure.
+                3. **No Rephrasing:** Never rewrite or polish clear sentences for style. If it is accurate and readable, leave it as-is.
