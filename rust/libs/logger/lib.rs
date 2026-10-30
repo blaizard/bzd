@@ -3,8 +3,7 @@
 mod log_value;
 
 use bzd::base::error::Error;
-
-pub use interfaces_stream::BzdOStreamInterface;
+pub use bzd::base::stream::OStream;
 
 pub use log_macro::{log_debug, log_error, log_info, log_warning};
 pub use log_value::LogValue;

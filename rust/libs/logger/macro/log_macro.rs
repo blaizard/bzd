@@ -115,12 +115,12 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
     for piece in &pieces {
         match piece {
             FormatPiece::Literal(text) => {
-                statements.extend(quote! { out.write(#text.as_bytes()).await?; });
+                statements.extend(quote! { out.write_all(#text.as_bytes()).await?; });
             }
             FormatPiece::Argument => {
                 let field = format_ident!("arg{}", arg_index);
                 arg_index += 1;
-                statements.extend(quote! { self.#field.write(out).await?; });
+                statements.extend(quote! { self.#field.write_to(out).await?; });
             }
         }
     }
@@ -166,8 +166,8 @@ fn expand(input: TokenStream, level: &str) -> TokenStream {
             }
 
             impl #impl_generics rust_interfaces_logger::LogMessage for __BzdLogMessage #type_generics {
-                async fn write<__BzdOutput: logger::BzdOStreamInterface>(&self, out: &mut __BzdOutput) -> ::core::result::Result<(), ::bzd::base::error::Error> {
-                    use logger::{BzdOStreamInterface as _, LogValue as _};
+                async fn write<__BzdOutput: logger::OStream>(&self, out: &mut __BzdOutput) -> ::core::result::Result<(), ::bzd::base::error::Error> {
+                    use logger::{OStream as _, LogValue as _};
                     #statements
                     Ok(())
                 }

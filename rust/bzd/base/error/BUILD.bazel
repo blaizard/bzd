@@ -8,6 +8,7 @@ rust_library(
     ],
     visibility = [
         "//rust/bzd/base:__pkg__",
+        "//rust/bzd/base/stream:__pkg__",
     ],
 )
 

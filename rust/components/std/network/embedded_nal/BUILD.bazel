@@ -1,0 +1,42 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//rust/interfaces:network",
+    ],
+)
+
+rust_library(
+    name = "embedded_nal",
+    srcs = [
+        "dns.rs",
+        "lib.rs",
+        "tcp.rs",
+    ],
+    crate_name = "rust_components_std_network_embedded_nal",
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/interfaces:network",
+        "@crates//:embedded-io-async",
+        "@crates//:embedded-nal-async",
+        "@crates//:std-embedded-nal-async",
+    ],
+)
+
+rust_test(
+    name = "embedded_nal_test",
+    crate = ":embedded_nal",
+)

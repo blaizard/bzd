@@ -1,7 +1,7 @@
 #![no_std]
 
 use bzd::base::error::Error;
-use interfaces_stream::BzdOStreamInterface;
+use bzd::base::stream::OStream;
 use logger::LogValue;
 pub use rust_components_generic_logger_backend_ostream_interface::{
     BzdComponentsGenericOStreamLoggerBackendContext,
@@ -67,14 +67,15 @@ impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBack
             .file
             .rsplit_once('/')
             .map_or(record.file, |(_, name)| name);
-        guard.write(level_prefix(record.level)).await?;
-        guard.write(b" [").await?;
-        guard.write(name.as_bytes()).await?;
-        guard.write(b":").await?;
-        record.line.write(&mut *guard).await?;
-        guard.write(b"] ").await?;
+        guard.write_all(level_prefix(record.level)).await?;
+        guard.write_all(b" [").await?;
+        guard.write_all(name.as_bytes()).await?;
+        guard.write_all(b":").await?;
+        record.line.write_to(&mut *guard).await?;
+        guard.write_all(b"] ").await?;
         record.message.write(&mut *guard).await?;
-        guard.write(b"\n").await?;
+        guard.write_all(b"\n").await?;
+        guard.flush().await?;
         Ok(())
     }
 }

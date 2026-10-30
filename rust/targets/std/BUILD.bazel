@@ -31,6 +31,7 @@ bdl_target(
         "//rust/components/embassy/executor",
         "//rust/components/embassy/timer",
         "//rust/components/generic/logger/backend/ostream",
+        "//rust/components/std/network/embedded_nal",
         "//rust/components/std/stream/out",
     ],
 )

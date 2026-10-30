@@ -1,20 +1,17 @@
 use super::LogValue;
 use bzd::base::error::Error;
-use interfaces_stream::BzdOStreamInterface;
+use bzd::base::stream::OStream;
 
 /// Write the decimal representation of a value, most significant digit first,
 /// with no intermediate buffer.
-pub(crate) async fn write_unsigned(
-    mut value: u64,
-    out: &mut impl BzdOStreamInterface,
-) -> Result<(), Error> {
+pub(crate) async fn write_unsigned(mut value: u64, out: &mut impl OStream) -> Result<(), Error> {
     let mut divisor: u64 = 1;
     while divisor <= value / 10 {
         divisor *= 10;
     }
     loop {
         let digit = (value / divisor) as u8;
-        out.write(&[b'0' + digit]).await?;
+        out.write_all(&[b'0' + digit]).await?;
         value %= divisor;
         if divisor == 1 {
             break;
@@ -28,7 +25,7 @@ macro_rules! impl_log_value_unsigned {
 	($($ty:ty),* $(,)?) => {
 		$(
 			impl LogValue for $ty {
-				async fn write(&self, out: &mut impl BzdOStreamInterface) -> Result<(), Error> {
+				async fn write_to(&self, out: &mut impl OStream) -> Result<(), Error> {
 					write_unsigned(*self as u64, out).await
 				}
 			}
@@ -40,10 +37,10 @@ macro_rules! impl_log_value_signed {
 	($($ty:ty),* $(,)?) => {
 		$(
 			impl LogValue for $ty {
-				async fn write(&self, out: &mut impl BzdOStreamInterface) -> Result<(), Error> {
+				async fn write_to(&self, out: &mut impl OStream) -> Result<(), Error> {
 					if *self < 0
 					{
-						out.write(b"-").await?;
+						out.write_all(b"-").await?;
 					}
 					write_unsigned(self.unsigned_abs() as u64, out).await
 				}

@@ -1,0 +1,31 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "stream",
+    srcs = [
+        "stream.rs",
+    ],
+    visibility = [
+        "//rust/bzd/base:__pkg__",
+    ],
+    deps = [
+        "//rust/bzd/base/error",
+    ] + selects.with_or({
+        ("@bzd_platforms//al:linux", "@bzd_platforms//al:osx"): [
+            "@crates//:embedded-io-async",
+        ],
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "@crates_esp32//:embedded-io-async",
+        ],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "@crates_esp32s3//:embedded-io-async",
+        ],
+    }),
+)
+
+rust_test(
+    name = "stream_test",
+    crate = ":stream",
+)

@@ -5,8 +5,8 @@
 #[bzd_test::test]
 mod tests {
     use bzd::base::error::{self, Error};
+    use bzd::base::stream::OStream;
     use bzd::sync::mutex::Mutex;
-    use interfaces_stream::BzdOStreamInterface;
     use logger::{log_debug, log_error, log_info, log_warning, Logger};
     use rust_components_generic_logger_backend_ostream::{
         BzdComponentsGenericOStreamLoggerBackend, BzdComponentsGenericOStreamLoggerBackendContext,
@@ -16,6 +16,7 @@ mod tests {
     struct RecordingSink {
         data: [u8; 2048],
         len: usize,
+        flush_count: usize,
     }
 
     impl RecordingSink {
@@ -23,6 +24,7 @@ mod tests {
             Self {
                 data: [0; 2048],
                 len: 0,
+                flush_count: 0,
             }
         }
 
@@ -31,10 +33,15 @@ mod tests {
         }
     }
 
-    impl BzdOStreamInterface for RecordingSink {
-        async fn write(&mut self, data: &[u8]) -> Result<(), Error> {
+    impl OStream for RecordingSink {
+        async fn write(&mut self, data: &[u8]) -> Result<usize, Error> {
             self.data[self.len..self.len + data.len()].copy_from_slice(data);
             self.len += data.len();
+            Ok(data.len())
+        }
+
+        async fn flush(&mut self) -> Result<(), Error> {
+            self.flush_count += 1;
             Ok(())
         }
     }
@@ -65,6 +72,20 @@ mod tests {
         assert_eq!(message.contains("] boom\n"), true)?;
         // Debug is filtered out by the default minimum level.
         assert_eq!(message.contains("[d] ["), false)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_flush_called() -> TestResult {
+        SINK.lock().await.flush_count = 0;
+        {
+            let context =
+                BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
+            let mut logger = Logger::new(&mut backend);
+            log_info!(logger, "hello").await?;
+        }
+        assert_eq!(SINK.lock().await.flush_count, 1)?;
         Ok(())
     }
 

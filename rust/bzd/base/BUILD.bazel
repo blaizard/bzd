@@ -9,5 +9,6 @@ rust_library(
     deps = [
         "//rust/bzd/base/error",
         "//rust/bzd/base/panic",
+        "//rust/bzd/base/stream",
     ],
 )

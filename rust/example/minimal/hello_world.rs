@@ -32,6 +32,7 @@ where
     async fn run(&mut self) -> Result<(), bzd::base::error::Error> {
         for _ in 1..3 {
             self.context.out.lock().await.write(b".").await?;
+            self.context.out.lock().await.flush().await?;
             self.context
                 .timer
                 .lock()

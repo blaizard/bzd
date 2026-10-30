@@ -1,8 +1,8 @@
 #![no_std]
 
+use bzd::base::stream::OStream;
 use esp_hal::gpio::AnyPin;
 use esp_hal::uart::{Config, Uart};
-use interfaces_stream::BzdOStreamInterface;
 use rust_components_esp_hal::init as esp_hal_init;
 pub use rust_components_esp_stream_uart_interface::{
     BzdComponentsEspUartDevice, BzdComponentsEspUartOutContext, BzdComponentsEspUartOutInterface,
@@ -52,30 +52,26 @@ impl BzdComponentsEspUartOutInterface for BzdComponentsEspUartOut {
     }
 }
 
-impl BzdOStreamInterface for BzdComponentsEspUartOut {
-    async fn write(&mut self, data: &[u8]) -> Result<(), bzd::base::error::Error> {
+impl OStream for BzdComponentsEspUartOut {
+    async fn write(&mut self, data: &[u8]) -> Result<usize, bzd::base::error::Error> {
         let uart = self
             .uart
             .as_mut()
             .ok_or_else(|| bzd::base::error::failure("UART not initialized"))?;
 
-        let mut offset = 0;
-        while offset < data.len() {
-            let written = uart
-                .write_async(&data[offset..])
-                .await
-                .map_err(|_| bzd::base::error::failure("failed to write to UART"))?;
-            if written == 0 {
-                return Err(bzd::base::error::failure(
-                    "UART write returned 0 bytes written",
-                ));
-            }
-            offset += written;
-        }
+        uart.write_async(data)
+            .await
+            .map_err(|_| bzd::base::error::failure("failed to write to UART"))
+    }
+
+    async fn flush(&mut self) -> Result<(), bzd::base::error::Error> {
+        let uart = self
+            .uart
+            .as_mut()
+            .ok_or_else(|| bzd::base::error::failure("UART not initialized"))?;
 
         uart.flush_async()
             .await
-            .map_err(|_| bzd::base::error::failure("failed to flush UART"))?;
-        Ok(())
+            .map_err(|_| bzd::base::error::failure("failed to flush UART"))
     }
 }

@@ -1,0 +1,16 @@
+use "rust/interfaces/network.bdl"
+
+namespace bzd.components.std.network.nal;
+
+
+component Dns : bzd.Dns {
+interface:
+	
+}
+
+component Tcp : bzd.Tcp {
+interface:
+	
+}
+
+

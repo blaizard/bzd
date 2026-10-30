@@ -1,9 +1,16 @@
 use "rust/components/embassy/executor/interface.bdl"
 use "rust/components/generic/logger/backend/ostream/interface.bdl"
 use "rust/components/std/stream/out/interface.bdl"
+use "rust/components/std/network/embedded_nal/interface.bdl"
 use "rust/components/embassy/timer/interface.bdl"
 
 
+
+composition network {
+	dns = bzd.components.std.network.nal.Dns();
+	tcp = bzd.components.std.network.nal.Tcp();
+	
+}
 
 composition {
 	out = bzd.components.std.Out();

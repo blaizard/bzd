@@ -1,4 +1,4 @@
-use interfaces_stream::BzdOStreamInterface;
+use bzd::base::stream::OStream;
 use std::io::{self, Write};
 
 pub struct BzdComponentsStdOut {}
@@ -15,15 +15,18 @@ impl Default for BzdComponentsStdOut {
     }
 }
 
-impl BzdOStreamInterface for BzdComponentsStdOut {
-    async fn write(&mut self, data: &[u8]) -> Result<(), bzd::base::error::Error> {
+impl OStream for BzdComponentsStdOut {
+    async fn write(&mut self, data: &[u8]) -> Result<usize, bzd::base::error::Error> {
         let mut stdout = io::stdout();
-        if stdout.write_all(data).is_err() {
-            return Err(bzd::base::error::failure("failed to write to stdout"));
-        }
-        if stdout.flush().is_err() {
-            return Err(bzd::base::error::failure("failed to flush stdout"));
-        }
-        Ok(())
+        stdout
+            .write(data)
+            .map_err(|_| bzd::base::error::failure("failed to write to stdout"))
+    }
+
+    async fn flush(&mut self) -> Result<(), bzd::base::error::Error> {
+        let mut stdout = io::stdout();
+        stdout
+            .flush()
+            .map_err(|_| bzd::base::error::failure("failed to flush stdout"))
     }
 }

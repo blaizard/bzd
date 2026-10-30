@@ -1,0 +1,7 @@
+
+namespace bzd;
+
+extern interface Dns;
+extern interface Tcp;
+
+

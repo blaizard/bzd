@@ -2,7 +2,7 @@
 #![allow(async_fn_in_trait)]
 
 use bzd::base::error::Error;
-use interfaces_stream::BzdOStreamInterface;
+use bzd::base::stream::OStream;
 
 pub use rust_interfaces_logger_level::BzdLoggerLevel;
 
@@ -16,7 +16,7 @@ pub struct LogRecord<M: LogMessage> {
 
 /// A log message that writes itself to provided stream.
 pub trait LogMessage {
-    async fn write<S: BzdOStreamInterface>(&self, out: &mut S) -> Result<(), Error>;
+    async fn write<S: OStream>(&self, out: &mut S) -> Result<(), Error>;
 }
 
 /// A backend that decides how a log event is formatted and emitted.
