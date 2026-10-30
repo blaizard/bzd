@@ -6,12 +6,10 @@
 #![no_std]
 #![no_main]
 
-mod adapter;
 mod error;
 
-use adapter::EmbeddedIOStream;
 use bzd::base::error::Error;
-use bzd::base::stream::{IStream, OStream};
+use bzd::base::stream::{EmbeddedIOStream, IOStream};
 use error::map_error;
 use reqwless::client::HttpConnection;
 use reqwless::request::{Method as ReqwlessMethod, Request as ReqwlessRequest, RequestBuilder};
@@ -74,7 +72,7 @@ pub async fn request<S>(
     body_buffer: &mut [u8],
 ) -> Result<ResponseInfo, Error>
 where
-    S: IStream + OStream + ?Sized,
+    S: IOStream + ?Sized,
 {
     let mut connection = HttpConnection::Plain(EmbeddedIOStream::new(stream));
     let http_request = ReqwlessRequest::new(to_reqwless_method(request.method), request.path)
@@ -119,9 +117,9 @@ fn to_reqwless_method(method: Method) -> ReqwlessMethod {
 #[bzd_test::test]
 mod tests {
     use super::*;
-    use crate::adapter::StreamError;
     use crate::error::map_error;
     use bzd::base::error::ErrorType;
+    use bzd::base::stream::{IStream, OStream};
 
     struct MockStream {
         input: &'static [u8],
@@ -227,14 +225,6 @@ mod tests {
         assert_eq!(error.error_type(), ErrorType::Failure)?;
         let error = map_error(reqwless::Error::ConnectionAborted);
         assert_eq!(error.error_type(), ErrorType::Eof)?;
-        Ok(())
-    }
-
-    #[test]
-    fn test_stream_error_kind() -> TestResult {
-        use embedded_io_async::Error as _;
-        let error = StreamError::new(bzd::base::error::timeout("timeout"));
-        assert_eq!(error.kind(), embedded_io_async::ErrorKind::TimedOut)?;
         Ok(())
     }
 }

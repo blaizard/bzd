@@ -93,6 +93,19 @@ pub trait OStream {
     }
 }
 
+/// Bidirectional asynchronous byte stream.
+pub trait IOStream: IStream + OStream {
+    /// Returns an adapter implementing `embedded_io_async::Read + Write`.
+    fn as_embedded_io(&mut self) -> EmbeddedIOStream<'_, Self>
+    where
+        Self: Sized,
+    {
+        EmbeddedIOStream::new(self)
+    }
+}
+
+impl<T: IStream + OStream + ?Sized> IOStream for T {}
+
 /// Adapter exposing an `IStream` as an `embedded_io_async::Read`.
 pub struct EmbeddedIStream<'a, S: ?Sized> {
     stream: &'a mut S,
@@ -132,6 +145,38 @@ impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedOStream<'_, S> {
 }
 
 impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedOStream<'_, S> {
+    async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
+        self.stream.write(data).await.map_err(EmbeddedError::new)
+    }
+
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        self.stream.flush().await.map_err(EmbeddedError::new)
+    }
+}
+
+/// Adapter exposing an `IOStream` as both `embedded_io_async::Read` and `Write`.
+pub struct EmbeddedIOStream<'a, S: ?Sized> {
+    stream: &'a mut S,
+}
+
+impl<'a, S: ?Sized> EmbeddedIOStream<'a, S> {
+    /// Creates an adapter from a stream reference.
+    pub fn new(stream: &'a mut S) -> Self {
+        Self { stream }
+    }
+}
+
+impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedIOStream<'_, S> {
+    type Error = EmbeddedError;
+}
+
+impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIOStream<'_, S> {
+    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
+        self.stream.read(buffer).await.map_err(EmbeddedError::new)
+    }
+}
+
+impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedIOStream<'_, S> {
     async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
         self.stream.write(data).await.map_err(EmbeddedError::new)
     }
@@ -251,6 +296,30 @@ mod tests {
             let mut reader = stream.as_embedded_read();
             reader
                 .read(&mut buffer)
+                .await
+                .map_err(EmbeddedError::into_error)?
+        };
+        assert_eq!(size, 5)?;
+        assert_eq!(&buffer[..size], &b"hello"[..])?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_embedded_io_stream() -> TestResult {
+        let mut stream = Buffer::<8>::new();
+        {
+            let mut io = stream.as_embedded_io();
+            let size = io
+                .write(b"hello")
+                .await
+                .map_err(EmbeddedError::into_error)?;
+            assert_eq!(size, 5)?;
+            io.flush().await.map_err(EmbeddedError::into_error)?;
+        }
+        let mut buffer = [0u8; 8];
+        let size = {
+            let mut io = stream.as_embedded_io();
+            io.read(&mut buffer)
                 .await
                 .map_err(EmbeddedError::into_error)?
         };
