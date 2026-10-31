@@ -8,6 +8,7 @@ rust_library(
     visibility = ["//rust/bzd:__pkg__"],
     deps = [
         "//rust/bzd/base/error",
+        "//rust/bzd/base/format",
         "//rust/bzd/base/panic",
         "//rust/bzd/base/stream",
     ],

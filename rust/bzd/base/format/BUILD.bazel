@@ -1,0 +1,21 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+rust_library(
+    name = "format",
+    srcs = [
+        "format.rs",
+    ],
+    visibility = [
+        "//rust/bzd/base:__pkg__",
+    ],
+    deps = [
+        "//rust/bzd/base/error",
+        "//rust/bzd/base/stream",
+    ],
+)
+
+rust_test(
+    name = "format_test",
+    crate = ":format",
+)

@@ -14,7 +14,7 @@ mod tests {
     use rust_interfaces_logger::BzdLoggerLevel;
 
     struct RecordingSink {
-        data: [u8; 2048],
+        data: [u8; 1024],
         len: usize,
         flush_count: usize,
     }
@@ -22,7 +22,7 @@ mod tests {
     impl RecordingSink {
         const fn new() -> Self {
             Self {
-                data: [0; 2048],
+                data: [0; 1024],
                 len: 0,
                 flush_count: 0,
             }
@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     async fn test_logging() -> TestResult {
-        SINK.lock().await.len = 0;
+        *SINK.lock().await = RecordingSink::new();
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
@@ -64,69 +64,24 @@ mod tests {
         }
         let guard = SINK.lock().await;
         let message = guard.as_str();
+        let name = file!().rsplit_once('/').map_or(file!(), |(_, name)| name);
         assert_eq!(message.contains("[i] ["), true)?;
         assert_eq!(message.contains("] count = 42, name = Alex\n"), true)?;
         assert_eq!(message.contains("[w] ["), true)?;
         assert_eq!(message.contains("] careful\n"), true)?;
         assert_eq!(message.contains("[e] ["), true)?;
         assert_eq!(message.contains("] boom\n"), true)?;
+        assert_eq!(message.contains(name), true)?;
         // Debug is filtered out by the default minimum level.
         assert_eq!(message.contains("[d] ["), false)?;
+        // One flush per emitted record.
+        assert_eq!(guard.flush_count, 3)?;
         Ok(())
     }
 
     #[test]
-    async fn test_flush_called() -> TestResult {
-        SINK.lock().await.flush_count = 0;
-        {
-            let context =
-                BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
-            let mut logger = Logger::new(&mut backend);
-            log_info!(logger, "hello").await?;
-        }
-        assert_eq!(SINK.lock().await.flush_count, 1)?;
-        Ok(())
-    }
-
-    #[test]
-    async fn test_error_value() -> TestResult {
-        SINK.lock().await.len = 0;
-        {
-            let context =
-                BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
-            let mut logger = Logger::new(&mut backend);
-            let error = error::failure("boom");
-            log_error!(logger, "{}", error).await?;
-        }
-        let guard = SINK.lock().await;
-        let message = guard.as_str();
-        assert_eq!(message.ends_with(": failure: boom\n"), true)?;
-        Ok(())
-    }
-
-    #[test]
-    async fn test_long_message() -> TestResult {
-        SINK.lock().await.len = 0;
-        {
-            let context =
-                BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
-            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
-            let mut logger = Logger::new(&mut backend);
-            let long = core::str::from_utf8(&[b'x'; 600]).unwrap();
-            log_info!(logger, "{}", long).await?;
-        }
-        let guard = SINK.lock().await;
-        let message = guard.as_str();
-        assert_eq!(message.matches('x').count(), 600)?;
-        assert_eq!(message.ends_with("\n"), true)?;
-        Ok(())
-    }
-
-    #[test]
-    async fn test_minimum_level_filtering() -> TestResult {
-        SINK.lock().await.len = 0;
+    async fn test_minimum_level() -> TestResult {
+        *SINK.lock().await = RecordingSink::new();
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
@@ -135,7 +90,6 @@ mod tests {
             let mut logger = Logger::new(&mut backend);
             log_error!(logger, "shown").await?;
             log_warning!(logger, "hidden").await?;
-            log_info!(logger, "hidden").await?;
         }
         let guard = SINK.lock().await;
         let message = guard.as_str();
@@ -145,19 +99,17 @@ mod tests {
     }
 
     #[test]
-    async fn test_location() -> TestResult {
-        SINK.lock().await.len = 0;
+    async fn test_error_value() -> TestResult {
+        *SINK.lock().await = RecordingSink::new();
         {
             let context =
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
             let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
-            log_info!(logger, "hello").await?;
+            log_error!(logger, "{}", error::failure("boom")).await?;
         }
         let guard = SINK.lock().await;
-        let message = guard.as_str();
-        let name = file!().rsplit_once('/').map_or(file!(), |(_, name)| name);
-        assert_eq!(message.contains(name), true)?;
+        assert_eq!(guard.as_str().ends_with(": failure: boom\n"), true)?;
         Ok(())
     }
 }

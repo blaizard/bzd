@@ -4,19 +4,10 @@ rust_library(
     name = "logger",
     srcs = [
         "lib.rs",
-        "log_value/base.rs",
-        "log_value/error_impl.rs",
-        "log_value/integral.rs",
-        "log_value/mod.rs",
-        "log_value/string.rs",
     ],
     crate_name = "logger",
-    proc_macro_deps = [
-        "//rust/libs/logger/macro:log_macro",
-    ],
     visibility = ["//visibility:public"],
     deps = [
-        "//interfaces:stream",
         "//rust/bzd",
         "//rust/interfaces:logger",
     ],

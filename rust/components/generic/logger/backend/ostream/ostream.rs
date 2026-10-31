@@ -1,15 +1,15 @@
 #![no_std]
 
 use bzd::base::error::Error;
+use bzd::base::format;
 use bzd::base::stream::OStream;
-use logger::LogValue;
 pub use rust_components_generic_logger_backend_ostream_interface::{
     BzdComponentsGenericOStreamLoggerBackendContext,
     BzdComponentsGenericOStreamLoggerBackendContextConstraint,
     BzdComponentsGenericOStreamLoggerBackendContextConstraintTypes,
     BzdComponentsGenericOStreamLoggerBackendInterface,
 };
-use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogMessage, LogRecord};
+use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogRecord};
 
 /// A logger writing formatted messages to a shared stream sink.
 pub struct BzdComponentsGenericOStreamLoggerBackend<
@@ -37,12 +37,12 @@ impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint>
     }
 }
 
-fn level_prefix(level: BzdLoggerLevel) -> &'static [u8] {
+fn level_prefix(level: BzdLoggerLevel) -> &'static str {
     match level {
-        BzdLoggerLevel::Error => b"[e]",
-        BzdLoggerLevel::Warning => b"[w]",
-        BzdLoggerLevel::Info => b"[i]",
-        BzdLoggerLevel::Debug => b"[d]",
+        BzdLoggerLevel::Error => "[e]",
+        BzdLoggerLevel::Warning => "[w]",
+        BzdLoggerLevel::Info => "[i]",
+        BzdLoggerLevel::Debug => "[d]",
     }
 }
 
@@ -58,7 +58,7 @@ fn level_priority(level: BzdLoggerLevel) -> u8 {
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBackendInterface
     for BzdComponentsGenericOStreamLoggerBackend<C>
 {
-    async fn log<M: LogMessage>(&mut self, record: LogRecord<M>) -> Result<(), Error> {
+    async fn log(&mut self, record: LogRecord<'_>) -> Result<(), Error> {
         if !self.is_enabled(record.level) {
             return Ok(());
         }
@@ -67,13 +67,12 @@ impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBack
             .file
             .rsplit_once('/')
             .map_or(record.file, |(_, name)| name);
-        guard.write_all(level_prefix(record.level)).await?;
-        guard.write_all(b" [").await?;
-        guard.write_all(name.as_bytes()).await?;
-        guard.write_all(b":").await?;
-        record.line.write_to(&mut *guard).await?;
-        guard.write_all(b"] ").await?;
-        record.message.write(&mut *guard).await?;
+        format::write_to(
+            &mut *guard,
+            format_args!("{} [{}:{}] ", level_prefix(record.level), name, record.line),
+        )
+        .await?;
+        format::write_to(&mut *guard, record.message).await?;
         guard.write_all(b"\n").await?;
         guard.flush().await?;
         Ok(())

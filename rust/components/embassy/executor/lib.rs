@@ -131,7 +131,7 @@ mod tests {
     use super::*;
     use bzd::base::error::Error;
     use rust_interfaces_executor::BzdExecutorInterface;
-    use rust_interfaces_logger::{BzdLoggerBackendInterface, LogMessage, LogRecord};
+    use rust_interfaces_logger::{BzdLoggerBackendInterface, LogRecord};
 
     use core::future::Future;
     use core::pin::Pin;
@@ -178,7 +178,7 @@ mod tests {
     struct NullBackend;
 
     impl BzdLoggerBackendInterface for NullBackend {
-        async fn log<M: LogMessage>(&mut self, _: LogRecord<M>) -> Result<(), Error> {
+        async fn log(&mut self, _: LogRecord<'_>) -> Result<(), Error> {
             Ok(())
         }
     }

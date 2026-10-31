@@ -2,24 +2,19 @@
 #![allow(async_fn_in_trait)]
 
 use bzd::base::error::Error;
-use bzd::base::stream::OStream;
+use core::fmt::Arguments;
 
 pub use rust_interfaces_logger_level::BzdLoggerLevel;
 
-/// One log event, including its source and lazy formatter message.
-pub struct LogRecord<M: LogMessage> {
+/// One log event, including its source and its lazily formatted message.
+pub struct LogRecord<'a> {
     pub level: BzdLoggerLevel,
     pub file: &'static str,
     pub line: u32,
-    pub message: M,
-}
-
-/// A log message that writes itself to provided stream.
-pub trait LogMessage {
-    async fn write<S: OStream>(&self, out: &mut S) -> Result<(), Error>;
+    pub message: Arguments<'a>,
 }
 
 /// A backend that decides how a log event is formatted and emitted.
 pub trait BzdLoggerBackendInterface {
-    async fn log<M: LogMessage>(&mut self, record: LogRecord<M>) -> Result<(), Error>;
+    async fn log(&mut self, record: LogRecord<'_>) -> Result<(), Error>;
 }
