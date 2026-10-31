@@ -1,4 +1,4 @@
-use bzd::base::error::{failure, Error};
+use bzd::base::error::Error;
 use bzd::base::stream::{IStream, OStream};
 use core::net::SocketAddr;
 use embedded_io_async::{Read, Write};
@@ -32,7 +32,7 @@ impl BzdTcpInterface for BzdComponentsStdNetworkNalTcp {
             .stack
             .connect(address)
             .await
-            .map_err(|_| failure("failed to connect TCP socket"))?;
+            .map_err(|_| bzd::base::error::failure!("failed to connect TCP socket"))?;
         Ok(TcpStream::new(connection))
     }
 }
@@ -52,7 +52,7 @@ impl<C: Read> IStream for TcpStream<C> {
         self.connection
             .read(buffer)
             .await
-            .map_err(|_| bzd::base::error::failure("TCP read failed"))
+            .map_err(|_| bzd::base::error::failure!("TCP read failed"))
     }
 }
 
@@ -61,14 +61,14 @@ impl<C: Write> OStream for TcpStream<C> {
         self.connection
             .write(data)
             .await
-            .map_err(|_| bzd::base::error::failure("TCP write failed"))
+            .map_err(|_| bzd::base::error::failure!("TCP write failed"))
     }
 
     async fn flush(&mut self) -> Result<(), Error> {
         self.connection
             .flush()
             .await
-            .map_err(|_| bzd::base::error::failure("TCP flush failed"))
+            .map_err(|_| bzd::base::error::failure!("TCP flush failed"))
     }
 }
 

@@ -69,11 +69,12 @@ pub async fn write_to<S: OStream>(out: &mut S, args: Arguments<'_>) -> Result<()
     loop {
         let (written, overflowed) = {
             let mut writer = SkipWriter::new(&mut chunk, skip);
-            write(&mut writer, args).map_err(|_| error::failure("failed to format the message"))?;
+            write(&mut writer, args)
+                .map_err(|_| error::failure!("failed to format the message"))?;
             (writer.written(), writer.overflowed())
         };
         if written == 0 && overflowed {
-            return Err(error::failure("format chunk is empty"));
+            return Err(error::failure!("format chunk is empty"));
         }
         if written > 0 {
             out.write_all(&chunk[..written]).await?;

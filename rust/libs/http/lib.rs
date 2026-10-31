@@ -239,7 +239,7 @@ mod tests {
                 assert_eq!(error.error_type(), ErrorType::Failure)?;
                 assert_eq!(error.message(), "http: buffer too small")?;
             }
-            Ok(_) => return Err(bzd::base::error::failure("expected the request to fail")),
+            Ok(_) => return Err(bzd::base::error::failure!("expected the request to fail")),
         }
         Ok(())
     }

@@ -106,7 +106,7 @@ mod tests {
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
             let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
-            log_error!(logger, "{}", error::failure("boom")).await?;
+            log_error!(logger, "{}", error::failure!("boom")).await?;
         }
         let guard = SINK.lock().await;
         assert_eq!(guard.as_str().ends_with(": failure: boom\n"), true)?;

@@ -4,6 +4,7 @@ load("//rust:defs.bzl", "rust_test")
 rust_library(
     name = "error",
     srcs = [
+        "arena.rs",
         "error.rs",
     ],
     visibility = [

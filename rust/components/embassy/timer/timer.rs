@@ -21,7 +21,7 @@ impl BzdComponentsEmbassyTimer {
 impl BzdTimerInterface for BzdComponentsEmbassyTimer {
     async fn delay(&mut self, duration: Duration) -> Result<(), bzd::base::error::Error> {
         let duration_us = u64::try_from(duration.as_micros())
-            .map_err(|_| bzd::base::error::failure("duration exceeds Embassy timer range"))?;
+            .map_err(|_| bzd::base::error::failure!("duration exceeds Embassy timer range"))?;
         EmbassyTimer::after(EmbassyDuration::from_micros(duration_us)).await;
         Ok(())
     }

@@ -38,7 +38,7 @@ impl BzdComponentsEspUartOutInterface for BzdComponentsEspUartOut {
             BzdComponentsEspUartDevice::Uart0 => Uart::new(peripheral.UART0.reborrow(), config),
             BzdComponentsEspUartDevice::Uart1 => Uart::new(peripheral.UART1.reborrow(), config),
         }
-        .map_err(|_| bzd::base::error::failure("failed to initialize UART"))?
+        .map_err(|_| bzd::base::error::failure!("failed to initialize UART"))?
         .with_tx(pin)
         .into_async();
 
@@ -57,21 +57,21 @@ impl OStream for BzdComponentsEspUartOut {
         let uart = self
             .uart
             .as_mut()
-            .ok_or_else(|| bzd::base::error::failure("UART not initialized"))?;
+            .ok_or_else(|| bzd::base::error::failure!("UART not initialized"))?;
 
         uart.write_async(data)
             .await
-            .map_err(|_| bzd::base::error::failure("failed to write to UART"))
+            .map_err(|_| bzd::base::error::failure!("failed to write to UART"))
     }
 
     async fn flush(&mut self) -> Result<(), bzd::base::error::Error> {
         let uart = self
             .uart
             .as_mut()
-            .ok_or_else(|| bzd::base::error::failure("UART not initialized"))?;
+            .ok_or_else(|| bzd::base::error::failure!("UART not initialized"))?;
 
         uart.flush_async()
             .await
-            .map_err(|_| bzd::base::error::failure("failed to flush UART"))
+            .map_err(|_| bzd::base::error::failure!("failed to flush UART"))
     }
 }

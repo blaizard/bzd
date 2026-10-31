@@ -29,7 +29,7 @@ pub mod tests {
 #[doc(hidden)]
 #[track_caller]
 pub fn assert_failed(message: &'static str) -> bzd::base::error::Error {
-    bzd::base::error::failure(message)
+    bzd::base::error::Error::with_message(bzd::base::error::ErrorType::Failure, message)
 }
 
 #[doc(hidden)]

@@ -71,9 +71,7 @@ pub trait OStream {
     async fn write_all(&mut self, mut data: &[u8]) -> Result<(), Error> {
         while !data.is_empty() {
             let size = self.write(data).await?;
-            if size == 0 {
-                return Err(error::failure("stream write returned 0 bytes written"));
-            }
+            error::ensure!(size != 0, "stream write returned 0 bytes written")?;
             data = &data[size..];
         }
         Ok(())
@@ -124,6 +122,8 @@ impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedIStream<'_, S> {
 
 impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIStream<'_, S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
+        error::ensure!(!buffer.is_empty(), "stream read with an empty buffer")
+            .map_err(EmbeddedError::new)?;
         self.stream.read(buffer).await.map_err(EmbeddedError::new)
     }
 }
@@ -146,6 +146,8 @@ impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedOStream<'_, S> {
 
 impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedOStream<'_, S> {
     async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
+        error::ensure!(!data.is_empty(), "stream write with an empty buffer")
+            .map_err(EmbeddedError::new)?;
         self.stream.write(data).await.map_err(EmbeddedError::new)
     }
 
@@ -172,12 +174,16 @@ impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedIOStream<'_, S> {
 
 impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIOStream<'_, S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
+        error::ensure!(!buffer.is_empty(), "stream read with an empty buffer")
+            .map_err(EmbeddedError::new)?;
         self.stream.read(buffer).await.map_err(EmbeddedError::new)
     }
 }
 
 impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedIOStream<'_, S> {
     async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
+        error::ensure!(!data.is_empty(), "stream write with an empty buffer")
+            .map_err(EmbeddedError::new)?;
         self.stream.write(data).await.map_err(EmbeddedError::new)
     }
 
@@ -274,7 +280,7 @@ mod tests {
                 assert_eq!(err.error_type(), error::ErrorType::Failure)?;
                 assert_eq!(err.message(), "stream write returned 0 bytes written")?;
             }
-            Ok(()) => return Err(error::failure("expected write_all to fail")),
+            Ok(()) => return Err(error::failure!("expected write_all to fail")),
         }
         Ok(())
     }
@@ -329,24 +335,65 @@ mod tests {
     }
 
     #[test]
+    async fn test_embedded_adapters_reject_empty_buffers() -> TestResult {
+        // Empty transfers can never make progress and some implementations block
+        // on them, so they must fail instead of being forwarded.
+        struct PanicStream;
+
+        impl IStream for PanicStream {
+            async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+                assert_eq!(buffer.is_empty(), false)?;
+                Ok(0)
+            }
+        }
+
+        impl OStream for PanicStream {
+            async fn write(&mut self, data: &[u8]) -> Result<usize, Error> {
+                assert_eq!(data.is_empty(), false)?;
+                Ok(0)
+            }
+        }
+
+        let mut stream = PanicStream;
+        let mut io = stream.as_embedded_io();
+        let error = io.read(&mut []).await.unwrap_err().into_error();
+        assert_eq!(error.error_type(), error::ErrorType::Failure)?;
+        assert_eq!(error.message(), "stream read with an empty buffer")?;
+        let error = io.write(&[]).await.unwrap_err().into_error();
+        assert_eq!(error.error_type(), error::ErrorType::Failure)?;
+        assert_eq!(error.message(), "stream write with an empty buffer")?;
+
+        let mut stream = PanicStream;
+        let mut reader = stream.as_embedded_read();
+        let error = reader.read(&mut []).await.unwrap_err().into_error();
+        assert_eq!(error.message(), "stream read with an empty buffer")?;
+
+        let mut stream = PanicStream;
+        let mut writer = stream.as_embedded_write();
+        let error = writer.write(&[]).await.unwrap_err().into_error();
+        assert_eq!(error.message(), "stream write with an empty buffer")?;
+        Ok(())
+    }
+
+    #[test]
     fn test_embedded_error_kind() -> TestResult {
-        let timeout = EmbeddedError::new(error::timeout("timeout"));
+        let timeout = EmbeddedError::new(error::timeout!("timeout"));
         assert_eq!(timeout.kind(), ErrorKind::TimedOut)?;
         assert_eq!(timeout.as_error().error_type(), error::ErrorType::Timeout)?;
         assert_eq!(timeout.into_error().error_type(), error::ErrorType::Timeout)?;
 
-        let data = EmbeddedError::new(error::data("data"));
+        let data = EmbeddedError::new(error::data!("data"));
         assert_eq!(data.kind(), ErrorKind::InvalidData)?;
         assert_eq!(
-            EmbeddedError::new(error::failure("failure")).kind(),
+            EmbeddedError::new(error::failure!("failure")).kind(),
             ErrorKind::Other
         )?;
         assert_eq!(
-            EmbeddedError::new(error::busy("busy")).kind(),
+            EmbeddedError::new(error::busy!("busy")).kind(),
             ErrorKind::Other
         )?;
         assert_eq!(
-            EmbeddedError::new(error::eof("eof")).kind(),
+            EmbeddedError::new(error::eof!("eof")).kind(),
             ErrorKind::Other
         )?;
         Ok(())

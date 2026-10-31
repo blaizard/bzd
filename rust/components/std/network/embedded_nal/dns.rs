@@ -26,7 +26,7 @@ impl BzdDnsInterface for BzdComponentsStdNetworkNalDns {
         self.stack
             .get_host_by_name(hostname, AddrType::Either)
             .await
-            .map_err(|_| bzd::base::error::failure("failed to resolve hostname"))
+            .map_err(|_| bzd::base::error::failure!("failed to resolve hostname"))
     }
 }
 

@@ -373,7 +373,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	let result = executor.join().await;
 
 	let error = (result != 0)
-		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure("One or more workloads failed.")));
+		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure!("One or more workloads failed.")));
 	log_info!(logger, "[default.executor] Completion.").await?;
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;

@@ -20,13 +20,13 @@ impl OStream for BzdComponentsStdOut {
         let mut stdout = io::stdout();
         stdout
             .write(data)
-            .map_err(|_| bzd::base::error::failure("failed to write to stdout"))
+            .map_err(|_| bzd::base::error::failure!("failed to write to stdout"))
     }
 
     async fn flush(&mut self) -> Result<(), bzd::base::error::Error> {
         let mut stdout = io::stdout();
         stdout
             .flush()
-            .map_err(|_| bzd::base::error::failure("failed to flush stdout"))
+            .map_err(|_| bzd::base::error::failure!("failed to flush stdout"))
     }
 }
