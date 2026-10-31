@@ -14,10 +14,11 @@ pub trait BzdDnsInterface {
 /// Opens outbound TCP connections.
 pub trait BzdTcpInterface {
     /// Bidirectional byte stream owned by the connection.
-    type Stream<'a>: IStream + OStream
-    where
-        Self: 'a;
+    ///
+    /// Must own its state or borrow static data: callers release the component
+    /// handle as soon as `connect` returns.
+    type Stream: IStream + OStream + 'static;
 
     /// Connect to `address` and return the resulting stream.
-    async fn connect<'a>(&'a self, address: SocketAddr) -> Result<Self::Stream<'a>, Error>;
+    async fn connect(&self, address: SocketAddr) -> Result<Self::Stream, Error>;
 }
