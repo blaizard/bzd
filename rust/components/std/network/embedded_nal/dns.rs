@@ -26,8 +26,12 @@ impl BzdDnsInterface for BzdComponentsStdNetworkNalDns {
         self.stack
             .get_host_by_name(hostname, AddrType::Either)
             .await
-            .map_err(|_| bzd::base::error::failure!("failed to resolve hostname"))
+            .map_err(|error| map_error(hostname, error))
     }
+}
+
+fn map_error(hostname: &str, error: std::io::Error) -> bzd::base::error::Error {
+    bzd::base::error::failure!("failed to resolve hostname '{hostname}': {error}")
 }
 
 #[cfg(test)]
@@ -38,6 +42,19 @@ mod tests {
     #[test]
     fn test_new() -> TestResult {
         let _dns = BzdComponentsStdNetworkNalDns::new();
+        Ok(())
+    }
+
+    #[test]
+    fn test_map_error() -> TestResult {
+        let error = map_error(
+            "example.com",
+            std::io::Error::new(std::io::ErrorKind::NotFound, "no such host"),
+        );
+        assert_eq!(
+            error.message(),
+            "failed to resolve hostname 'example.com': no such host"
+        )?;
         Ok(())
     }
 }

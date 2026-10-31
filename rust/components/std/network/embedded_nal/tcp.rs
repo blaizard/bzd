@@ -32,9 +32,13 @@ impl BzdTcpInterface for BzdComponentsStdNetworkNalTcp {
             .stack
             .connect(address)
             .await
-            .map_err(|_| bzd::base::error::failure!("failed to connect TCP socket"))?;
+            .map_err(|error| map_error("failed to connect TCP socket", error))?;
         Ok(TcpStream::new(connection))
     }
+}
+
+fn map_error<E: core::fmt::Display>(context: &str, error: E) -> Error {
+    bzd::base::error::failure!("{context}: {error}")
 }
 
 pub struct TcpStream<C> {
@@ -52,7 +56,7 @@ impl<C: Read> IStream for TcpStream<C> {
         self.connection
             .read(buffer)
             .await
-            .map_err(|_| bzd::base::error::failure!("TCP read failed"))
+            .map_err(|error| map_error("TCP read failed", error))
     }
 }
 
@@ -61,14 +65,14 @@ impl<C: Write> OStream for TcpStream<C> {
         self.connection
             .write(data)
             .await
-            .map_err(|_| bzd::base::error::failure!("TCP write failed"))
+            .map_err(|error| map_error("TCP write failed", error))
     }
 
     async fn flush(&mut self) -> Result<(), Error> {
         self.connection
             .flush()
             .await
-            .map_err(|_| bzd::base::error::failure!("TCP flush failed"))
+            .map_err(|error| map_error("TCP flush failed", error))
     }
 }
 
@@ -133,6 +137,16 @@ mod tests {
     #[test]
     fn test_new() -> TestResult {
         let _tcp = BzdComponentsStdNetworkNalTcp::new();
+        Ok(())
+    }
+
+    #[test]
+    fn test_map_error() -> TestResult {
+        let error = map_error(
+            "TCP read failed",
+            std::io::Error::new(std::io::ErrorKind::ConnectionReset, "connection reset"),
+        );
+        assert_eq!(error.message(), "TCP read failed: connection reset")?;
         Ok(())
     }
 }
