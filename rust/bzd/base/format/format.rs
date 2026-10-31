@@ -73,9 +73,7 @@ pub async fn write_to<S: OStream>(out: &mut S, args: Arguments<'_>) -> Result<()
                 .map_err(|_| error::failure!("failed to format the message"))?;
             (writer.written(), writer.overflowed())
         };
-        if written == 0 && overflowed {
-            return Err(error::failure!("format chunk is empty"));
-        }
+        error::ensure!(written > 0 || !overflowed, "format chunk is empty")?;
         if written > 0 {
             out.write_all(&chunk[..written]).await?;
             skip += written;
