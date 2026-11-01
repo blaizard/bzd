@@ -1,6 +1,18 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_rust//rust:defs.bzl", "rust_library", "rust_library_group")
 
+rust_library(
+    name = "fpu",
+    srcs = ["fpu.rs"],
+    crate_name = "bzd_esp_fpu",
+    target_compatible_with = select({
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+)
+
 rust_library_group(
     name = "rust",
     target_compatible_with = select({
@@ -11,12 +23,14 @@ rust_library_group(
     visibility = ["//visibility:public"],
     deps = select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "@crates_esp32//:esp-alloc",
             "@crates_esp32//:esp-backtrace",
             "@crates_esp32//:esp-bootloader-esp-idf",
             "@crates_esp32//:esp-hal",
             "@crates_esp32//:esp-println",
         ],
         "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "@crates_esp32s3//:esp-alloc",
             "@crates_esp32s3//:esp-backtrace",
             "@crates_esp32s3//:esp-bootloader-esp-idf",
             "@crates_esp32s3//:esp-hal",

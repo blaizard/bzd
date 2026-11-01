@@ -21,5 +21,9 @@ impl<T> Singleton<T> {
 static PERIPHERALS: Singleton<esp_hal::peripherals::Peripherals> = Singleton::new();
 
 pub fn init() -> &'static mut esp_hal::peripherals::Peripherals {
-    PERIPHERALS.get_mut_or_init(|| esp_hal::init(esp_hal::Config::default()))
+    PERIPHERALS.get_mut_or_init(|| {
+        let peripherals = esp_hal::init(esp_hal::Config::default());
+        bzd_esp_fpu::enable();
+        peripherals
+    })
 }
