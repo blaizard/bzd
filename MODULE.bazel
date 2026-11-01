@@ -146,7 +146,7 @@ use_repo(requirements_nodejs, "nodejs_deps")
 
 RUST_EDITION = "2024"
 
-RUST_VERSION = "1.92.0"
+RUST_VERSION = "1.95.0"
 
 toolchain_rust = use_extension("@bzd_toolchain_rust//:extensions.bzl", "toolchain_rust")
 toolchain_rust.toolchain(

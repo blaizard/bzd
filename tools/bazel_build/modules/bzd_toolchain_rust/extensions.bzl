@@ -5,32 +5,32 @@ load("@bzd_platforms//:defs.bzl", "constraints_from_platform_name")
 load("//toolchains:defs.bzl", "config_settings_to_rust_triple")
 
 _repositories = {
-    "esp-rust-1.92.0": {
+    "esp-rust-1.95.0": {
         "stdlib_target": {
-            "build_file": Label("//toolchains/esp_rust_1.92.0:stdlib_target.BUILD.bazel"),
+            "build_file": Label("//toolchains/esp_rust_1.95.0:stdlib_target.BUILD.bazel"),
             "http": [
                 bzd_http_archive(
-                    sha256 = "159577235ac78591c850a432ad1a982735fe910d0495d26e7c5c17643acc4b4f",
+                    sha256 = "708bee337ac2d41c0e861af93047bffec91a052fbcb4957925d840a41f327717",
                     strip_prefix = "rust-src-nightly/rust-src/lib/rustlib/src/rust",
-                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-src-1.92.0.0.tar.xz",
+                    url = "https://github.com/esp-rs/rust-build/releases/download/v1.95.0.0/rust-src-1.95.0.0.tar.xz",
                 ),
             ],
         },
         "toolchain": [{
-            "build_file": Label("//toolchains/esp_rust_1.92.0:toolchain.BUILD.bazel"),
+            "build_file": Label("//toolchains/esp_rust_1.95.0:toolchain.BUILD.bazel"),
             "compatible_with": [
                 Label("@bzd_platforms//al_isa:linux-x86_64"),
             ],
             "http": [
                 bzd_http_archive(
-                    integrity = "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
+                    sha256 = "aad2fb24baeab6ad61c41f002f136fe0b416ef39a501d29750ab66c18a699433",
                     strip_prefix = "rust-nightly-x86_64-unknown-linux-gnu/rustc",
-                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-1.92.0.0-x86_64-unknown-linux-gnu.tar.xz",
+                    url = "https://github.com/esp-rs/rust-build/releases/download/v1.95.0.0/rust-1.95.0.0-x86_64-unknown-linux-gnu.tar.xz",
                 ),
                 bzd_http_archive(
-                    integrity = "sha256-vLCRgGo+El8ParhSFcHrcXT7w4g5dZdlUJ6d0lVl65U=",
+                    sha256 = "aad2fb24baeab6ad61c41f002f136fe0b416ef39a501d29750ab66c18a699433",
                     strip_prefix = "rust-nightly-x86_64-unknown-linux-gnu/rust-std-x86_64-unknown-linux-gnu",
-                    url = "https://data.blaizard.com/file/bzd/toolchains/rust/esp/rust-1.92.0.0-x86_64-unknown-linux-gnu.tar.xz",
+                    url = "https://github.com/esp-rs/rust-build/releases/download/v1.95.0.0/rust-1.95.0.0-x86_64-unknown-linux-gnu.tar.xz",
                     output = "stdlib_exec",
                 ),
             ],
@@ -40,14 +40,14 @@ _repositories = {
 
 _data = {
     "esp32-xtensa_lx6": {
-        "1.92.0": {
-            "repository": "esp-rust-1.92.0",
+        "1.95.0": {
+            "repository": "esp-rust-1.95.0",
             "target": Label("@bzd_platforms//al_isa:esp32-xtensa_lx6"),
         },
     },
     "esp32s3-xtensa_lx7": {
-        "1.92.0": {
-            "repository": "esp-rust-1.92.0",
+        "1.95.0": {
+            "repository": "esp-rust-1.95.0",
             "target": Label("@bzd_platforms//al_isa:esp32s3-xtensa_lx7"),
         },
     },

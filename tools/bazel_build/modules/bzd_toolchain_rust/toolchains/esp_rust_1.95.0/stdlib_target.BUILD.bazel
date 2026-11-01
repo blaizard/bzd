@@ -7,6 +7,27 @@ package(default_visibility = ["//visibility:public"])
 filegroup(
     name = "stdlib_target",
     srcs = [
+        ":alloc",
+        ":compiler_builtins",
+        ":core",
+    ],
+)
+
+# esp-radio and esp-alloc require the alloc crate.
+rust_library(
+    name = "alloc",
+    srcs = glob([
+        "library/alloc/src/**/*.rs",
+    ]),
+    crate_name = "alloc",
+    rustc_env = {
+        "RUSTC_BOOTSTRAP": "1",
+    },
+    rustc_flags = [
+        "--cfg=bootstrap",
+        "--cap-lints=allow",
+    ],
+    deps = [
         ":compiler_builtins",
         ":core",
     ],
