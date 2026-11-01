@@ -19,6 +19,10 @@ crates_esp32.annotation(
     deps = ["@crates_esp32//:xtensa-lx"],
 )
 crates_esp32.annotation(
+    crate = "esp-radio-rtos-driver",
+    deps = ["@crates_esp32//:portable-atomic"],
+)
+crates_esp32.annotation(
     build_script_env = {"OPT_LEVEL": "s"},
     crate = "esp-hal",
     deps = [

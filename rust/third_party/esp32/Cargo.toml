@@ -11,15 +11,20 @@ publish = false
 [dependencies]
 critical-section = "1.2.0"
 embassy-executor = "0.10.0"
+embassy-net = { version = "0.9.1", features = ["dhcpv4", "medium-ethernet", "proto-ipv6", "tcp", "dns"] }
 embassy-sync = "0.8.0"
 embassy-time = { version = "0.5.1", features = ["generic-queue-8"] }
-esp-backtrace = { version = "0.19.0", features = ["esp32", "println"] }
-esp-bootloader-esp-idf = { version = "0.5.0", features = ["esp32"] }
-esp-hal = { version = "1.1.2", features = ["esp32", "rt", "unstable"] }
-esp-println = { version = "0.17.0", default-features = false, features = ["auto", "esp32"] }
-esp-rom-sys = "=0.1.4" # 0.1.5 needs unstable cfg_select.
-esp-rtos = { version = "0.3.0", features = ["embassy", "esp32"] }
-# 0.41.0 requires esp-rom-sys 0.1.5 which needs unstable cfg_select.
-esp32 = "=0.40.2"
+embedded-io-async = "0.7.0"
+embedded-nal-async = "0.9.0"
+esp-alloc = { version = "0.11.0", features = ["esp32"] }
+esp-backtrace = { version = "0.20.0", features = ["esp32", "println"] }
+esp-bootloader-esp-idf = { version = "0.6.0", features = ["esp32"] }
+esp-hal = { version = "1.2.2", features = ["esp32", "rt", "unstable"] }
+esp-println = { version = "0.18.0", default-features = false, features = ["auto", "esp32"] }
+esp-radio = { version = "1.0.0-beta.1", features = ["wifi", "esp32"] }
+esp-rom-sys = "=0.1.5"
+esp-rtos = { version = "0.4.0", features = ["embassy", "esp-radio", "esp32"] }
+portable-atomic = "1.15.0"
+esp32 = "0.42.0"
 xtensa-lx = "0.13.0"
-xtensa-lx-rt = "0.22.0"
+xtensa-lx-rt = "0.23.0"
