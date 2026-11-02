@@ -1,0 +1,44 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library", "bdl_system")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "composition",
+    srcs = [
+        "composition.bdl",
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:stream",
+        "//rust/components/embassy/network:interface",
+        "//rust/components/esp/network/wifi:interface",
+        "//rust/interfaces:network",
+    ],
+)
+
+rust_library(
+    name = "http_get",
+    srcs = [
+        "http_get.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":composition",
+        "//interfaces:stream",
+        "//rust/bzd",
+        "//rust/interfaces:network",
+        "//rust/libs/http",
+    ],
+)
+
+bdl_system(
+    name = "http",
+    targets = {
+        "std": "//rust/targets:auto",
+    },
+    deps = [
+        ":http_get",
+        "//rust/components/embassy/network",
+        "//rust/components/esp/network/wifi",
+    ],
+)

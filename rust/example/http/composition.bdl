@@ -1,0 +1,16 @@
+use "rust/components/embassy/network/interface.bdl"
+use "rust/components/esp/network/wifi/interface.bdl"
+use "rust/example/http/interface.bdl"
+
+
+
+composition {
+	wifi = bzd.components.esp.network.WiFi(ssid = "myssid", password = "mypassword");
+	dns = bzd.components.embassy.network.Dns(network = wifi);
+	tcp = bzd.components.embassy.network.Tcp(network = wifi);
+	http = bzd.example.HttpGet(dns = dns, tcp = tcp);
+	http.run();
+	
+}
+
+
