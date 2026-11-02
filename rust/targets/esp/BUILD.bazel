@@ -1,3 +1,4 @@
+load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bzd_bdl//:defs.bzl", "bdl_target")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_binary")
@@ -10,6 +11,7 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/bzd",
+        "//rust/libs/esp:fpu",
         "//rust/libs/esp:rust",
     ],
     alwayslink = True,
@@ -23,6 +25,7 @@ rust_binary(
     deps = [
         "//rust/bzd",
         "//rust/libs/embassy",
+        "//rust/libs/esp:fpu",
         "//rust/libs/esp:rust",
     ],
 )
@@ -34,15 +37,29 @@ rust_binary(
     ],
     deps = [
         "//rust/bzd",
+        "//rust/libs/esp:fpu",
         "//rust/libs/esp:rust",
+    ],
+)
+
+selects.config_setting_group(
+    name = "esp32s3_uart",
+    match_all = [
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7",
+        "//tools/bazel_build/settings/executor:is_uart",
     ],
 )
 
 bdl_target(
     name = "auto",
-    composition = [
-        "composition.bdl",
-    ],
+    composition = ["composition.bdl"] + select({
+        ":esp32s3_uart": [
+            "out_usb_jtag.bdl",
+        ],
+        "//conditions:default": [
+            "out_uart.bdl",
+        ],
+    }),
     data = {
         "deps": [
             "//rust/bzd",
@@ -58,8 +75,14 @@ bdl_target(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/executor",
+        "//rust/components/embassy/network",
         "//rust/components/embassy/timer",
         "//rust/components/esp/stream/uart",
         "//rust/components/generic/logger/backend/ostream",
-    ],
+    ] + select({
+        ":esp32s3_uart": [
+            "//rust/components/esp/stream/usb_serial_jtag",
+        ],
+        "//conditions:default": [],
+    }),
 )

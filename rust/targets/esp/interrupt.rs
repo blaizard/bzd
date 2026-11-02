@@ -2,6 +2,8 @@
 #![no_main]
 
 use core::sync::atomic::{AtomicU32, Ordering};
+// Forces the global allocator from esp-alloc to be linked.
+use esp_alloc as _;
 use esp_backtrace as _;
 use esp_hal::{
     handler,
@@ -33,6 +35,7 @@ fn main() -> ! {
     println!("Booted");
 
     let peripherals = esp_hal::init(Config::default());
+    bzd_esp_fpu::enable();
     let timg0 = TimerGroup::new(peripherals.TIMG0);
     let timer0 = timg0.timer0;
 

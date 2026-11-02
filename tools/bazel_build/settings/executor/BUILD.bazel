@@ -23,3 +23,11 @@ config_setting(
     },
     visibility = ["//visibility:public"],
 )
+
+config_setting(
+    name = "is_uart",
+    flag_values = {
+        "//tools/bazel_build/settings/executor": "uart",
+    },
+    visibility = ["//visibility:public"],
+)

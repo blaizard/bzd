@@ -1,0 +1,10 @@
+use "rust/components/esp/stream/usb_serial_jtag/interface.bdl"
+
+
+
+composition {
+	out = bzd.components.esp.UsbSerialJtagOut();
+	
+}
+
+

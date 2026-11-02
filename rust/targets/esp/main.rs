@@ -3,6 +3,8 @@
 
 //use esp_backtrace as _;
 use bzd::base::panic::PanicPrint;
+// Forces the global allocator from esp-alloc to be linked.
+use esp_alloc as _;
 use esp_hal::{main, system::software_reset};
 use esp_println::{print, println};
 
@@ -31,6 +33,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[main]
 fn main() -> ! {
+    bzd_esp_fpu::enable();
     let _ = unsafe { run_executor() };
 
     println!("<exit code 0>");
