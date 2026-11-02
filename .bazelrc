@@ -114,9 +114,9 @@ build:rust --build_tag_filters=rust
 test:rust --test_tag_filters=rust
 # Optimize external crates for size in every build.
 build --@rules_rust//rust/settings:per_crate_rustc_flag=external@-Copt-level=z
+build --@rules_rust//rust/settings:codegen_units=1
 build:prod --@rules_rust//rust/settings:lto=fat
 # A single codegen unit improves cross-unit optimization and reduces size.
-build:prod --@rules_rust//rust/settings:codegen_units=1
 build:prod --@rules_rust//rust/settings:extra_rustc_flag=-Copt-level=z
 
 # Add stamping
