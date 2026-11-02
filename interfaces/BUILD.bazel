@@ -92,8 +92,8 @@ bdl_library(
         ":network",
     ],
     implementation = {
-        "rust": "//rust/interfaces/impl:tcp",
         "cc": "//cc/bzd/platform/interfaces:tcp",
+        "rust": "//rust/interfaces/impl:tcp",
     },
 )
 
