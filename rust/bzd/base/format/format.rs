@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![allow(async_fn_in_trait)]
 
 use core::fmt::{write, Arguments};
 use error::{self, Error};
@@ -63,7 +64,7 @@ impl core::fmt::Write for SkipWriter<'_> {
 /// A message that fits in [`CHUNK_SIZE`] bytes is formatted only once. A longer message
 /// is formatted again for each chunk, which requires its `Display` implementations to be
 /// pure, that is to always produce the same output for the same input.
-pub async fn write_to<S: OStream>(out: &mut S, args: Arguments<'_>) -> Result<(), Error> {
+pub async fn write_to<S: OStream + ?Sized>(out: &mut S, args: Arguments<'_>) -> Result<(), Error> {
     let mut chunk = [0u8; CHUNK_SIZE];
     let mut skip = 0;
     loop {
@@ -82,6 +83,26 @@ pub async fn write_to<S: OStream>(out: &mut S, args: Arguments<'_>) -> Result<()
             return Ok(());
         }
     }
+}
+
+/// Extension trait for writing formatted messages to an [`OStream`].
+pub trait OStreamFormat: OStream {
+    async fn format(&mut self, args: Arguments<'_>) -> Result<(), Error> {
+        write_to(self, args).await
+    }
+}
+
+impl<T: OStream> OStreamFormat for T {}
+
+/// Write a formatted message to an output stream.
+#[macro_export]
+macro_rules! format_to {
+    ($out:expr, $($arg:tt)*) => {
+        async {
+            use $crate::OStreamFormat;
+            $out.format(::core::format_args!($($arg)*)).await
+        }
+    };
 }
 
 #[cfg(test)]
