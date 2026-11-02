@@ -4,7 +4,7 @@ use rust_components_embassy_network_interface::{
     BzdComponentsEmbassyNetworkTcpContext, BzdComponentsEmbassyNetworkTcpContextConstraint,
     BzdComponentsEmbassyNetworkTcpInterface,
 };
-use rust_interfaces_network::BzdTcpInterface;
+use rust_interfaces_network::BzdNetworkTcpInterface;
 
 use crate::state::{self, TcpConnectionType};
 use crate::stream::TcpStream;
@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<C> BzdTcpInterface for BzdComponentsEmbassyNetworkTcp<C>
+impl<C> BzdNetworkTcpInterface for BzdComponentsEmbassyNetworkTcp<C>
 where
     C: BzdComponentsEmbassyNetworkTcpContextConstraint,
 {

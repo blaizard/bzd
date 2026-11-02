@@ -2,7 +2,5 @@
 namespace bzd;
 
 extern interface Network;
-extern interface Dns;
-extern interface Tcp;
 
 

@@ -8,7 +8,7 @@ pub use rust_example_http_composition::{
 use bzd_http::{request, Method, Request};
 use core::net::SocketAddr;
 use interfaces_stream::BzdOStreamInterface;
-use rust_interfaces_network::{BzdDnsInterface, BzdTcpInterface};
+use rust_interfaces_network::{BzdNetworkDnsInterface, BzdNetworkTcpInterface};
 
 const HOSTNAME: &str = "example.com";
 const PORT: u16 = 80;

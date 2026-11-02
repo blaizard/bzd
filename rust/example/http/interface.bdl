@@ -1,5 +1,6 @@
 use "interfaces/stream.bdl"
-use "rust/interfaces/network.bdl"
+use "rust/interfaces/dns.bdl"
+use "rust/interfaces/tcp.bdl"
 
 namespace bzd.example;
 
@@ -7,8 +8,8 @@ namespace bzd.example;
 component HttpGet {
 config:
 	out = {out};
-	dns = bzd.Dns;
-	tcp = bzd.Tcp;
+	dns = bzd.network.Dns;
+	tcp = bzd.network.Tcp;
 	
 interface:
 	method run();

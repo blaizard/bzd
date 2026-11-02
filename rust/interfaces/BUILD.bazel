@@ -36,7 +36,9 @@ bdl_library(
 bdl_library(
     name = "network",
     srcs = [
+        "dns.bdl",
         "network.bdl",
+        "tcp.bdl",
     ],
     visibility = ["//visibility:public"],
     implementation = {

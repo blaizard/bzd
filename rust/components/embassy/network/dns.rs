@@ -4,7 +4,7 @@ use rust_components_embassy_network_interface::{
     BzdComponentsEmbassyNetworkDnsContext, BzdComponentsEmbassyNetworkDnsContextConstraint,
     BzdComponentsEmbassyNetworkDnsInterface,
 };
-use rust_interfaces_network::BzdDnsInterface;
+use rust_interfaces_network::BzdNetworkDnsInterface;
 
 use crate::state;
 
@@ -24,7 +24,7 @@ where
     }
 }
 
-impl<C> BzdDnsInterface for BzdComponentsEmbassyNetworkDns<C>
+impl<C> BzdNetworkDnsInterface for BzdComponentsEmbassyNetworkDns<C>
 where
     C: BzdComponentsEmbassyNetworkDnsContextConstraint,
 {

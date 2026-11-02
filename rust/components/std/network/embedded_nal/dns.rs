@@ -1,6 +1,6 @@
 use core::net::IpAddr;
 use embedded_nal_async::{AddrType, Dns as _};
-use rust_interfaces_network::BzdDnsInterface;
+use rust_interfaces_network::BzdNetworkDnsInterface;
 use std_embedded_nal_async::Stack;
 
 pub struct BzdComponentsStdNetworkNalDns {
@@ -21,7 +21,7 @@ impl Default for BzdComponentsStdNetworkNalDns {
     }
 }
 
-impl BzdDnsInterface for BzdComponentsStdNetworkNalDns {
+impl BzdNetworkDnsInterface for BzdComponentsStdNetworkNalDns {
     async fn resolve(&self, hostname: &str) -> Result<IpAddr, bzd::base::error::Error> {
         self.stack
             .get_host_by_name(hostname, AddrType::Either)

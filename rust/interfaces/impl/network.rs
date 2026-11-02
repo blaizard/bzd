@@ -9,13 +9,13 @@ use core::net::{IpAddr, SocketAddr};
 pub trait BzdNetworkInterface {}
 
 /// Resolves hostnames to IP addresses.
-pub trait BzdDnsInterface {
+pub trait BzdNetworkDnsInterface {
     /// Resolve `hostname` into an address.
     async fn resolve(&self, hostname: &str) -> Result<IpAddr, Error>;
 }
 
 /// Opens outbound TCP connections.
-pub trait BzdTcpInterface {
+pub trait BzdNetworkTcpInterface {
     /// Bidirectional byte stream owned by the connection.
     ///
     /// Must own its state or borrow static data: callers release the component

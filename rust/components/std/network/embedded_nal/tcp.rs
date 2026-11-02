@@ -3,7 +3,7 @@ use bzd::base::stream::{IStream, OStream};
 use core::net::SocketAddr;
 use embedded_io_async::{Read, Write};
 use embedded_nal_async::TcpConnect;
-use rust_interfaces_network::BzdTcpInterface;
+use rust_interfaces_network::BzdNetworkTcpInterface;
 use std_embedded_nal_async::Stack;
 
 pub struct BzdComponentsStdNetworkNalTcp {
@@ -24,7 +24,7 @@ impl Default for BzdComponentsStdNetworkNalTcp {
     }
 }
 
-impl BzdTcpInterface for BzdComponentsStdNetworkNalTcp {
+impl BzdNetworkTcpInterface for BzdComponentsStdNetworkNalTcp {
     type Stream = TcpStream<<Stack as TcpConnect>::Connection<'static>>;
 
     async fn connect(&self, address: SocketAddr) -> Result<Self::Stream, Error> {
