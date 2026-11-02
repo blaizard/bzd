@@ -16,6 +16,7 @@ bdl_target(
     name = "auto",
     composition = [
         "composition.bdl",
+        "network.bdl",
     ],
     data = {
         "deps": [

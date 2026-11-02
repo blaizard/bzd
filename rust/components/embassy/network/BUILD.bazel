@@ -8,6 +8,8 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//interfaces:tcp",
+        "//rust/interfaces:dns",
         "//rust/interfaces:network",
     ],
 )
@@ -30,8 +32,9 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
+        "//interfaces:tcp",
         "//rust/bzd",
-        "//rust/interfaces:network",
+        "//rust/interfaces:dns",
         "//rust/libs/embassy",
     ] + select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [

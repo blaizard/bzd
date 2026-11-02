@@ -34,11 +34,20 @@ bdl_library(
 )
 
 bdl_library(
-    name = "network",
+    name = "dns",
     srcs = [
         "dns.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    implementation = {
+        "rust": "//rust/interfaces/impl:dns",
+    },
+)
+
+bdl_library(
+    name = "network",
+    srcs = [
         "network.bdl",
-        "tcp.bdl",
     ],
     visibility = ["//visibility:public"],
     implementation = {

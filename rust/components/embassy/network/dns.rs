@@ -4,7 +4,7 @@ use rust_components_embassy_network_interface::{
     BzdComponentsEmbassyNetworkDnsContext, BzdComponentsEmbassyNetworkDnsContextConstraint,
     BzdComponentsEmbassyNetworkDnsInterface,
 };
-use rust_interfaces_network::BzdNetworkDnsInterface;
+use rust_interfaces_dns::BzdNetworkDnsInterface;
 
 use crate::state;
 

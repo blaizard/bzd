@@ -1,6 +1,6 @@
+use "interfaces/tcp.bdl"
 use "rust/interfaces/dns.bdl"
 use "rust/interfaces/network.bdl"
-use "rust/interfaces/tcp.bdl"
 
 namespace bzd.components.embassy.network;
 
@@ -13,7 +13,7 @@ interface:
 	
 }
 
-component Tcp : bzd.network.Tcp {
+component Tcp : bzd.network.tcp.Client {
 config:
 	network = bzd.Network;
 	

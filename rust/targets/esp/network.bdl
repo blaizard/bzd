@@ -1,0 +1,18 @@
+use "rust/components/embassy/network/interface.bdl"
+use "rust/components/esp/network/wifi/interface.bdl"
+
+namespace network;
+
+
+composition tcp {
+	client = bzd.components.embassy.network.Tcp(network = wifi);
+	
+}
+
+composition {
+	wifi = bzd.components.esp.network.WiFi(ssid = "myssid", password = "mypassword");
+	dns = bzd.components.embassy.network.Dns(network = wifi);
+	
+}
+
+

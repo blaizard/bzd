@@ -90,8 +90,11 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         ":network",
-        "//cc/bzd/platform/interfaces:tcp",
     ],
+    implementation = {
+        "rust": "//rust/interfaces/impl:tcp",
+        "cc": "//cc/bzd/platform/interfaces:tcp",
+    },
 )
 
 bdl_library(

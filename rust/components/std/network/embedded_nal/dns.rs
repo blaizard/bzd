@@ -1,6 +1,6 @@
 use core::net::IpAddr;
 use embedded_nal_async::{AddrType, Dns as _};
-use rust_interfaces_network::BzdNetworkDnsInterface;
+use rust_interfaces_dns::BzdNetworkDnsInterface;
 use std_embedded_nal_async::Stack;
 
 pub struct BzdComponentsStdNetworkNalDns {

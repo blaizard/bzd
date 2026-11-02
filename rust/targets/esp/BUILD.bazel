@@ -52,7 +52,10 @@ selects.config_setting_group(
 
 bdl_target(
     name = "auto",
-    composition = ["composition.bdl"] + select({
+    composition = [
+        "composition.bdl",
+        "network.bdl",
+    ] + select({
         ":esp32s3_uart": [
             "out_usb_jtag.bdl",
         ],
@@ -77,6 +80,7 @@ bdl_target(
         "//rust/components/embassy/executor",
         "//rust/components/embassy/network",
         "//rust/components/embassy/timer",
+        "//rust/components/esp/network/wifi",
         "//rust/components/esp/stream/uart",
         "//rust/components/generic/logger/backend/ostream",
     ] + select({

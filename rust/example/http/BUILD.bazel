@@ -10,9 +10,8 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//interfaces:stream",
-        "//rust/components/embassy/network:interface",
-        "//rust/components/esp/network/wifi:interface",
-        "//rust/interfaces:network",
+        "//interfaces:tcp",
+        "//rust/interfaces:dns",
     ],
 )
 
@@ -25,8 +24,9 @@ rust_library(
     deps = [
         ":composition",
         "//interfaces:stream",
+        "//interfaces:tcp",
         "//rust/bzd",
-        "//rust/interfaces:network",
+        "//rust/interfaces:dns",
         "//rust/libs/http",
     ],
 )
@@ -38,7 +38,5 @@ bdl_system(
     },
     deps = [
         ":http_get",
-        "//rust/components/embassy/network",
-        "//rust/components/esp/network/wifi",
     ],
 )

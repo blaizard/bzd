@@ -1,10 +1,10 @@
 use bzd::base::error::Error;
 use core::net::SocketAddr;
+use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rust_components_embassy_network_interface::{
     BzdComponentsEmbassyNetworkTcpContext, BzdComponentsEmbassyNetworkTcpContextConstraint,
     BzdComponentsEmbassyNetworkTcpInterface,
 };
-use rust_interfaces_network::BzdNetworkTcpInterface;
 
 use crate::state::{self, TcpConnectionType};
 use crate::stream::TcpStream;
@@ -25,7 +25,7 @@ where
     }
 }
 
-impl<C> BzdNetworkTcpInterface for BzdComponentsEmbassyNetworkTcp<C>
+impl<C> BzdNetworkTcpClientInterface for BzdComponentsEmbassyNetworkTcp<C>
 where
     C: BzdComponentsEmbassyNetworkTcpContextConstraint,
 {

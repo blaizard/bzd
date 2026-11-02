@@ -272,10 +272,6 @@ class PresetFragment(SymbolFragment):
 				"interface": "bzd.network.Dns",
 				"symbol": "target.network.dns",
 			},
-			"network.tcp": {
-				"interface": "bzd.network.Tcp",
-				"symbol": "target.network.tcp",
-			},
 		}
 
 		if self.preset in presets:

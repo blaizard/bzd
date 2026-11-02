@@ -8,7 +8,8 @@ bdl_library(
         "interface.bdl",
     ],
     deps = [
-        "//rust/interfaces:network",
+        "//interfaces:tcp",
+        "//rust/interfaces:dns",
     ],
 )
 
@@ -28,8 +29,9 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
+        "//interfaces:tcp",
         "//rust/bzd",
-        "//rust/interfaces:network",
+        "//rust/interfaces:dns",
         "@crates_std//:embedded-io-async",
         "@crates_std//:embedded-nal-async",
         "@crates_std//:std-embedded-nal-async",

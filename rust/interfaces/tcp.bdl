@@ -1,6 +1,0 @@
-
-namespace bzd.network;
-
-extern interface Tcp;
-
-

@@ -1,0 +1,16 @@
+use "rust/components/std/network/embedded_nal/interface.bdl"
+
+namespace network;
+
+
+composition tcp {
+	client = bzd.components.std.network.nal.Tcp();
+	
+}
+
+composition {
+	dns = bzd.components.std.network.nal.Dns();
+	
+}
+
+
