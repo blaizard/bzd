@@ -20,6 +20,7 @@ BdlTargetInfo = provider(
         "data": "Dictionary of files or bazel targets associated with target.",
         "deps": "List of dependencies for this target.",
         "language": "Language used for this target.",
+        "presets": "List of preset JSON files for the composition of this target.",
     },
 )
 

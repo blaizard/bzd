@@ -19,6 +19,7 @@ def _bdl_target_impl(ctx):
         data = ctx.attr.data | parent.data
         language = parent.language
         binary = parent.binary
+        presets = ctx.files.presets + parent.presets
 
     else:
         composition = ctx.files.composition
@@ -26,6 +27,7 @@ def _bdl_target_impl(ctx):
         data = ctx.attr.data
         language = ctx.attr.language
         binary = ctx.attr.binary
+        presets = ctx.files.presets
 
     if not composition:
         fail("The target {} is missing composition files".format(ctx.label))
@@ -36,6 +38,7 @@ def _bdl_target_impl(ctx):
         data = data,
         language = language,
         binary = binary,
+        presets = presets,
     )
 
 _bdl_target = rule(
@@ -69,6 +72,10 @@ _bdl_target = rule(
         ),
         "platform": attr.label(
             doc = "The platform used for the transition of this target.",
+        ),
+        "presets": attr.label_list(
+            allow_files = [".json"],
+            doc = "JSON preset files referenced by `preset NAME from \"PATH\";` statements in the composition files.",
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",

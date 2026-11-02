@@ -56,12 +56,17 @@ bdl_target(
     ],
     language = "cc",
     platform = "@clang//:platform-linux-x86_64",
+    presets = [
+        "//config:my_config.json",
+    ],
     deps = [
         ":main",
     ],
     visibility = ["//visibility:public"],
 )
 ```
+
+`presets` are JSON files referenced by `preset NAME from "PATH";` statements in the composition files of the target.
 
 Note that a target whose name ends with `auto` must not define a `platform` attribute. In this case the platform is
 provided by platform specific variants that inherit the composition, deps and language via the `parent` attribute.

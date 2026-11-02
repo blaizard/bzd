@@ -23,7 +23,7 @@ def _bdl_composition_impl(ctx):
             deps = target_provider.deps,
             output_dir = target_name,
             namespace = name,
-            presets = [],
+            presets = target_provider.presets,
         )
         bdl_providers[name] = bdl_provider
         deps[name] = target_provider.deps

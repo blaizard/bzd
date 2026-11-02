@@ -1,5 +1,6 @@
 load("@bazel_skylib//lib:selects.bzl", "selects")
 load("@bzd_bdl//:defs.bzl", "bdl_target")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_binary")
 
@@ -42,6 +43,14 @@ rust_binary(
     ],
 )
 
+bzd_config_default(
+    name = "network_config",
+    values = {
+        "password": "mypassword",
+        "ssid": "myssid",
+    },
+)
+
 selects.config_setting_group(
     name = "esp32s3_uart",
     match_all = [
@@ -75,6 +84,9 @@ bdl_target(
         ],
     },
     language = "rust",
+    presets = [
+        ":network_config.json",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/executor",
