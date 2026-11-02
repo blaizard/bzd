@@ -29,7 +29,7 @@ class Context:
 		self.updateIgnoreOverride: typing.Optional[str] = None
 		self.logger = logger
 		self.release = Release(uid=self.uid, token=self.token)
-		self.node = Node(uid=self.uid, token=self.token, logger=logger)
+		self.node = Node(uid=self.uid, token=self.token)
 		self.binary = Binary(binary=self.application, logger=self.logger)
 
 	@staticmethod

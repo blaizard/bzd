@@ -1,12 +1,10 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import LogFactory from "#bzd/nodejs/core/log.js";
 import { HttpClient } from "#bzd/nodejs/core/http/client.js";
 import { delayMs } from "#bzd/nodejs/utils/delay.js";
 import pathlib from "#bzd/nodejs/utils/pathlib.js";
 import { configDefaultNodeVolume, configRemotes, configToken } from "#bzd/apps/artifacts/api/nodejs/config.js";
 
 const Exception = ExceptionFactory("artifacts", "api");
-const Log = LogFactory("artifacts", "api");
 
 Exception.assert(configRemotes().length > 0, "'remotes' from the API config cannot be empty.");
 
@@ -16,16 +14,22 @@ export class ArtifactsBase {
 		remotes = configRemotes(),
 		volume = configDefaultNodeVolume(),
 		token = process.env.BZD_NODE_TOKEN ?? configToken(),
-		logger = Log,
 		httpClient = HttpClient,
 	} = {}) {
 		this.uid = uid;
 		this.remoteSources = remotes;
 		this.volume = volume;
 		this.token = token;
-		this.logger = logger;
 		this.remote = null;
 		this.httpClient = httpClient;
+	}
+
+	/// Log an error to the console.
+	///
+	/// The regular logger may itself be backed by the artifacts publisher, so
+	/// logging through it would re-enqueue publish errors and create a loop.
+	logError(...args) {
+		console.error(...args);
 	}
 
 	/// Lazily iterate over remote sources, retrying the current remote (if any).
@@ -56,7 +60,7 @@ export class ArtifactsBase {
 				try {
 					return await callback(remote);
 				} catch (e) {
-					this.logger.error(`Remote '${remote}' failed (attempt ${retry + 1}/${nbRetries + 1}): ${e}`);
+					this.logError(`Remote '${remote}' failed (attempt ${retry + 1}/${nbRetries + 1}): ${e}`);
 				}
 			}
 			if (retryForS === null) {

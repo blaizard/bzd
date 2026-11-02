@@ -1,5 +1,6 @@
 import typing
 import os
+import sys
 import time
 
 from bzd.http.client import HttpClient
@@ -8,7 +9,6 @@ from apps.artifacts.api.python.config import (
 	configToken,
 	configDefaultNodeVolume,
 )
-from bzd.logging import Logger
 
 assert len(configRemotes()) > 0, "'remotes' from the API config cannot be empty."
 
@@ -28,7 +28,6 @@ class ArtifactsBase:
 		remotes: typing.List[str] = configRemotes(),
 		volume: str = configDefaultNodeVolume(),
 		token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken()),
-		logger: Logger = Logger("artifacts.api"),
 		httpClient: typing.Any = HttpClient,
 	) -> None:
 		"""Construct the Artifacts API object.
@@ -38,7 +37,6 @@ class ArtifactsBase:
 		        remotes: The remotes to be used.
 		        volume: The volume to be used.
 		        token: The application token to be used.
-		        logger: The logger to be used.
 		        httpClient: The http client object to be used.
 		"""
 
@@ -46,9 +44,17 @@ class ArtifactsBase:
 		self.remoteSources = remotes
 		self.volume = volume
 		self.token = token
-		self.logger = logger
 		self.remote: typing.Optional[str] = None
 		self.httpClient = httpClient
+
+	def logError(self, message: str) -> None:
+		"""Log an error to stderr.
+
+		The regular logger may itself be backed by the artifacts publisher, so
+		logging through it would re-enqueue publish errors and create a loop.
+		"""
+
+		print(message, file=sys.stderr)
 
 	@property
 	def remotes(self) -> typing.Generator[typing.Tuple[str, int, int], None, None]:
@@ -94,7 +100,7 @@ class ArtifactsBase:
 				try:
 					return callback(remote)
 				except Exception as e:
-					self.logger.error(f"Remote '{remote}' failed (attempt {retry + 1}/{nbRetries + 1}): {str(e)}")
+					self.logError(f"Remote '{remote}' failed (attempt {retry + 1}/{nbRetries + 1}): {str(e)}")
 			if retryForS is None:
 				break
 			timestampElapsed = time.time() - timestampStart

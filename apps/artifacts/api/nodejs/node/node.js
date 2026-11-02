@@ -81,7 +81,7 @@ export class Node extends ArtifactsBase {
 	///
 	/// \param options The options to pass to the logger backend.
 	makeLoggerBackend(options = {}) {
-		return new LoggerBackendNode({ node: this, logger: this.logger, ...options });
+		return new LoggerBackendNode({ node: this, ...options });
 	}
 
 	async _publish(entry) {
@@ -100,7 +100,7 @@ export class Node extends ArtifactsBase {
 			} catch (e) {
 				if (e instanceof HttpClientException && MALFORMED_REQUEST_STATUS_CODES.includes(e.code)) {
 					// The request is malformed and can never succeed, drop it.
-					this.logger.error(`Remote '${remote}' dropped the malformed request: ${e.message}`);
+					this.logError(`Remote '${remote}' dropped the malformed request: ${e.message}`);
 					return;
 				}
 				throw e;

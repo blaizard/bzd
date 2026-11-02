@@ -57,7 +57,7 @@ class Node(ArtifactsBase):
 	def __init__(
 		self,
 		path: typing.Optional[typing.List[str]] = None,
-		maxBufferSize: int = 0,
+		maxBufferSize: int = 1000,
 		blockForS: typing.Optional[float] = None,
 		**kwargs: typing.Any,
 	) -> None:
@@ -129,7 +129,7 @@ class Node(ArtifactsBase):
 						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
 					except HttpClientException as e:
 						if e.status in MalformedRequestStatusCodes:
-							self.logger.error(f"Remote '{remote}' dropped the malformed request: {str(e)}")
+							self.logError(f"Remote '{remote}' dropped the malformed request: {str(e)}")
 							self.buffer.pop(0)
 							continue
 						raise
@@ -377,6 +377,6 @@ class LoggerHandlerNode(LoggerHandler):
 						},
 					)
 		except NodePublishNoRemote as e:
-			self.node.logger.error(str(e))
+			self.node.logError(str(e))
 
 		flow.next(data=data)

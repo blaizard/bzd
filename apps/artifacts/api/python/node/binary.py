@@ -15,7 +15,7 @@ from bzd.logging import Logger
 class Utility:
 	def __init__(self, uid: str, logger: Logger) -> None:
 		self.uid = uid
-		self.node = Node(uid=self.uid, logger=logger)
+		self.node = Node(uid=self.uid)
 		self.logger = logger
 
 	def fail(self, message: str, errorCode: int = 1) -> None:
@@ -49,7 +49,7 @@ class Utility:
 			self.logger.info(f"Published to node {self.uid}:{'/'.join(path)}: {data}")
 
 		except NodePublishNoRemote as e:
-			self.logger.error(str(e))
+			self.node.logError(str(e))
 
 	def publish(self, data: str) -> None:
 		"""Publish some data to a remote node."""

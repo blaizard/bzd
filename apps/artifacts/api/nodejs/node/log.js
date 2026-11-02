@@ -16,8 +16,8 @@ export class LoggerBackendNode {
 		this.maxBufferSize = maxBufferSize;
 		this.logger = logger;
 		this.buffer = [];
-		/// Chain of pending publishes, serialized to avoid overlapping requests.
-		this.flushPromise = Promise.resolve();
+		/// Pending flush, or null when no flush is scheduled.
+		this.flushPromise = null;
 
 		/// Register as a log backend at 'trace' level: receives all log entries (all levels including trace).
 		this.logger.addBackend("artifacts", (...args) => this.processor(...args), "info");
@@ -43,10 +43,17 @@ export class LoggerBackendNode {
 		}
 	}
 
-	/// Publish all buffered entries in a single bulk request.
-	async flush() {
-		/// Serialize the publishes so that concurrent flush requests never overlap.
-		this.flushPromise = this.flushPromise.then(() => this.publish());
+	/// Flush the buffered logs.
+	///
+	/// This is only a trigger: publish() drains the whole buffer. If a flush is
+	/// already pending, coalesce this call into it so a slow remote cannot stack
+	/// an unbounded chain of publishes. New logs wait for the next flush.
+	flush() {
+		if (this.flushPromise === null) {
+			this.flushPromise = this.publish().finally(() => {
+				this.flushPromise = null;
+			});
+		}
 		return this.flushPromise;
 	}
 
