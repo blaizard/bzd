@@ -5,6 +5,9 @@ use bzd::base::error::Error;
 use bzd::base::stream::{IStream, OStream};
 use core::net::{IpAddr, SocketAddr};
 
+/// Marker for a network provider that can be injected into network components.
+pub trait BzdNetworkInterface {}
+
 /// Resolves hostnames to IP addresses.
 pub trait BzdDnsInterface {
     /// Resolve `hostname` into an address.

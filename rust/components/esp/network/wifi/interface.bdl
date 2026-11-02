@@ -1,0 +1,24 @@
+use "interfaces/stream.bdl"
+use "rust/interfaces/network.bdl"
+
+namespace bzd.components.esp.network;
+
+
+component WiFi : bzd.Network {
+config:
+	out = {out};
+	ssid = String;
+	password = String;
+	timeout_s = Integer(30) [min(1)];
+	
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	method service();
+	
+composition:
+	this.service();
+	
+}
+
+
