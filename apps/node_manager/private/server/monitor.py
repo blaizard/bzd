@@ -1,3 +1,4 @@
+import os
 import psutil
 import typing
 import json
@@ -8,6 +9,61 @@ from apps.node_manager.private.server.nvidia import Nvidia
 from apps.node_manager.private.server.ups import UPS
 from apps.node_manager.private.server.config import Config
 from apps.node_manager.private.server.workload import Workload
+
+# Virtual or transient filesystems. They do not represent persistent storage,
+# and their mount points often change with containers.
+IGNORED_FSTYPES = {
+	"autofs",
+	"binfmt_misc",
+	"bpf",
+	"cgroup",
+	"cgroup2",
+	"configfs",
+	"debugfs",
+	"devpts",
+	"devtmpfs",
+	"efivarfs",
+	"fusectl",
+	"hugetlbfs",
+	"mqueue",
+	"nsfs",
+	"overlay",
+	"proc",
+	"pstore",
+	"ramfs",
+	"rpc_pipefs",
+	"securityfs",
+	"squashfs",
+	"sysfs",
+	"tmpfs",
+	"tracefs",
+}
+
+
+def getNetworkInterfaces() -> typing.Set[str]:
+	"""Return the network interfaces to report."""
+
+	interfaces = {
+		name
+		for name, stats in psutil.net_if_stats().items()  # type: ignore
+		if stats.isup and "loopback" not in stats.flags.lower()
+	}
+	# Prefer physical interfaces
+	physical = {name for name in interfaces if os.path.exists(os.path.join("/sys/class/net", name, "device"))}
+	return physical or interfaces
+
+
+def getBlockDevices() -> typing.Set[str]:
+	"""Return the block devices to report."""
+
+	devices = set((psutil.disk_io_counters(perdisk=True, nowrap=True) or {}).keys())  # type: ignore
+	# Prefer physical, device-mapper and software RAID devices.
+	stable = {
+		name
+		for name in devices
+		if any(os.path.exists(os.path.join("/sys/block", name, entry)) for entry in ("device", "dm", "md"))
+	}
+	return stable or devices
 
 
 class Monitor:
@@ -94,15 +150,17 @@ class Monitor:
 			# Do some filtering as some cloud vps mount a lot of devices.
 			if any(opt in ignoreWithOps for opt in partition.opts.split(",")):
 				continue
+			if partition.fstype in IGNORED_FSTYPES:
+				continue
+			# Keep one entry per device, extra bind mounts must not add keys.
 			if partition.device not in disks:
 				usage = psutil.disk_usage(partition.mountpoint)  # type: ignore
 				disks[partition.device] = {
-					"path": [],
+					"path": partition.mountpoint,
 					"data": {"used": usage.used, "total": usage.total},
 				}
-			disks[partition.device]["path"].append(partition.mountpoint)  # type: ignore
 
-		dictionary = {",".join(sorted(data["path"])): data["data"] for data in disks.values()}
+		dictionary = {data["path"]: data["data"] for data in disks.values()}
 		return self.config.disksMappings(dictionary)
 
 	def network(self) -> typing.Any:
@@ -112,11 +170,7 @@ class Monitor:
 		timestampDiffS = timestampS - self.networkPrevious.get("_timestampS", timestampS)
 		self.networkPrevious["_timestampS"] = timestampS
 
-		# Only consider interfaces that are UP and the ones that are not loopback.
-		statsAll = psutil.net_if_stats()  # type: ignore
-		validInterfaces = {
-			interface for interface, stats in statsAll.items() if stats.isup and "loopback" not in stats.flags.lower()
-		}
+		validInterfaces = getNetworkInterfaces()
 
 		# Get the stats
 		netStat = psutil.net_io_counters(pernic=True, nowrap=True)  # type: ignore
@@ -150,8 +204,11 @@ class Monitor:
 		self.ioPrevious["_timestampS"] = timestampS
 
 		ioStat = psutil.disk_io_counters(perdisk=True, nowrap=True)  # type: ignore
+		validDevices = getBlockDevices()
 		io = {}
 		for name, sdiskio in ioStat.items():
+			if name not in validDevices:
+				continue
 			self.ioPrevious.setdefault(name, {})
 			diffIn = max(
 				sdiskio.write_bytes - self.ioPrevious[name].get("in", sdiskio.write_bytes),
