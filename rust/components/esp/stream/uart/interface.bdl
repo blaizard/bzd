@@ -12,7 +12,7 @@ enum UartDevice
 component UartOut : bzd.OStream {
 config:
 	device = UartDevice;
-	pin = Integer [min(0) max(39)];
+	pin = Integer [min(0) max(48)];
 	baudrate = Integer [min(300) max(5000000)];
 	
 interface:

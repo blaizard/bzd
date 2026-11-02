@@ -1,0 +1,32 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//interfaces:stream",
+    ],
+)
+
+rust_library(
+    name = "usb_serial_jtag",
+    srcs = [
+        "usb_serial_jtag.rs",
+    ],
+    crate_name = "rust_components_esp_stream_usb_serial_jtag",
+    target_compatible_with = [
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:stream",
+        "//rust/bzd",
+        "//rust/components/esp/hal",
+        "//rust/libs/esp:rust",
+        "@crates_esp32s3//:embedded-io-async",
+    ],
+)

@@ -1,0 +1,13 @@
+use "interfaces/stream.bdl"
+
+namespace bzd.components.esp;
+
+
+component UsbSerialJtagOut : bzd.OStream {
+interface:
+	method init() [init];
+	method shutdown() [shutdown];
+	
+}
+
+
