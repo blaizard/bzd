@@ -17,14 +17,13 @@ runs:
         # Special logic for PRs, they do behave differently:
         # - comments on PR are treated as comment on the base branch (no info on the PR branch)
         # - The ref is not populated correctly.
-        # The gate is done in the shell because for `issue_comment` an `if:` reduces to the
-        # `github.event.issue.pull_request` object, which the runner coerces to false.
+        # PR detection must not rely on `github.event_name`: inside a reusable workflow it is
+        # always "workflow_call". Detect the PR from the event payload instead.
         - name: "Gather PR Metadata"
           id: metadata
           shell: bash
           env:
-              EVENT_NAME: ${{ github.event_name }}
-              IS_PR: ${{ github.event_name == 'issue_comment' && github.event.issue.pull_request && 'true' || 'false' }}
+              IS_PR: ${{ (github.event.issue.pull_request || github.event.pull_request) && 'true' || 'false' }}
               API_URL: ${{ github.api_url }}
               REPOSITORY: ${{ github.repository }}
               PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
@@ -32,7 +31,7 @@ runs:
           run: |
               set -euo pipefail
 
-              if [[ "${EVENT_NAME}" != pull_request* && "${IS_PR}" != "true" ]]; then
+              if [ "${IS_PR}" != "true" ]; then
                 echo "Not a pull-request event, no PR metadata to gather."
                 exit 0
               fi
