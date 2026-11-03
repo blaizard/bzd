@@ -447,10 +447,10 @@ export default class HttpServer {
 					if (e instanceof HttpError) {
 						e.send(context);
 					} else if (e instanceof ExceptionPrecondition) {
-						response.status(400).send(e.message);
+						context.sendStatus(400, e.message);
 					} else if (options.exceptionGuard) {
 						Exception.print("Exception Guard; {}", Exception.fromError(e));
-						response.status(500).send(e.message);
+						context.sendStatus(500, e.message);
 					} else {
 						throw e;
 					}
@@ -505,10 +505,14 @@ function resetErrorHandler(reject) {
 // eslint-disable-next-line no-unused-vars
 function middlewareErrorHandler(e, req, res, next) {
 	Exception.print("Receive error; {}", e);
+	if (res.headersSent) {
+		return;
+	}
 	try {
 		// Body-parser errors (e.g. malformed JSON) carry a client error status, otherwise default to 500.
 		const status = e.status || e.statusCode || 500;
-		res.status(status >= 400 && status < 500 ? status : 500).send(e.message);
+		const context = new HttpServerContext(req, res);
+		context.sendStatus(status >= 400 && status < 500 ? status : 500, e.message);
 	} catch (error) {
 		Log.error("While reporting error to client: {}", error.message);
 	}

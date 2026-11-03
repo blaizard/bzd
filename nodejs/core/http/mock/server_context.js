@@ -149,6 +149,13 @@ export default class MockServerContext extends HttpServerContextCommon {
 
 	sendStatus(code, message = null) {
 		this.setStatus(code);
+		const headerNames = Object.keys(this.response.headers).map((name) => name.toLowerCase());
+		if (typeof message === "string" && !headerNames.includes("content-type")) {
+			this.setHeader("Content-Type", "text/plain; charset=utf-8");
+		}
+		if (code >= 400 && !headerNames.includes("content-security-policy")) {
+			this.setHeader("Content-Security-Policy", "default-src 'none'");
+		}
 		this.send(message);
 	}
 

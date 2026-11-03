@@ -185,6 +185,12 @@ export class HttpServerContext extends HttpServerContextCommon {
 
 	sendStatus(code, message = null) {
 		this.setStatus(code);
+		if (typeof message === "string" && !this.response.hasHeader("Content-Type")) {
+			this.response.setHeader("Content-Type", "text/plain; charset=utf-8");
+		}
+		if (code >= 400 && !this.response.hasHeader("Content-Security-Policy")) {
+			this.response.setHeader("Content-Security-Policy", "default-src 'none'");
+		}
 		this.send(message);
 	}
 

@@ -103,6 +103,21 @@
                 "get",
                 "/x/nodes/testnode?include=%zz"
             ]
+        },
+        {
+            "doc": "Check that an attacker-controlled path is not reflected as executable HTML.",
+            "expects": {
+                "data_contains": "<img src=x onerror=alert(document.domain)>",
+                "headers": {
+                    "Content-Security-Policy": "default-src 'none'",
+                    "Content-Type": "text/plain; charset=utf-8"
+                },
+                "status": 400
+            },
+            "request": [
+                "get",
+                "/api/v1/file?path=%3Cimg%20src%3Dx%20onerror%3Dalert(document.domain)%3E"
+            ]
         }
     ]
 }
