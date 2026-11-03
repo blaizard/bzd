@@ -22,6 +22,8 @@ jobs:
                   key: ${{ secrets.BZD_KEY }}
                   lease: "true"
                   opencode: "true"
+                  # Personal access token: pushes with the job token are ignored by Gitea to prevent recursion.
+                  git_token: ${{ secrets.BZD_AGENT_TOKEN }}
 
             - name: "Maintain documentation"
               uses: ./.gitea/actions/opencode

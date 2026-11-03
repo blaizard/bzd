@@ -10,6 +10,7 @@ jobs:
             - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
                   key: ${{ secrets.BZD_KEY }}
+                  # Personal access token: pushes with the job token are ignored by Gitea to prevent recursion.
                   git_token: ${{ secrets.BZD_AGENT_TOKEN }}
 
             - name: "Create PR description from comment"
