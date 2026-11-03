@@ -3,45 +3,20 @@
 load("@bzd_bdl//:providers.bzl", "BdlCompositionInfo", "BdlTargetInfo")
 load("@rules_rust//rust:defs.bzl", "rust_common", "rust_library")
 load("//rust:defs.bzl", "rust_binary")
-
-def _merge_crate_info(deps):
-    """Merge rust crate providers into a single one."""
-
-    dep_infos = []
-    dep_transitive_infos = []
-
-    for dep in deps:
-        if rust_common.crate_info in dep:
-            dep_infos.append(
-                rust_common.dep_variant_info(
-                    crate_info = dep[rust_common.crate_info],
-                    dep_info = dep[rust_common.dep_info],
-                    cc_info = None,
-                    build_info = None,
-                ),
-            )
-
-        if rust_common.crate_group_info in dep:
-            dep_transitive_infos.append(
-                dep[rust_common.crate_group_info].dep_variant_infos,
-            )
-
-    return rust_common.crate_group_info(
-        dep_variant_infos = depset(dep_infos, transitive = dep_transitive_infos),
-    )
+load("//rust/bdl/generator:crate_info.bzl", "merge_crate_info")
 
 def _rust_generate_main_impl(ctx):
     target_info = ctx.attr.target[BdlTargetInfo]
     if target_info.language == "rust":
         main = target_info.data["main"][0][DefaultInfo].files.to_list()[0]
-        crate_group_info = _merge_crate_info(target_info.data["deps"])
+        crate_group_info = merge_crate_info(target_info.data["deps"])
     else:
         main = ctx.actions.declare_file("{}.main.rs".format(ctx.label.name))
         ctx.actions.write(
             output = main,
             content = "",
         )
-        crate_group_info = _merge_crate_info([])
+        crate_group_info = merge_crate_info([])
     return [DefaultInfo(files = depset([main])), crate_group_info]
 
 _rust_generate_main = rule(
@@ -59,7 +34,7 @@ _rust_generate_main = rule(
 def _rust_generate_composition_impl(ctx):
     info = ctx.attr.composition[BdlCompositionInfo]
     all_deps = ctx.attr.deps + info.deps[ctx.attr.target_name]
-    crate_group_info = _merge_crate_info(all_deps)
+    crate_group_info = merge_crate_info(all_deps)
 
     args = ctx.actions.args()
     args.add("--output", ctx.outputs.output)

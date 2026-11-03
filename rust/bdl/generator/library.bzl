@@ -1,7 +1,10 @@
 """Rust code generator for bdl library."""
 
 load("@bzd_bdl//:providers.bzl", "BdlInfo")
+load("@rules_cc//cc:defs.bzl", "CcInfo")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_rust//rust:defs.bzl", "rust_common", "rust_library")
+load("//rust/bdl/generator:crate_info.bzl", "merge_crate_info")
 
 def label_to_crate_name(label):
     """Convert a bazel label into a crate name.
@@ -74,6 +77,40 @@ _rust_generate_headers = rule(
     },
 )
 
+def _rust_deps_impl(ctx):
+    return [
+        DefaultInfo(),
+        merge_crate_info(ctx.attr.deps),
+    ]
+
+_rust_deps = rule(
+    implementation = _rust_deps_impl,
+    doc = """Group the Rust dependencies of a bdl library into a single crate group.""",
+    attrs = {
+        "deps": attr.label_list(doc = "List of bdl dependencies."),
+    },
+)
+
+def _link_deps_impl(ctx):
+    return [
+        DefaultInfo(),
+        cc_common.merge_cc_infos(
+            direct_cc_infos = [
+                dep[CcInfo]
+                for dep in ctx.attr.deps
+                if CcInfo in dep and rust_common.crate_info not in dep and rust_common.crate_group_info not in dep
+            ],
+        ),
+    ]
+
+_link_deps = rule(
+    implementation = _link_deps_impl,
+    doc = """Merge the native dependencies of a bdl library for manual FFI linkage.""",
+    attrs = {
+        "deps": attr.label_list(doc = "List of bdl dependencies."),
+    },
+)
+
 def _generator_rust_library_impl(
         name,
         visibility,
@@ -90,6 +127,16 @@ def _generator_rust_library_impl(
         implementation_deps = implementation_deps,
     )
 
+    _rust_deps(
+        name = "{}.deps".format(name),
+        deps = deps,
+    )
+
+    _link_deps(
+        name = "{}.link_deps".format(name),
+        deps = deps,
+    )
+
     rust_library(
         name = name,
         crate_name = label_to_crate_name("//{}:{}".format(native.package_name(), name.removesuffix(".rust"))),
@@ -97,9 +144,14 @@ def _generator_rust_library_impl(
             "{}.rs".format(name),
         ],
         visibility = visibility,
-        deps = deps + implementation_deps + [
+        deps = [
+            "{}.deps".format(name),
+        ] + implementation_deps + [
             Label("//rust/bdl/generator/impl/adapter:component"),
             Label("//rust/bzd:bzd"),
+        ],
+        link_deps = [
+            "{}.link_deps".format(name),
         ],
         **kwargs
     )

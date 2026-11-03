@@ -42,11 +42,12 @@ rust_library_group(
 )
 
 # Create an empty library only to propagate the -Tlinkall.x flag.
+# The C++ library must be in link_deps as it carries native linker flags.
 rust_library(
     name = "crate_linker",
     srcs = ["crate_linker.rs"],
+    link_deps = [":linker"],
     visibility = ["//visibility:public"],
-    deps = [":linker"],
 )
 
 cc_library(
