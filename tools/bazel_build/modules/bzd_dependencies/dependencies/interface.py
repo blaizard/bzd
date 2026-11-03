@@ -16,6 +16,9 @@ class Dependencies:
 		for (name, version), extras in self.dependencies_.items():
 			yield name, version, extras
 
+	def __bool__(self) -> bool:
+		return bool(self.dependencies_)
+
 	def diff(self, other: "Dependencies") -> typing.List[str]:
 		"""Get the human-readable differences with another set of dependencies."""
 

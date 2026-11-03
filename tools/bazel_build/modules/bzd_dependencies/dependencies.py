@@ -49,6 +49,8 @@ if __name__ == "__main__":
 		try:
 			dependency = AllDependencies[name](context)
 			dependencies = dependency.get()
+			if not dependencies:
+				raise RuntimeError(f"No dependencies found for '{name}'.")
 			if args.upgrade:
 				dependency.upgrade(dependencies)
 				upgraded = dependency.get()
