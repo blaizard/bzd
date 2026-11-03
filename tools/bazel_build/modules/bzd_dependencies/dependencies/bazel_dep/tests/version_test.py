@@ -1,6 +1,6 @@
 import unittest
 
-from bzd_dependencies.utils.version import Version
+from dependencies.bazel_dep.version import Version
 
 
 def _parse(value: str) -> Version:

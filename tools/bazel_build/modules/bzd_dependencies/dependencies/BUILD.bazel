@@ -7,4 +7,5 @@ py_library(
         "interface.py",
     ],
     visibility = ["//:__subpackages__"],
+    deps = ["//context"],
 )

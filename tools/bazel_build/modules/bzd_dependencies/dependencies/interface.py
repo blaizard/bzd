@@ -1,5 +1,6 @@
-import pathlib
 import typing
+
+from context.context import Context
 
 
 class Dependencies:
@@ -37,7 +38,7 @@ class Dependencies:
 
 
 class DependencyInterface(typing.Protocol):
-	def __init__(self, workspace: pathlib.Path) -> None: ...
+	def __init__(self, context: Context) -> None: ...
 
 	def get(self) -> Dependencies: ...
 

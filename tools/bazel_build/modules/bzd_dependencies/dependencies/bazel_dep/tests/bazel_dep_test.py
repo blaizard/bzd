@@ -7,6 +7,8 @@ import unittest
 from bzd.http.client import HttpClientException
 from bzd.http.client_mock import HttpClientMock, HttpResponseMock
 
+from context.context import Context
+
 from dependencies.bazel_dep.bazel_dep import BazelDep
 from dependencies.bazel_dep.bcr import BcrRegistry
 
@@ -38,7 +40,7 @@ class TestBazelDep(unittest.TestCase):
 			(workspace / "sub").mkdir()
 			(workspace / "sub" / "MODULE.bazel").write_bytes(b'bazel_dep(name = "rules_python", version = "1.0.0")\n')
 
-			dependencies = BazelDep(workspace, _registry({})).get()
+			dependencies = BazelDep(Context(workspace), _registry({})).get()
 
 			self.assertEqual(
 				sorted((name, version, len(extras)) for name, version, extras in dependencies.items()),
@@ -49,7 +51,7 @@ class TestBazelDep(unittest.TestCase):
 		with tempfile.TemporaryDirectory() as directory:
 			workspace = pathlib.Path(directory)
 			(workspace / "MODULE.bazel").write_bytes(MODULE)
-			dependency = BazelDep(workspace, _registry({"rules_python": ["1.0.0", "1.2.0"]}))
+			dependency = BazelDep(Context(workspace), _registry({"rules_python": ["1.0.0", "1.2.0"]}))
 
 			dependency.upgrade(dependency.get())
 
@@ -66,7 +68,7 @@ class TestBazelDep(unittest.TestCase):
 		with tempfile.TemporaryDirectory() as directory:
 			workspace = pathlib.Path(directory)
 			(workspace / "MODULE.bazel").write_bytes(MODULE)
-			dependency = BazelDep(workspace, _registry({"rules_python": ["1.0.0", "1.2.0"]}))
+			dependency = BazelDep(Context(workspace), _registry({"rules_python": ["1.0.0", "1.2.0"]}))
 			dependency.upgrade(dependency.get())
 			upgraded = (workspace / "MODULE.bazel").read_bytes()
 
@@ -78,7 +80,7 @@ class TestBazelDep(unittest.TestCase):
 		with tempfile.TemporaryDirectory() as directory:
 			workspace = pathlib.Path(directory)
 			(workspace / "MODULE.bazel").write_bytes(b"bazel_dep(name = 'rules_python', version = '1.0.0')\r\n")
-			dependency = BazelDep(workspace, _registry({"rules_python": ["1.0.0", "1.2.0"]}))
+			dependency = BazelDep(Context(workspace), _registry({"rules_python": ["1.0.0", "1.2.0"]}))
 
 			dependency.upgrade(dependency.get())
 
@@ -91,7 +93,7 @@ class TestBazelDep(unittest.TestCase):
 		with tempfile.TemporaryDirectory() as directory:
 			workspace = pathlib.Path(directory)
 			(workspace / "MODULE.bazel").write_bytes(b'bazel_dep(name = "rules_python", version = "2.0.0")\n')
-			dependency = BazelDep(workspace, _registry({"rules_python": ["1.0.0", "1.2.0"]}))
+			dependency = BazelDep(Context(workspace), _registry({"rules_python": ["1.0.0", "1.2.0"]}))
 
 			dependency.upgrade(dependency.get())
 
@@ -107,7 +109,7 @@ class TestBazelDep(unittest.TestCase):
 		with tempfile.TemporaryDirectory() as directory:
 			workspace = pathlib.Path(directory)
 			(workspace / "MODULE.bazel").write_bytes(MODULE)
-			dependency = BazelDep(workspace, BcrRegistry(get=HttpClientMock(callback).get))
+			dependency = BazelDep(Context(workspace), BcrRegistry(get=HttpClientMock(callback).get))
 
 			with self.assertRaises(HttpClientException):
 				dependency.upgrade(dependency.get())

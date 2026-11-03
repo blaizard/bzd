@@ -1,0 +1,11 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "context",
+    srcs = [
+        "__init__.py",
+        "context.py",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = ["@bzd_python//bzd/utils:run"],
+)

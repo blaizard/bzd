@@ -1,0 +1,12 @@
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+
+compile_pip_requirements(
+    name = "requirements",
+    timeout = "long",
+    env = {"CUSTOM_COMPILE_COMMAND": "bazel run @bzd_dns//:requirements.update"},
+    extra_args = ["--no-strip-extras"],
+    generate_hashes = True,
+    requirements_in = ":requirements.in",
+    requirements_txt = ":requirements.txt",
+    tags = ["manual"],
+)

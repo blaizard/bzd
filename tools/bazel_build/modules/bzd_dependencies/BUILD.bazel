@@ -9,7 +9,9 @@ py_binary(
     main = "dependencies.py",
     visibility = ["//visibility:public"],
     deps = [
+        "//context",
         "//dependencies:interface",
         "//dependencies/bazel_dep",
+        "//dependencies/pip_requirements",
     ],
 )

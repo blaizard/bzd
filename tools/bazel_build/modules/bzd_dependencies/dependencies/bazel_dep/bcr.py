@@ -2,7 +2,7 @@ import typing
 
 from bzd.http.client import HttpClient, HttpClientException, HttpResponse
 
-from bzd_dependencies.utils.version import Version
+from dependencies.bazel_dep.version import Version
 
 DEFAULT_BCR_URL = "https://bcr.bazel.build"
 

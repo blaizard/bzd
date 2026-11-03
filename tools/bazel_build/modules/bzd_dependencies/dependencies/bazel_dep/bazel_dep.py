@@ -3,7 +3,7 @@ import collections
 import pathlib
 import typing
 
-from bzd_dependencies.utils.files import findFiles
+from context.context import Context
 
 from dependencies.bazel_dep.bcr import BcrRegistry
 from dependencies.interface import Dependencies
@@ -47,16 +47,16 @@ def _versionRange(
 class BazelDep:
 	"""Discover and upgrade bazel_dep entries declared in the workspace MODULE.bazel files."""
 
-	def __init__(self, workspace: pathlib.Path, registry: typing.Optional[BcrRegistry] = None) -> None:
-		self.workspace = workspace
+	def __init__(self, context: Context, registry: typing.Optional[BcrRegistry] = None) -> None:
+		self.context = context
 		self.registry_ = registry or BcrRegistry()
 
 	def get(self) -> Dependencies:
 		"""Get all bazel_dep entries, one per occurrence, in discovery order."""
 
 		dependencies = Dependencies()
-		for path in findFiles(self.workspace, "MODULE.bazel"):
-			modulePath = self.workspace / path
+		for path in self.context.findFiles("MODULE.bazel"):
+			modulePath = self.context.workspace / path
 			content = modulePath.read_bytes()
 			lineStarts = _lineStarts(content)
 			for node in ast.walk(ast.parse(content.decode("utf-8"))):

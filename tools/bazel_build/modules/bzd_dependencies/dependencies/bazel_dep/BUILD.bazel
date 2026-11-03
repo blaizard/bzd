@@ -6,11 +6,12 @@ py_library(
         "__init__.py",
         "bazel_dep.py",
         "bcr.py",
+        "version.py",
     ],
     visibility = ["//:__subpackages__"],
     deps = [
+        "//context",
         "//dependencies:interface",
-        "//python/bzd_dependencies:utils",
         "@bzd_python//bzd/http:client",
     ],
 )

@@ -5,10 +5,16 @@ import sys
 import time
 import typing
 
+from context.context import Context
+
 from dependencies.bazel_dep.bazel_dep import BazelDep
 from dependencies.interface import DependencyInterface
+from dependencies.pip_requirements.pip_requirements import PipRequirements
 
-AllDependencies: typing.Dict[str, typing.Type[DependencyInterface]] = {"bazel_dep": BazelDep}
+AllDependencies: typing.Dict[str, typing.Type[DependencyInterface]] = {
+	"bazel_dep": BazelDep,
+	"pip_requirements": PipRequirements,
+}
 
 
 if __name__ == "__main__":
@@ -36,11 +42,12 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	success = True
+	context = Context(args.workspace)
 	for name in args.use if args.use else AllDependencies.keys():
 		print(f"==== {name}...", flush=True, end="")
 		startTime = time.monotonic()
 		try:
-			dependency = AllDependencies[name](args.workspace)
+			dependency = AllDependencies[name](context)
 			dependencies = dependency.get()
 			if args.upgrade:
 				dependency.upgrade(dependencies)
