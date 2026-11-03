@@ -41,7 +41,7 @@ sh_binary_wrapper(
 compile_pip_requirements(
     name = "requirements",
     timeout = "long",
-    generate_hashes = False,
+    generate_hashes = True,
     requirements_in = ":requirements.in",
     requirements_txt = ":requirements.txt",
     tags = ["manual"],
