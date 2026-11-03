@@ -1,5 +1,5 @@
 name: create_pr_on_changes
-description: "Sanitize the workspace, and if changes are detected, commit them to a new branch, push it and create a PR."
+description: "If changes are detected, commit them to a new branch, push it and create a PR."
 
 inputs:
     token:
@@ -18,10 +18,6 @@ inputs:
     commit_message:
         description: "The commit message to use."
         required: true
-    sanitize:
-        description: "Whether to run the sanitizer before looking for changes."
-        required: false
-        default: "true"
 
 outputs:
     has_changes:
@@ -34,13 +30,6 @@ outputs:
 runs:
     using: composite
     steps:
-        - name: "Sanitize"
-          if: inputs.sanitize == 'true'
-          shell: bash
-          run: |
-              set -euo pipefail
-              bzd-lease ./tools/bazel run //:sanitizer -- --all
-
         - name: "Commit changes to a new branch"
           id: commit
           shell: bash
