@@ -4,6 +4,15 @@ on:
     schedule:
         - cron: "0 18 * * 5" # runs every friday at 18:00 UTC (saturday 03:00 JST)
     workflow_dispatch: # allows manual triggering
+        inputs:
+            dependency:
+                description: "Dependency backend to process"
+                type: choice
+                options:
+                    - all
+                    - bazel_dep
+                    - pip_requirements
+                default: all
 
 jobs:
     lease_linux:
@@ -18,29 +27,39 @@ jobs:
     dependencies:
         needs: lease_linux
         runs-on: linux
+        strategy:
+            fail-fast: false
+            max-parallel: 1
+            matrix:
+                dependency:
+                    - bazel_dep
+                    - pip_requirements
         steps:
-            - uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
+            - if: ${{ !inputs.dependency || inputs.dependency == 'all' || inputs.dependency == matrix.dependency }}
+              uses: https://git.blaizard.com/blaise/deployment/ci/gitea/setup@main
               with:
                   key: ${{ secrets.BZD_KEY }}
                   lease: "true"
                   # Personal access token: pushes with the job token are ignored by Gitea to prevent recursion.
                   git_token: ${{ secrets.BZD_AGENT_TOKEN }}
 
-            - name: "Update dependencies"
+            - if: ${{ !inputs.dependency || inputs.dependency == 'all' || inputs.dependency == matrix.dependency }}
+              name: "Update dependencies"
               run: |
                   set -o pipefail
                   {
-                      echo '## Automated dependency upgrade'
+                      echo '## Automated dependency upgrade: ${{ matrix.dependency }}'
                       echo
                       echo '```'
                   } > /tmp/pr-body.txt
-                  bzd-lease ./tools/bazel run @bzd_dependencies -- --upgrade | tee -a /tmp/pr-body.txt
+                  bzd-lease ./tools/bazel run @bzd_dependencies -- --use "${{ matrix.dependency }}" --upgrade | tee -a /tmp/pr-body.txt
                   echo '```' >> /tmp/pr-body.txt
 
-            - uses: ./.gitea/actions/create_pr_on_changes
+            - if: ${{ !inputs.dependency || inputs.dependency == 'all' || inputs.dependency == matrix.dependency }}
+              uses: ./.gitea/actions/create_pr_on_changes
               with:
                   token: ${{ secrets.BZD_AGENT_TOKEN }}
-                  title: "[DEPENDENCIES] Automated dependency upgrade"
+                  title: "[DEPENDENCIES] Automated ${{ matrix.dependency }} upgrade"
                   body_file: /tmp/pr-body.txt
-                  branch_prefix: "deps/auto-update-"
-                  commit_message: "deps: automated dependency upgrade"
+                  branch_prefix: "deps/auto-update-${{ matrix.dependency }}-"
+                  commit_message: "deps: automated ${{ matrix.dependency }} upgrade"
