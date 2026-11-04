@@ -138,7 +138,7 @@ def _requirements_nodejs_impl(module_ctx):
             content_json = json.decode(content)
             packages = content_json["packages"]
 
-            # First pass, remove all incomatible packages.
+            # First pass, remove all incompatible packages.
             valid_packages = {package: metadata for package, metadata in packages.items() if _is_valid_dependency(module_ctx, metadata)}
 
             # Second pass, create the package repositories.

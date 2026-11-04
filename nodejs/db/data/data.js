@@ -186,12 +186,12 @@ export default class Data {
 				const start = value.findIndex((d) => d[0] < before);
 				const end = value.findLastIndex((d) => d[0] > after);
 
-				// Every samples are older than what is requested.
+				// Every sample is older than what is requested.
 				if (end == -1) {
 					return [];
 				}
 
-				// 'before' is older than the local data, means every samples are newer.
+				// 'before' is older than the local data, means every sample is newer.
 				if (start == -1) {
 					const external = await this.getExternal_({ uid, key, count, after, before });
 					return external === null ? [] : external;
@@ -239,7 +239,7 @@ export default class Data {
 			if (after !== null) {
 				const end = value.findLastIndex((d) => d[0] > after);
 
-				// Every samples are older than what is requested.
+				// Every sample is older than what is requested.
 				if (end == -1) {
 					return [];
 				}

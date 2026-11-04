@@ -296,7 +296,7 @@ if __name__ == "__main__":
 		# Run npm to generate the dependency lock file.
 		localBazelBinary(
 			str(args.npm),
-			# --slient seem to make the command hang sometimes.
+			# --silent seems to make the command hang sometimes.
 			[
 				"install",
 				"--package-lock-only",

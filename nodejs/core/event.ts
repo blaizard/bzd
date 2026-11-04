@@ -59,7 +59,7 @@ export default class Event {
     ///
     /// \param id The identifier of the events to be triggered
     ///
-    /// \return true if the evetn has been triggered, false otherwise.
+    /// \return true if the event has been triggered, false otherwise.
     is(id: string): boolean {
         return typeof this.proactive[id] !== "undefined";
     }

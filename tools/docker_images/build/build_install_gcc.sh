@@ -4,8 +4,8 @@ set -e
 
 # https://gcc.gnu.org/wiki/InstallingGCC
 
-# Default to /usr instead of /usr/local, this will install it along side other gcc distro, which
-# is needed for clang to find installed gcc version. This is a requisite when build llvm-project for example.
+# Default to /usr instead of /usr/local, this will install it alongside other gcc distros, which
+# is needed for clang to find installed gcc version. This is a requisite when building llvm-project for example.
 INSTALL_PATH=/usr
 while [[ $# -gt 0 ]] && [[ "$1" == "--"* ]] ;
 do

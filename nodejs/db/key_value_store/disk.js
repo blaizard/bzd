@@ -30,7 +30,7 @@ export default class KeyValueStoreDisk extends KeyValueStore {
 
 		this.cache = null;
 
-		// Initialize ansynchronously the rest of the data
+		// Initialize asynchronously the rest of the data
 		Log.info("Using disk key value store DB at '{}'.", this.path);
 	}
 

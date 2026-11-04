@@ -13,7 +13,7 @@ const Log = LogFactory("authentication", "session");
 ///
 /// It contains 2 types of tokens.
 /// - refresh token: This is the first one that is acquired after login. It is a longer
-///                  term token (than the access) that is stored on the database along side
+///                  term token (than the access) that is stored in the database alongside
 ///                  the user data. User can revoke the access at any time. It can be used
 ///                  by a 3rd party to access user specific info.
 ///                  This token does not change when refreshed, only its expiration date changes.
@@ -82,7 +82,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 		const authentication = this;
 
 		// This endpoint returns a refresh token.
-		// A refresh token is stored in the user database and is similar to a OAuth token.
+		// A refresh token is stored in the user database and is similar to an OAuth token.
 		// It can be exchanged to an access token with /auth/refresh.
 		rest.handle("post", "/auth/login", async function (inputs) {
 			// Verify uid/password pair

@@ -7,7 +7,7 @@ void __attribute__((weak)) bzd::platform::panic(const bzd::FunctionRef<void(bzd:
 {
 	::bzd::components::std::Out out{};
 	callback(out);
-	// Triggers a signal on POSIX which provoques a stack trace dump.
+	// Triggers a signal on POSIX which provokes a stack trace dump.
 	std::terminate();
 }
 

@@ -328,7 +328,7 @@ class Diff:
 				index1 += 1
 				index2 += 1
 			else:
-				# If the current character of content1 appears ldiffater in content2, advance in content2
+				# If the current character of content1 appears later in content2, advance in content2
 				maybeIndex2 = self.content2.find(b1, index2)
 				if maybeIndex2 != -1:
 					lcs.append(b1)

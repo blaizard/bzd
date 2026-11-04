@@ -10,7 +10,7 @@ const Exception = ExceptionFactory("persistence", "disk");
 
 /**
  * This module is responsible for keeping the data consistent and persistent.
- * It acts as a on-memory database and save the content recurrently to the disk, to ensure no data
+ * It acts as an in-memory database and saves the content recurrently to the disk, to ensure no data
  * loss.
  */
 export default class PersistenceDisk {

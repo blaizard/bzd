@@ -12,7 +12,7 @@ impl<T> Singleton<T> {
     }
 
     fn get_mut_or_init(&self, init: impl FnOnce() -> T) -> &'static mut T {
-        // SAFETY: this singleton is only accessed by yhr single executor.
+        // SAFETY: this singleton is only accessed by the single executor.
         let value = unsafe { &mut *self.0.get() };
         value.get_or_insert_with(init)
     }
