@@ -24,5 +24,6 @@ rust_library(
         "//interfaces:stream",
         "//rust/bzd",
         "//rust/interfaces:logger",
+        "//rust/libs/logger:ring_buffer",
     ],
 )

@@ -334,10 +334,10 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	let mut logger_backend = executor.logger_backend().lock().await;
 	let mut logger = Logger::new(&mut *logger_backend);
 
-	log_info!(logger, "[default.executor] Initialization completed.").await?;
+	log_info!(logger, "[default.executor] Initialization completed.")?.flush().await?;
 
 	// Execute the workloads and services.
-	log_info!(logger, "[default.executor] Composition phase.").await?;
+	log_info!(logger, "[default.executor] Composition phase.")?.flush().await?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 		.push_workload(async {
@@ -369,15 +369,16 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 		})
 		;
 
-	log_info!(logger, "[default.executor] Execution phase.").await?;
+	log_info!(logger, "[default.executor] Execution phase.")?.flush().await?;
 	let result = executor.join().await;
 
 	let error = (result != 0)
 		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure!("One or more workloads failed.")));
-	log_info!(logger, "[default.executor] Completion.").await?;
+	log_info!(logger, "[default.executor] Completion.")?;
 	if let Some(error) = error.as_ref() {
-		log_error!(logger, "[default.executor] Workload failure: {}", error).await?;
+		log_error!(logger, "[default.executor] Workload failure: {}", error)?;
 	}
+	logger.flush().await?;
 	drop(logger_backend);
 
 	// Shutdown all registry entries.

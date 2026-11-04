@@ -1,21 +1,24 @@
 #![no_std]
 
 use bzd::base::error::Error;
-use bzd::base::format;
 use bzd::base::stream::OStream;
+use ring_buffer::RingBuffer;
 pub use rust_components_generic_logger_backend_ostream_interface::{
     BzdComponentsGenericOStreamLoggerBackendContext,
     BzdComponentsGenericOStreamLoggerBackendContextConstraint,
     BzdComponentsGenericOStreamLoggerBackendContextConstraintTypes,
     BzdComponentsGenericOStreamLoggerBackendInterface,
 };
-use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogRecord};
+use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel};
 
-/// A logger writing formatted messages to a shared stream sink.
+const RING_SIZE: usize = 1024;
+
+/// A logger writing serialized records to a shared stream sink.
 pub struct BzdComponentsGenericOStreamLoggerBackend<
     C: BzdComponentsGenericOStreamLoggerBackendContextConstraint,
 > {
     context: BzdComponentsGenericOStreamLoggerBackendContext<C>,
+    ring: RingBuffer<RING_SIZE>,
 }
 
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint>
@@ -23,26 +26,15 @@ impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint>
 {
     /// Create a new logger.
     pub fn new(context: BzdComponentsGenericOStreamLoggerBackendContext<C>) -> Self {
-        Self { context }
+        Self {
+            context,
+            ring: RingBuffer::<RING_SIZE>::new(),
+        }
     }
 
     /// Set the minimum level to be logged.
     pub fn set_minimum_level(&mut self, level: BzdLoggerLevel) {
         self.context.min_level = level;
-    }
-
-    /// Whether the given level is currently logged.
-    fn is_enabled(&self, level: BzdLoggerLevel) -> bool {
-        level_priority(level) <= level_priority(self.context.min_level)
-    }
-}
-
-fn level_prefix(level: BzdLoggerLevel) -> &'static str {
-    match level {
-        BzdLoggerLevel::Error => "[e]",
-        BzdLoggerLevel::Warning => "[w]",
-        BzdLoggerLevel::Info => "[i]",
-        BzdLoggerLevel::Debug => "[d]",
     }
 }
 
@@ -58,22 +50,24 @@ fn level_priority(level: BzdLoggerLevel) -> u8 {
 impl<C: BzdComponentsGenericOStreamLoggerBackendContextConstraint> BzdLoggerBackendInterface
     for BzdComponentsGenericOStreamLoggerBackend<C>
 {
-    async fn log(&mut self, record: LogRecord<'_>) -> Result<(), Error> {
-        if !self.is_enabled(record.level) {
+    fn push<F>(&mut self, level: BzdLoggerLevel, write: F) -> Result<(), Error>
+    where
+        F: FnOnce(&mut dyn core::fmt::Write) -> core::fmt::Result,
+    {
+        if level_priority(level) > level_priority(self.context.min_level) {
             return Ok(());
         }
-        let mut guard = self.context.out.lock().await;
-        let name = record
-            .file
-            .rsplit_once('/')
-            .map_or(record.file, |(_, name)| name);
-        format::write_to(
-            &mut *guard,
-            format_args!("{} [{}:{}] ", level_prefix(record.level), name, record.line),
-        )
-        .await?;
-        format::write_to(&mut *guard, record.message).await?;
-        guard.write_all(b"\n").await?;
+        self.ring.push(write)
+    }
+
+    async fn flush(&mut self) -> Result<(), Error> {
+        let output = &mut self.context.out;
+        let ring = &mut self.ring;
+        let mut guard = output.lock().await;
+        while let Some((first, second)) = ring.pop() {
+            guard.write_all(first).await?;
+            guard.write_all(second).await?;
+        }
         guard.flush().await?;
         Ok(())
     }

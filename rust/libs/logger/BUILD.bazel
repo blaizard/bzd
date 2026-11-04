@@ -1,4 +1,5 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
 
 rust_library(
     name = "logger",
@@ -11,4 +12,20 @@ rust_library(
         "//rust/bzd",
         "//rust/interfaces:logger",
     ],
+)
+
+rust_library(
+    name = "ring_buffer",
+    srcs = [
+        "ring_buffer.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_test(
+    name = "ring_buffer_test",
+    crate = ":ring_buffer",
 )

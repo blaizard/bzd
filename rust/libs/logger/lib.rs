@@ -2,9 +2,12 @@
 
 use bzd::base::error::Error;
 
-pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, LogRecord};
+pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel};
 
 /// Frontend that dispatches log events to a backend.
+///
+/// Logging is synchronous; use [`Logger::flush`] to wait for queued messages to
+/// be emitted.
 pub struct Logger<'a, B: BzdLoggerBackendInterface> {
     backend: &'a mut B,
 }
@@ -15,9 +18,38 @@ impl<'a, B: BzdLoggerBackendInterface> Logger<'a, B> {
         Self { backend }
     }
 
-    /// Dispatch an event to the backend.
-    pub async fn log(&mut self, record: LogRecord<'_>) -> Result<(), Error> {
-        self.backend.log(record).await
+    /// Enqueue a log message.
+    ///
+    /// Returns the logger so a flush can be chained:
+    /// `log_info!(logger, "...")?.flush().await?`.
+    pub fn log(
+        &mut self,
+        level: BzdLoggerLevel,
+        file: &'static str,
+        line: u32,
+        args: core::fmt::Arguments<'_>,
+    ) -> Result<&mut Self, Error> {
+        let name = file.rsplit_once('/').map_or(file, |(_, name)| name);
+        self.backend.push(level, |record| {
+            write!(record, "{} [{}:{}] ", level_prefix(level), name, line)?;
+            record.write_fmt(args)?;
+            record.write_str("\n")
+        })?;
+        Ok(self)
+    }
+
+    /// Emit all queued messages.
+    pub async fn flush(&mut self) -> Result<(), Error> {
+        self.backend.flush().await
+    }
+}
+
+fn level_prefix(level: BzdLoggerLevel) -> &'static str {
+    match level {
+        BzdLoggerLevel::Error => "[e]",
+        BzdLoggerLevel::Warning => "[w]",
+        BzdLoggerLevel::Info => "[i]",
+        BzdLoggerLevel::Debug => "[d]",
     }
 }
 
@@ -26,14 +58,12 @@ impl<'a, B: BzdLoggerBackendInterface> Logger<'a, B> {
 #[macro_export]
 macro_rules! __bzd_log {
     ($logger:expr, $level:expr, $($format:tt)*) => {
-        async {
-            ($logger).log($crate::LogRecord {
-                level: $level,
-                file: ::core::file!(),
-                line: ::core::line!(),
-                message: ::core::format_args!($($format)*),
-            }).await
-        }
+        ($logger).log(
+            $level,
+            ::core::file!(),
+            ::core::line!(),
+            ::core::format_args!($($format)*),
+        )
     };
 }
 

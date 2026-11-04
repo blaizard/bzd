@@ -2,105 +2,94 @@
 #![no_main]
 #![allow(async_fn_in_trait)]
 
-use core::fmt::{write, Arguments};
-use error::{self, Error};
+use core::fmt;
+use error::Error;
 use stream::OStream;
 
-/// The number of bytes written to the stream per formatting pass.
-const CHUNK_SIZE: usize = 256;
-
-/// A `core::fmt::Write` sink that drops the first `skip` bytes of the formatted output,
-/// fills its buffer with the following bytes and discards the rest.
-///
-/// It allows a message to be formatted and written in chunks without any allocation,
-/// the remaining bytes being produced by formatting the message again with a bigger skip.
-struct SkipWriter<'a> {
-    buffer: &'a mut [u8],
-    skip: usize,
+/// Fixed-size writer used by [`write_into`].
+struct MessageWriter<'a> {
+    data: &'a mut [u8],
     written: usize,
-    overflowed: bool,
 }
 
-impl<'a> SkipWriter<'a> {
-    fn new(buffer: &'a mut [u8], skip: usize) -> Self {
-        Self {
-            buffer,
-            skip,
-            written: 0,
-            overflowed: false,
-        }
-    }
-
-    fn written(&self) -> usize {
-        self.written
-    }
-
-    fn overflowed(&self) -> bool {
-        self.overflowed
+impl<'a> MessageWriter<'a> {
+    fn new(data: &'a mut [u8]) -> Self {
+        Self { data, written: 0 }
     }
 }
 
-impl core::fmt::Write for SkipWriter<'_> {
-    fn write_str(&mut self, text: &str) -> core::fmt::Result {
+impl fmt::Write for MessageWriter<'_> {
+    fn write_str(&mut self, text: &str) -> fmt::Result {
         let bytes = text.as_bytes();
-        if self.skip >= bytes.len() {
-            self.skip -= bytes.len();
-            return Ok(());
+        if bytes.len() > self.data.len() - self.written {
+            return Err(fmt::Error);
         }
-        let remaining = &bytes[self.skip..];
-        self.skip = 0;
-        let size = remaining.len().min(self.buffer.len() - self.written);
-        self.buffer[self.written..self.written + size].copy_from_slice(&remaining[..size]);
-        self.written += size;
-        if size < remaining.len() {
-            self.overflowed = true;
-        }
+        self.data[self.written..self.written + bytes.len()].copy_from_slice(bytes);
+        self.written += bytes.len();
         Ok(())
     }
 }
 
-/// Write a formatted message to a stream, chunk by chunk, without any allocation.
-///
-/// A message that fits in [`CHUNK_SIZE`] bytes is formatted only once. A longer message
-/// is formatted again for each chunk, which requires its `Display` implementations to be
-/// pure, that is to always produce the same output for the same input.
-pub async fn write_to<S: OStream + ?Sized>(out: &mut S, args: Arguments<'_>) -> Result<(), Error> {
-    let mut chunk = [0u8; CHUNK_SIZE];
-    let mut skip = 0;
-    loop {
-        let (written, overflowed) = {
-            let mut writer = SkipWriter::new(&mut chunk, skip);
-            write(&mut writer, args)
-                .map_err(|_| error::failure!("failed to format the message"))?;
-            (writer.written(), writer.overflowed())
-        };
-        error::ensure!(written > 0 || !overflowed, "format chunk is empty")?;
-        if written > 0 {
-            out.write_all(&chunk[..written]).await?;
-            skip += written;
-        }
-        if !overflowed {
-            return Ok(());
-        }
+/// Format `args` into `data`, returning the number of bytes written or `None`
+/// when it does not fit.
+pub fn write_into(data: &mut [u8], args: fmt::Arguments<'_>) -> Option<usize> {
+    let mut writer = MessageWriter::new(data);
+    fmt::write(&mut writer, args).ok()?;
+    Some(writer.written)
+}
+
+/// Custom serialization for a formatting argument.
+pub trait Serialize {
+    /// Serialize this value into a formatter.
+    fn serialize(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result;
+}
+
+impl<T: fmt::Display + ?Sized> Serialize for T {
+    fn serialize(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(self, formatter)
+    }
+}
+
+/// Adapter exposing a [`Serialize`] value as a `Display` argument.
+pub struct Serialized<'a, T: ?Sized>(&'a T);
+
+/// Wrap a value so it is formatted through its [`Serialize`] implementation.
+pub fn serialize<T: Serialize + ?Sized>(value: &T) -> Serialized<'_, T> {
+    Serialized(value)
+}
+
+impl<T: Serialize + ?Sized> fmt::Display for Serialized<'_, T> {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.serialize(formatter)
     }
 }
 
 /// Extension trait for writing formatted messages to an [`OStream`].
 pub trait OStreamFormat: OStream {
-    async fn format(&mut self, args: Arguments<'_>) -> Result<(), Error> {
-        write_to(self, args).await
+    /// Write formatted bytes to this stream.
+    async fn write_message(&mut self, data: &[u8]) -> Result<(), Error> {
+        self.write_all(data).await
     }
 }
 
-impl<T: OStream> OStreamFormat for T {}
+impl<T: OStream + ?Sized> OStreamFormat for T {}
 
 /// Write a formatted message to an output stream.
+///
+/// The message is built in a temporary 1 KiB buffer. If it does not fit, it is
+/// dropped.
 #[macro_export]
 macro_rules! format_to {
     ($out:expr, $($arg:tt)*) => {
         async {
             use $crate::OStreamFormat;
-            $out.format(::core::format_args!($($arg)*)).await
+            let mut data = [0u8; 1024];
+            let ::core::option::Option::Some(length) =
+                $crate::write_into(&mut data, ::core::format_args!($($arg)*))
+            else {
+                return ::core::result::Result::Ok(());
+            };
+            $out.write_message(&data[..length]).await
         }
     };
 }
@@ -110,67 +99,32 @@ macro_rules! format_to {
 mod tests {
     use super::*;
 
-    fn format_into(buffer: &mut [u8], skip: usize, args: Arguments<'_>) -> (usize, bool) {
-        let mut writer = SkipWriter::new(buffer, skip);
-        write(&mut writer, args).unwrap();
-        (writer.written(), writer.overflowed())
-    }
-
     #[test]
-    fn test_fit() -> TestResult {
-        let mut buffer = [0u8; 16];
-        let (written, overflowed) = format_into(&mut buffer, 0, format_args!("hello {}", 42));
-        assert_eq!(written, 8)?;
-        assert_eq!(overflowed, false)?;
-        assert_eq!(&buffer[..written], b"hello 42")?;
+    async fn test_custom_serialize() -> TestResult {
+        struct Mac([u8; 3]);
+
+        impl Serialize for Mac {
+            fn serialize(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(
+                    formatter,
+                    "{:02x}:{:02x}:{:02x}",
+                    self.0[0], self.0[1], self.0[2]
+                )
+            }
+        }
+
+        let mut buffer = Buffer::<64>::new();
+        let mac = Mac([1, 2, 3]);
+        format_to!(buffer, "mac={}", serialize(&mac)).await?;
+        assert_eq!(buffer.as_str(), "mac=01:02:03")?;
         Ok(())
     }
 
     #[test]
-    fn test_exact_fit() -> TestResult {
-        let mut buffer = [0u8; 8];
-        let (written, overflowed) = format_into(&mut buffer, 0, format_args!("hello {}", 42));
-        assert_eq!(written, 8)?;
-        assert_eq!(overflowed, false)?;
-        Ok(())
-    }
-
-    #[test]
-    fn test_overflow() -> TestResult {
-        let mut buffer = [0u8; 4];
-        let (written, overflowed) = format_into(&mut buffer, 0, format_args!("hello {}", 42));
-        assert_eq!(written, 4)?;
-        assert_eq!(overflowed, true)?;
-        assert_eq!(&buffer[..written], b"hell")?;
-        Ok(())
-    }
-
-    #[test]
-    fn test_skip_whole_pieces() -> TestResult {
-        let mut buffer = [0u8; 4];
-        let (written, overflowed) = format_into(&mut buffer, 6, format_args!("hello {}", 42));
-        assert_eq!(written, 2)?;
-        assert_eq!(overflowed, false)?;
-        assert_eq!(&buffer[..written], b"42")?;
-        Ok(())
-    }
-
-    #[test]
-    fn test_skip_part_of_piece() -> TestResult {
-        let mut buffer = [0u8; 4];
-        let (written, overflowed) = format_into(&mut buffer, 2, format_args!("hello {}", 42));
-        assert_eq!(written, 4)?;
-        assert_eq!(overflowed, true)?;
-        assert_eq!(&buffer[..written], b"llo ")?;
-        Ok(())
-    }
-
-    #[test]
-    fn test_empty_message() -> TestResult {
-        let mut buffer = [0u8; 4];
-        let (written, overflowed) = format_into(&mut buffer, 0, format_args!(""));
-        assert_eq!(written, 0)?;
-        assert_eq!(overflowed, false)?;
+    async fn test_display_fallback() -> TestResult {
+        let mut buffer = Buffer::<64>::new();
+        format_to!(buffer, "{}", serialize(&42)).await?;
+        assert_eq!(buffer.as_str(), "42")?;
         Ok(())
     }
 
@@ -204,30 +158,30 @@ mod tests {
     }
 
     #[test]
-    async fn test_write_short_message() -> TestResult {
+    async fn test_format_to_short_message() -> TestResult {
         let mut buffer = Buffer::<64>::new();
-        write_to(&mut buffer, format_args!("hello {}", 42)).await?;
+        format_to!(buffer, "hello {}", 42).await?;
         assert_eq!(buffer.as_str(), "hello 42")?;
         assert_eq!(buffer.write_count, 1)?;
         Ok(())
     }
 
     #[test]
-    async fn test_write_empty_message() -> TestResult {
+    async fn test_format_to_empty_message() -> TestResult {
         let mut buffer = Buffer::<64>::new();
-        write_to(&mut buffer, format_args!("")).await?;
+        format_to!(buffer, "").await?;
         assert_eq!(buffer.as_str(), "")?;
         assert_eq!(buffer.write_count, 0)?;
         Ok(())
     }
 
     #[test]
-    async fn test_write_long_message() -> TestResult {
+    async fn test_format_to_drops_oversized() -> TestResult {
         struct Repeated;
 
-        impl core::fmt::Display for Repeated {
-            fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-                for _ in 0..1000 {
+        impl fmt::Display for Repeated {
+            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                for _ in 0..2000 {
                     formatter.write_str("x")?;
                 }
                 Ok(())
@@ -235,19 +189,18 @@ mod tests {
         }
 
         let mut buffer = Buffer::<2048>::new();
-        write_to(&mut buffer, format_args!("{}", Repeated)).await?;
-        assert_eq!(buffer.as_str().len(), 1000)?;
-        assert_eq!(buffer.as_str().matches('x').count(), 1000)?;
-        assert_eq!(buffer.write_count, 4)?;
+        format_to!(buffer, "{}", Repeated).await?;
+        assert_eq!(buffer.as_str(), "")?;
+        assert_eq!(buffer.write_count, 0)?;
         Ok(())
     }
 
     #[test]
-    async fn test_write_split_multibyte_character() -> TestResult {
+    async fn test_format_to_multibyte() -> TestResult {
         struct Repeated;
 
-        impl core::fmt::Display for Repeated {
-            fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        impl fmt::Display for Repeated {
+            fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
                 for _ in 0..300 {
                     formatter.write_str("é")?;
                 }
@@ -256,8 +209,7 @@ mod tests {
         }
 
         let mut buffer = Buffer::<2048>::new();
-        // The leading 'a' makes the chunk boundaries fall in the middle of a character.
-        write_to(&mut buffer, format_args!("a{}", Repeated)).await?;
+        format_to!(buffer, "a{}", Repeated).await?;
         assert_eq!(buffer.as_str().matches('é').count(), 300)?;
         assert_eq!(buffer.as_str().starts_with("aé"), true)?;
         Ok(())

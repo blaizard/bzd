@@ -57,10 +57,11 @@ mod tests {
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
             let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
-            log_info!(logger, "count = {}, name = {}", 42, "Alex").await?;
-            log_warning!(logger, "careful").await?;
-            log_error!(logger, "boom").await?;
-            log_debug!(logger, "hidden").await?;
+            log_info!(logger, "count = {}, name = {}", 42, "Alex")?;
+            log_warning!(logger, "careful")?;
+            log_error!(logger, "boom")?;
+            log_debug!(logger, "hidden")?;
+            logger.flush().await?;
         }
         let guard = SINK.lock().await;
         let message = guard.as_str();
@@ -74,8 +75,8 @@ mod tests {
         assert_eq!(message.contains(name), true)?;
         // Debug is filtered out by the default minimum level.
         assert_eq!(message.contains("[d] ["), false)?;
-        // One flush per emitted record.
-        assert_eq!(guard.flush_count, 3)?;
+        // One flush per backend flush.
+        assert_eq!(guard.flush_count, 1)?;
         Ok(())
     }
 
@@ -88,13 +89,29 @@ mod tests {
             let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             backend.set_minimum_level(BzdLoggerLevel::Error);
             let mut logger = Logger::new(&mut backend);
-            log_error!(logger, "shown").await?;
-            log_warning!(logger, "hidden").await?;
+            log_error!(logger, "shown")?;
+            log_warning!(logger, "hidden")?;
+            logger.flush().await?;
         }
         let guard = SINK.lock().await;
         let message = guard.as_str();
         assert_eq!(message.contains("] shown\n"), true)?;
         assert_eq!(message.contains("hidden"), false)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_chained_flush() -> TestResult {
+        *SINK.lock().await = RecordingSink::new();
+        {
+            let context =
+                BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
+            let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
+            let mut logger = Logger::new(&mut backend);
+            log_info!(logger, "chained")?.flush().await?;
+        }
+        let guard = SINK.lock().await;
+        assert_eq!(guard.as_str().contains("] chained\n"), true)?;
         Ok(())
     }
 
@@ -106,7 +123,8 @@ mod tests {
                 BzdComponentsGenericOStreamLoggerBackendContext::new(&SINK, BzdLoggerLevel::Info);
             let mut backend = BzdComponentsGenericOStreamLoggerBackend::new(context);
             let mut logger = Logger::new(&mut backend);
-            log_error!(logger, "{}", error::failure!("boom")).await?;
+            log_error!(logger, "{}", error::failure!("boom"))?;
+            logger.flush().await?;
         }
         let guard = SINK.lock().await;
         assert_eq!(guard.as_str().ends_with(": failure: boom\n"), true)?;
