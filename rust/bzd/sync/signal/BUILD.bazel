@@ -1,0 +1,14 @@
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "signal",
+    srcs = [
+        "signal.rs",
+    ],
+    visibility = [
+        "//rust/bzd/sync:__pkg__",
+    ],
+    deps = [
+        "//rust/libs/embassy",
+    ],
+)
