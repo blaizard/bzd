@@ -178,15 +178,16 @@ mod tests {
     struct NullBackend;
 
     impl BzdLoggerBackendInterface for NullBackend {
-        fn push<F>(&mut self, _level: BzdLoggerLevel, _write: F) -> Result<(), Error>
-        where
-            F: FnOnce(&mut dyn core::fmt::Write) -> core::fmt::Result,
-        {
-            Ok(())
+        fn push(
+            &self,
+            _level: BzdLoggerLevel,
+            _write: &mut dyn FnMut(&mut dyn core::fmt::Write) -> core::fmt::Result,
+        ) -> Result<Option<usize>, Error> {
+            Ok(None)
         }
 
-        async fn flush(&mut self) -> Result<(), Error> {
-            Ok(())
+        fn is_consumed(&self, _target: usize) -> bool {
+            true
         }
     }
 

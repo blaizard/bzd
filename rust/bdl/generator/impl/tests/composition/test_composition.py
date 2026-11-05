@@ -46,7 +46,7 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("let mut logger = Logger::new(&mut logger_front);", actual)
+		self.assertIn("let mut logger = logger_backend.lock().await.logger();", actual)
 
 	def testCompositionEnum(self) -> None:
 		content = """
@@ -131,7 +131,7 @@ composition {
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
-use logger::{log_error, log_info, BzdLoggerBackendInterface, Logger};
+use logger::{log_error, log_info};
 
 #[allow(unused_imports)]
 use rust_interfaces_logger::BzdLoggerLevel;
@@ -332,8 +332,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	let executor = DefaultExecutor::new();
 	let logger_backend = executor.logger_backend();
-	let mut logger_front = logger_backend.lock().await.front();
-	let mut logger = Logger::new(&mut logger_front);
+	let mut logger = logger_backend.lock().await.logger();
 
 	log_info!(logger, "[default.executor] Initialization completed.")?;
 

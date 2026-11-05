@@ -11,6 +11,7 @@ rust_library(
     deps = [
         "//rust/bzd",
         "//rust/interfaces:logger",
+        "//rust/libs/embassy",
     ],
 )
 

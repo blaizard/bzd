@@ -4,7 +4,7 @@
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
-use logger::{log_error, log_info, BzdLoggerBackendInterface, Logger};
+use logger::{log_error, log_info};
 
 #[allow(unused_imports)]
 use rust_interfaces_logger::BzdLoggerLevel;
@@ -89,8 +89,7 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 
 	let executor = {{ context | executorConstructorToStr }};
 	let logger_backend = executor.logger_backend();
-	let mut logger_front = logger_backend.lock().await.front();
-	let mut logger = Logger::new(&mut logger_front);
+	let mut logger = logger_backend.lock().await.logger();
 
 	log_info!(logger, "[{{ context.executor }}] Initialization completed.")?;
 

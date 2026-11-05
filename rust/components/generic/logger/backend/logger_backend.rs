@@ -3,7 +3,7 @@
 
 use bzd::base::error::Error;
 use bzd::sync::signal::Signal;
-use embassy_futures::yield_now;
+use logger::Logger;
 use ring_buffer::RingBuffer;
 pub use rust_components_generic_logger_backend_interface::{
     BzdComponentsGenericLoggerBackendContext, BzdComponentsGenericLoggerBackendContextConstraint,
@@ -13,15 +13,6 @@ pub use rust_components_generic_logger_backend_interface::{
 use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, BzdLoggerSinkInterface};
 
 const RING_SIZE: usize = 1024;
-
-const fn level_priority(level: BzdLoggerLevel) -> u8 {
-    match level {
-        BzdLoggerLevel::Error => 0,
-        BzdLoggerLevel::Warning => 1,
-        BzdLoggerLevel::Info => 2,
-        BzdLoggerLevel::Debug => 3,
-    }
-}
 
 struct Shared {
     ring: RingBuffer<RING_SIZE>,
@@ -37,45 +28,24 @@ impl Shared {
     }
 }
 
-/// A frontend handle used to enqueue records without taking the backend lock.
-pub struct LoggerFront {
-    min_level: BzdLoggerLevel,
-    shared: *const Shared,
-    pending: Option<usize>,
-}
-
-impl LoggerFront {
-    fn shared(&self) -> &'static Shared {
-        // SAFETY: the backend lives in a static component, so its address is
-        // stable for the program lifetime. The frontend and the backend service
-        // run on the same executor thread.
-        unsafe { &*self.shared }
-    }
-}
-
-impl BzdLoggerBackendInterface for LoggerFront {
-    fn push<F>(&mut self, level: BzdLoggerLevel, write: F) -> Result<(), Error>
-    where
-        F: FnOnce(&mut dyn core::fmt::Write) -> core::fmt::Result,
-    {
-        if level_priority(level) > level_priority(self.min_level) {
-            return Ok(());
+impl BzdLoggerBackendInterface for Shared {
+    fn push(
+        &self,
+        _level: BzdLoggerLevel,
+        write: &mut dyn FnMut(&mut dyn core::fmt::Write) -> core::fmt::Result,
+    ) -> Result<Option<usize>, Error> {
+        let before = self.ring.overflow_count();
+        let index = self.ring.push(write)?;
+        if self.ring.overflow_count() == before {
+            self.wake.signal(());
+            Ok(Some(index))
+        } else {
+            Ok(None)
         }
-        let shared = self.shared();
-        self.pending = Some(shared.ring.push(write)?);
-        shared.wake.signal(());
-        Ok(())
     }
 
-    async fn flush(&mut self) -> Result<(), Error> {
-        if let Some(target) = self.pending {
-            let shared = self.shared();
-            while !shared.ring.is_consumed(target) {
-                yield_now().await;
-            }
-            self.pending = None;
-        }
-        Ok(())
+    fn is_consumed(&self, target: usize) -> bool {
+        self.ring.is_consumed(target)
     }
 }
 
@@ -96,30 +66,34 @@ impl<C: BzdComponentsGenericLoggerBackendContextConstraint> BzdComponentsGeneric
     }
 
     /// Create a frontend handle.
-    pub fn front(&self) -> LoggerFront {
-        LoggerFront {
-            min_level: self.context.min_level,
-            shared: &self.shared as *const Shared,
-            pending: None,
-        }
+    pub fn logger(&self) -> Logger {
+        Logger::new(
+            &self.shared as *const dyn BzdLoggerBackendInterface,
+            self.context.min_level,
+        )
+    }
+
+    /// Drain all queued records through the sink.
+    pub async fn flush(&mut self) -> Result<(), Error> {
+        let mut sink = self.context.sink.lock().await;
+        drain(&self.shared, &mut *sink).await?;
+        sink.flush().await
     }
 }
 
 impl<C: BzdComponentsGenericLoggerBackendContextConstraint> BzdLoggerBackendInterface
     for BzdComponentsGenericLoggerBackend<C>
 {
-    fn push<F>(&mut self, level: BzdLoggerLevel, write: F) -> Result<(), Error>
-    where
-        F: FnOnce(&mut dyn core::fmt::Write) -> core::fmt::Result,
-    {
-        let mut front = self.front();
-        front.push(level, write)
+    fn push(
+        &self,
+        level: BzdLoggerLevel,
+        write: &mut dyn FnMut(&mut dyn core::fmt::Write) -> core::fmt::Result,
+    ) -> Result<Option<usize>, Error> {
+        self.shared.push(level, write)
     }
 
-    async fn flush(&mut self) -> Result<(), Error> {
-        let mut sink = self.context.sink.lock().await;
-        drain(&self.shared, &mut *sink).await?;
-        sink.flush().await
+    fn is_consumed(&self, target: usize) -> bool {
+        self.shared.is_consumed(target)
     }
 }
 
@@ -160,6 +134,7 @@ async fn drain<S: BzdLoggerSinkInterface + 'static>(
 mod tests {
     use super::*;
     use bzd::sync::mutex::Mutex;
+    use logger::{log_debug, log_error, log_info, log_warning};
 
     struct RecordingSink {
         data: [u8; 1024],
@@ -211,15 +186,13 @@ mod tests {
     async fn test_drain() -> TestResult {
         *SINK.lock().await = RecordingSink::new();
         let mut backend = backend(BzdLoggerLevel::Info);
-        let mut front = backend.front();
-        front.push(BzdLoggerLevel::Info, |record| {
-            write!(record, "hello {}", 42)
-        })?;
-        front.push(BzdLoggerLevel::Debug, |record| write!(record, "hidden"))?;
+        let mut front = backend.logger();
+        log_info!(front, "hello {}", 42)?;
+        log_debug!(front, "hidden")?;
         backend.flush().await?;
 
         let guard = SINK.lock().await;
-        assert_eq!(guard.as_str(), "hello 42")?;
+        assert_eq!(guard.as_str().contains("] hello 42\n"), true)?;
         assert_eq!(guard.flush_count, 1)?;
         Ok(())
     }
@@ -228,13 +201,14 @@ mod tests {
     async fn test_minimum_level() -> TestResult {
         *SINK.lock().await = RecordingSink::new();
         let mut backend = backend(BzdLoggerLevel::Error);
-        let mut front = backend.front();
-        front.push(BzdLoggerLevel::Error, |record| write!(record, "shown"))?;
-        front.push(BzdLoggerLevel::Warning, |record| write!(record, "hidden"))?;
+        let mut front = backend.logger();
+        log_error!(front, "shown")?;
+        log_warning!(front, "hidden")?;
         backend.flush().await?;
 
         let guard = SINK.lock().await;
-        assert_eq!(guard.as_str(), "shown")?;
+        assert_eq!(guard.as_str().contains("] shown\n"), true)?;
+        assert_eq!(guard.as_str().contains("hidden"), false)?;
         Ok(())
     }
 
@@ -242,12 +216,12 @@ mod tests {
     async fn test_flush() -> TestResult {
         *SINK.lock().await = RecordingSink::new();
         let mut backend = backend(BzdLoggerLevel::Info);
-        let mut front = backend.front();
-        front.push(BzdLoggerLevel::Info, |record| write!(record, "pending"))?;
+        let mut front = backend.logger();
+        log_info!(front, "pending")?;
         backend.flush().await?;
 
         let guard = SINK.lock().await;
-        assert_eq!(guard.as_str(), "pending")?;
+        assert_eq!(guard.as_str().contains("] pending\n"), true)?;
         Ok(())
     }
 }

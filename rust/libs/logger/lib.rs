@@ -1,6 +1,7 @@
 #![no_std]
 
 use bzd::base::error::Error;
+use embassy_futures::yield_now;
 
 pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel};
 
@@ -8,14 +9,27 @@ pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel};
 ///
 /// Logging is synchronous; use [`Logger::flush`] to wait for queued messages to
 /// be emitted.
-pub struct Logger<'a, B: BzdLoggerBackendInterface> {
-    backend: &'a mut B,
+pub struct Logger {
+    queue: *const dyn BzdLoggerBackendInterface,
+    min_level: BzdLoggerLevel,
+    pending: Option<usize>,
 }
 
-impl<'a, B: BzdLoggerBackendInterface> Logger<'a, B> {
-    /// Create a new logger.
-    pub fn new(backend: &'a mut B) -> Self {
-        Self { backend }
+impl Logger {
+    /// Create a new logger from a backend queue handle.
+    pub fn new(queue: *const dyn BzdLoggerBackendInterface, min_level: BzdLoggerLevel) -> Self {
+        Self {
+            queue,
+            min_level,
+            pending: None,
+        }
+    }
+
+    fn queue(&self) -> &dyn BzdLoggerBackendInterface {
+        // SAFETY: the queue is owned by a static component, so its address is
+        // stable for the program lifetime. The frontend and the backend service
+        // run on the same executor thread.
+        unsafe { &*self.queue }
     }
 
     /// Enqueue a log message.
@@ -29,18 +43,39 @@ impl<'a, B: BzdLoggerBackendInterface> Logger<'a, B> {
         line: u32,
         args: core::fmt::Arguments<'_>,
     ) -> Result<&mut Self, Error> {
+        if level_priority(level) > level_priority(self.min_level) {
+            return Ok(self);
+        }
         let name = file.rsplit_once('/').map_or(file, |(_, name)| name);
-        self.backend.push(level, |record| {
+        let mut write = |record: &mut dyn core::fmt::Write| -> core::fmt::Result {
             write!(record, "{} [{}:{}] ", level_prefix(level), name, line)?;
             record.write_fmt(args)?;
             record.write_str("\n")
-        })?;
+        };
+        if let Some(index) = self.queue().push(level, &mut write)? {
+            self.pending = Some(index);
+        }
         Ok(self)
     }
 
-    /// Emit all queued messages.
+    /// Wait until all queued messages have been consumed.
     pub async fn flush(&mut self) -> Result<(), Error> {
-        self.backend.flush().await
+        if let Some(target) = self.pending {
+            while !self.queue().is_consumed(target) {
+                yield_now().await;
+            }
+            self.pending = None;
+        }
+        Ok(())
+    }
+}
+
+const fn level_priority(level: BzdLoggerLevel) -> u8 {
+    match level {
+        BzdLoggerLevel::Error => 0,
+        BzdLoggerLevel::Warning => 1,
+        BzdLoggerLevel::Info => 2,
+        BzdLoggerLevel::Debug => 3,
     }
 }
 

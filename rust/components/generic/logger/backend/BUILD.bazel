@@ -23,7 +23,7 @@ rust_library(
         ":interface",
         "//rust/bzd",
         "//rust/interfaces:logger",
-        "//rust/libs/embassy",
+        "//rust/libs/logger",
         "//rust/libs/logger:ring_buffer",
     ],
 )
