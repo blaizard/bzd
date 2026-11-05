@@ -4,7 +4,7 @@
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
-use logger::{log_error, log_info, Logger};
+use logger::{log_error, log_info, BzdLoggerBackendInterface, Logger};
 
 #[allow(unused_imports)]
 use rust_interfaces_logger::BzdLoggerLevel;
@@ -88,13 +88,14 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% end %}
 
 	let executor = {{ context | executorConstructorToStr }};
-	let mut logger_backend = executor.logger_backend().lock().await;
-	let mut logger = Logger::new(&mut *logger_backend);
+	let logger_backend = executor.logger_backend();
+	let mut logger_front = logger_backend.lock().await.front();
+	let mut logger = Logger::new(&mut logger_front);
 
-	log_info!(logger, "[{{ context.executor }}] Initialization completed.")?.flush().await?;
+	log_info!(logger, "[{{ context.executor }}] Initialization completed.")?;
 
 	// Execute the workloads and services.
-	log_info!(logger, "[{{ context.executor }}] Composition phase.")?.flush().await?;
+	log_info!(logger, "[{{ context.executor }}] Composition phase.")?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 {% for entry in workloads[context] %}
@@ -121,7 +122,7 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% end %}
 		;
 
-	log_info!(logger, "[{{ context.executor }}] Execution phase.")?.flush().await?;
+	log_info!(logger, "[{{ context.executor }}] Execution phase.")?;
 	let result = executor.join().await;
 
 	let error = (result != 0)
@@ -130,8 +131,7 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "[{{ context.executor }}] Workload failure: {}", error)?;
 	}
-	logger.flush().await?;
-	drop(logger_backend);
+	logger_backend.lock().await.flush().await?;
 
 	// Shutdown all registry entries.
 {% for fqn, entry in registry[context] %}

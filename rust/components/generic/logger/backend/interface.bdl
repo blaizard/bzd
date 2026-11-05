@@ -1,0 +1,19 @@
+use "rust/interfaces/logger.bdl"
+
+namespace bzd.components.generic;
+
+
+component LoggerBackend : bzd.logger.Backend {
+config:
+	sink = bzd.logger.Sink;
+	min_level = bzd.logger.Level;
+	
+interface:
+	method run();
+	
+composition:
+	this.run();
+	
+}
+
+

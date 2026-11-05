@@ -1,0 +1,34 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//rust/interfaces:logger",
+    ],
+)
+
+rust_library(
+    name = "logger_backend",
+    srcs = [
+        "logger_backend.rs",
+    ],
+    crate_name = "rust_components_generic_logger_backend",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/interfaces:logger",
+        "//rust/libs/embassy",
+        "//rust/libs/logger:ring_buffer",
+    ],
+)
+
+rust_test(
+    name = "logger_backend_test",
+    crate = ":logger_backend",
+)

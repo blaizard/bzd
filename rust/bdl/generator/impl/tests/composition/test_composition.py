@@ -46,7 +46,7 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("let mut logger = Logger::new(&mut *logger_backend);", actual)
+		self.assertIn("let mut logger = Logger::new(&mut logger_front);", actual)
 
 	def testCompositionEnum(self) -> None:
 		content = """
@@ -131,7 +131,7 @@ composition {
 use component::{CompositionComponent, Lifecycle, StaticComponent};
 
 #[allow(unused_imports)]
-use logger::{log_error, log_info, Logger};
+use logger::{log_error, log_info, BzdLoggerBackendInterface, Logger};
 
 #[allow(unused_imports)]
 use rust_interfaces_logger::BzdLoggerLevel;
@@ -331,13 +331,14 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	DefaultPrinterEntry::get().init().await?;
 
 	let executor = DefaultExecutor::new();
-	let mut logger_backend = executor.logger_backend().lock().await;
-	let mut logger = Logger::new(&mut *logger_backend);
+	let logger_backend = executor.logger_backend();
+	let mut logger_front = logger_backend.lock().await.front();
+	let mut logger = Logger::new(&mut logger_front);
 
-	log_info!(logger, "[default.executor] Initialization completed.")?.flush().await?;
+	log_info!(logger, "[default.executor] Initialization completed.")?;
 
 	// Execute the workloads and services.
-	log_info!(logger, "[default.executor] Composition phase.")?.flush().await?;
+	log_info!(logger, "[default.executor] Composition phase.")?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 		.push_workload(async {
@@ -369,7 +370,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 		})
 		;
 
-	log_info!(logger, "[default.executor] Execution phase.")?.flush().await?;
+	log_info!(logger, "[default.executor] Execution phase.")?;
 	let result = executor.join().await;
 
 	let error = (result != 0)
@@ -378,8 +379,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "[default.executor] Workload failure: {}", error)?;
 	}
-	logger.flush().await?;
-	drop(logger_backend);
+	logger_backend.lock().await.flush().await?;
 
 	// Shutdown all registry entries.
 	DefaultExecutorEntry::get().shutdown().await?;

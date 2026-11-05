@@ -4,10 +4,9 @@ use "rust/interfaces/logger.bdl"
 namespace bzd.components.generic;
 
 
-component OStreamLoggerBackend : bzd.logger.Backend {
+component OStreamLoggerSink : bzd.logger.Sink {
 config:
 	out = bzd.OStream;
-	min_level = bzd.logger.Level;
 	
 }
 

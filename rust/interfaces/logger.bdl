@@ -4,4 +4,10 @@ namespace bzd.logger;
 
 extern interface Backend;
 
+interface Sink {
+	method write(data = Vector<Byte>);
+	method flush();
+	
+}
+
 

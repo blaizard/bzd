@@ -17,13 +17,12 @@ rust_library(
     srcs = [
         "ostream.rs",
     ],
-    crate_name = "rust_components_generic_logger_backend_ostream",
+    crate_name = "rust_components_generic_logger_sink_ostream",
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
         "//interfaces:stream",
         "//rust/bzd",
         "//rust/interfaces:logger",
-        "//rust/libs/logger:ring_buffer",
     ],
 )

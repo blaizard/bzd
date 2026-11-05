@@ -1,11 +1,13 @@
 use "rust/components/embassy/executor/interface.bdl"
-use "rust/components/generic/logger/backend/ostream/interface.bdl"
+use "rust/components/generic/logger/backend/interface.bdl"
+use "rust/components/generic/logger/sink/ostream/interface.bdl"
 use "rust/components/embassy/timer/interface.bdl"
 
 
 
 composition {
-	logger_backend = bzd.components.generic.OStreamLoggerBackend(out = out, min_level = bzd.logger.Level.Info);
+	ostream_logger = bzd.components.generic.OStreamLoggerSink(out = out);
+	logger_backend = bzd.components.generic.LoggerBackend(sink = ostream_logger, min_level = bzd.logger.Level.Info);
 	executor = bzd.components.embassy.Executor(logger_backend = logger_backend) [executor];
 	timer = bzd.components.embassy.Timer();
 	

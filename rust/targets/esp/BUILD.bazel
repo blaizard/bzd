@@ -94,7 +94,8 @@ bdl_target(
         "//rust/components/embassy/timer",
         "//rust/components/esp/network/wifi",
         "//rust/components/esp/stream/uart",
-        "//rust/components/generic/logger/backend/ostream",
+        "//rust/components/generic/logger/backend:logger_backend",
+        "//rust/components/generic/logger/sink/ostream",
     ] + select({
         ":esp32s3_uart": [
             "//rust/components/esp/stream/usb_serial_jtag",
