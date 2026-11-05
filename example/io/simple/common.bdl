@@ -1,3 +1,5 @@
+use "interfaces/stream.bdl"
+use "interfaces/timer.bdl"
 
 namespace example;
 
@@ -5,8 +7,8 @@ namespace example;
 // Emit integer continuously.
 component Emitter {
 config:
-	out = {out};
-	timer = {timer};
+	out: bzd.OStream = target.out;
+	timer: bzd.Timer = target.timer;
 	
 interface:
 	method generate();
@@ -20,8 +22,8 @@ composition:
 // Poll and receive data.
 component Poller {
 config:
-	out = {out};
-	timer = {timer};
+	out: bzd.OStream = target.out;
+	timer: bzd.Timer = target.timer;
 	id = const Integer(0);
 	
 interface:

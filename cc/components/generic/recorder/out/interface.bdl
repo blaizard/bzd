@@ -1,12 +1,14 @@
 use "interfaces/recorder.bdl"
+use "interfaces/stream.bdl"
+use "interfaces/timer.bdl"
 
 namespace bzd.components.generic.recorder;
 
 
 component Out : bzd.Recorder {
 config:
-	out = {out};
-	timer = {timer};
+	out: bzd.OStream = target.out;
+	timer: bzd.Timer = target.timer;
 	
 interface:
 	method run();

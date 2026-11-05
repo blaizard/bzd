@@ -1,11 +1,12 @@
 use "cc/bzd/test/runner.bdl"
+use "interfaces/timer.bdl"
 
 namespace tests;
 
 
 component CustomRunner : bzd.test.Runner {
 config:
-	timer = {timer};
+	timer: bzd.Timer = target.timer;
 	
 }
 

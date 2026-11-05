@@ -22,6 +22,10 @@ bdl_library(
     srcs = [
         "composition.bdl",
     ],
+    deps = [
+        "//interfaces:stream",
+        "//interfaces:timer",
+    ],
     implementation = {
         "cc": ":lib",
     },

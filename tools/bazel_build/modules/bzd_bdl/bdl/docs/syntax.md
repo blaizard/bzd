@@ -90,12 +90,11 @@ An expression is defined as follows:
 [<name> [: <interface>] =] <type>[(<values>)] [[<contracts>...]];
 ```
 
-where `values` can be a combination of `value`, `symbol`, `regexpr` or `preset`.
+where `values` can be a combination of `value`, `symbol` or `regexpr`.
 
 - `value` is a literal.
 - `symbol` is either a relative symbol to the current namespace `abc` or a fully qualified name `this.is.abc`.
 - `regexpr` is a regular expression `/[a-z]*/`.
-- `preset` is a preset that is replaced by a predefined content. For example `abc = {out};` is equivalent to `abc: bzd.OStream = target.out;`
 
 ## Methods
 

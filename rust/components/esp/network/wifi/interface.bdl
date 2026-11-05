@@ -6,7 +6,7 @@ namespace bzd.components.esp.network;
 
 component WiFi : bzd.Network {
 config:
-	out = {out};
+	out: bzd.OStream = target.out;
 	ssid = String;
 	password = String;
 	timeout_s = Integer(30) [min(1)];

@@ -6,7 +6,7 @@ namespace bzd.test;
 
 component Runner {
 interface:
-	method run(out = {out}, timer = {timer});
+	method run(out: bzd.OStream = target.out, timer: bzd.Timer = target.timer);
 	
 }
 

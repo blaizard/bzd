@@ -1,3 +1,4 @@
+use "interfaces/stream.bdl"
 
 namespace bzd.components.generic;
 
@@ -5,7 +6,7 @@ namespace bzd.components.generic;
 component ExecutorProfilerMemory {
 config:
 	size = Integer(1024);
-	out = {out};
+	out: bzd.OStream = target.out;
 	
 interface:
 	

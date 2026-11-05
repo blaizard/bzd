@@ -1,11 +1,12 @@
+use "interfaces/stream.bdl"
 
 namespace bzd.components.generic;
 
 
 component Console {
 config:
-	out = {out};
-	in = {in};
+	out: bzd.OStream = target.out;
+	in: bzd.IStream = target.in;
 	
 interface:
 	method run();

@@ -23,8 +23,6 @@ _regexprValue = r"(?P<value>\".*?(?<!\\)\"|-?[0-9]+(?:\.[0-9]*)?|true|false)"
 _regexprString = r"\"(?P<value>.*?)\""
 # Match regular expression: /.*/
 _regexprRegexpr = r"/(?P<regexpr>[^\s]+)/"
-# Match preset: {abc.def}
-_regexprPreset = r"\{(?P<preset>" + _regexprBaseName + r"(?:\." + _regexprBaseName + r")*)\}"
 # Match operator: + or - or \ or *
 _regexprOperator = r"(?P<operator>[\+\-\\\*])"
 
@@ -222,9 +220,6 @@ def makeGrammarExpressionFragment(
 
 		# Test for value.
 		grammarValue.append(GrammarItem(_regexprValue, FragmentNewElement, grammarValue))
-
-		# Test for preset.
-		grammarValue.append(GrammarItem(_regexprPreset, FragmentNewElement, grammarValue))
 
 		# Test for symbol.
 		grammarValue.extend(

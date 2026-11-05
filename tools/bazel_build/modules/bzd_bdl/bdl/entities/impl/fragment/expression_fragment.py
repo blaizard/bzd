@@ -29,8 +29,6 @@ class ExpressionFragment(EntityExpression):
 			return OperatorFragment(element)
 		elif element.isAttr("regexpr"):
 			return RegexprFragment(element)
-		elif element.isAttr("preset"):
-			return PresetFragment(element)
 
 		ExpressionFragment(element).error(message=f"Unsupported expression fragment for element: '{element}'.")
 
@@ -53,7 +51,6 @@ class ExpressionFragment(EntityExpression):
 			"const",
 			"fqn_type",
 			"fqn_value",
-			"preset",
 		):
 			if self.element.isAttr(attr):
 				elementBuilder.setAttr(attr, self.element.getAttr(attr).value)
@@ -171,6 +168,15 @@ class SymbolFragment(ExpressionFragment):
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def resolve(self, resolver: "Resolver") -> None:
+		# Contextual values are resolved at composition time, when the context is known.
+		if self.symbol.isDeferred(resolver):
+			# Keep a type for validation during precompilation. Prefer the declared
+			# interface when available, fall back to Any for untyped contextual values.
+			parent = self.element.context.parent
+			interface = parent.getAttrValue("interface") if isinstance(parent, Element) else None
+			ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", interface if interface else "Any")
+			return
+
 		# Normal resolution path.
 		entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
 		if entity.isRoleMeta:
@@ -255,30 +261,3 @@ class SymbolFragment(ExpressionFragment):
 				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}",
 			)
 			self._setLiteral(maybeValue)
-
-
-class PresetFragment(SymbolFragment):
-	def resolve(self, resolver: "Resolver") -> None:
-		presets = {
-			"out": {"interface": "bzd.OStream", "symbol": "target.out"},
-			"in": {"interface": "bzd.IStream", "symbol": "target.in"},
-			"timer": {"interface": "bzd.Timer", "symbol": "target.timer"},
-			"clock": {"interface": "bzd.Clock", "symbol": "target.clock"},
-			"network.tcp.client": {
-				"interface": "bzd.network.tcp.Client",
-				"symbol": "target.network.tcp.client",
-			},
-			"network.dns": {
-				"interface": "bzd.network.Dns",
-				"symbol": "target.network.dns",
-			},
-		}
-
-		if self.preset in presets:
-			for attr, value in presets[self.preset].items():
-				ElementBuilder.cast(self.element, ElementBuilder).setAttr(attr, value)
-
-		else:
-			self.error(message=f"The preset '{self.preset}' is not supported.")
-
-		super().resolve(resolver=resolver)

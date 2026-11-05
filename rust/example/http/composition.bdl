@@ -1,9 +1,13 @@
 use "rust/example/http/interface.bdl"
+use "interfaces/tcp.bdl"
+use "rust/interfaces/dns.bdl"
 
 
 
 composition {
-	http = bzd.example.HttpGet(dns = {network.dns}, tcp = {network.tcp.client});
+	dns: bzd.network.Dns = target.network.dns;
+	tcp: bzd.network.tcp.Client = target.network.tcp.client;
+	http = bzd.example.HttpGet(dns = dns, tcp = tcp);
 	http.run();
 	
 }

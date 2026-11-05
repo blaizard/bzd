@@ -8,7 +8,9 @@ bdl_library(
         "composition.bdl",
     ],
     deps = [
+        "//interfaces:stream",
         "//interfaces:tcp",
+        "//interfaces:timer",
     ],
 )
 

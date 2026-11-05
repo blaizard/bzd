@@ -12,6 +12,7 @@ bdl_library(
     ],
     deps = [
         "//cc/bzd/test:runner",
+        "//interfaces:stream",
         "//interfaces:timer",
     ],
 )

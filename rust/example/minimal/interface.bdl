@@ -6,8 +6,8 @@ namespace bzd.example;
 
 component HelloWorld {
 config:
-	out = {out};
-	timer = {timer};
+	out: bzd.OStream = target.out;
+	timer: bzd.Timer = target.timer;
 	
 interface:
 	method run();

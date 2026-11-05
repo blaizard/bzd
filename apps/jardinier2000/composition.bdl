@@ -1,4 +1,5 @@
 use "interfaces/timer.bdl"
+use "interfaces/stream.bdl"
 use "interfaces/io.bdl"
 
 namespace jardinier;
@@ -24,8 +25,8 @@ enum LEDState
 
 component LightController {
 config:
-	timer = {timer};
-	out = {out};
+	timer: bzd.Timer = target.timer;
+	out: bzd.OStream = target.out;
 	
 interface:
 	method run();
@@ -37,8 +38,8 @@ interface:
 
 component WaterController {
 config:
-	timer = {timer};
-	out = {out};
+	timer: bzd.Timer = target.timer;
+	out: bzd.OStream = target.out;
 	wateringTimeS = Integer;
 	wakeUpPeriodS = Integer;
 	
@@ -51,8 +52,8 @@ interface:
 
 component LEDController {
 config:
-	timer = {timer};
-	out = {out};
+	timer: bzd.Timer = target.timer;
+	out: bzd.OStream = target.out;
 	
 interface:
 	method run();
@@ -63,8 +64,8 @@ interface:
 
 component Controller {
 config:
-	timer = {timer};
-	out = {out};
+	timer: bzd.Timer = target.timer;
+	out: bzd.OStream = target.out;
 	
 interface:
 	method run();

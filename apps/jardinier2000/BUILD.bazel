@@ -10,6 +10,7 @@ bdl_library(
     ],
     deps = [
         "//interfaces:io",
+        "//interfaces:stream",
         "//interfaces:timer",
     ],
 )

@@ -178,15 +178,6 @@ class Entity:
 			self.regexpr.assign(regexpr)
 
 	@property
-	def isPreset(self) -> bool:
-		return self.element.isAttr("preset")
-
-	@property
-	def preset(self) -> str:
-		"""Get the preset associated with this entity."""
-		return self.element.getAttr("preset").value
-
-	@property
 	def isLiteral(self) -> bool:
 		"""Check if a value has a literal underlying value."""
 		return self.element.isAttr("literal")
@@ -552,7 +543,10 @@ class EntityExpression(Entity):
 		"""Whether this expression carries an explicit value, as opposed to a bare type
 		declaration which has no default value and is therefore mandatory."""
 
-		return self.isValue or self.isPreset or self.isParameters or self.underlyingValueFQN is not None
+		if self.isSymbol and self.symbol.isContextual:
+			return True
+
+		return self.isValue or self.isParameters or self.underlyingValueFQN is not None
 
 	@property
 	def isRValue(self) -> bool:

@@ -7,7 +7,7 @@ namespace bzd.example;
 
 component HttpGet {
 config:
-	out = {out};
+	out: bzd.OStream = target.out;
 	dns = bzd.network.Dns;
 	tcp = bzd.network.tcp.Client;
 	

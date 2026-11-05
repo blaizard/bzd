@@ -11,6 +11,7 @@ bdl_library(
     ],
     deps = [
         "//cc/components/posix/proactor",
+        "//interfaces:stream",
         "//interfaces:tcp",
     ],
 )

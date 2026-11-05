@@ -1,13 +1,15 @@
 use "interfaces/tcp.bdl"
+use "interfaces/stream.bdl"
+use "interfaces/timer.bdl"
 
 namespace trader;
 
 
 component Trader {
 config:
-	out = {out};
-	timer = {timer};
-	client = {network.tcp.client};
+	out: bzd.OStream = target.out;
+	timer: bzd.Timer = target.timer;
+	client: bzd.network.tcp.Client = target.network.tcp.client;
 	
 interface:
 	method run();
