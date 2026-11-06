@@ -89,12 +89,12 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 
 	let executor = {{ context | executorConstructorToStr }};
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger();
+	let mut logger = logger_backend.lock().await.logger("{{ context.executor }}");
 
-	log_info!(logger, "[{{ context.executor }}] Initialization completed.")?;
+	log_info!(logger, "Initialization completed.")?;
 
 	// Execute the workloads and services.
-	log_info!(logger, "[{{ context.executor }}] Composition phase.")?;
+	log_info!(logger, "Composition phase.")?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 {% for entry in workloads[context] %}
@@ -121,14 +121,14 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% end %}
 		;
 
-	log_info!(logger, "[{{ context.executor }}] Execution phase.")?;
+	log_info!(logger, "Execution phase.")?;
 	let result = executor.join().await;
 
 	let error = (result != 0)
 		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure!("One or more workloads failed.")));
-	log_info!(logger, "[{{ context.executor }}] Completion.")?;
+	log_info!(logger, "Completion.")?;
 	if let Some(error) = error.as_ref() {
-		log_error!(logger, "[{{ context.executor }}] Workload failure: {}", error)?;
+		log_error!(logger, "Workload failure: {}", error)?;
 	}
 	logger_backend.lock().await.flush().await?;
 

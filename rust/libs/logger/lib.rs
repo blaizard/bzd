@@ -27,9 +27,13 @@ impl LoggerBackendState {
         }
     }
 
-    /// Create a frontend handle.
-    pub fn logger(&self, min_level: BzdLoggerLevel) -> Logger {
-        Logger::new(self as *const dyn BzdLoggerBackendInterface, min_level)
+    /// Create a frontend handle for the given topic.
+    pub fn logger(&self, topic: &'static str, min_level: BzdLoggerLevel) -> Logger {
+        Logger::new(
+            self as *const dyn BzdLoggerBackendInterface,
+            topic,
+            min_level,
+        )
     }
 
     /// Drain all queued records and flush the sink.

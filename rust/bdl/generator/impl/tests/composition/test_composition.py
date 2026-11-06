@@ -46,7 +46,10 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("let mut logger = logger_backend.lock().await.logger();", actual)
+		self.assertIn(
+			'let mut logger = logger_backend.lock().await.logger("default.executor");',
+			actual,
+		)
 		self.assertNotIn("install", actual)
 
 	def testCompositionLogger(self) -> None:
@@ -58,6 +61,7 @@ enum Level {
 }
 struct LoggerConfig {
 	level = Level(Level.Info);
+	topic = String("");
 }
 
 namespace default;
@@ -78,7 +82,7 @@ composition {
 """
 		actual = self._generate(content=content, imports=[], target="bzd")
 		self.assertIn(
-			"logger: logger::logger_state().logger(BzdLoggerLevel::Info)",
+			'logger: logger::logger_state().logger("bzd.logger.default.hello", BzdLoggerLevel::Info)',
 			actual,
 		)
 		self.assertNotIn("LoggerBackendState", actual)
@@ -90,7 +94,17 @@ composition {
 		)
 		actual = self._generate(content=content, imports=[], target="bzd")
 		self.assertIn(
-			"logger: logger::logger_state().logger(BzdLoggerLevel::Debug)",
+			'logger: logger::logger_state().logger("bzd.logger.default.hello", BzdLoggerLevel::Debug)',
+			actual,
+		)
+
+		content = content.replace(
+			"hello = Hello(logger = bzd.logger.LoggerConfig(level = bzd.logger.Level.Debug));",
+			'hello = Hello(logger = bzd.logger.LoggerConfig(topic = "custom.topic"));',
+		)
+		actual = self._generate(content=content, imports=[], target="bzd")
+		self.assertIn(
+			'logger: logger::logger_state().logger("custom.topic", BzdLoggerLevel::Info)',
 			actual,
 		)
 
@@ -378,12 +392,12 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	let executor = DefaultExecutor::new();
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger();
+	let mut logger = logger_backend.lock().await.logger("default.executor");
 
-	log_info!(logger, "[default.executor] Initialization completed.")?;
+	log_info!(logger, "Initialization completed.")?;
 
 	// Execute the workloads and services.
-	log_info!(logger, "[default.executor] Composition phase.")?;
+	log_info!(logger, "Composition phase.")?;
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 		.push_workload(async {
@@ -415,14 +429,14 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 		})
 		;
 
-	log_info!(logger, "[default.executor] Execution phase.")?;
+	log_info!(logger, "Execution phase.")?;
 	let result = executor.join().await;
 
 	let error = (result != 0)
 		.then(|| failure.into_inner().unwrap_or_else(|| bzd::base::error::failure!("One or more workloads failed.")));
-	log_info!(logger, "[default.executor] Completion.")?;
+	log_info!(logger, "Completion.")?;
 	if let Some(error) = error.as_ref() {
-		log_error!(logger, "[default.executor] Workload failure: {}", error)?;
+		log_error!(logger, "Workload failure: {}", error)?;
 	}
 	logger_backend.lock().await.flush().await?;
 

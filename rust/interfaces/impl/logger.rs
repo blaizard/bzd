@@ -27,15 +27,21 @@ pub trait BzdLoggerBackendInterface {
 /// be emitted.
 pub struct Logger {
     queue: *const dyn BzdLoggerBackendInterface,
+    topic: &'static str,
     min_level: BzdLoggerLevel,
     pending: Option<usize>,
 }
 
 impl Logger {
     /// Create a new logger from a backend queue handle.
-    pub fn new(queue: *const dyn BzdLoggerBackendInterface, min_level: BzdLoggerLevel) -> Self {
+    pub fn new(
+        queue: *const dyn BzdLoggerBackendInterface,
+        topic: &'static str,
+        min_level: BzdLoggerLevel,
+    ) -> Self {
         Self {
             queue,
+            topic,
             min_level,
             pending: None,
         }
@@ -63,8 +69,16 @@ impl Logger {
             return Ok(self);
         }
         let name = file.rsplit_once('/').map_or(file, |(_, name)| name);
+        let topic = self.topic;
         let mut write = |record: &mut dyn core::fmt::Write| -> core::fmt::Result {
-            write!(record, "{} [{}:{}] ", level_prefix(level), name, line)?;
+            write!(
+                record,
+                "{} [{}:{}] [{}] ",
+                level_prefix(level),
+                name,
+                line,
+                topic
+            )?;
             record.write_fmt(args)?;
             record.write_str("\n")
         };

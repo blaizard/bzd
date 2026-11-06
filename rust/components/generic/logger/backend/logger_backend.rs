@@ -21,9 +21,9 @@ impl<C: BzdComponentsGenericLoggerBackendContextConstraint> BzdComponentsGeneric
         Self { context }
     }
 
-    /// Create a frontend handle.
-    pub fn logger(&self) -> Logger {
-        logger_state().logger(self.context.min_level)
+    /// Create a frontend handle for the given topic.
+    pub fn logger(&self, topic: &'static str) -> Logger {
+        logger_state().logger(topic, self.context.min_level)
     }
 
     /// Drain all queued records through the sink.

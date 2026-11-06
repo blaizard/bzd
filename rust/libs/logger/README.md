@@ -16,8 +16,8 @@ the backend is a thin adapter that drains a simple circular queue, owned by this
 
 The implementation is split as follows:
 
-- `Logger` and its macros are the frontend. They serialize records into the queue.
-- `LoggerBackendState`, in this library, is the single persistent queue (ring buffer + wake signal). It is a global static, so frontends can log before the backend component exists. It does not take the backend component lock.
+- `Logger` and its macros are the frontend. They serialize records into the queue, prefixed with a per-frontend topic.
+- `LoggerBackendState`, in this library, is the single persistent queue (ring buffer + wake signal). It is a global static, so frontends can log before the backend component exists. It does not take the backend component lock. Each frontend is created with a topic through `LoggerBackendState::logger(topic, level)`.
 - `LoggerBackend` is a thin adapter that owns the sink and drains the global state in its service. It can also drain on demand through `flush()`.
 - The backend consumes records in place (`peek` then `commit`), without copying them out of the ring.
 - A specialization (for example `OStreamLoggerSink`) implements `bzd.logger.Sink` and only writes/flushes the bytes.

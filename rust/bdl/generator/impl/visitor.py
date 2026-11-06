@@ -137,16 +137,19 @@ class Transform:
 			item.isSymbol and item.symbol.kind == "bzd.logger.LoggerConfig"
 		)
 
-	def loggerLevelToStr(self, item: ParametersResolvedItem) -> str:
+	def loggerConfigToStr(self, item: ParametersResolvedItem, defaultTopic: str) -> str:
 		param = typing.cast(Expression, item.param)
-		level = next((sub for sub in param.parametersResolved if sub.name == "level"), None)
-		assert level is not None, f"The logger config '{param}' is missing a 'level'."
-		assert level.param.literalNative is not None, f"The logger level of '{param}' is not resolved."
-		return self.literalNativeToStr(level.param.literalNative)
+		values = {sub.name: sub.param.literalNative for sub in param.parametersResolved}
+		assert "level" in values, f"The logger config '{param}' is missing a 'level'."
+		assert values["level"] is not None, f"The logger level of '{param}' is not resolved."
+		return "logger::logger_state().logger({}, {})".format(
+			self.literalNativeToStr(values.get("topic") or defaultTopic),
+			self.literalNativeToStr(values["level"]),
+		)
 
-	def configFieldValueToStr(self, item: ParametersResolvedItem) -> str:
+	def configFieldValueToStr(self, item: ParametersResolvedItem, defaultTopic: str) -> str:
 		if self.isLoggerConfig(item.expected):
-			return f"logger::logger_state().logger({self.loggerLevelToStr(item)})"
+			return self.loggerConfigToStr(item, defaultTopic)
 		return self.configParamValueToStr(item)
 
 	def configConstructorValueToStr(self, item: EntityExpression) -> str:
@@ -271,12 +274,14 @@ class Transform:
 		"""Generate the context construction call of a registry entry."""
 
 		contextType = "{}Context".format(self.symbolToStr(entity.expression.symbol))
+		defaultTopic = entity.expression.fqn
 		if self.configDependencyItems(entity):
 			constraint = self.constraintTypesToStr(entity, context)
-			args = ", ".join(self.configFieldValueToStr(item) for item in entity.expression.parametersResolved)
+			args = ", ".join(self.configFieldValueToStr(item, defaultTopic) for item in entity.expression.parametersResolved)
 			return "{}::<{}>::new({})".format(contextType, constraint, args)
 		fields = ", ".join(
-			"{}: {}".format(item.name, self.configFieldValueToStr(item)) for item in entity.expression.parametersResolved
+			"{}: {}".format(item.name, self.configFieldValueToStr(item, defaultTopic))
+			for item in entity.expression.parametersResolved
 		)
 		return "{} {{ {} }}".format(contextType, fields)
 

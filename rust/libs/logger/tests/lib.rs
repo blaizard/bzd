@@ -72,16 +72,16 @@ mod tests {
         }
     }
 
-    fn logger(backend: &MockBackend, min_level: BzdLoggerLevel) -> Logger {
+    fn logger(backend: &MockBackend, topic: &'static str, min_level: BzdLoggerLevel) -> Logger {
         let queue =
             backend as &dyn BzdLoggerBackendInterface as *const dyn BzdLoggerBackendInterface;
-        Logger::new(queue, min_level)
+        Logger::new(queue, topic, min_level)
     }
 
     #[test]
     async fn test_logging() -> TestResult {
         let backend = MockBackend::new();
-        let mut logger = logger(&backend, BzdLoggerLevel::Info);
+        let mut logger = logger(&backend, "test", BzdLoggerLevel::Info);
         log_info!(logger, "count = {}, name = {}", 42, "Alex")?;
         log_warning!(logger, "careful")?;
         log_error!(logger, "boom")?;
@@ -91,7 +91,7 @@ mod tests {
         let message = backend.as_str();
         let name = file!().rsplit_once('/').map_or(file!(), |(_, name)| name);
         assert_eq!(message.contains("[i] ["), true)?;
-        assert_eq!(message.contains("] count = 42, name = Alex\n"), true)?;
+        assert_eq!(message.contains("] [test] count = 42, name = Alex\n"), true)?;
         assert_eq!(message.contains("[w] ["), true)?;
         assert_eq!(message.contains("] careful\n"), true)?;
         assert_eq!(message.contains("[e] ["), true)?;
@@ -105,7 +105,7 @@ mod tests {
     #[test]
     async fn test_minimum_level() -> TestResult {
         let backend = MockBackend::new();
-        let mut logger = logger(&backend, BzdLoggerLevel::Error);
+        let mut logger = logger(&backend, "test", BzdLoggerLevel::Error);
         log_error!(logger, "shown")?;
         log_warning!(logger, "hidden")?;
         logger.flush().await?;
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     async fn test_chained_flush() -> TestResult {
         let backend = MockBackend::new();
-        let mut logger = logger(&backend, BzdLoggerLevel::Info);
+        let mut logger = logger(&backend, "test", BzdLoggerLevel::Info);
         log_info!(logger, "chained")?.flush().await?;
 
         assert_eq!(backend.as_str().contains("] chained\n"), true)?;
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     async fn test_error_value() -> TestResult {
         let backend = MockBackend::new();
-        let mut logger = logger(&backend, BzdLoggerLevel::Info);
+        let mut logger = logger(&backend, "test", BzdLoggerLevel::Info);
         log_error!(logger, "{}", error::failure!("boom"))?;
         logger.flush().await?;
 
@@ -174,13 +174,28 @@ mod tests {
     async fn test_backend_state_drain() -> TestResult {
         let state = LoggerBackendState::new();
         let mut sink = RecordingSink::new();
-        let mut front = state.logger(BzdLoggerLevel::Info);
+        let mut front = state.logger("test", BzdLoggerLevel::Info);
         log_info!(front, "hello {}", 42)?;
         log_debug!(front, "hidden")?;
         state.flush(&mut sink).await?;
 
-        assert_eq!(sink.as_str().contains("] hello 42\n"), true)?;
+        assert_eq!(sink.as_str().contains("] [test] hello 42\n"), true)?;
         assert_eq!(sink.flush_count, 1)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_backend_state_topics() -> TestResult {
+        let state = LoggerBackendState::new();
+        let mut sink = RecordingSink::new();
+        let mut first = state.logger("first", BzdLoggerLevel::Info);
+        let mut second = state.logger("second", BzdLoggerLevel::Info);
+        log_info!(first, "one")?;
+        log_info!(second, "two")?;
+        state.flush(&mut sink).await?;
+
+        assert_eq!(sink.as_str().contains("] [first] one\n"), true)?;
+        assert_eq!(sink.as_str().contains("] [second] two\n"), true)?;
         Ok(())
     }
 
@@ -188,7 +203,7 @@ mod tests {
     async fn test_backend_state_minimum_level() -> TestResult {
         let state = LoggerBackendState::new();
         let mut sink = RecordingSink::new();
-        let mut front = state.logger(BzdLoggerLevel::Error);
+        let mut front = state.logger("test", BzdLoggerLevel::Error);
         log_error!(front, "shown")?;
         log_warning!(front, "hidden")?;
         state.flush(&mut sink).await?;
@@ -202,7 +217,7 @@ mod tests {
     async fn test_backend_state_buffered() -> TestResult {
         let state = LoggerBackendState::new();
         let mut sink = RecordingSink::new();
-        let mut front = state.logger(BzdLoggerLevel::Info);
+        let mut front = state.logger("test", BzdLoggerLevel::Info);
         log_info!(front, "buffered")?;
 
         assert_eq!(sink.as_str().contains("buffered"), false)?;
