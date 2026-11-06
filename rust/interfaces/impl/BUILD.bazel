@@ -36,6 +36,7 @@ rust_library(
         "//interfaces:stream",
         "//rust/bzd",
         "//rust/interfaces:logger_level",
+        "//rust/libs/embassy",
     ],
 )
 

@@ -6,7 +6,9 @@
 mod tests {
     use bzd::base::error::{self, Error};
     use core::cell::RefCell;
-    use logger::{log_debug, log_error, log_info, log_warning, BzdLoggerBackendInterface, Logger};
+    use logger::{
+        log_debug, log_error, log_info, log_warning, BzdLoggerBackendInterface, Logger, LoggerCell,
+    };
     use rust_interfaces_logger::BzdLoggerLevel;
 
     struct MockState {
@@ -131,6 +133,50 @@ mod tests {
         logger.flush().await?;
 
         assert_eq!(backend.as_str().ends_with(": failure: boom\n"), true)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_logger_cell_before_install() -> TestResult {
+        static CELL: LoggerCell = LoggerCell::new();
+        let mut logger = CELL.logger(BzdLoggerLevel::Info);
+        log_info!(logger, "dropped")?;
+        logger.flush().await?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_logger_cell_after_install() -> TestResult {
+        static CELL: LoggerCell = LoggerCell::new();
+        let backend = MockBackend::new();
+        // SAFETY: the backend outlives the cell usage in this test.
+        unsafe { CELL.install(&backend) };
+        let mut logger = CELL.logger(BzdLoggerLevel::Info);
+        log_info!(logger, "cell")?;
+        logger.flush().await?;
+
+        assert_eq!(backend.as_str().contains("] cell\n"), true)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_logger_cell_shared() -> TestResult {
+        static CELL: LoggerCell = LoggerCell::new();
+        let backend = MockBackend::new();
+        // SAFETY: the backend outlives the cell usage in this test.
+        unsafe { CELL.install(&backend) };
+        let mut first = CELL.logger(BzdLoggerLevel::Info);
+        let mut second = CELL.logger(BzdLoggerLevel::Warning);
+        log_info!(first, "first")?;
+        log_warning!(second, "second")?;
+        log_debug!(second, "debug")?;
+        first.flush().await?;
+        second.flush().await?;
+
+        let message = backend.as_str();
+        assert_eq!(message.contains("] first\n"), true)?;
+        assert_eq!(message.contains("] second\n"), true)?;
+        assert_eq!(message.contains("] debug\n"), false)?;
         Ok(())
     }
 }

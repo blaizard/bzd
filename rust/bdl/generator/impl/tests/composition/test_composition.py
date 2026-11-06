@@ -7,11 +7,11 @@ from rust.bdl.generator.impl.visitor import compositionRust
 
 
 class TestComposition(unittest.TestCase):
-	def _generate(self, content: str, imports: list[str]) -> str:
+	def _generate(self, content: str, imports: list[str], target: str = "default") -> str:
 		bdl = Object.fromContent(content=content, objectContext=ObjectContext(resolve=True))
 		composition = Composition()
 		composition.visit(bdl).process()
-		view = composition.view(target="default")
+		view = composition.view(target=target)
 		return compositionRust(composition=view, data={"rust": {"imports": imports}})
 
 	def testCompositionWithoutOut(self) -> None:
@@ -46,7 +46,48 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("let mut logger = logger_backend.lock().await.logger();", actual)
+		self.assertIn("let mut logger = {", actual)
+		self.assertIn("unsafe { LOGGER_EXECUTOR.install(&*backend) };", actual)
+		self.assertIn("backend.logger()", actual)
+
+	def testCompositionLogger(self) -> None:
+		content = """
+namespace bzd.logger;
+enum Level {
+	Debug,
+	Info
+}
+struct LoggerConfig {
+	level = Level(Level.Info);
+}
+
+namespace default;
+component Hello {
+config:
+	logger = bzd.logger.LoggerConfig();
+interface:
+	method run();
+}
+component Executor {
+}
+
+composition {
+	executor = Executor() [executor];
+	hello = Hello();
+	hello.run();
+}
+"""
+		actual = self._generate(content=content, imports=[], target="bzd")
+		self.assertIn("static LOGGER_LOGGER_DEFAULT_EXECUTOR: logger::LoggerCell = logger::LoggerCell::new();", actual)
+		self.assertIn("logger: LOGGER_LOGGER_DEFAULT_EXECUTOR.logger(BzdLoggerLevel::Info)", actual)
+		self.assertIn("unsafe { LOGGER_LOGGER_DEFAULT_EXECUTOR.install(&*backend) };", actual)
+
+		content = content.replace(
+			"hello = Hello();",
+			"hello = Hello(logger = bzd.logger.LoggerConfig(level = bzd.logger.Level.Debug));",
+		)
+		actual = self._generate(content=content, imports=[], target="bzd")
+		self.assertIn("logger: LOGGER_LOGGER_DEFAULT_EXECUTOR.logger(BzdLoggerLevel::Debug)", actual)
 
 	def testCompositionEnum(self) -> None:
 		content = """
@@ -142,6 +183,8 @@ use rust_interfaces_executor::BzdExecutorInterface;
 use child::*;
 #[allow(unused_imports)]
 use parent::*;
+
+static LOGGER_EXECUTOR: logger::LoggerCell = logger::LoggerCell::new();
 
 // ---- Registry
 struct DefaultExecutorEntry {
@@ -332,7 +375,12 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	let executor = DefaultExecutor::new();
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger();
+	let mut logger = {
+		let backend = logger_backend.lock().await;
+		// SAFETY: the backend is owned by a static registry entry.
+		unsafe { LOGGER_EXECUTOR.install(&*backend) };
+		backend.logger()
+	};
 
 	log_info!(logger, "[default.executor] Initialization completed.")?;
 

@@ -48,6 +48,29 @@ pub trait BzdTestMyServiceInterface {
 			expectedContent.rstrip("\n"),
 		)
 
+	def testLoggerConfig(self) -> None:
+
+		bdlContent = """namespace bzd.logger;
+enum Level
+{
+	Info
+}
+
+struct LoggerConfig {
+	level = Level(Level.Info);
+}
+
+namespace default;
+component MyComponent {
+config:
+	logger = bzd.logger.LoggerConfig();
+}
+"""
+		bdl = Object.fromContent(content=bdlContent, objectContext=ObjectContext(resolve=True))
+		actual = formatRust(bdl)
+
+		self.assertIn("pub logger: Logger,", actual)
+
 	def testComponent(self) -> None:
 
 		bdlContent = """component MyComponent {

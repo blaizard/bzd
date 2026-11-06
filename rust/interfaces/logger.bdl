@@ -10,4 +10,9 @@ interface Sink {
 	
 }
 
+struct LoggerConfig {
+	level = Level(Level.Info);
+	
+}
+
 

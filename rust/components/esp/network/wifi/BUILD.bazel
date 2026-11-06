@@ -8,7 +8,7 @@ bdl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//interfaces:stream",
+        "//rust/interfaces:logger",
         "//rust/interfaces:network",
     ],
 )
@@ -33,6 +33,7 @@ rust_library(
         "//rust/interfaces:network",
         "//rust/libs/embassy",
         "//rust/libs/esp:rust",
+        "//rust/libs/logger",
     ] + select({
         "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
             "@crates_esp32//:embassy-net",

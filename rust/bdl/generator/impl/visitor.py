@@ -51,8 +51,19 @@ class Transform:
 	def methodReturnToStr(self, method: Method) -> str:
 		return f"Result<{self.symbolNonConstToStr(method.symbol)}, bzd::base::error::Error>"
 
+	def methodParameterTypeToStr(self, item: EntityExpression) -> str:
+		if item.isSymbol:
+			return self.symbolToStr(item.symbol)
+
+		assert isinstance(item, Expression)
+		symbol = item.interfaceType
+		if symbol.category in {CategoryOriginal.interface, CategoryOriginal.component}:
+			return f"impl {self.symbolInterfaceToStr(symbol)}"
+
+		return self.symbolToStr(symbol)
+
 	def methodToStr(self, method: Method) -> str:
-		parameters = "".join([f", {item.name}: {self.symbolToStr(item.symbol)}" for item in method.parameters])
+		parameters = "".join([f", {item.name}: {self.methodParameterTypeToStr(item)}" for item in method.parameters])
 		return f"async fn {method.name}(&mut self{parameters}) -> {self.methodReturnToStr(method)};"
 
 	def symbolInterfaceToStr(self, symbol: Optional[Symbol]) -> str:
@@ -65,6 +76,8 @@ class Transform:
 		return ": " + " + ".join([self.symbolInterfaceToStr(symbol) for symbol in entity.inheritanceList])
 
 	def isList(self, item: EntityExpression) -> bool:
+		if not item.isSymbol:
+			return False
 		return bool(item.symbol.category == CategoryOriginal.builtin and item.symbol.kinds[-1] == "list")
 
 	def listItems(self, item: Expression) -> typing.List[ParametersResolvedItem]:
@@ -74,10 +87,10 @@ class Transform:
 		return len(self.listItems(typing.cast(Expression, item)))
 
 	def configDependencySymbol(self, item: EntityExpression) -> Optional[Symbol]:
-		if item.symbol.category in {CategoryOriginal.interface, CategoryOriginal.component}:
-			return item.symbol
 		if isinstance(item, Expression) and item.isInterfaceType:
 			return item.interfaceType
+		if item.isSymbol and item.symbol.category in {CategoryOriginal.interface, CategoryOriginal.component}:
+			return item.symbol
 		if self.isList(item):
 			items = self.listItems(typing.cast(Expression, item))
 			if items and items[0].param.isSymbol:
@@ -117,7 +130,33 @@ class Transform:
 	def configConstructorFields(self, entity: Entity) -> str:
 		return ", ".join([item.name for item in entity.getConfigAggregated()])
 
+	def isLoggerConfig(self, item: EntityExpression) -> bool:
+		if not isinstance(item, Expression):
+			return False
+		return (item.isInterfaceType and item.interfaceType.kind == "bzd.logger.LoggerConfig") or (
+			item.isSymbol and item.symbol.kind == "bzd.logger.LoggerConfig"
+		)
+
+	@staticmethod
+	def loggerCellNameToStr(context: Context) -> str:
+		name = "".join(c if c.isalnum() else "_" for c in context.executorWithoutTarget).upper()
+		return f"LOGGER_{name}"
+
+	def loggerLevelToStr(self, item: ParametersResolvedItem) -> str:
+		param = typing.cast(Expression, item.param)
+		level = next((sub for sub in param.parametersResolved if sub.name == "level"), None)
+		assert level is not None, f"The logger config '{param}' is missing a 'level'."
+		assert level.param.literalNative is not None, f"The logger level of '{param}' is not resolved."
+		return self.literalNativeToStr(level.param.literalNative)
+
+	def configFieldValueToStr(self, item: ParametersResolvedItem, context: Context) -> str:
+		if self.isLoggerConfig(item.expected):
+			return f"{self.loggerCellNameToStr(context)}.logger({self.loggerLevelToStr(item)})"
+		return self.configParamValueToStr(item)
+
 	def configConstructorValueToStr(self, item: EntityExpression) -> str:
+		if self.isLoggerConfig(item):
+			return "Logger"
 		if self.isList(item):
 			return f"[component::ComponentHandle<{self.toCamelCase(item.name)}Type>; {self.listSize(item)}]"
 		if self.configDependencySymbol(item) is not None:
@@ -171,6 +210,9 @@ class Transform:
 	def configParamValueToStr(self, item: ParametersResolvedItem) -> str:
 		"""Render the value of a resolved config parameter, either a literal or a registry reference."""
 
+		if self.isLoggerConfig(item.expected):
+			item.error("A logger config can only be used as a component configuration value.")
+			return ""
 		if item.param.isLiteral:
 			return self.literalNativeToStr(item.param.literalNative)
 		param = typing.cast(Expression, item.param)
@@ -236,10 +278,11 @@ class Transform:
 		contextType = "{}Context".format(self.symbolToStr(entity.expression.symbol))
 		if self.configDependencyItems(entity):
 			constraint = self.constraintTypesToStr(entity, context)
-			args = ", ".join(self.configParamValueToStr(item) for item in entity.expression.parametersResolved)
+			args = ", ".join(self.configFieldValueToStr(item, context) for item in entity.expression.parametersResolved)
 			return "{}::<{}>::new({})".format(contextType, constraint, args)
 		fields = ", ".join(
-			"{}: {}".format(item.name, self.configParamValueToStr(item)) for item in entity.expression.parametersResolved
+			"{}: {}".format(item.name, self.configFieldValueToStr(item, context))
+			for item in entity.expression.parametersResolved
 		)
 		return "{} {{ {} }}".format(contextType, fields)
 

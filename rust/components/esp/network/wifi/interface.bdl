@@ -1,4 +1,4 @@
-use "interfaces/stream.bdl"
+use "rust/interfaces/logger.bdl"
 use "rust/interfaces/network.bdl"
 
 namespace bzd.components.esp.network;
@@ -6,7 +6,7 @@ namespace bzd.components.esp.network;
 
 component WiFi : bzd.Network {
 config:
-	out: bzd.OStream = target.out;
+	logger = bzd.logger.LoggerConfig();
 	ssid = String;
 	password = String;
 	timeout_s = Integer(30) [min(1)];

@@ -16,6 +16,10 @@ use rust_interfaces_executor::BzdExecutorInterface;
 use {{ import }}::*;
 {% end %}
 
+{% for context in contexts %}
+static {{ context | loggerCellNameToStr }}: logger::LoggerCell = logger::LoggerCell::new();
+{% end %}
+
 // ---- Registry
 
 {#- Generate calls for all init members associated with an expression. -#}
@@ -89,7 +93,12 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 
 	let executor = {{ context | executorConstructorToStr }};
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger();
+	let mut logger = {
+		let backend = logger_backend.lock().await;
+		// SAFETY: the backend is owned by a static registry entry.
+		unsafe { {{ context | loggerCellNameToStr }}.install(&*backend) };
+		backend.logger()
+	};
 
 	log_info!(logger, "[{{ context.executor }}] Initialization completed.")?;
 

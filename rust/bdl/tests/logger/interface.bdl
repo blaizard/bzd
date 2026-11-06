@@ -1,0 +1,15 @@
+use "rust/interfaces/logger.bdl"
+
+namespace bzd.test;
+
+
+component LoggerUser {
+config:
+	logger = bzd.logger.LoggerConfig();
+	
+interface:
+	method run();
+	
+}
+
+

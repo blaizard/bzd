@@ -4,7 +4,7 @@
 {%- elif configDependencySymbol(item) -%}
 component::ComponentHandle<C::{{ item.name | toCamelCase }}>
 {%- else -%}
-{{ item.symbol | symbolToStr }}
+{{ configConstructorValueToStr(item) }}
 {%- end -%}
 {%- end -%}
 
@@ -65,7 +65,7 @@ impl{{ data | configTypeParameters }} {{ data.fqn | fqnToCapitalized }}Context<{
 {% else %}
 pub struct {{ data.fqn | fqnToCapitalized }}Context {
 {% for item in data.getConfigAggregated() %}
-	pub {{ item.name }}: {{ item.symbol | symbolToStr }},
+	pub {{ item.name }}: {{ configContextValue(item) }},
 {% end %}
 }
 {% end %}

@@ -1,7 +1,6 @@
 #![no_std]
 
 use bzd::base::error::Error;
-use bzd::base::format::format_to;
 use embassy_net::tcp::client::{TcpClient, TcpClientState};
 use embassy_net::StackResources;
 use esp_radio::wifi::sta::StationConfig;
@@ -9,6 +8,7 @@ use esp_radio::wifi::{
     AuthenticationMethodConfig, Config as WifiConfig, ControllerConfig, Interface, Password, Ssid,
     WifiController,
 };
+use logger::{log_error, log_info};
 use rust_components_embassy_network::state::{self, NetworkState, TcpClientType};
 use rust_components_esp_hal::init as esp_hal_init;
 pub use rust_components_esp_network_wifi_interface::*;
@@ -19,20 +19,14 @@ static STACK_RESOURCES: StaticCell<StackResources<4>> = StaticCell::new();
 static TCP_CLIENT_STATE: StaticCell<TcpClientState<2, 1536, 1536>> = StaticCell::new();
 static TCP_CLIENT: StaticCell<TcpClientType> = StaticCell::new();
 
-pub struct BzdComponentsEspNetworkWiFi<C>
-where
-    C: BzdComponentsEspNetworkWiFiContextConstraint,
-{
-    context: BzdComponentsEspNetworkWiFiContext<C>,
+pub struct BzdComponentsEspNetworkWiFi {
+    context: BzdComponentsEspNetworkWiFiContext,
     controller: Option<WifiController<'static>>,
     runner: Option<embassy_net::Runner<'static, Interface>>,
 }
 
-impl<C> BzdComponentsEspNetworkWiFi<C>
-where
-    C: BzdComponentsEspNetworkWiFiContextConstraint,
-{
-    pub fn new(context: BzdComponentsEspNetworkWiFiContext<C>) -> Self {
+impl BzdComponentsEspNetworkWiFi {
+    pub fn new(context: BzdComponentsEspNetworkWiFiContext) -> Self {
         Self {
             context,
             controller: None,
@@ -41,15 +35,9 @@ where
     }
 }
 
-impl<C> BzdNetworkInterface for BzdComponentsEspNetworkWiFi<C> where
-    C: BzdComponentsEspNetworkWiFiContextConstraint
-{
-}
+impl BzdNetworkInterface for BzdComponentsEspNetworkWiFi {}
 
-impl<C> BzdComponentsEspNetworkWiFiInterface for BzdComponentsEspNetworkWiFi<C>
-where
-    C: BzdComponentsEspNetworkWiFiContextConstraint,
-{
+impl BzdComponentsEspNetworkWiFiInterface for BzdComponentsEspNetworkWiFi {
     async fn init(&mut self) -> Result<(), Error> {
         if state::get().is_some() {
             return Err(bzd::base::error::failure!(
@@ -127,28 +115,23 @@ where
             )
         })?;
 
-        let out = self.context.out;
         let ssid = self.context.ssid;
+        let logger = &mut self.context.logger;
         let connection = async move {
             loop {
                 match controller.connect_async().await {
                     Ok(info) => {
-                        let _ = format_to!(
-                            out.lock().await,
-                            "WiFi connected: ssid={} channel={}\n",
+                        let _ = log_info!(
+                            logger,
+                            "WiFi connected: ssid={} channel={}",
                             info.ssid.as_str(),
                             info.channel
-                        )
-                        .await;
+                        );
                         let _ = controller.wait_for_disconnect_async().await;
                         embassy_time::Timer::after(embassy_time::Duration::from_secs(1)).await;
                     }
                     Err(err) => {
-                        let _ = format_to!(
-                            out.lock().await,
-                            "WiFi connect failed for '{ssid}': {err:?}\n"
-                        )
-                        .await;
+                        let _ = log_error!(logger, "WiFi connect failed for '{}': {:?}", ssid, err);
                         embassy_time::Timer::after(embassy_time::Duration::from_secs(5)).await;
                     }
                 }
