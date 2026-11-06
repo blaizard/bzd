@@ -46,9 +46,8 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
-		self.assertIn("let mut logger = {", actual)
-		self.assertIn("unsafe { LOGGER_EXECUTOR.install(&*backend) };", actual)
-		self.assertIn("backend.logger()", actual)
+		self.assertIn("let mut logger = logger_backend.lock().await.logger();", actual)
+		self.assertNotIn("install", actual)
 
 	def testCompositionLogger(self) -> None:
 		content = """
@@ -78,16 +77,22 @@ composition {
 }
 """
 		actual = self._generate(content=content, imports=[], target="bzd")
-		self.assertIn("static LOGGER_LOGGER_DEFAULT_EXECUTOR: logger::LoggerCell = logger::LoggerCell::new();", actual)
-		self.assertIn("logger: LOGGER_LOGGER_DEFAULT_EXECUTOR.logger(BzdLoggerLevel::Info)", actual)
-		self.assertIn("unsafe { LOGGER_LOGGER_DEFAULT_EXECUTOR.install(&*backend) };", actual)
+		self.assertIn(
+			"logger: logger::logger_state().logger(BzdLoggerLevel::Info)",
+			actual,
+		)
+		self.assertNotIn("LoggerBackendState", actual)
+		self.assertNotIn("install", actual)
 
 		content = content.replace(
 			"hello = Hello();",
 			"hello = Hello(logger = bzd.logger.LoggerConfig(level = bzd.logger.Level.Debug));",
 		)
 		actual = self._generate(content=content, imports=[], target="bzd")
-		self.assertIn("logger: LOGGER_LOGGER_DEFAULT_EXECUTOR.logger(BzdLoggerLevel::Debug)", actual)
+		self.assertIn(
+			"logger: logger::logger_state().logger(BzdLoggerLevel::Debug)",
+			actual,
+		)
 
 	def testCompositionEnum(self) -> None:
 		content = """
@@ -183,8 +188,6 @@ use rust_interfaces_executor::BzdExecutorInterface;
 use child::*;
 #[allow(unused_imports)]
 use parent::*;
-
-static LOGGER_EXECUTOR: logger::LoggerCell = logger::LoggerCell::new();
 
 // ---- Registry
 struct DefaultExecutorEntry {
@@ -375,12 +378,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	let executor = DefaultExecutor::new();
 	let logger_backend = executor.logger_backend();
-	let mut logger = {
-		let backend = logger_backend.lock().await;
-		// SAFETY: the backend is owned by a static registry entry.
-		unsafe { LOGGER_EXECUTOR.install(&*backend) };
-		backend.logger()
-	};
+	let mut logger = logger_backend.lock().await.logger();
 
 	log_info!(logger, "[default.executor] Initialization completed.")?;
 

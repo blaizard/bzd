@@ -7,9 +7,10 @@ mod tests {
     use bzd::base::error::{self, Error};
     use core::cell::RefCell;
     use logger::{
-        log_debug, log_error, log_info, log_warning, BzdLoggerBackendInterface, Logger, LoggerCell,
+        log_debug, log_error, log_info, log_warning, BzdLoggerBackendInterface, Logger,
+        LoggerBackendState,
     };
-    use rust_interfaces_logger::BzdLoggerLevel;
+    use rust_interfaces_logger::{BzdLoggerLevel, BzdLoggerSinkInterface};
 
     struct MockState {
         data: [u8; 1024],
@@ -136,47 +137,78 @@ mod tests {
         Ok(())
     }
 
+    struct RecordingSink {
+        data: [u8; 1024],
+        length: usize,
+        flush_count: usize,
+    }
+
+    impl RecordingSink {
+        const fn new() -> Self {
+            Self {
+                data: [0; 1024],
+                length: 0,
+                flush_count: 0,
+            }
+        }
+
+        fn as_str(&self) -> &str {
+            core::str::from_utf8(&self.data[..self.length]).unwrap()
+        }
+    }
+
+    impl BzdLoggerSinkInterface for RecordingSink {
+        async fn write(&mut self, data: &[u8]) -> Result<(), Error> {
+            self.data[self.length..self.length + data.len()].copy_from_slice(data);
+            self.length += data.len();
+            Ok(())
+        }
+
+        async fn flush(&mut self) -> Result<(), Error> {
+            self.flush_count += 1;
+            Ok(())
+        }
+    }
+
     #[test]
-    async fn test_logger_cell_before_install() -> TestResult {
-        static CELL: LoggerCell = LoggerCell::new();
-        let mut logger = CELL.logger(BzdLoggerLevel::Info);
-        log_info!(logger, "dropped")?;
-        logger.flush().await?;
+    async fn test_backend_state_drain() -> TestResult {
+        let state = LoggerBackendState::new();
+        let mut sink = RecordingSink::new();
+        let mut front = state.logger(BzdLoggerLevel::Info);
+        log_info!(front, "hello {}", 42)?;
+        log_debug!(front, "hidden")?;
+        state.flush(&mut sink).await?;
+
+        assert_eq!(sink.as_str().contains("] hello 42\n"), true)?;
+        assert_eq!(sink.flush_count, 1)?;
         Ok(())
     }
 
     #[test]
-    async fn test_logger_cell_after_install() -> TestResult {
-        static CELL: LoggerCell = LoggerCell::new();
-        let backend = MockBackend::new();
-        // SAFETY: the backend outlives the cell usage in this test.
-        unsafe { CELL.install(&backend) };
-        let mut logger = CELL.logger(BzdLoggerLevel::Info);
-        log_info!(logger, "cell")?;
-        logger.flush().await?;
+    async fn test_backend_state_minimum_level() -> TestResult {
+        let state = LoggerBackendState::new();
+        let mut sink = RecordingSink::new();
+        let mut front = state.logger(BzdLoggerLevel::Error);
+        log_error!(front, "shown")?;
+        log_warning!(front, "hidden")?;
+        state.flush(&mut sink).await?;
 
-        assert_eq!(backend.as_str().contains("] cell\n"), true)?;
+        assert_eq!(sink.as_str().contains("] shown\n"), true)?;
+        assert_eq!(sink.as_str().contains("hidden"), false)?;
         Ok(())
     }
 
     #[test]
-    async fn test_logger_cell_shared() -> TestResult {
-        static CELL: LoggerCell = LoggerCell::new();
-        let backend = MockBackend::new();
-        // SAFETY: the backend outlives the cell usage in this test.
-        unsafe { CELL.install(&backend) };
-        let mut first = CELL.logger(BzdLoggerLevel::Info);
-        let mut second = CELL.logger(BzdLoggerLevel::Warning);
-        log_info!(first, "first")?;
-        log_warning!(second, "second")?;
-        log_debug!(second, "debug")?;
-        first.flush().await?;
-        second.flush().await?;
+    async fn test_backend_state_buffered() -> TestResult {
+        let state = LoggerBackendState::new();
+        let mut sink = RecordingSink::new();
+        let mut front = state.logger(BzdLoggerLevel::Info);
+        log_info!(front, "buffered")?;
 
-        let message = backend.as_str();
-        assert_eq!(message.contains("] first\n"), true)?;
-        assert_eq!(message.contains("] second\n"), true)?;
-        assert_eq!(message.contains("] debug\n"), false)?;
+        assert_eq!(sink.as_str().contains("buffered"), false)?;
+
+        state.flush(&mut sink).await?;
+        assert_eq!(sink.as_str().contains("] buffered\n"), true)?;
         Ok(())
     }
 }

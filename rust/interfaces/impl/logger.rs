@@ -1,7 +1,6 @@
 #![no_std]
 
 use bzd::base::error::Error;
-use core::cell::UnsafeCell;
 use embassy_futures::yield_now;
 
 pub use rust_interfaces_logger_level::BzdLoggerLevel;
@@ -20,69 +19,6 @@ pub trait BzdLoggerBackendInterface {
 
     /// Whether the record up to `target` has been consumed.
     fn is_consumed(&self, target: usize) -> bool;
-}
-
-/// Late-bound logger backend.
-///
-/// Frontends can be created before the backend is installed and start
-/// forwarding once it is.
-pub struct LoggerCell {
-    backend: UnsafeCell<Option<*const dyn BzdLoggerBackendInterface>>,
-}
-
-// SAFETY: the cell is installed and used from the single executor thread.
-unsafe impl Sync for LoggerCell {}
-
-impl LoggerCell {
-    pub const fn new() -> Self {
-        Self {
-            backend: UnsafeCell::new(None),
-        }
-    }
-
-    /// Install the backend associated with this cell.
-    ///
-    /// # Safety
-    ///
-    /// The backend must outlive every logger created from this cell.
-    pub unsafe fn install(&self, backend: &dyn BzdLoggerBackendInterface) {
-        let backend = unsafe {
-            core::mem::transmute::<
-                &dyn BzdLoggerBackendInterface,
-                &'static dyn BzdLoggerBackendInterface,
-            >(backend)
-        };
-        unsafe { *self.backend.get() = Some(backend as *const dyn BzdLoggerBackendInterface) };
-    }
-
-    /// Create a frontend associated with this cell.
-    pub fn logger(&self, min_level: BzdLoggerLevel) -> Logger {
-        Logger::new(self as *const dyn BzdLoggerBackendInterface, min_level)
-    }
-
-    fn backend(&self) -> Option<&dyn BzdLoggerBackendInterface> {
-        unsafe { (*self.backend.get()).map(|backend| &*backend) }
-    }
-}
-
-impl BzdLoggerBackendInterface for LoggerCell {
-    fn push(
-        &self,
-        level: BzdLoggerLevel,
-        write: &mut dyn FnMut(&mut dyn core::fmt::Write) -> core::fmt::Result,
-    ) -> Result<Option<usize>, Error> {
-        match self.backend() {
-            Some(backend) => backend.push(level, write),
-            None => Ok(None),
-        }
-    }
-
-    fn is_consumed(&self, target: usize) -> bool {
-        match self.backend() {
-            Some(backend) => backend.is_consumed(target),
-            None => true,
-        }
-    }
 }
 
 /// Frontend that dispatches log events to a backend.

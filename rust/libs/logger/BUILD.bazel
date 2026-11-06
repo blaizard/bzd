@@ -9,6 +9,8 @@ rust_library(
     crate_name = "logger",
     visibility = ["//visibility:public"],
     deps = [
+        ":ring_buffer",
+        "//rust/bzd",
         "//rust/interfaces:logger",
     ],
 )

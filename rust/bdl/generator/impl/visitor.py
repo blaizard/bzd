@@ -137,11 +137,6 @@ class Transform:
 			item.isSymbol and item.symbol.kind == "bzd.logger.LoggerConfig"
 		)
 
-	@staticmethod
-	def loggerCellNameToStr(context: Context) -> str:
-		name = "".join(c if c.isalnum() else "_" for c in context.executorWithoutTarget).upper()
-		return f"LOGGER_{name}"
-
 	def loggerLevelToStr(self, item: ParametersResolvedItem) -> str:
 		param = typing.cast(Expression, item.param)
 		level = next((sub for sub in param.parametersResolved if sub.name == "level"), None)
@@ -149,9 +144,9 @@ class Transform:
 		assert level.param.literalNative is not None, f"The logger level of '{param}' is not resolved."
 		return self.literalNativeToStr(level.param.literalNative)
 
-	def configFieldValueToStr(self, item: ParametersResolvedItem, context: Context) -> str:
+	def configFieldValueToStr(self, item: ParametersResolvedItem) -> str:
 		if self.isLoggerConfig(item.expected):
-			return f"{self.loggerCellNameToStr(context)}.logger({self.loggerLevelToStr(item)})"
+			return f"logger::logger_state().logger({self.loggerLevelToStr(item)})"
 		return self.configParamValueToStr(item)
 
 	def configConstructorValueToStr(self, item: EntityExpression) -> str:
@@ -278,11 +273,10 @@ class Transform:
 		contextType = "{}Context".format(self.symbolToStr(entity.expression.symbol))
 		if self.configDependencyItems(entity):
 			constraint = self.constraintTypesToStr(entity, context)
-			args = ", ".join(self.configFieldValueToStr(item, context) for item in entity.expression.parametersResolved)
+			args = ", ".join(self.configFieldValueToStr(item) for item in entity.expression.parametersResolved)
 			return "{}::<{}>::new({})".format(contextType, constraint, args)
 		fields = ", ".join(
-			"{}: {}".format(item.name, self.configFieldValueToStr(item, context))
-			for item in entity.expression.parametersResolved
+			"{}: {}".format(item.name, self.configFieldValueToStr(item)) for item in entity.expression.parametersResolved
 		)
 		return "{} {{ {} }}".format(contextType, fields)
 
