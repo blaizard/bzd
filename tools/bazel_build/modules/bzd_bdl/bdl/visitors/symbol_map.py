@@ -67,7 +67,7 @@ class Resolver:
 		return self.symbols.getEntity(fqn=fqn, exclude=self.exclude)
 
 	def getEntityResolved(self, fqn: str) -> Result[EntityType]:
-		if fqn.startswith("target."):
+		if self.target is None and fqn.startswith("target."):
 			return self.symbols.getEntityResolved(fqn="Any")
 		return self.symbols.getEntityResolved(fqn=fqn, exclude=self.exclude)
 

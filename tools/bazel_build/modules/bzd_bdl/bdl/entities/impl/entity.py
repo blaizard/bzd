@@ -380,7 +380,7 @@ class Entity:
 			# Resolve the types from a config sequence if any.
 			# These are resolved only when used, allowing symbol to be only available during composition.
 			for entity in parentParams:
-				typing.cast("Expression", entity).resolve(resolver=resolver.make(namespace=parentEntity.namespace))
+				typing.cast("Expression", entity).resolveValue(resolver=resolver.make(namespace=parentEntity.namespace))
 			params.extend(parentParams)
 
 		return params
@@ -517,6 +517,10 @@ class EntityExpression(Entity):
 		return self.element.isAttr("symbol")
 
 	@property
+	def isInterfaceType(self) -> bool:
+		return self.element.isAttr("interface") and bool(self.element.getAttr("interface").value)
+
+	@property
 	def symbol(self) -> Symbol:
 		return Symbol(
 			element=self.element,
@@ -543,7 +547,7 @@ class EntityExpression(Entity):
 		"""Whether this expression carries an explicit value, as opposed to a bare type
 		declaration which has no default value and is therefore mandatory."""
 
-		if self.isSymbol and self.symbol.isContextual:
+		if self.isInterfaceType:
 			return True
 
 		return self.isValue or self.isParameters or self.underlyingValueFQN is not None

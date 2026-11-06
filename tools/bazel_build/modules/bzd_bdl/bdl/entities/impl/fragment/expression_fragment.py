@@ -168,15 +168,6 @@ class SymbolFragment(ExpressionFragment):
 		return Parameters(element=self.element, NestedElementType=Expression)
 
 	def resolve(self, resolver: "Resolver") -> None:
-		# Contextual values are resolved at composition time, when the context is known.
-		if self.symbol.isDeferred(resolver):
-			# Keep a type for validation during precompilation. Prefer the declared
-			# interface when available, fall back to Any for untyped contextual values.
-			parent = self.element.context.parent
-			interface = parent.getAttrValue("interface") if isinstance(parent, Element) else None
-			ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", interface if interface else "Any")
-			return
-
 		# Normal resolution path.
 		entity = self.symbol.resolve(resolver=resolver, maybeValue=True)
 		if entity.isRoleMeta:

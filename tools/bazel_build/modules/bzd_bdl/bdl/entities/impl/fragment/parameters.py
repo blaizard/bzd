@@ -122,7 +122,7 @@ class ParametersCommon:
 		for param in self:
 			if param.isLiteral or param.isValue or param.isRegexpr:
 				pass
-			elif param.isSymbol:
+			elif param.isSymbol or (param.isInterfaceType and param.underlyingTypeFQN is not None):
 				entityType = param.getEntityUnderlyingTypeResolved(resolver)
 				entityType.assertTrue(
 					condition=entityType.isRoleType,

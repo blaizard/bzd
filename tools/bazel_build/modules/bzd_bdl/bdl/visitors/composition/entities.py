@@ -235,7 +235,7 @@ class Entities:
 		meta: typing.List[Expression] = []
 		for expression in expressions:
 			resolver = expression.makeResolver(symbols=self.symbols)
-			expression.resolveMemoized(resolver=resolver)
+			expression.resolve(resolver=resolver)
 
 			if self.processFirstStage(expression=expression, fqns=fqns) is None:
 				continue
@@ -265,7 +265,7 @@ class Entities:
 		for expression in executors + workloads:
 			context = self.getContext(expression=expression, defaultExecutor=defaultExecutor)
 			resolver = context.makeResolver(symbols=self.symbols, expression=expression)
-			expression.resolve(resolver=resolver)
+			expression.resolveValue(resolver=resolver)
 			self.addResolved(expression=expression, context=context)
 
 		# - meta should be processed at the end, to ensure that all symbols are
@@ -304,7 +304,7 @@ class Entities:
 				dependency = self.symbols.getEntityResolved(fqn=fqn).value
 				if isinstance(dependency, Expression):
 					resolver = context.makeResolver(symbols=self.symbols, expression=dependency)
-					dependency.resolveMemoized(resolver=resolver)
+					dependency.resolveValue(resolver=resolver)
 					self.addResolvedDependency(dependency, context=context)
 
 	def addResolved(self, expression: Expression, context: Context, isDepedency: bool = False) -> None:
@@ -357,6 +357,7 @@ class Entities:
 	def processEntry(self, expression: Expression, isDepedency: bool, context: Context) -> None:
 		"""Resolve the dependencies for a specific expression."""
 		resolver = context.makeResolver(symbols=self.symbols, expression=expression)
+		expression.resolveValue(resolver=resolver)
 
 		# Find the symbol underlying type.
 		underlyingType = expression.getEntityUnderlyingTypeResolved(resolver=resolver)
@@ -389,7 +390,7 @@ class Entities:
 		for fqn in expression.dependencies:
 			dep = resolver.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
 			if isinstance(dep, Expression):
-				dep.resolveMemoized(resolver=resolver.make(expression=dep))
+				dep.resolveValue(resolver=resolver.make(expression=dep))
 				# Non-literal deps needs to be treated as dependencies to be later resolved.
 				# Literal ones can be used directly.
 				if not dep.isLiteral:

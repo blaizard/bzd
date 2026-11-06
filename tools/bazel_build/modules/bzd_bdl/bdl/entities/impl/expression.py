@@ -1,6 +1,6 @@
 import typing
 
-from bzd.parser.element import Element
+from bzd.parser.element import Element, ElementBuilder
 
 from bdl.contracts.validation import Validation
 from bdl.entities.impl.fragment.symbol import Symbol
@@ -51,10 +51,6 @@ class Expression(EntityExpression):
 			const="const",
 			contract="contract",
 		)
-
-	@property
-	def isInterfaceType(self) -> bool:
-		return self.element.isAttr("interface") and bool(self.element.getAttr("interface").value)
 
 	@property
 	def interfaceType(self) -> Symbol:
@@ -171,17 +167,42 @@ class Expression(EntityExpression):
 		fragments[0].toElement(self.element)
 
 	def resolve(self, resolver: "Resolver") -> None:
-		"""Resolve entities.
+		"""Resolve the expression according to its declaration kind.
+
+		A typed declaration only resolves its type, its value is resolved when
+		the declaration is instantiated. An untyped expression is fully resolved.
 
 		Args:
 		    resolver: The resolver to be used.
 		"""
 
-		# Resolve the interface associated with this expression.
 		if self.isInterfaceType:
-			self.interfaceType.resolve(resolver=resolver)
-			# TODO: Ensure that the interface is part of the parent type.
+			self.resolveType(resolver=resolver)
+		else:
+			self.resolveValue(resolver=resolver)
 
+	def resolveType(self, resolver: "Resolver") -> None:
+		"""Resolve the explicit type of this expression, without its value.
+
+		Args:
+		    resolver: The resolver to be used.
+		"""
+
+		if not self.isInterfaceType:
+			return
+
+		if not self.element.isAttr("interface_resolved"):
+			self.interfaceType.resolve(resolver=resolver)
+		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_type", self.interfaceType.kind)
+
+	def resolveValue(self, resolver: "Resolver") -> None:
+		"""Resolve the type and value of this expression.
+
+		Args:
+		    resolver: The resolver to be used.
+		"""
+
+		self.resolveType(resolver=resolver)
 		self.resolveFragments(resolver=resolver)
 		self.assertTrue(
 			condition=self.isValue or self.isSymbol or self.isRegexpr,

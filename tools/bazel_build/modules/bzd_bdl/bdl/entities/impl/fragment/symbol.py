@@ -5,7 +5,6 @@ from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
 from bzd.parser.error import Error, AssertionResult
 
 from bdl.entities.impl.fragment.contract import Contracts
-from bdl.entities.impl.fragment.fqn import FQN
 from bdl.entities.impl.fragment.parameters import Parameters
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bdl.entities.impl.types import Category
@@ -189,28 +188,6 @@ class Symbol:
 	@property
 	def fqn(self) -> str:
 		return self.element.getAttr(self.kindAttr).value
-
-	@property
-	def contextNamespace(self) -> typing.Optional[str]:
-		"""Get the contextual namespace of this symbol, if any."""
-		namespace = FQN.toNamespace(self.fqn)
-		if len(namespace) > 1 and namespace[0] in {"this", "target"}:
-			return namespace[0]
-		return None
-
-	@property
-	def isContextual(self) -> bool:
-		"""Whether this symbol requires a contextual namespace such as `this` or `target`."""
-		return self.contextNamespace is not None
-
-	def isDeferred(self, resolver: "Resolver") -> bool:
-		"""Whether this symbol requires a context that is not available in the resolver."""
-		context = self.contextNamespace
-		if context == "this":
-			return resolver.this is None
-		if context == "target":
-			return resolver.target is None
-		return False
 
 	@property
 	def isThis(self) -> bool:

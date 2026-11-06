@@ -108,6 +108,34 @@ composition {
 		composition = Composition()
 		composition.visit(bdl).process()
 
+	def testTypedValueComposition(self) -> None:
+		bdl = self._build(
+			content="""
+namespace default;
+extern interface OStream;
+component SomeOut : OStream {
+}
+component Executor {}
+component Hello {
+config:
+	out: OStream = other;
+interface:
+	method run();
+}
+composition {
+	other = SomeOut();
+	executor = Executor() [executor];
+	hello = Hello();
+	hello.run();
+}
+"""
+		)
+		composition = Composition()
+		composition.visit(bdl).process()
+		context = next(iter(composition.contexts))
+		entry = composition.registry[context]["default.hello"]
+		self.assertIn("default.other", [dep.fqn for dep in entry.deps])
+
 
 if __name__ == "__main__":
 	unittest.main()
