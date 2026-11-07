@@ -4,9 +4,9 @@ import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 const Exception = ExceptionFactory("test", "db", "data", "handlers");
 
 describe("Handlers", () => {
-	it("no handlers", () => {
+	it("no handlers", async () => {
 		const handlers = new Handlers({});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "b"], "value1"],
 			[["a"], "value2"],
 			[["a", "c", "d"], "value3"],
@@ -24,7 +24,7 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("history", () => {
+	it("history", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				history: 2,
@@ -36,7 +36,7 @@ describe("Handlers", () => {
 				history: 7,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "b"], "value1"],
 			[["a"], "value2"],
 			[["a", "c", "d"], "value3"],
@@ -54,7 +54,7 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("history deep override fires after shallow block skip", () => {
+	it("history deep override fires after shallow block skip", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				history: 2,
@@ -63,7 +63,7 @@ describe("Handlers", () => {
 				history: 3,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a"], "valueA"],
 			[["a", "c", "d"], "valueACD"],
 			[["a", "d"], "valueAD"],
@@ -75,13 +75,13 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("toString", () => {
+	it("toString", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				toString: "{b} != {d}",
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "name", "b"], "value1"],
 			[["c"], "value4"],
 			[["b", "l"], "value5"],
@@ -94,18 +94,18 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("toString failed", () => {
+	it("toString failed", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				toString: "{b} != {d}",
 			},
 		});
-		Exception.assertThrows(() => {
-			handlers.process([[["a", "b"], "value1"]]);
+		await Exception.assertThrows(async () => {
+			await handlers.process([[["a", "b"], "value1"]]);
 		});
 	});
 
-	it("combined", () => {
+	it("combined", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				toString: "{b} != {d}",
@@ -115,7 +115,7 @@ describe("Handlers", () => {
 				history: 7,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "name", "b"], "value1"],
 			[["c"], "value4"],
 			[["b", "l"], "value5"],
@@ -128,11 +128,11 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("toString multi-group", () => {
+	it("toString multi-group", async () => {
 		const handlers = new Handlers({
 			"/a": { toString: "{b} != {d}" },
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "x", "b"], 1],
 			[["a", "x", "d"], 2],
 			[["a", "y", "b"], 3],
@@ -148,13 +148,13 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("group", () => {
+	it("group", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				group: true,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "name", "b"], "value1"],
 			[["c"], "value4"],
 			[["a", "name", "d"], "value6"],
@@ -167,13 +167,13 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("group scalar leaves untouched", () => {
+	it("group scalar leaves untouched", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				group: true,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "name"], "value1"],
 			[["a", "name", "b"], "value2"],
 		]);
@@ -183,14 +183,14 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("group combined", () => {
+	it("group combined", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				group: true,
 				history: 2,
 			},
 		});
-		const result = handlers.process([
+		const result = await handlers.process([
 			[["a", "name", "b"], "value1"],
 			[["c"], "value4"],
 			[["a", "name", "d"], "value6"],
@@ -201,7 +201,7 @@ describe("Handlers", () => {
 		]);
 	});
 
-	it("validation root", () => {
+	it("validation root", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				validation: {
@@ -209,27 +209,27 @@ describe("Handlers", () => {
 				},
 			},
 		});
-		handlers.process([[["a"], "I am a string"]]);
-		Exception.assertThrows(() => {
-			handlers.process([[["a"], 12]]);
+		await handlers.process([[["a"], "I am a string"]]);
+		await Exception.assertThrows(async () => {
+			await handlers.process([[["a"], 12]]);
 		});
 	});
 
-	it("validation invalid json", () => {
+	it("validation invalid json", async () => {
 		const handlers = new Handlers({
 			"/a": {
 				validation: {},
 			},
 		});
-		Exception.assertThrowsWithMatch(() => {
-			handlers.process([
+		await Exception.assertThrowsWithMatch(async () => {
+			await handlers.process([
 				[["a", "b"], "value1"],
 				[["a"], "value2"],
 			]);
 		}, "not json-compatible");
 	});
 
-	it("validation complex", () => {
+	it("validation complex", async () => {
 		const handlers = new Handlers({
 			"/data/cpu": {
 				validation: {
@@ -246,14 +246,14 @@ describe("Handlers", () => {
 				},
 			},
 		});
-		handlers.process([
+		await handlers.process([
 			[
 				["data", "cpu", "main"],
 				[0, 1, 0.5],
 			],
 		]);
-		Exception.assertThrowsWithMatch(() => {
-			handlers.process([
+		await Exception.assertThrowsWithMatch(async () => {
+			await handlers.process([
 				[
 					["data", "cpu", "main"],
 					[0, 1.1, 0.5],

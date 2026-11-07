@@ -19,7 +19,6 @@ const sortedAvailableHandlers = [
 	["unit", UnitHandler],
 	["history", HistoryHandler],
 ];
-const availableHandlers = Object.fromEntries(sortedAvailableHandlers);
 
 const SPECIAL_KEY_FOR_HANDLERS = "\x01";
 
@@ -38,6 +37,16 @@ class FragmentAccessor {
 	/// Get the value of the fragment.
 	get value() {
 		return this.fragments[this.index][1];
+	}
+
+	/// Set the value of the fragment.
+	set value(value) {
+		this.fragments[this.index][1] = value;
+	}
+
+	/// Get the full key of the fragment.
+	get fullKey() {
+		return this.fragments[this.index][0];
 	}
 
 	/// Get the options of the fragment.
@@ -94,7 +103,13 @@ class FragmentRange {
 }
 
 export default class Handlers {
-	constructor(configuration, defaultOptions = {}) {
+	constructor(configuration, defaultOptions = {}, customHandlers = {}) {
+		const factories = Object.assign(
+			Object.fromEntries(sortedAvailableHandlers.map(([name, Handler]) => [name, (options) => new Handler(options)])),
+			customHandlers,
+		);
+		const handlerOrder = (name) => sortedAvailableHandlers.findIndex(([handler]) => handler === name);
+
 		// Convert the configuration:
 		// {
 		//	 "a/b/c": {
@@ -123,16 +138,13 @@ export default class Handlers {
 				return r[segment];
 			}, result);
 
-			// Sort the handlers by their order in the sortedAvailableHandlers.
-			const sortedProps = Object.entries(props).sort(
-				([a], [b]) =>
-					sortedAvailableHandlers.findIndex(([h]) => h === a) - sortedAvailableHandlers.findIndex(([h]) => h === b),
-			);
+			// Sort the handlers by their order in the handler list.
+			const sortedProps = Object.entries(props).sort(([a], [b]) => handlerOrder(a) - handlerOrder(b));
 
 			object[SPECIAL_KEY_FOR_HANDLERS] = {
 				handlers: sortedProps.map(([handler, options]) => {
-					Exception.assert(handler in availableHandlers, "The handler '{}' is not supported.", handler);
-					return new availableHandlers[handler](options);
+					Exception.assert(handler in factories, "The handler '{}' is not supported.", handler);
+					return factories[handler](options);
 				}),
 				root: key,
 			};
@@ -152,7 +164,7 @@ export default class Handlers {
 		});
 	}
 
-	process(fragments) {
+	async process(fragments) {
 		// Sort and initialize the fragments with an empty options.
 		fragments = Handlers.sort(fragments).map(([key, value, options = null]) => [
 			key,
@@ -177,7 +189,7 @@ export default class Handlers {
 					}
 					const range = new FragmentRange(fragments, index, root);
 					for (const handler of handlers) {
-						handler.process(range);
+						await handler.process(range);
 					}
 				}
 			}
