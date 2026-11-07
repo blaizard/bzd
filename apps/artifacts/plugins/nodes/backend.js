@@ -4,7 +4,7 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import RecordsDistributed from "#bzd/apps/artifacts/plugins/nodes/records/distributed.js";
-import Files from "#bzd/apps/artifacts/plugins/nodes/files.js";
+import { FileDatabase, FileValue, FilesHandler } from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.js";
@@ -14,7 +14,9 @@ import Router from "#bzd/nodejs/core/router.js";
 import format from "#bzd/nodejs/core/format.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import DataGenerator from "#bzd/nodejs/db/data/generator.js";
+import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 import { Readable } from "stream";
+import { fromChunk } from "#bzd/nodejs/core/stream.js";
 import mime from "mime";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampUs, timestampMs } from "#bzd/nodejs/utils/timestamp.js";
@@ -185,7 +187,7 @@ export default class Plugin extends PluginBase {
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 		const routersTagsFromKey = buildRoutersForTagsFromKey(optionsTags);
 		const regexTagsFromUid = buildRegexForTagsFromUid(optionsTags);
-		this.files = optionsFiles ? new Files(optionsFiles) : null;
+		this.files = optionsFiles ? new FileDatabase(optionsFiles) : null;
 
 		this.records = new RecordsDistributed(optionsRecords);
 		if (optionsFiles) {
@@ -214,14 +216,18 @@ export default class Plugin extends PluginBase {
 					}
 				},
 			};
-			optionsNodes["external"] = async (uid, key, count, after, before) => {
-				if (this.files?.matches(key)) {
-					return await this.files.onExternal(uid, key, count, after, before);
-				}
-				return dbReadExternal ? await dbReadExternal.onExternal(uid, key, count, after, before) : null;
-			};
+			if (dbReadExternal !== null) {
+				optionsNodes["external"] = async (...args) => {
+					return await dbReadExternal.onExternal(...args);
+				};
+			}
 
-			this.nodes = new Nodes(optionsHandlers, optionsNodes);
+			const handlers = new Handlers(
+				optionsHandlers,
+				{ history: 10 },
+				this.files ? { files: () => new FilesHandler(this.files) } : {},
+			);
+			this.nodes = new Nodes(handlers, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				await this.nodes.insert({ uid: uid, key: ["data"], value: data });
 			}
@@ -347,20 +353,24 @@ export default class Plugin extends PluginBase {
 				async (context) => {
 					const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
 					const timestamp = timestampUs();
-					const { pointer } = await this.files.write({
-						uid,
-						key,
-						data: context.getBody(),
-						mime: context.getHeader("content-type", "application/octet-stream"),
-						timestamp,
-					});
 					const records = await this.nodes.insert({
 						uid,
 						key,
-						value: pointer,
+						value: new FileValue({
+							uid,
+							stream: fromChunk(context.getBody()),
+							mime: context.getHeader("content-type", "application/octet-stream"),
+							filename: context.getQuery("filename", null, String),
+						}),
 						timestamp,
 						isAbsoluteTimestamp: true,
 					});
+					const pointer = records[0][1][1];
+					Exception.assertPrecondition(
+						FileDatabase.isPointer(pointer),
+						"The file handler did not produce a pointer: {:?}",
+						pointer,
+					);
 					await this.records.write(Nodes.recordToDisk(records), recordsMainStorageName);
 
 					context.setStatus(200);
@@ -835,11 +845,6 @@ export default class Plugin extends PluginBase {
 			next: currentTick === null ? tick : currentTick + 1,
 			end: end,
 		};
-	}
-
-	/// Whether a key is owned by the file store.
-	isFileKey(key) {
-		return this.files?.matches(key) ?? false;
 	}
 
 	/// Write a value to the in-memory data.

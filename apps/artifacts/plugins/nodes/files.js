@@ -1,28 +1,33 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import Router from "#bzd/nodejs/core/router.js";
 import { fromChunk } from "#bzd/nodejs/core/stream.js";
 import StorageDisk from "#bzd/nodejs/db/storage/disk.js";
-import { FileNotFoundError } from "#bzd/nodejs/db/storage/storage.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
+import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 import mime from "mime";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes", "files");
 
 const PREFIX = "@file";
 
+/// Value representing a file to be stored.
+export class FileValue {
+	constructor({ uid, stream, mime = null, filename = null }) {
+		this.uid = uid;
+		this.stream = stream;
+		this.mime = mime;
+		this.filename = filename;
+	}
+}
+
 /// Store files on disk and expose them as time-related entries.
 ///
 /// Files are stored under: <root>/<uid>/<key...>/<timestampUs>-<counter>.<ext>
 /// The path is referenced in the nodes data as: "@file/<uid>/<key...>/<filename>".
-export default class Files {
+export class FileDatabase {
 	constructor(options = {}) {
 		Exception.assert(options.path, "'nodes.files.path' must be set.");
 		this.options = options;
 		this.storage = null;
-		this.router = new Router();
-		for (const match of options.keys ?? []) {
-			this.router.add(match, () => {});
-		}
 	}
 
 	/// Initialize the storage.
@@ -45,43 +50,32 @@ export default class Files {
 
 	/// Convert a file pointer into a path list.
 	static pointerToPathList(pointer) {
-		Exception.assertPrecondition(Files.isPointer(pointer), "Invalid file pointer: {:?}.", pointer);
+		Exception.assertPrecondition(FileDatabase.isPointer(pointer), "Invalid file pointer: {:?}.", pointer);
 		return Utils.pathToKey(pointer.slice(PREFIX.length));
-	}
-
-	/// Extract the timestamp from a filename, or null if invalid.
-	static timestampFromFilename(filename) {
-		const timestamp = parseInt(filename, 10);
-		return Number.isNaN(timestamp) ? null : timestamp;
-	}
-
-	/// Check if a key is backed by the file store.
-	matches(key) {
-		return Boolean(this.router.match(Utils.keyToPath(key)));
 	}
 
 	/// Write a new file and return its pointer.
 	///
 	/// \param uid The uid of the node.
 	/// \param key The key of the node.
-	/// \param data The content of the file.
+	/// \param stream The content of the file.
 	/// \param mimeType The mime type of the file.
 	/// \param timestamp The timestamp in microseconds to be used in the filename.
-	async write({ uid, key, data, mime: mimeType, timestamp }) {
-		const extension = mime.extension(mimeType) || "bin";
+	async write({ uid, key, stream, mime: mimeType, timestamp }) {
+		const extension = mime.extension(mimeType || "application/octet-stream") || "bin";
 		const directory = [uid, ...key];
-
-		let filename = String(timestamp) + "." + extension;
+		let storedFilename = String(timestamp) + "." + extension;
 		let counter = 0;
-		while (await this.storage.is([...directory, filename])) {
-			filename = String(timestamp) + "-" + ++counter + "." + extension;
+		while (await this.storage.is([...directory, storedFilename])) {
+			storedFilename = String(timestamp) + "-" + ++counter + "." + extension;
 		}
 
-		await this.storage.write([...directory, filename], fromChunk(data), /*mkdir*/ true);
+		const data = typeof stream?.pipe === "function" ? stream : fromChunk(stream);
+		await this.storage.write([...directory, storedFilename], data, /*mkdir*/ true);
 
 		return {
-			filename: filename,
-			pointer: Files.makePointer(uid, key, filename),
+			filename: storedFilename,
+			pointer: FileDatabase.makePointer(uid, key, storedFilename),
 		};
 	}
 
@@ -92,7 +86,7 @@ export default class Files {
 	///
 	/// \return true if the file was copied, false if it was already present.
 	async syncFrom(client, pointer) {
-		const pathList = Files.pointerToPathList(pointer);
+		const pathList = FileDatabase.pointerToPathList(pointer);
 		if (await this.storage.is(pathList)) {
 			return false;
 		}
@@ -104,65 +98,23 @@ export default class Files {
 	async read(pathList) {
 		return await this.storage.read(pathList);
 	}
+}
 
-	/// List all files of a given key.
-	async list(uid, key) {
-		try {
-			return await this.storage.listAll([uid, ...key]);
-		} catch (e) {
-			if (e instanceof FileNotFoundError) {
-				return [];
-			}
-			throw e;
-		}
+/// Handler that stores file values and replaces them with their pointer.
+export class FilesHandler {
+	constructor(files) {
+		this.files = files;
 	}
 
-	/// Get older entries of a key from the file store.
-	async onExternal(uid, key, count, after, before) {
-		count = count ?? 1;
-		if (count <= 0) {
-			return [];
+	async process(range) {
+		for (const fragment of range.all()) {
+			fragment.value = (
+				await this.files.write({
+					key: fragment.fullKey,
+					timestamp: timestampUs(),
+					...fragment.value,
+				})
+			).pointer;
 		}
-		const filenames = await this.list(uid, key);
-		let entries = filenames
-			.map((filename) => [Files.timestampFromFilename(filename), filename])
-			.filter(([timestamp]) => timestamp !== null);
-
-		if (entries.length === 0) {
-			return [];
-		}
-
-		entries.sort((a, b) => a[0] - b[0]);
-		const toResult = ([timestamp, filename]) => [timestamp, Files.makePointer(uid, key, filename)];
-
-		if (after !== null && before !== null) {
-			// Mirror the behavior of the InfluxDB provider: return at most one entry per bucket.
-			const period = Math.max(Math.floor((before - after) / count), 1);
-			const buckets = new Map();
-			for (const entry of entries) {
-				const timestamp = entry[0];
-				if (timestamp <= after || timestamp >= before) {
-					continue;
-				}
-				const bucket = Math.floor((timestamp - after) / period);
-				if (!buckets.has(bucket)) {
-					buckets.set(bucket, entry);
-				}
-			}
-			return [...buckets.values()].map(toResult);
-		}
-
-		if (after !== null) {
-			return entries
-				.filter(([timestamp]) => timestamp > after)
-				.slice(0, count)
-				.map(toResult);
-		}
-
-		entries.reverse();
-		if (before !== null) {
-			entries = entries.filter(([timestamp]) => timestamp < before);
-		}
-		return entries.slice(0, count).map(toResult);
 	}
 }

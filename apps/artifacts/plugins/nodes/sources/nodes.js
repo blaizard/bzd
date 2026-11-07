@@ -2,7 +2,7 @@ import Source from "#bzd/apps/artifacts/plugins/nodes/sources/source.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
-import Files from "#bzd/apps/artifacts/plugins/nodes/files.js";
+import { FileDatabase } from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "source", "nodes");
@@ -50,7 +50,7 @@ export default class SourceNodes extends Source {
 		const updatedRecords = result.records.map((record) =>
 			Nodes.recordFromDisk(record).map(([uid, data, timestamp, isAbsoluteTimestamp]) => {
 				const value = data[1];
-				if (Files.isPointer(value)) {
+				if (FileDatabase.isPointer(value)) {
 					pointers.add(value);
 				}
 				return [uid, data, isAbsoluteTimestamp ? timestamp : timestamp + timeDelayLocalRemote, isAbsoluteTimestamp];

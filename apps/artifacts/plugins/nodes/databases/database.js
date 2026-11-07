@@ -46,8 +46,7 @@ export default class Database {
 		const tickStart = this.tick;
 		const result = await this.plugin.read(tickStart, this.options.maxSize || 1024 * 1024, /*diskFormat*/ false);
 
-		// Keep only non-files/blobs records, as they are not handled by the database.
-		const records = result.records.flat().filter(([, data]) => !this.plugin.isFileKey(data[0]));
+		const records = result.records.reduce((all, record) => all.concat(record), []);
 		// Always set the tick to make sure that on errors we skip what has been written or failed.
 		this.tick = result.next;
 

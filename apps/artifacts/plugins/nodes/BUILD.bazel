@@ -24,6 +24,7 @@ bzd_nodejs_library(
         "//nodejs/core:format",
         "//nodejs/core:log",
         "//nodejs/core:router",
+        "//nodejs/core:stream",
         "//nodejs/core/http:client",
         "//nodejs/core/mcp:server",
         "//nodejs/core/services",
@@ -31,6 +32,7 @@ bzd_nodejs_library(
         "//nodejs/db:utils",
         "//nodejs/db/data:generator",
         "//nodejs/db/data/backend:handler",
+        "//nodejs/db/data/handlers",
         "//nodejs/db/key_value_store:make_from_config",
         "//nodejs/db/storage",
         "//nodejs/utils:object",
@@ -53,10 +55,9 @@ bzd_nodejs_library(
     deps = [
         "//apps/artifacts/common:utils",
         "//nodejs/core:exception",
-        "//nodejs/core:router",
         "//nodejs/core:stream",
-        "//nodejs/db/storage",
         "//nodejs/db/storage:disk",
+        "//nodejs/utils:timestamp",
     ],
 )
 
@@ -74,7 +75,6 @@ bzd_nodejs_library(
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/db/data",
-        "//nodejs/db/data/handlers",
     ],
 )
 

@@ -1,6 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
-import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 import Data from "#bzd/nodejs/db/data/data.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 
@@ -9,9 +8,7 @@ const Log = LogFactory("apps", "plugin", "nodes");
 
 export class Nodes {
 	constructor(handlers, options) {
-		this.handlers = new Handlers(handlers, {
-			history: 10,
-		});
+		this.handlers = handlers;
 		this.data = new Data(options);
 	}
 
@@ -57,7 +54,7 @@ export class Nodes {
 			options.unit = unit;
 		}
 		let fragments = Nodes.getAllPathAndValues(value, key, options);
-		fragments = this.handlers.process(fragments);
+		fragments = await this.handlers.process(fragments);
 		timestamp = this.data.insert(uid, fragments, timestamp);
 
 		// Generate records.
