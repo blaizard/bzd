@@ -6,10 +6,14 @@ bzd_nodejs_library(
         "backend.js",
         "storage.js",
     ],
+    packages = [
+        "@nodejs_deps//:mime",
+    ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
     ],
     deps = [
+        ":files",
         ":nodes",
         "//apps/artifacts/backend:plugin",
         "//apps/artifacts/common:utils",
@@ -32,6 +36,27 @@ bzd_nodejs_library(
         "//nodejs/utils:object",
         "//nodejs/utils:optional",
         "//nodejs/utils:timestamp",
+    ],
+)
+
+bzd_nodejs_library(
+    name = "files",
+    srcs = [
+        "files.js",
+    ],
+    packages = [
+        "@nodejs_deps//:mime",
+    ],
+    visibility = [
+        "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//apps/artifacts/common:utils",
+        "//nodejs/core:exception",
+        "//nodejs/core:router",
+        "//nodejs/core:stream",
+        "//nodejs/db/storage",
+        "//nodejs/db/storage:disk",
     ],
 )
 

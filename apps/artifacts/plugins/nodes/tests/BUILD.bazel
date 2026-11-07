@@ -18,7 +18,9 @@ bzd_nodejs_test(
     deps = [
         "//apps/artifacts/backend:plugin_tester",
         "//apps/artifacts/plugins/nodes:backend",
+        "//apps/artifacts/plugins/nodes:files",
         "//nodejs/core:exception",
+        "//nodejs/core:stream",
         "//nodejs/core/http/mock:client",
         "//nodejs/utils:delay",
     ],

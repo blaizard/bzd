@@ -4,6 +4,7 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import RecordsDistributed from "#bzd/apps/artifacts/plugins/nodes/records/distributed.js";
+import Files from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.js";
@@ -14,6 +15,7 @@ import format from "#bzd/nodejs/core/format.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import { Readable } from "stream";
+import mime from "mime";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampUs, timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 import { handleDataGet, getDataGetInputsFromQuery } from "#bzd/nodejs/db/data/backend/handler.js";
@@ -162,6 +164,7 @@ export default class Plugin extends PluginBase {
 		const optionsHandlers = options["nodes.handlers"] || {};
 		const optionsTags = options["nodes.tags"] || {};
 		const optionsDashboards = options["nodes.dashboards"] || [];
+		const optionsFiles = options["nodes.files"] || null;
 
 		// Add the validation to the handlers options.
 		for (const [path, validation] of Object.entries(optionsSchema)) {
@@ -182,8 +185,14 @@ export default class Plugin extends PluginBase {
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 		const routersTagsFromKey = buildRoutersForTagsFromKey(optionsTags);
 		const regexTagsFromUid = buildRegexForTagsFromUid(optionsTags);
+		this.files = optionsFiles ? new Files(optionsFiles) : null;
 
 		this.records = new RecordsDistributed(optionsRecords);
+		if (optionsFiles) {
+			provider.addStartProcess("files.initialize", async () => {
+				await this.files.initialize();
+			});
+		}
 		provider.addStartProcess("records.initialize", async () => {
 			let optionsNodes = {
 				cache: this.cache,
@@ -205,11 +214,12 @@ export default class Plugin extends PluginBase {
 					}
 				},
 			};
-			if (dbReadExternal !== null) {
-				optionsNodes["external"] = async (...args) => {
-					return await dbReadExternal.onExternal(...args);
-				};
-			}
+			optionsNodes["external"] = async (uid, key, count, after, before) => {
+				if (this.files?.matches(key)) {
+					return await this.files.onExternal(uid, key, count, after, before);
+				}
+				return dbReadExternal ? await dbReadExternal.onExternal(uid, key, count, after, before) : null;
+			};
 
 			this.nodes = new Nodes(optionsHandlers, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
@@ -325,6 +335,62 @@ export default class Plugin extends PluginBase {
 				),
 			);
 		});
+
+		if (optionsFiles) {
+			/// Upload a file and store it as a time-series entry.
+			///
+			/// POST <endpoint>/@file/<uid>/<path:*>
+			/// The body is the raw content of the file.
+			endpoints.register(
+				"post",
+				"/@file/{path:*}",
+				async (context) => {
+					const [uid, ...key] = Utils.pathToKey(context.getParam("path"));
+					const timestamp = timestampUs();
+					const { pointer } = await this.files.write({
+						uid,
+						key,
+						data: context.getBody(),
+						mime: context.getHeader("content-type", "application/octet-stream"),
+						timestamp,
+					});
+					const records = await this.nodes.insert({
+						uid,
+						key,
+						value: pointer,
+						timestamp,
+						isAbsoluteTimestamp: true,
+					});
+					await this.records.write(Nodes.recordToDisk(records), recordsMainStorageName);
+
+					context.setStatus(200);
+					context.sendJson({ path: pointer, timestamp });
+				},
+				{
+					limit: optionsFiles.limit || 20 * 1024 * 1024,
+					timeoutS: 30 * 60,
+				},
+			);
+
+			/// Retrieve a file.
+			///
+			/// GET <endpoint>/@file/<uid>/<path:*>
+			endpoints.register("get", "/@file/{path:*}", async (context) => {
+				const pathList = Utils.pathToKey(context.getParam("path"));
+				let stream = null;
+				try {
+					stream = await this.files.read(pathList);
+				} catch (e) {
+					context.sendStatus(404);
+					return;
+				}
+
+				context.setHeader("Content-Type", mime.lookup(pathList.at(-1)));
+				context.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+				context.setStatus(200);
+				await context.sendStream(stream);
+			});
+		}
 
 		/// Export a dataset into a file of a specific format.
 		endpoints.register("get", "/@export/{uid}/{path:*}", async (context) => {
@@ -769,6 +835,11 @@ export default class Plugin extends PluginBase {
 			next: currentTick === null ? tick : currentTick + 1,
 			end: end,
 		};
+	}
+
+	/// Whether a key is owned by the file store.
+	isFileKey(key) {
+		return this.files?.matches(key) ?? false;
 	}
 
 	/// Write a value to the in-memory data.

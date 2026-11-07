@@ -1,9 +1,12 @@
 import Source from "#bzd/apps/artifacts/plugins/nodes/sources/source.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
+import LogFactory from "#bzd/nodejs/core/log.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
+import Files from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("artifacts", "nodes", "source", "nodes");
+const Log = LogFactory("artifacts", "nodes", "source", "nodes");
 
 export default class SourceNodes extends Source {
 	constructor(...args) {
@@ -43,11 +46,31 @@ export default class SourceNodes extends Source {
 			this.plugin.version,
 			tick,
 		);
+		const pointers = new Set();
 		const updatedRecords = result.records.map((record) =>
-			Nodes.recordFromDisk(record).map(([uid, key, value, timestamp, isAbsoluteTimestamp]) => {
-				return [uid, key, value, isAbsoluteTimestamp ? timestamp : timestamp + timeDelayLocalRemote];
+			Nodes.recordFromDisk(record).map(([uid, data, timestamp, isAbsoluteTimestamp]) => {
+				const value = data[1];
+				if (Files.isPointer(value)) {
+					pointers.add(value);
+				}
+				return [uid, data, isAbsoluteTimestamp ? timestamp : timestamp + timeDelayLocalRemote, isAbsoluteTimestamp];
 			}),
 		);
+
+		// Mirror the files referenced by the records before they are inserted.
+		if (this.plugin.files) {
+			for (const pointer of pointers) {
+				try {
+					await this.plugin.files.syncFrom(this.client, pointer);
+				} catch (e) {
+					if (e.code === 404) {
+						Log.warning("The file '{}' is not available on the remote: {}", pointer, e.message);
+					} else {
+						throw e;
+					}
+				}
+			}
+		}
 
 		return [updatedRecords, next, end];
 	}

@@ -11,6 +11,7 @@ bzd_nodejs_library(
     deps = [
         ":source",
         "//apps/artifacts/plugins/nodes",
+        "//apps/artifacts/plugins/nodes:files",
         "//nodejs/core:exception",
         "//nodejs/core:log",
         "//nodejs/utils:timestamp",

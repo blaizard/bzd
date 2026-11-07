@@ -1,8 +1,10 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import Plugin from "#bzd/apps/artifacts/plugins/nodes/backend.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
+import Files from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import PluginTester from "#bzd/apps/artifacts/backend/plugin_tester.js";
 import { makeMockHttpClientFactory } from "#bzd/nodejs/core/http/mock/client.js";
+import { fromChunk } from "#bzd/nodejs/core/stream.js";
 import { delayMs } from "#bzd/nodejs/utils/delay.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
@@ -746,6 +748,55 @@ describe("Plugin", () => {
 		}).timeout(10000);
 	});
 
+	describe("Files", () => {
+		const tester = new PluginTester();
+		tester.register("nodes", Plugin, {
+			"nodes.records": {
+				path: "./records-files",
+				clean: true,
+			},
+			"nodes.files": {
+				path: "./files",
+				keys: ["/data/camera/{name}"],
+			},
+		});
+
+		before(async () => {
+			await tester.start();
+		});
+
+		after(async () => {
+			await tester.stop();
+		});
+
+		it("upload and read", async () => {
+			const response = await tester.send("nodes", "post", "/@file/uid01/data/camera/front", {
+				headers: { "Content-Type": "image/png" },
+				data: Buffer.from("fake-image-content"),
+			});
+			const pointer = response.data.path;
+			Exception.assert(Files.isPointer(pointer), "Invalid file pointer: {}", pointer);
+
+			const data = await tester.send("nodes", "get", "/uid01/data/camera/front");
+			Exception.assertEqual(data.data.data, pointer);
+
+			const file = await tester.send("nodes", "get", "/" + pointer);
+			Exception.assertEqual(file.data, "fake-image-content");
+		});
+
+		it("external history", async () => {
+			for (let i = 0; i < 11; ++i) {
+				await tester.send("nodes", "post", "/@file/uid01/data/camera/front", {
+					headers: { "Content-Type": "image/png" },
+					data: Buffer.from("image-" + i),
+				});
+			}
+			const response = await tester.send("nodes", "get", "/uid01/data/camera/front?count=12");
+			Exception.assertEqual(response.data.data.length, 12);
+			response.data.data.forEach((value) => Exception.assert(Files.isPointer(value), "Invalid pointer: {}", value));
+		});
+	});
+
 	describe("Export", () => {
 		const tester = new PluginTester();
 		tester.register("nodes", Plugin, {
@@ -994,6 +1045,57 @@ describe("Plugin", () => {
 				},
 			);
 		});
+		it("sync file", async () => {
+			const tester = new PluginTester();
+			const pointer = "@file/uid01/data/camera/front/1234567890.png";
+			const record = Nodes.recordToDisk([["uid01", [["data", "camera", "front"], pointer], 1234567890, true]]);
+
+			tester.register(
+				"nodes",
+				Plugin,
+				{
+					"nodes.records": {
+						path: "./records-source-files",
+						clean: true,
+					},
+					"nodes.files": {
+						path: "./files-source",
+						keys: ["/data/camera/{name}"],
+					},
+					"nodes.sources": {
+						source1: {
+							type: "nodes",
+							host: "http://source1",
+							throwOnFailure: true,
+							persistent: true,
+						},
+					},
+				},
+				{
+					HttpClientFactory: makeMockHttpClientFactory((url, options) => {
+						if (url.startsWith("http://source1/x/source1/@records")) {
+							return { version: 5, timestamp: 0, records: [record], next: 1, end: true };
+						}
+						if (url.startsWith("http://source1/x/source1/@file/")) {
+							Exception.assertEqual(options.expect, "stream");
+							return fromChunk("remote-file");
+						}
+						Exception.unreachable("Unexpected request: {}", url);
+					}),
+				},
+			);
+
+			await tester.start();
+			try {
+				await tester.serviceRun("nodes.nodes", "source.source1");
+				const data = await tester.send("nodes", "get", "/uid01/data/camera/front");
+				Exception.assertEqual(data.data.data, pointer);
+				const file = await tester.send("nodes", "get", "/" + pointer);
+				Exception.assertEqual(file.data, "remote-file");
+			} finally {
+				await tester.stop();
+			}
+		});
 	});
 
 	describe("Sync", () => {
@@ -1227,6 +1329,63 @@ describe("Plugin", () => {
 					Exception.unreachable("Should not be reached: {}", url);
 				}
 			});
+		});
+
+		it("does not write files", async () => {
+			const tester = new PluginTester();
+			let content = "";
+			tester.register(
+				"nodes",
+				Plugin,
+				{
+					"nodes.records": {
+						path: "./records-files-influxdb",
+						clean: true,
+					},
+					"nodes.files": {
+						path: "./files-influxdb",
+						keys: ["/data/camera/{name}"],
+					},
+					"nodes.databases": {
+						database1: {
+							type: "influxdb",
+							org: "myorg",
+							bucket: "mybucket",
+							host: "http://influxdb1",
+							token: "mytoken",
+							retentionS: 2592000,
+							write: true,
+						},
+					},
+				},
+				{
+					HttpClientFactory: makeMockHttpClientFactory((url, options) => {
+						if (url.endsWith("/api/v2/write")) {
+							content += options.data;
+							return {};
+						}
+						Exception.unreachable("Unexpected request: {}", url);
+					}),
+				},
+			);
+
+			await tester.start();
+			try {
+				await tester.send("nodes", "post", "/@file/uid01/data/camera/front", {
+					headers: { "Content-Type": "image/png" },
+					data: Buffer.from("image"),
+				});
+				await tester.send("nodes", "post", "/uid01/data/value", {
+					headers: { "Content-Type": "application/json" },
+					data: JSON.stringify({ a: 1 }),
+				});
+				await tester.serviceRun("nodes.nodes", "database.database1.write");
+
+				Exception.assert(content.includes("data.value.a=1"), "Missing data field: {}", content);
+				Exception.assert(!content.includes("data.camera.front"), "File pointer written to InfluxDB: {}", content);
+			} finally {
+				await tester.stop();
+			}
 		});
 	});
 });
