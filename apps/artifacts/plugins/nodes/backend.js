@@ -16,7 +16,6 @@ import Utils from "#bzd/apps/artifacts/common/utils.js";
 import DataGenerator from "#bzd/nodejs/db/data/generator.js";
 import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 import { Readable } from "stream";
-import { fromChunk } from "#bzd/nodejs/core/stream.js";
 import mime from "mime";
 import MCPServer from "#bzd/nodejs/core/mcp/server.js";
 import { timestampUs, timestampMs } from "#bzd/nodejs/utils/timestamp.js";
@@ -343,6 +342,8 @@ export default class Plugin extends PluginBase {
 		});
 
 		if (optionsFiles) {
+			const limit = optionsFiles.limit || 20 * 1024 * 1024;
+
 			/// Upload a file and store it as a time-series entry.
 			///
 			/// POST <endpoint>/@file/<uid>/<path:*>
@@ -358,7 +359,7 @@ export default class Plugin extends PluginBase {
 						key,
 						value: new FileValue({
 							uid,
-							stream: fromChunk(context.getBody()),
+							stream: context.getBodyStream(limit),
 							mime: context.getHeader("content-type", "application/octet-stream"),
 							filename: context.getQuery("filename", null, String),
 						}),
@@ -377,7 +378,7 @@ export default class Plugin extends PluginBase {
 					context.sendJson({ path: pointer, timestamp });
 				},
 				{
-					limit: optionsFiles.limit || 20 * 1024 * 1024,
+					type: [],
 					timeoutS: 30 * 60,
 				},
 			);

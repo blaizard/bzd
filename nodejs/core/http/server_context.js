@@ -4,7 +4,7 @@ import { pipeline, finished } from "stream/promises";
 import Busboy from "busboy";
 import { toString } from "#bzd/nodejs/core/stream.js";
 
-import { Writable } from "stream";
+import { Transform, Writable } from "stream";
 
 const Exception = ExceptionFactory("http", "server", "context");
 
@@ -161,6 +161,33 @@ export class HttpServerContext extends HttpServerContextCommon {
 
 	getBody() {
 		return this.request.body;
+	}
+
+	getBodyStream(limit = null) {
+		const source = this.request;
+		if (limit === null) {
+			return source;
+		}
+		if (parseInt(this.getHeader("content-length", "0"), 10) > limit) {
+			throw this.httpError(413, "Payload too large");
+		}
+		const createError = () => this.httpError(413, "Payload too large");
+		let size = 0;
+		const stream = source.pipe(
+			new Transform({
+				transform(chunk, encoding, callback) {
+					size += chunk.length;
+					if (size > limit) {
+						source.destroy();
+						callback(createError());
+						return;
+					}
+					callback(null, chunk);
+				},
+			}),
+		);
+		source.on("error", (error) => stream.destroy(error));
+		return stream;
 	}
 
 	getQueries() {

@@ -1,5 +1,5 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import { toString } from "#bzd/nodejs/core/stream.js";
+import { fromChunk, toString } from "#bzd/nodejs/core/stream.js";
 import { HttpError } from "#bzd/nodejs/core/http/server_context.js";
 import HttpServerContextCommon from "../server_context_common.js";
 
@@ -110,6 +110,14 @@ export default class MockServerContext extends HttpServerContextCommon {
 	}
 
 	// todo
+	getBodyStream(limit = null) {
+		const data = this.request.data;
+		if (limit !== null && String(data).length > limit) {
+			throw this.httpError(413, "Payload too large");
+		}
+		return data && typeof data.pipe === "function" ? data : fromChunk(data);
+	}
+
 	getBody() {
 		switch (this.request.type) {
 			case "raw":

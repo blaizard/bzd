@@ -101,15 +101,15 @@ export default function extensionWebdav(plugin, options, provider, endpoints) {
 			await scopeExceptionHandler(context, lock, async () => {
 				const path = getPathFromContext(context);
 				const storage = plugin.getStorage();
-				const body = context.getBody();
+				const body = context.getBodyStream(optionsWebdav.limit);
 				await plugin.locks.lock(path.asPosix(), async () => {
-					await storage.writeFromChunk(path.parts, body);
+					await storage.write(path.parts, body);
 				});
 				context.sendStatus(200);
 			});
 		},
 		{
-			limit: optionsWebdav.limit,
+			type: [],
 			timeoutS: optionsWebdav.timeoutS,
 		},
 	);
