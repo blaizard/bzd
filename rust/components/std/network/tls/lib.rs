@@ -13,9 +13,9 @@ use embedded_tls::{
 };
 use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rand_core::{CryptoRng, RngCore};
-use rust_components_std_network_tls_interface::{
+pub use rust_components_std_network_tls_interface::{
     BzdComponentsStdNetworkTlsContext, BzdComponentsStdNetworkTlsContextConstraint,
-    BzdComponentsStdNetworkTlsInterface,
+    BzdComponentsStdNetworkTlsContextConstraintTypes, BzdComponentsStdNetworkTlsInterface,
 };
 use rust_interfaces_tls::BzdNetworkTlsClientInterface;
 

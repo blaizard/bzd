@@ -12,7 +12,7 @@ publish = false
 [dependencies]
 embassy-futures = "0.1.2"
 embedded-io-async = "0.7.0"
-embedded-tls = { version = "0.19.0", default-features = false, features = ["rsa", "rustpki"] }
+embedded-tls = { version = "0.19.0", default-features = false, features = ["p384", "rsa", "rustpki"] }
 pem-rfc7468 = { version = "1.0.0", features = ["alloc"] }
 rand_core = { version = "0.6.4", default-features = false }
 reqwless = { version = "0.14.0", default-features = false }
