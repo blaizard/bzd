@@ -58,6 +58,8 @@ impl Lifecycle for {{ fqn | entryStructNameToStr }} {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("{{ fqn }}", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing {{ entry.expression.symbol.kind }}")?;
 			{{ callInitMembers(entry, fqn) }}
 			Ok(())
 		}).await?;
@@ -67,6 +69,8 @@ impl Lifecycle for {{ fqn | entryStructNameToStr }} {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("{{ fqn }}", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down {{ entry.expression.symbol.kind }}")?;
 			{{ callShutdownMembers(entry, fqn) }}
 			Ok(())
 		}).await?;
@@ -136,6 +140,7 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 {% for fqn, entry in registry[context] %}
 	{{ fqn | entryStructNameToStr }}::get().shutdown().await?;
 {% end %}
+	let _ = logger_backend.lock().await.flush().await;
 
 	error.map_or(Ok(()), Err)
 }

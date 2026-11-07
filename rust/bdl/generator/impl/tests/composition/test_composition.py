@@ -222,6 +222,8 @@ impl Lifecycle for DefaultExecutorEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.executor", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing default.Executor")?;
 			
 			Ok(())
 		}).await?;
@@ -231,6 +233,8 @@ impl Lifecycle for DefaultExecutorEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.executor", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down default.Executor")?;
 			
 			Ok(())
 		}).await?;
@@ -256,6 +260,8 @@ impl Lifecycle for DefaultOutEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.out", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing default.Out")?;
 			
 			Ok(())
 		}).await?;
@@ -265,6 +271,8 @@ impl Lifecycle for DefaultOutEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.out", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down default.Out")?;
 			
 			Ok(())
 		}).await?;
@@ -290,6 +298,8 @@ impl Lifecycle for DefaultPersonChildEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.person_child", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing default.Child")?;
 			
 			Ok(())
 		}).await?;
@@ -299,6 +309,8 @@ impl Lifecycle for DefaultPersonChildEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.person_child", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down default.Child")?;
 			
 			Ok(())
 		}).await?;
@@ -324,6 +336,8 @@ impl Lifecycle for DefaultPersonParentEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.person_parent", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing default.Parent")?;
 					DefaultPersonChildEntry::get().init().await?;
 			
 			Ok(())
@@ -334,6 +348,8 @@ impl Lifecycle for DefaultPersonParentEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.person_parent", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down default.Parent")?;
 					DefaultPersonChildEntry::get().shutdown().await?;
 			
 			Ok(())
@@ -360,6 +376,8 @@ impl Lifecycle for DefaultPrinterEntry {
 	async fn init(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.acquire(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.printer", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Initializing default.Printer")?;
 					DefaultOutEntry::get().init().await?;
 			
 			Ok(())
@@ -370,6 +388,8 @@ impl Lifecycle for DefaultPrinterEntry {
 	async fn shutdown(&self) -> Result<(), bzd::base::error::Error>
 	{
 		self.component.release(async |component| {
+			let mut lifecycle_logger = logger::logger_state().logger("default.printer", BzdLoggerLevel::Info);
+			log_info!(lifecycle_logger, "Shutting down default.Printer")?;
 					DefaultOutEntry::get().shutdown().await?;
 			
 			Ok(())
@@ -446,6 +466,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	DefaultPersonChildEntry::get().shutdown().await?;
 	DefaultPersonParentEntry::get().shutdown().await?;
 	DefaultPrinterEntry::get().shutdown().await?;
+	let _ = logger_backend.lock().await.flush().await;
 
 	error.map_or(Ok(()), Err)
 }
