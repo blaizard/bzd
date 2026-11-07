@@ -54,3 +54,14 @@ bdl_library(
         "rust": "//rust/interfaces/impl:network",
     },
 )
+
+bdl_library(
+    name = "tls",
+    srcs = [
+        "tls.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    implementation = {
+        "rust": "//rust/interfaces/impl:tls",
+    },
+)

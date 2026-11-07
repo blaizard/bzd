@@ -1,0 +1,49 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:tcp",
+        "//rust/interfaces:tls",
+    ],
+)
+
+rust_library(
+    name = "tls",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_std_network_tls",
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:tcp",
+        "//rust/bzd",
+        "//rust/interfaces:tls",
+        "@crates//:embedded-tls",
+        "@crates//:pem-rfc7468",
+        "@crates//:rand_core",
+        "@crates_std//:getrandom",
+    ],
+)
+
+rust_test(
+    name = "tls_test",
+    crate = ":tls",
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

@@ -1,0 +1,16 @@
+use "interfaces/tcp.bdl"
+use "rust/interfaces/tls.bdl"
+
+namespace bzd.components.std.network;
+
+
+component Tls : bzd.network.tls.Client {
+config:
+	tcp = bzd.network.tcp.Client;
+	ca_certificate = String;
+	
+interface:
+	
+}
+
+

@@ -1,0 +1,6 @@
+
+namespace bzd.network.tls;
+
+extern interface Client;
+
+

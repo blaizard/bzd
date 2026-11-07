@@ -63,6 +63,17 @@ rust_library(
 )
 
 rust_library(
+    name = "tls",
+    srcs = [
+        "tls.rs",
+    ],
+    visibility = ["//rust/interfaces:__pkg__"],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_library(
     name = "tcp",
     srcs = [
         "tcp.rs",

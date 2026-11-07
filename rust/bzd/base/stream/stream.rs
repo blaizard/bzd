@@ -5,6 +5,8 @@
 use core::fmt;
 use error::Error;
 
+pub use embedded_io_async;
+
 /// An embedded I/O error wrapping a bzd::error object.
 #[derive(Debug)]
 pub struct EmbeddedError {
