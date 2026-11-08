@@ -5,14 +5,14 @@ sh_binary_wrapper(
     name = "qemu",
     command = """
         {esptool} --chip esp32-s3 elf2image -o "./image" "$1"
-        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x100000 ./qemu_flash.bin
+        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x150000 ./qemu_flash.bin
         {qemu} --binary "$1" -- -machine esp32s3 -m 4M -drive file=./qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
     """,
     locations = {
+        "//partition_table:partition_table_4mb_ota_3x1344kib.bin": "partitions",
         "//tools/qemu:qemu-system-xtensa": "qemu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32s3_xtensa_lx7_sdk//:bin/bootloader.bin": "bootloader",
-        "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
 )
@@ -30,14 +30,14 @@ sh_binary_wrapper(
     name = "esp_emu",
     command = """
         {esptool} --chip esp32-s3 elf2image -o "./image" "$1"
-        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x100000 ./qemu_flash.bin
+        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x150000 ./qemu_flash.bin
         {esp_emu} --binary "$1" -- --chip esp32s3 --firmware ./qemu_flash.bin --exit-on "<exit code"
     """,
     locations = {
+        "//partition_table:partition_table_4mb_ota_3x1344kib.bin": "partitions",
         "//tools/esp_emu": "esp_emu",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32s3_xtensa_lx7_sdk//:bin/bootloader.bin": "bootloader",
-        "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
 )
@@ -55,14 +55,14 @@ sh_binary_wrapper(
     name = "qemu_gdb",
     command = """
         {esptool} --chip esp32-s3 elf2image -o "./image" "$1"
-        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x100000 ./qemu_flash.bin
+        {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x150000 ./qemu_flash.bin
         {qemu_gdb} --binary "$1" -- -machine esp32s3 -m 4M -drive file=./qemu_flash.bin,if=mtd,format=raw -no-reboot -nographic
      """,
     locations = {
+        "//partition_table:partition_table_4mb_ota_3x1344kib.bin": "partitions",
         "//tools/qemu_gdb:esp32s3": "qemu_gdb",
         "@bzd_python//bzd/utils:binary_builder": "builder",
         "@esp32s3_xtensa_lx7_sdk//:bin/bootloader.bin": "bootloader",
-        "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
 )
@@ -83,14 +83,14 @@ sh_binary_wrapper(
         {executor_uart} \
                 --esptool {esptool} \
                 --device_vid_pid 0x303A 0x1001 \
-                --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x100000 \
+                --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x150000 \
                 -- \
                 --chip esp32s3 --baud 460800 --before default_reset --after hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 4MB
     """,
     locations = {
+        "//partition_table:partition_table_4mb_ota_3x1344kib.bin": "partitions",
         "//tools/esptool:executor_uart": "executor_uart",
         "@esp32s3_xtensa_lx7_sdk//:bin/bootloader.bin": "bootloader",
-        "@esp32s3_xtensa_lx7_sdk//:bin/partition-table.bin": "partitions",
         "@esptool//:esptool": "esptool",
     },
 )

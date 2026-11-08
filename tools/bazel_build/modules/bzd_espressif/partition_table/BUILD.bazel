@@ -1,0 +1,4 @@
+exports_files(
+    ["partition_table_4mb_ota_3x1344kib.bin"],
+    visibility = ["//visibility:public"],
+)
