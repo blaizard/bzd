@@ -27,6 +27,9 @@ bdl_target(
         ],
     },
     language = "rust",
+    presets = [
+        "//rust/targets:tls_config.json",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/executor",
@@ -34,6 +37,7 @@ bdl_target(
         "//rust/components/generic/logger/backend:logger_backend",
         "//rust/components/generic/logger/sink/ostream",
         "//rust/components/std/network/embedded_nal",
+        "//rust/components/std/network/tls",
         "//rust/components/std/stream/out",
     ],
 )

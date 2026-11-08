@@ -1,3 +1,7 @@
+exports_files([
+    "tls_config.json",
+])
+
 alias(
     name = "main",
     actual = select({

@@ -1,10 +1,12 @@
 use "rust/components/embassy/network/interface.bdl"
 use "rust/components/esp/network/wifi/interface.bdl"
+use "rust/components/esp/network/tls/interface.bdl"
 
 namespace network;
 
 
 preset cfg from "rust/targets/esp/network_config.json";
+preset tls_config from "rust/targets/tls_config.json";
 composition tcp {
 	client = bzd.components.embassy.network.Tcp(network = wifi);
 	
@@ -13,6 +15,11 @@ composition tcp {
 composition {
 	wifi = bzd.components.esp.network.WiFi(ssid = cfg.ssid, password = cfg.password);
 	dns = bzd.components.embassy.network.Dns(network = wifi);
+	
+}
+
+composition tls {
+	client = bzd.components.esp.network.Tls(tcp = target.network.tcp.client, ca_certificate = tls_config.ca_certificate);
 	
 }
 
