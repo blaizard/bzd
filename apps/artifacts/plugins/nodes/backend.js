@@ -4,7 +4,8 @@ import PluginBase from "#bzd/apps/artifacts/backend/plugin.js";
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import LogFactory from "#bzd/nodejs/core/log.js";
 import RecordsDistributed from "#bzd/apps/artifacts/plugins/nodes/records/distributed.js";
-import { FileDatabase, FileValue, FilesHandler } from "#bzd/apps/artifacts/plugins/nodes/files.js";
+import { File, FileStore } from "#bzd/apps/artifacts/plugins/nodes/files.js";
+import ImageHandler from "#bzd/apps/artifacts/plugins/nodes/handlers/image.js";
 import { HttpClientFactory } from "#bzd/nodejs/core/http/client.js";
 import Services from "#bzd/nodejs/core/services/services.js";
 import DatabaseInfluxDB from "#bzd/apps/artifacts/plugins/nodes/databases/influxdb.js";
@@ -165,7 +166,7 @@ export default class Plugin extends PluginBase {
 		const optionsHandlers = options["nodes.handlers"] || {};
 		const optionsTags = options["nodes.tags"] || {};
 		const optionsDashboards = options["nodes.dashboards"] || [];
-		const optionsFiles = options["nodes.files"] || null;
+		const optionsFilestore = options["nodes.filestore"] || null;
 
 		// Add the validation to the handlers options.
 		for (const [path, validation] of Object.entries(optionsSchema)) {
@@ -186,12 +187,12 @@ export default class Plugin extends PluginBase {
 		const routerDashboards = buildRouterForDashboards(optionsDashboards);
 		const routersTagsFromKey = buildRoutersForTagsFromKey(optionsTags);
 		const regexTagsFromUid = buildRegexForTagsFromUid(optionsTags);
-		this.files = optionsFiles ? new FileDatabase(optionsFiles) : null;
+		this.fileStore = optionsFilestore ? new FileStore(optionsFilestore) : null;
 
 		this.records = new RecordsDistributed(optionsRecords);
-		if (optionsFiles) {
-			provider.addStartProcess("files.initialize", async () => {
-				await this.files.initialize();
+		if (optionsFilestore) {
+			provider.addStartProcess("filestore.initialize", async () => {
+				await this.fileStore.initialize();
 			});
 		}
 		provider.addStartProcess("records.initialize", async () => {
@@ -221,12 +222,8 @@ export default class Plugin extends PluginBase {
 				};
 			}
 
-			const handlers = new Handlers(
-				optionsHandlers,
-				{ history: 10 },
-				this.files ? { files: () => new FilesHandler(this.files) } : {},
-			);
-			this.nodes = new Nodes(handlers, optionsNodes);
+			const handlers = new Handlers(optionsHandlers, { history: 10 }, { image: () => new ImageHandler() });
+			this.nodes = new Nodes(handlers, this.fileStore, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				await this.nodes.insert({ uid: uid, key: ["data"], value: data });
 			}
@@ -341,8 +338,8 @@ export default class Plugin extends PluginBase {
 			);
 		});
 
-		if (optionsFiles) {
-			const limit = optionsFiles.limit || 20 * 1024 * 1024;
+		if (optionsFilestore) {
+			const limit = optionsFilestore.limit || 20 * 1024 * 1024;
 
 			/// Upload a file and store it as a time-series entry.
 			///
@@ -357,8 +354,7 @@ export default class Plugin extends PluginBase {
 					const records = await this.nodes.insert({
 						uid,
 						key,
-						value: new FileValue({
-							uid,
+						value: new File({
 							stream: context.getBodyStream(limit),
 							mime: context.getHeader("content-type", "application/octet-stream"),
 							filename: context.getQuery("filename", null, String),
@@ -368,8 +364,8 @@ export default class Plugin extends PluginBase {
 					});
 					const pointer = records[0][1][1];
 					Exception.assertPrecondition(
-						FileDatabase.isPointer(pointer),
-						"The file handler did not produce a pointer: {:?}",
+						FileStore.isFile(pointer),
+						"The file store did not produce a pointer: {:?}",
 						pointer,
 					);
 					await this.records.write(Nodes.recordToDisk(records), recordsMainStorageName);
@@ -390,7 +386,7 @@ export default class Plugin extends PluginBase {
 				const pathList = Utils.pathToKey(context.getParam("path"));
 				let stream = null;
 				try {
-					stream = await this.files.read(pathList);
+					stream = await this.fileStore.read(pathList);
 				} catch (e) {
 					context.sendStatus(404);
 					return;

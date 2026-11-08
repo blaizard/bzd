@@ -1,14 +1,12 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import LogFactory from "#bzd/nodejs/core/log.js";
 import Data from "#bzd/nodejs/db/data/data.js";
-import Utils from "#bzd/apps/artifacts/common/utils.js";
 
 const Exception = ExceptionFactory("apps", "plugin", "nodes");
-const Log = LogFactory("apps", "plugin", "nodes");
 
 export class Nodes {
-	constructor(handlers, options) {
+	constructor(handlers = null, fileStore = null, options = {}) {
 		this.handlers = handlers;
+		this.fileStore = fileStore;
 		this.data = new Data(options);
 	}
 
@@ -54,7 +52,12 @@ export class Nodes {
 			options.unit = unit;
 		}
 		let fragments = Nodes.getAllPathAndValues(value, key, options);
-		fragments = await this.handlers.process(fragments);
+		if (this.handlers) {
+			fragments = await this.handlers.process(fragments);
+		}
+		if (this.fileStore) {
+			await this.fileStore.process(fragments, { uid, timestamp });
+		}
 		timestamp = this.data.insert(uid, fragments, timestamp);
 
 		// Generate records.

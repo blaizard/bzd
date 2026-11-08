@@ -21,7 +21,6 @@ bzd_nodejs_test(
         "//apps/artifacts/plugins/nodes:backend",
         "//apps/artifacts/plugins/nodes:files",
         "//nodejs/core:exception",
-        "//nodejs/core:stream",
         "//nodejs/core/http/mock:client",
         "//nodejs/utils:delay",
     ],

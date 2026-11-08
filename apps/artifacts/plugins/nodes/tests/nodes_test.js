@@ -1,7 +1,6 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
-import makeStorageFromConfig from "#bzd/nodejs/db/key_value_store/make_from_config.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
@@ -46,7 +45,7 @@ describe("Nodes", () => {
 	});
 
 	describe("Nodes", () => {
-		const nodes = new Nodes(new Handlers({}), /*options*/ {});
+		const nodes = new Nodes(new Handlers({}), /*fileStore*/ null, /*options*/ {});
 
 		it("initial conditions", async () => {
 			const result = nodes.getNodes();
