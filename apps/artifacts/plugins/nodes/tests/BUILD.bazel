@@ -6,6 +6,7 @@ bzd_nodejs_test(
     main = "nodes_test.js",
     deps = [
         "//apps/artifacts/plugins/nodes:backend",
+        "//apps/artifacts/plugins/nodes:files",
         "//nodejs/core:exception",
         "//nodejs/db/data/handlers",
         "//nodejs/utils:timestamp",

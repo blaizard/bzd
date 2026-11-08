@@ -55,7 +55,6 @@ bzd_nodejs_library(
     deps = [
         "//apps/artifacts/common:utils",
         "//nodejs/core:exception",
-        "//nodejs/core:stream",
         "//nodejs/db/storage:make_from_config",
         "//nodejs/utils:timestamp",
     ],

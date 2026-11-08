@@ -795,7 +795,7 @@ describe("Plugin", () => {
 			const response = await tester.send("nodes", "get", "/uid01/big");
 			Exception.assert(FileStore.isFile(response.data.data), "The value was not stored: {}", response.data.data);
 			const file = await tester.send("nodes", "get", "/@file/" + response.data.data["$file"]);
-			Exception.assertEqual(JSON.parse(file.data), value);
+			Exception.assertEqual(file.data, value);
 		});
 	});
 

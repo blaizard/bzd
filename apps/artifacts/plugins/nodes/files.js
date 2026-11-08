@@ -1,5 +1,4 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
-import { fromChunk } from "#bzd/nodejs/core/stream.js";
 import makeFromConfig from "#bzd/nodejs/db/storage/make_from_config.js";
 import Utils from "#bzd/apps/artifacts/common/utils.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
@@ -9,10 +8,11 @@ const Exception = ExceptionFactory("apps", "plugin", "nodes", "files");
 
 /// Value representing a file to be stored.
 export class File {
-	constructor({ stream, mime = null, filename = null }) {
+	constructor({ stream, mime = null, filename = null, metadata = {} }) {
 		this.stream = stream;
 		this.mime = mime;
 		this.filename = filename;
+		this.metadata = metadata;
 	}
 }
 
@@ -34,18 +34,15 @@ export class FileStore {
 		return value !== null && typeof value === "object" && typeof value["$file"] === "string";
 	}
 
-	/// Estimate the serialized size of a value.
+	/// Get the size of a value that can be stored as is, 0 otherwise.
 	static sizeOf(value) {
-		if (value === undefined) {
-			return 0;
-		}
 		if (typeof value === "string") {
 			return Buffer.byteLength(value);
 		}
-		if (ArrayBuffer.isView(value)) {
+		if (value instanceof Uint8Array) {
 			return value.byteLength;
 		}
-		return Buffer.byteLength(JSON.stringify(value));
+		return 0;
 	}
 
 	/// Store files and large values, replacing them with their pointers.
@@ -59,13 +56,15 @@ export class FileStore {
 					key: fragment[0],
 					stream: fragment[1].stream,
 					mime: fragment[1].mime,
+					metadata: fragment[1].metadata,
 					timestamp: fileTimestamp,
 				});
 			} else if (limit && FileStore.sizeOf(fragment[1]) > limit) {
 				fragment[1] = await this.store({
 					uid,
 					key: fragment[0],
-					value: fragment[1],
+					stream: fragment[1],
+					mime: typeof fragment[1] === "string" ? "text/plain" : "application/octet-stream",
 					timestamp: fileTimestamp,
 				});
 			}
@@ -76,16 +75,11 @@ export class FileStore {
 	///
 	/// \param uid The uid of the node.
 	/// \param key The key of the node.
-	/// \param stream The content of the file, if any.
-	/// \param value The value to be serialized, if any.
+	/// \param stream The content of the file.
 	/// \param mimeType The mime type of the file.
+	/// \param metadata Additional metadata to be added to the pointer.
 	/// \param timestamp The timestamp in microseconds to be used in the filename.
-	async store({ uid, key, stream = null, value = null, mime: mimeType = null, timestamp }) {
-		if (value !== null) {
-			stream = JSON.stringify(value);
-			mimeType = "application/json";
-		}
-
+	async store({ uid, key, stream, mime: mimeType = null, metadata = {}, timestamp }) {
 		const extension = mime.extension(mimeType || "application/octet-stream") || "bin";
 		const directory = [uid, ...key];
 		let filename = String(timestamp) + "." + extension;
@@ -94,10 +88,15 @@ export class FileStore {
 			filename = String(timestamp) + "-" + ++counter + "." + extension;
 		}
 
-		const data = typeof stream?.pipe === "function" ? stream : fromChunk(stream);
-		await this.storage.write([...directory, filename], data, /*mkdir*/ true);
+		const path = [...directory, filename];
+		if (typeof stream?.pipe === "function") {
+			await this.storage.write(path, stream, /*mkdir*/ true);
+		} else {
+			await this.storage.writeFromChunk(path, stream, /*mkdir*/ true);
+		}
 
 		return {
+			...metadata,
 			$file: Utils.keyToPath([uid, ...key, filename]).slice(1),
 		};
 	}

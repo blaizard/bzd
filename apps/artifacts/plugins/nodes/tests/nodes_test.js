@@ -1,6 +1,7 @@
 import ExceptionFactory from "#bzd/nodejs/core/exception.js";
 import Handlers from "#bzd/nodejs/db/data/handlers/handlers.js";
 import { Nodes } from "#bzd/apps/artifacts/plugins/nodes/nodes.js";
+import { File, FileStore } from "#bzd/apps/artifacts/plugins/nodes/files.js";
 import { timestampUs } from "#bzd/nodejs/utils/timestamp.js";
 
 const Exception = ExceptionFactory("test", "artifacts", "plugins", "nodes");
@@ -87,6 +88,28 @@ describe("Nodes", () => {
 			const fromDisk = Nodes.recordFromDisk(onDisk);
 			Exception.assertEqual(fromDisk, record);
 			Exception.assertEqual(Object.prototype.shadowed, undefined);
+		});
+	});
+
+	describe("FileStore", () => {
+		it("metadata", async () => {
+			const fileStore = new FileStore({ storage: { type: "memory", data: {} } });
+			await fileStore.initialize();
+			const fragments = [
+				[
+					["image"],
+					new File({
+						stream: Buffer.from("content"),
+						mime: "image/png",
+						metadata: { hello: "world" },
+					}),
+				],
+			];
+			await fileStore.process(fragments, { uid: "uid01", timestamp: 123 });
+			Exception.assertEqual(fragments[0][1], {
+				hello: "world",
+				$file: "uid01/image/123.png",
+			});
 		});
 	});
 });
