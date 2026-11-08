@@ -1,0 +1,53 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:tcp",
+        "//rust/interfaces:tls",
+    ],
+)
+
+rust_library(
+    name = "tls",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_esp_network_tls",
+    target_compatible_with = select({
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:tcp",
+        "//rust/bzd",
+        "//rust/interfaces:tls",
+        "//rust/libs/embassy",
+    ] + select({
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "@crates_esp32//:embedded-io-async",
+            "@crates_esp32//:esp-alloc",
+            "@crates_esp32//:esp-hal",
+            "@crates_esp32//:mbedtls-rs",
+            "@crates_esp32//:rand_chacha",
+            "@crates_esp32//:rand_core",
+        ],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "@crates_esp32s3//:embedded-io-async",
+            "@crates_esp32s3//:esp-alloc",
+            "@crates_esp32s3//:esp-hal",
+            "@crates_esp32s3//:mbedtls-rs",
+            "@crates_esp32s3//:rand_chacha",
+            "@crates_esp32s3//:rand_core",
+        ],
+        "//conditions:default": [],
+    }),
+)

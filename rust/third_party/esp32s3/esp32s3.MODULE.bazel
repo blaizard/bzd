@@ -30,6 +30,21 @@ crates_esp32s3.annotation(
         "@crates_esp32s3//:xtensa-lx-rt",
     ],
 )
+
+# mbedtls-rs-sys looks for its pre-generated bindings and libraries relative to
+# CARGO_MANIFEST_DIR. cargo-bazel runs build scripts from an empty runfiles
+# directory, so point the build script at the actual external repository.
+crates_esp32s3.annotation(
+    build_script_data_glob = [
+        "libs/**/*",
+        "src/include/*.rs",
+    ],
+    build_script_env = {
+        "CARGO_MANIFEST_DIR": "external/rules_rust++_crate+++crates_esp32s3+crates_esp32s3__mbedtls-rs-sys-0.3.1",
+    },
+    compile_data_glob = ["src/include/*.rs"],
+    crate = "mbedtls-rs-sys",
+)
 crates_esp32s3.render_config(
     generate_target_compatible_with = False,
 )

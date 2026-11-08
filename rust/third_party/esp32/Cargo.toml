@@ -26,5 +26,8 @@ esp-rom-sys = "=0.1.5"
 esp-rtos = { version = "0.4.0", features = ["embassy", "esp-radio", "esp32"] }
 portable-atomic = "1.15.0"
 esp32 = "0.42.0"
+mbedtls-rs = { version = "0.3.0", default-features = false, features = ["tls", "esp32"] }
+rand_chacha = { version = "0.10.0", default-features = false }
+rand_core = "0.10.1"
 xtensa-lx = "0.13.0"
 xtensa-lx-rt = "0.23.0"
