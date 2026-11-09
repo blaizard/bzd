@@ -1,0 +1,18 @@
+use "interfaces/tcp.bdl"
+use "rust/interfaces/dns.bdl"
+use "rust/interfaces/tls.bdl"
+
+namespace bzd.components.generic.network;
+
+
+component Http {
+config:
+	dns: bzd.network.Dns = target.network.dns;
+	tcp: bzd.network.tcp.Client = target.network.tcp.client;
+	tls: bzd.network.tls.Client = bzd.components.generic.network.tls.Error();
+	
+interface:
+	
+}
+
+

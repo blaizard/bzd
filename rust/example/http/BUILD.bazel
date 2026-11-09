@@ -10,23 +10,22 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//interfaces:stream",
-        "//interfaces:tcp",
-        "//rust/interfaces:dns",
+        "//rust/components/generic/network/http:interface",
     ],
 )
 
 rust_library(
-    name = "http_get",
+    name = "http_example",
     srcs = [
-        "http_get.rs",
+        "lib.rs",
     ],
+    crate_name = "rust_example_http",
     visibility = ["//visibility:public"],
     deps = [
         ":composition",
         "//interfaces:stream",
-        "//interfaces:tcp",
         "//rust/bzd",
-        "//rust/interfaces:dns",
+        "//rust/components/generic/network/http",
         "//rust/libs/http",
     ],
 )
@@ -37,6 +36,7 @@ bdl_system(
         "std": "//rust/targets:auto",
     },
     deps = [
-        ":http_get",
+        ":http_example",
+        "//rust/components/generic/network/http",
     ],
 )

@@ -3,8 +3,9 @@ use "rust/example/http/interface.bdl"
 
 
 composition {
-	http = bzd.example.HttpGet(dns = target.network.dns, tcp = target.network.tcp.client);
-	http.run();
+	http = bzd.components.generic.network.Http(tls = target.network.tls.client);
+	example = bzd.example.HttpExample(http = http);
+	example.run();
 	
 }
 

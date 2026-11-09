@@ -1,15 +1,13 @@
 use "interfaces/stream.bdl"
-use "interfaces/tcp.bdl"
-use "rust/interfaces/dns.bdl"
+use "rust/components/generic/network/http/interface.bdl"
 
 namespace bzd.example;
 
 
-component HttpGet {
+component HttpExample {
 config:
 	out: bzd.OStream = target.out;
-	dns = bzd.network.Dns;
-	tcp = bzd.network.tcp.Client;
+	http = bzd.components.generic.network.Http;
 	
 interface:
 	method run();

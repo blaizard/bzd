@@ -44,10 +44,8 @@ pub enum Method {
 pub struct Request<'a> {
     /// HTTP method.
     pub method: Method,
-    /// Value of the `Host` header.
-    pub host: &'a str,
-    /// Request path.
-    pub path: &'a str,
+    /// Parsed request URL.
+    pub url: Url<'a>,
     /// Additional headers.
     pub headers: &'a [(&'a str, &'a str)],
     /// Request body.
@@ -79,8 +77,8 @@ where
     S: IOStream + ?Sized,
 {
     let mut connection = HttpConnection::Plain(EmbeddedIOStream::new(stream));
-    let http_request = ReqwlessRequest::new(to_reqwless_method(request.method), request.path)
-        .host(request.host)
+    let http_request = ReqwlessRequest::new(to_reqwless_method(request.method), request.url.path())
+        .host(request.url.authority())
         .headers(request.headers)
         .body(request.body)
         .build();
@@ -173,8 +171,7 @@ mod tests {
             &mut stream,
             Request {
                 method: Method::Get,
-                host: "example.com",
-                path: "/status",
+                url: Url::parse("http://example.com/status")?,
                 headers: &[],
                 body: &[],
             },
@@ -200,8 +197,7 @@ mod tests {
             &mut stream,
             Request {
                 method: Method::Post,
-                host: "example.com",
-                path: "/echo",
+                url: Url::parse("http://example.com/echo")?,
                 headers: &[],
                 body: b"PING",
             },
@@ -229,8 +225,7 @@ mod tests {
             &mut stream,
             Request {
                 method: Method::Get,
-                host: "example.com",
-                path: "/",
+                url: Url::parse("http://example.com/")?,
                 headers: &[],
                 body: &[],
             },

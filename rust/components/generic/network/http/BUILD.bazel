@@ -1,0 +1,33 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//interfaces:tcp",
+        "//rust/components/generic/network/tls/error:interface",
+        "//rust/interfaces:dns",
+        "//rust/interfaces:tls",
+    ],
+)
+
+rust_library(
+    name = "http",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_generic_network_http",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//interfaces:tcp",
+        "//rust/bzd",
+        "//rust/interfaces:dns",
+        "//rust/interfaces:tls",
+        "//rust/libs/http",
+    ],
+)
