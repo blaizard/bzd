@@ -1,6 +1,7 @@
 #![no_std]
 
 use bzd::base::error::Error;
+use bzd::base::format::write_into;
 use bzd::sync::signal::Signal;
 use ring_buffer::RingBuffer;
 use rust_interfaces_logger::BzdLoggerSinkInterface;
@@ -8,6 +9,7 @@ use rust_interfaces_logger::BzdLoggerSinkInterface;
 pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, Logger};
 
 const RING_SIZE: usize = 1024;
+const MAX_RECORDS_PER_BATCH: usize = 32;
 
 /// Persistent state of a logger backend.
 ///
@@ -36,32 +38,67 @@ impl LoggerBackendState {
         )
     }
 
-    /// Drain all queued records and flush the sink.
+    /// Drain queued records in batches, report dropped ones, and flush the sink.
     pub async fn flush<S: BzdLoggerSinkInterface + 'static>(
         &self,
         sink: &mut S,
     ) -> Result<(), Error> {
-        self.drain(sink).await?;
-        sink.flush().await
+        loop {
+            let mut drained = 0;
+            while drained < MAX_RECORDS_PER_BATCH {
+                let Some((first, second, length)) = self.ring.peek() else {
+                    break;
+                };
+
+                if !first.is_empty() {
+                    sink.write(first).await?;
+                }
+                if !second.is_empty() {
+                    sink.write(second).await?;
+                }
+                self.ring.commit(length);
+                drained += 1;
+            }
+
+            let overflowed = self.ring.overflow_count();
+            if overflowed > 0 {
+                report_overflow(sink, overflowed).await?;
+                self.ring.clear_overflow_count(overflowed);
+            }
+
+            sink.flush().await?;
+
+            if drained < MAX_RECORDS_PER_BATCH {
+                break;
+            }
+        }
+        Ok(())
     }
 
     /// Wait until a new record is available.
     pub async fn wait(&self) {
         self.wake.wait().await;
     }
+}
 
-    async fn drain<S: BzdLoggerSinkInterface + 'static>(&self, sink: &mut S) -> Result<(), Error> {
-        while let Some((first, second, length)) = self.ring.peek() {
-            if !first.is_empty() {
-                sink.write(first).await?;
-            }
-            if !second.is_empty() {
-                sink.write(second).await?;
-            }
-            self.ring.commit(length);
-        }
-        Ok(())
-    }
+async fn report_overflow<S: BzdLoggerSinkInterface + 'static>(
+    sink: &mut S,
+    overflowed: usize,
+) -> Result<(), Error> {
+    let mut buffer = [0u8; 128];
+    let Some(length) = write_into(
+        &mut buffer,
+        format_args!(
+            "[w] [logger] {} message(s) dropped due to overflow\n",
+            overflowed
+        ),
+    ) else {
+        return Err(bzd::base::error::failure!(
+            "logger: overflow message too long"
+        ));
+    };
+
+    sink.write(&buffer[..length]).await
 }
 
 impl Default for LoggerBackendState {

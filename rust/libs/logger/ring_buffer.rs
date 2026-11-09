@@ -124,6 +124,15 @@ impl<const N: usize> RingBuffer<N> {
         self.overflowed.load(Ordering::Relaxed)
     }
 
+    /// Subtract `count` from the number of dropped records.
+    pub fn clear_overflow_count(&self, count: usize) {
+        let _ = self
+            .overflowed
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |current| {
+                Some(current.saturating_sub(count))
+            });
+    }
+
     fn write_header(&self, index: usize, length: usize) {
         let index = index % N;
         // SAFETY: the producer writes the header of the record it is appending,
@@ -268,6 +277,16 @@ mod tests {
         ring.push(|record| write!(record, "abcde"))?;
         let length = take(&ring, &mut bytes).unwrap();
         assert_eq!(&bytes[..length], b"abcde")?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_clear_overflow_count() -> TestResult {
+        let ring = RingBuffer::<16>::new();
+        ring.push(|record| write!(record, "abcdefghijklmnopqrst"))?;
+        assert_eq!(ring.overflow_count(), 1)?;
+        ring.clear_overflow_count(1);
+        assert_eq!(ring.overflow_count(), 0)?;
         Ok(())
     }
 

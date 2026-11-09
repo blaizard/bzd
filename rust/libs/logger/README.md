@@ -20,4 +20,5 @@ The implementation is split as follows:
 - `LoggerBackendState`, in this library, is the single persistent queue (ring buffer + wake signal). It is a global static, so frontends can log before the backend component exists. It does not take the backend component lock. Each frontend is created with a topic through `LoggerBackendState::logger(topic, level)`.
 - `LoggerBackend` is a thin adapter that owns the sink and drains the global state in its service. It can also drain on demand through `flush()`.
 - The backend consumes records in place (`peek` then `commit`), without copying them out of the ring.
+- If records were dropped because the ring was full, the backend writes a warning directly to the sink on the next flush and resets the overflow counter.
 - A specialization (for example `OStreamLoggerSink`) implements `bzd.logger.Sink` and only writes/flushes the bytes.
