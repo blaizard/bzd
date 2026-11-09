@@ -146,6 +146,67 @@ class TestRun(unittest.TestCase):
 		composition.view(target="default").entity("default.test1.world")
 		composition.view(target="default").entity("default.test2.world")
 
+	def testInlineDefaultComponent(self) -> None:
+		bdl = Object.fromContent(
+			content="""
+			namespace default;
+			interface Iface { }
+			component Error : Iface { }
+			component User {
+			config:
+				dep: Iface = Error();
+			interface:
+				method run();
+			}
+			component Executor { }
+			composition {
+				executor = Executor() [executor];
+				user = User();
+				user.run();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True),
+		)
+
+		composition = Composition()
+		composition.visit(bdl).process()
+		composition.symbols.getEntityResolved("default.user.bdlDefaultDep").value
+		entries = next(iter(composition.registry.values()))
+		self.assertIn("default.user.bdlDefaultDep", entries)
+		dep = next(item for item in entries["default.user"].expression.parametersResolved if item.name == "dep")
+		self.assertEqual(dep.param.underlyingValueFQN, "default.user.bdlDefaultDep")
+
+	def testInlineDefaultComponentOverride(self) -> None:
+		bdl = Object.fromContent(
+			content="""
+			namespace default;
+			interface Iface { }
+			component Error : Iface { }
+			component Other : Iface { }
+			component User {
+			config:
+				dep: Iface = Error();
+			interface:
+				method run();
+			}
+			component Executor { }
+			composition {
+				executor = Executor() [executor];
+				other = Other();
+				user = User(dep = other);
+				user.run();
+			}
+			""",
+			objectContext=ObjectContext(resolve=True),
+		)
+
+		composition = Composition()
+		composition.visit(bdl).process()
+		self.assertFalse(composition.symbols.getEntityResolved("default.user.bdlDefaultDep"))
+		entries = next(iter(composition.registry.values()))
+		dep = next(item for item in entries["default.user"].expression.parametersResolved if item.name == "dep")
+		self.assertEqual(dep.param.underlyingValueFQN, "default.other")
+
 	def testConnections(self) -> None:
 		common = Object.fromContent(
 			content="""

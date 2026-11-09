@@ -354,6 +354,49 @@ class Entities:
 
 		return entity
 
+	def processDefaultComponents(
+		self,
+		expression: Expression,
+		resolver: Resolver,
+	) -> typing.List[Expression]:
+		"""Register inline component defaults as internal registry entries.
+
+		The expression must be a component instance. A config entry such as
+		`tls = SomeComponent()` is an inline component instance. The generators
+		expect config dependencies to reference a registry entry, so create one
+		under the parent component and rewrite the config value to point to it.
+		"""
+
+		result: typing.List[Expression] = []
+
+		for item in expression.parametersResolved:
+			if not item.param.isRValue:
+				continue
+
+			expected = item.expected
+			expectedSymbol = expected.interfaceType if expected.isInterfaceType else expected.symbol
+			expectedEntity = expectedSymbol.getEntityResolved(resolver=resolver)
+			if expectedEntity.category not in {Category.interface, Category.component}:
+				continue
+
+			paramEntity = item.param.getEntityUnderlyingTypeResolved(resolver=resolver)
+			if paramEntity.category != Category.component:
+				continue
+
+			name = "bdlDefault{}".format(item.name[:1].upper() + item.name[1:])
+			hidden = self.createEntityNestedComposition(
+				element=item.param.deepCopy().element,
+				this=expression,
+				resolveNamespace=item.param.namespace,
+				resolver=resolver,
+				name=name,
+			)
+			assert isinstance(hidden, Expression)
+			item.param.setUnderlyingValueFQN(hidden.fqn)
+			result.append(hidden)
+
+		return result
+
 	def processEntry(self, expression: Expression, isDepedency: bool, context: Context) -> None:
 		"""Resolve the dependencies for a specific expression."""
 		resolver = context.makeResolver(symbols=self.symbols, expression=expression)
@@ -385,6 +428,17 @@ class Entities:
 		entry = self.expressions.insert(expression=expression, entryType=entryType, context=context)
 		if entry is None:
 			return
+
+		# Inline component instances used as config defaults are not part of the
+		# registry. Register them as internal dependencies so they can be
+		# referenced through a component handle like any other registry entry.
+		if underlyingType.category == Category.component:
+			entry.deps.pushGroup(
+				self.processDefaultComponents(
+					expression=entry.expression,
+					resolver=resolver,
+				)
+			)
 
 		# Look for all dependencies and add the expression only.
 		for fqn in expression.dependencies:

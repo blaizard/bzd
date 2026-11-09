@@ -187,9 +187,9 @@ class SymbolFragment(ExpressionFragment):
 					condition=entity.isFQN,
 					message="A value referenced must have an valid FQN.",
 				)
-				self._setUnderlyingValueFQN(str(self.symbol))
+				self.setUnderlyingValueFQN(str(self.symbol))
 			else:
-				self._setUnderlyingValueFQN(entity.underlyingValueFQN)
+				self.setUnderlyingValueFQN(entity.underlyingValueFQN)
 
 			# Propagate the literal value.
 			self._setLiteral(entity.literal)

@@ -125,7 +125,7 @@ class Entity:
 		"""
 		return self.element.getAttrValue("fqn_type")
 
-	def _setUnderlyingValueFQN(self, fqn: str) -> None:
+	def setUnderlyingValueFQN(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_value", fqn)
 
 	def _setLiteral(self, value: typing.Optional[typing.Union[str, LiteralExtended]]) -> None:

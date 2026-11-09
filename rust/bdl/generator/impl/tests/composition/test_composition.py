@@ -52,6 +52,54 @@ composition {
 		)
 		self.assertNotIn("install", actual)
 
+	def testCompositionInlineDefaultComponent(self) -> None:
+		content = """
+namespace default;
+interface Iface { }
+component Error : Iface { }
+component User {
+config:
+	dep: Iface = Error();
+interface:
+	method run();
+}
+component Executor { }
+composition {
+	executor = Executor() [executor];
+	user = User();
+	user.run();
+}
+"""
+		actual = self._generate(content=content, imports=["user", "error"])
+		self.assertIn("struct DefaultUserBdlDefaultDepEntry", actual)
+		self.assertIn("component: CompositionComponent<DefaultError>", actual)
+		self.assertIn("DefaultUserContextConstraintTypes<DefaultError>", actual)
+		self.assertIn("&DefaultUserBdlDefaultDepEntry::get().component.handle()", actual)
+
+	def testCompositionInlineDefaultComponentOverride(self) -> None:
+		content = """
+namespace default;
+interface Iface { }
+component Error : Iface { }
+component Other : Iface { }
+component User {
+config:
+	dep: Iface = Error();
+interface:
+	method run();
+}
+component Executor { }
+composition {
+	executor = Executor() [executor];
+	other = Other();
+	user = User(dep = other);
+	user.run();
+}
+"""
+		actual = self._generate(content=content, imports=["user", "error", "other"])
+		self.assertNotIn("BdlDefaultDepEntry", actual)
+		self.assertIn("&DefaultOtherEntry::get().component.handle()", actual)
+
 	def testCompositionLogger(self) -> None:
 		content = """
 namespace bzd.logger;

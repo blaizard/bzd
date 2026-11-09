@@ -136,6 +136,27 @@ composition {
 }
 ```
 
+A config entry whose type is an interface or a component can default to an
+inline component instance:
+
+```bdl
+component HttpClient {
+config:
+	tls: bzd.network.tls.Client = bzd.components.generic.network.tls.Error();
+}
+```
+
+The default is registered as an internal entry under the parent instance, named
+`bdlDefault<ConfigName>` (for example `bdlDefaultTls`). This lets the generated
+code reference it like any other registry entry. A composition can override the
+default by passing a different component:
+
+```bdl
+composition {
+	client = HttpClient(tls = target.network.tls.client);
+}
+```
+
 ### Composition
 
 Similarly, a predefined composition can be described for a component when instantiated. For example:

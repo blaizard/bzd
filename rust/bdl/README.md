@@ -149,6 +149,17 @@ where
 
 The component implementation provides the concrete struct and implements the trait. The runtime support crate `//rust/bdl/generator/impl/adapter:component` provides `Component`, `CompositionComponent`, `StaticComponent`, `ComponentHandle`, and the `Lifecycle` trait.
 
+A config dependency can default to an inline component instance:
+
+```bdl
+config:
+	tls: bzd.network.tls.Client = bzd.components.generic.network.tls.Error();
+```
+
+The composition registers the default as an internal entry under the parent
+instance (`bdlDefaultTls` in this example) and passes its handle to the
+component. The composition can override it like any other config argument.
+
 ## Implementation dependencies
 
 Rust dependencies provided through the `implementation` attribute are re-exported as part of the public API:
