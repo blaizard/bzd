@@ -1,0 +1,29 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/interfaces:tls",
+    ],
+)
+
+rust_library(
+    name = "error",
+    srcs = [
+        "error.rs",
+    ],
+    crate_name = "rust_components_generic_network_tls_error",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/interfaces:tls",
+    ],
+)
+

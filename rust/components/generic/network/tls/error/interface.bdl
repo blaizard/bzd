@@ -1,0 +1,13 @@
+use "rust/interfaces/tls.bdl"
+
+namespace bzd.components.generic.network.tls;
+
+
+component Error : bzd.network.tls.Client {
+config:
+	
+interface:
+	
+}
+
+
