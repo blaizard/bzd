@@ -6,6 +6,7 @@ rust_library(
     srcs = [
         "error.rs",
         "lib.rs",
+        "url.rs",
     ],
     crate_name = "bzd_http",
     visibility = ["//visibility:public"],

@@ -7,6 +7,9 @@
 #![no_main]
 
 mod error;
+pub mod url;
+
+pub use url::{Scheme, Url};
 
 use bzd::base::error::Error;
 use bzd::base::stream::{EmbeddedIOStream, IOStream};
