@@ -12,7 +12,7 @@ pub mod url;
 pub use url::{Scheme, Url};
 
 use bzd::base::error::Error;
-use bzd::base::stream::{EmbeddedIOStream, IOStream};
+use bzd::base::stream::{EmbeddedStream, IOStream};
 use error::map_error;
 use reqwless::client::HttpConnection;
 use reqwless::request::{Method as ReqwlessMethod, Request as ReqwlessRequest, RequestBuilder};
@@ -76,7 +76,7 @@ pub async fn request<S>(
 where
     S: IOStream + ?Sized,
 {
-    let mut connection = HttpConnection::Plain(EmbeddedIOStream::new(stream));
+    let mut connection = HttpConnection::Plain(EmbeddedStream::new(stream));
     let http_request = ReqwlessRequest::new(to_reqwless_method(request.method), request.url.path())
         .host(request.url.authority())
         .headers(request.headers)

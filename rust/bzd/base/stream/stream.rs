@@ -43,7 +43,8 @@ impl embedded_io_async::Error for EmbeddedError {
         match self.error.error_type() {
             error::ErrorType::Timeout => embedded_io_async::ErrorKind::TimedOut,
             error::ErrorType::Data => embedded_io_async::ErrorKind::InvalidData,
-            error::ErrorType::Failure | error::ErrorType::Busy | error::ErrorType::Eof => {
+            error::ErrorType::Eof => embedded_io_async::ErrorKind::BrokenPipe,
+            error::ErrorType::Failure | error::ErrorType::Busy => {
                 embedded_io_async::ErrorKind::Other
             }
         }
@@ -56,11 +57,8 @@ pub trait IStream {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error>;
 
     /// Returns an adapter implementing `embedded_io_async::Read`.
-    fn as_embedded_read(&mut self) -> EmbeddedIStream<'_, Self>
-    where
-        Self: Sized,
-    {
-        EmbeddedIStream::new(self)
+    fn as_embedded_read(&mut self) -> EmbeddedStream<'_, Self> {
+        EmbeddedStream::new(self)
     }
 }
 
@@ -85,44 +83,41 @@ pub trait OStream {
     }
 
     /// Returns an adapter implementing `embedded_io_async::Write`.
-    fn as_embedded_write(&mut self) -> EmbeddedOStream<'_, Self>
-    where
-        Self: Sized,
-    {
-        EmbeddedOStream::new(self)
+    fn as_embedded_write(&mut self) -> EmbeddedStream<'_, Self> {
+        EmbeddedStream::new(self)
     }
 }
 
 /// Bidirectional asynchronous byte stream.
 pub trait IOStream: IStream + OStream {
     /// Returns an adapter implementing `embedded_io_async::Read + Write`.
-    fn as_embedded_io(&mut self) -> EmbeddedIOStream<'_, Self>
-    where
-        Self: Sized,
-    {
-        EmbeddedIOStream::new(self)
+    fn as_embedded_io(&mut self) -> EmbeddedStream<'_, Self> {
+        EmbeddedStream::new(self)
     }
 }
 
 impl<T: IStream + OStream + ?Sized> IOStream for T {}
 
-/// Adapter exposing an `IStream` as an `embedded_io_async::Read`.
-pub struct EmbeddedIStream<'a, S: ?Sized> {
+/// Adapter exposing a bzd stream as `embedded_io_async` traits.
+///
+/// A wrapper is required because the orphan rules forbid implementing the
+/// foreign `embedded_io_async` traits directly for bzd stream types.
+pub struct EmbeddedStream<'a, S: ?Sized> {
     stream: &'a mut S,
 }
 
-impl<'a, S: ?Sized> EmbeddedIStream<'a, S> {
+impl<'a, S: ?Sized> EmbeddedStream<'a, S> {
     /// Creates an adapter from a stream reference.
     pub fn new(stream: &'a mut S) -> Self {
         Self { stream }
     }
 }
 
-impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedIStream<'_, S> {
+impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedStream<'_, S> {
     type Error = EmbeddedError;
 }
 
-impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIStream<'_, S> {
+impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedStream<'_, S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
         error::ensure!(!buffer.is_empty(), "stream read with an empty buffer")
             .map_err(EmbeddedError::new)?;
@@ -130,59 +125,7 @@ impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIStream<'_, S> {
     }
 }
 
-/// Adapter exposing an `OStream` as an `embedded_io_async::Write`.
-pub struct EmbeddedOStream<'a, S: ?Sized> {
-    stream: &'a mut S,
-}
-
-impl<'a, S: ?Sized> EmbeddedOStream<'a, S> {
-    /// Creates an adapter from a stream reference.
-    pub fn new(stream: &'a mut S) -> Self {
-        Self { stream }
-    }
-}
-
-impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedOStream<'_, S> {
-    type Error = EmbeddedError;
-}
-
-impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedOStream<'_, S> {
-    async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
-        error::ensure!(!data.is_empty(), "stream write with an empty buffer")
-            .map_err(EmbeddedError::new)?;
-        self.stream.write(data).await.map_err(EmbeddedError::new)
-    }
-
-    async fn flush(&mut self) -> Result<(), Self::Error> {
-        self.stream.flush().await.map_err(EmbeddedError::new)
-    }
-}
-
-/// Adapter exposing an `IOStream` as both `embedded_io_async::Read` and `Write`.
-pub struct EmbeddedIOStream<'a, S: ?Sized> {
-    stream: &'a mut S,
-}
-
-impl<'a, S: ?Sized> EmbeddedIOStream<'a, S> {
-    /// Creates an adapter from a stream reference.
-    pub fn new(stream: &'a mut S) -> Self {
-        Self { stream }
-    }
-}
-
-impl<S: ?Sized> embedded_io_async::ErrorType for EmbeddedIOStream<'_, S> {
-    type Error = EmbeddedError;
-}
-
-impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedIOStream<'_, S> {
-    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
-        error::ensure!(!buffer.is_empty(), "stream read with an empty buffer")
-            .map_err(EmbeddedError::new)?;
-        self.stream.read(buffer).await.map_err(EmbeddedError::new)
-    }
-}
-
-impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedIOStream<'_, S> {
+impl<S: OStream + ?Sized> embedded_io_async::Write for EmbeddedStream<'_, S> {
     async fn write(&mut self, data: &[u8]) -> Result<usize, Self::Error> {
         error::ensure!(!data.is_empty(), "stream write with an empty buffer")
             .map_err(EmbeddedError::new)?;
@@ -288,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    async fn test_embedded_adapters() -> TestResult {
+    async fn test_embedded_stream() -> TestResult {
         let mut stream = Buffer::<8>::new();
         {
             let mut writer = stream.as_embedded_write();
@@ -309,11 +252,7 @@ mod tests {
         };
         assert_eq!(size, 5)?;
         assert_eq!(&buffer[..size], &b"hello"[..])?;
-        Ok(())
-    }
 
-    #[test]
-    async fn test_embedded_io_stream() -> TestResult {
         let mut stream = Buffer::<8>::new();
         {
             let mut io = stream.as_embedded_io();
@@ -396,7 +335,7 @@ mod tests {
         )?;
         assert_eq!(
             EmbeddedError::new(error::eof!("eof")).kind(),
-            ErrorKind::Other
+            ErrorKind::BrokenPipe
         )?;
         Ok(())
     }
