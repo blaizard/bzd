@@ -4,6 +4,7 @@ load("//rust:defs.bzl", "rust_test")
 rust_library(
     name = "stream",
     srcs = [
+        "embedded_io.rs",
         "stream.rs",
     ],
     visibility = [
