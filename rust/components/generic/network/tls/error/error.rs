@@ -28,7 +28,12 @@ impl BzdComponentsGenericNetworkTlsErrorInterface for BzdComponentsGenericNetwor
 pub struct ErrorStream;
 
 impl IStream for ErrorStream {
-    async fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, Error> {
+    type Chunk<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    async fn read<'a>(&'a mut self, _buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
         Err(bzd::base::error::failure!("tls: no TLS client configured"))
     }
 }

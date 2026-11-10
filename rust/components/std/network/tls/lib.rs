@@ -35,8 +35,14 @@ impl<C> TlsStream<C> {
 }
 
 impl<C: Read<Error = TlsError>> IStream for TlsStream<C> {
-    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
-        self.connection.read(buffer).await.map_err(map_tls_error)
+    type Chunk<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
+        let size = self.connection.read(buffer).await.map_err(map_tls_error)?;
+        Ok(&buffer[..size])
     }
 }
 
@@ -131,7 +137,10 @@ impl<S: IStream + OStream> ErrorType for Transport<S> {
 
 impl<S: IStream + OStream> Read for Transport<S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
-        self.stream.read(buffer).await.map_err(EmbeddedError::new)
+        self.stream
+            .read_into(buffer)
+            .await
+            .map_err(EmbeddedError::new)
     }
 }
 
@@ -365,11 +374,16 @@ mod tests {
     }
 
     impl IStream for MockStream {
-        async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        type Chunk<'a>
+            = &'a [u8]
+        where
+            Self: 'a;
+
+        async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
             let size = buffer.len().min(self.input.len());
             buffer[..size].copy_from_slice(&self.input[..size]);
             self.input = &self.input[size..];
-            Ok(size)
+            Ok(&buffer[..size])
         }
     }
 
@@ -390,8 +404,8 @@ mod tests {
     async fn test_tls_stream_delegates() -> TestResult {
         let mut stream = TlsStream::new(MockConnection::new(b"hello"));
         let mut buffer = [0u8; 5];
-        assert_eq!(stream.read(&mut buffer).await?, 5)?;
-        assert_eq!(&buffer, b"hello")?;
+        let chunk = stream.read(&mut buffer).await?;
+        assert_eq!(chunk, &b"hello"[..])?;
         stream.write_all(b"world").await?;
         assert_eq!(&stream.connection.output, b"world\0\0\0")?;
         Ok(())

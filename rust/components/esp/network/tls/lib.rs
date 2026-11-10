@@ -73,11 +73,18 @@ impl<C> TlsStream<C> {
 }
 
 impl<C: Read<Error = SessionError>> IStream for TlsStream<C> {
-    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
-        self.connection
+    type Chunk<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
+        let size = self
+            .connection
             .read(buffer)
             .await
-            .map_err(map_session_error)
+            .map_err(map_session_error)?;
+        Ok(&buffer[..size])
     }
 }
 
@@ -132,7 +139,7 @@ impl<S: IStream + OStream> ErrorType for Transport<S> {
 
 impl<S: IStream + OStream> Read for Transport<S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
-        self.stream.read(buffer).await.map_err(TransportError)
+        self.stream.read_into(buffer).await.map_err(TransportError)
     }
 }
 

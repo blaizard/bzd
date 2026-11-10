@@ -142,13 +142,21 @@ mod tests {
     }
 
     impl IStream for MockStream {
-        async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, bzd::base::error::Error> {
+        type Chunk<'a>
+            = &'a [u8]
+        where
+            Self: 'a;
+
+        async fn read<'a>(
+            &'a mut self,
+            buffer: &'a mut [u8],
+        ) -> Result<Self::Chunk<'a>, bzd::base::error::Error> {
             assert_eq!(buffer.is_empty(), false)?;
             let remaining = &self.input[self.input_offset..];
             let size = buffer.len().min(remaining.len());
             buffer[..size].copy_from_slice(&remaining[..size]);
             self.input_offset += size;
-            Ok(size)
+            Ok(&buffer[..size])
         }
     }
 

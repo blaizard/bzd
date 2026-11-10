@@ -52,11 +52,18 @@ impl<C> TcpStream<C> {
 }
 
 impl<C: Read> IStream for TcpStream<C> {
-    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
-        self.connection
+    type Chunk<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
+        let size = self
+            .connection
             .read(buffer)
             .await
-            .map_err(|error| map_error("TCP read failed", error))
+            .map_err(|error| map_error("TCP read failed", error))?;
+        Ok(&buffer[..size])
     }
 }
 
@@ -127,8 +134,8 @@ mod tests {
     async fn test_stream_roundtrip() -> TestResult {
         let mut stream = TcpStream::new(MockConnection::new(b"hello"));
         let mut buffer = [0u8; 5];
-        assert_eq!(stream.read(&mut buffer).await?, 5)?;
-        assert_eq!(&buffer, b"hello")?;
+        let chunk = stream.read(&mut buffer).await?;
+        assert_eq!(chunk, &b"hello"[..])?;
         stream.write_all(b"world").await?;
         assert_eq!(&stream.connection.output, b"world\0\0\0")?;
         Ok(())

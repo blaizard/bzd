@@ -53,6 +53,9 @@ impl embedded_io_async::Error for EmbeddedError {
 ///
 /// A wrapper is required because the orphan rules forbid implementing the
 /// foreign `embedded_io_async` traits directly for bzd stream types.
+///
+/// Chunks borrowed from the stream's own storage are materialized through
+/// [`IStream::read_into`].
 pub struct EmbeddedStream<'a, S: ?Sized> {
     stream: &'a mut S,
 }
@@ -72,7 +75,10 @@ impl<S: IStream + ?Sized> embedded_io_async::Read for EmbeddedStream<'_, S> {
     async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Self::Error> {
         error::ensure!(!buffer.is_empty(), "stream read with an empty buffer")
             .map_err(EmbeddedError::new)?;
-        self.stream.read(buffer).await.map_err(EmbeddedError::new)
+        self.stream
+            .read_into(buffer)
+            .await
+            .map_err(EmbeddedError::new)
     }
 }
 
@@ -112,11 +118,16 @@ mod tests {
     }
 
     impl<const N: usize> IStream for Buffer<N> {
-        async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        type Chunk<'a>
+            = &'a [u8]
+        where
+            Self: 'a;
+
+        async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
             let size = buffer.len().min(self.len - self.offset);
             buffer[..size].copy_from_slice(&self.data[self.offset..self.offset + size]);
             self.offset += size;
-            Ok(size)
+            Ok(&buffer[..size])
         }
     }
 
@@ -180,9 +191,17 @@ mod tests {
         struct PanicStream;
 
         impl IStream for PanicStream {
-            async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+            type Chunk<'a>
+                = &'a [u8]
+            where
+                Self: 'a;
+
+            async fn read<'a>(
+                &'a mut self,
+                buffer: &'a mut [u8],
+            ) -> Result<Self::Chunk<'a>, Error> {
                 assert_eq!(buffer.is_empty(), false)?;
-                Ok(0)
+                Ok(&buffer[..0])
             }
         }
 

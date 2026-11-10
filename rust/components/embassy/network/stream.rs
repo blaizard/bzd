@@ -13,11 +13,18 @@ impl<C> TcpStream<C> {
 }
 
 impl<C: Read> IStream for TcpStream<C> {
-    async fn read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
-        self.connection
+    type Chunk<'a>
+        = &'a [u8]
+    where
+        Self: 'a;
+
+    async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
+        let size = self
+            .connection
             .read(buffer)
             .await
-            .map_err(|error| bzd::base::error::failure!("TCP read failed: {error}"))
+            .map_err(|error| bzd::base::error::failure!("TCP read failed: {error}"))?;
+        Ok(&buffer[..size])
     }
 }
 
