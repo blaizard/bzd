@@ -9,22 +9,18 @@ pub use embedded_io::*;
 
 /// A window of bytes returned by [`IStream::read`].
 ///
-/// Dropping a chunk releases it, treating the whole window as consumed unless
-/// [`BorrowChunk::truncate_release`] was called first.
+/// Dropping a chunk releases it; the whole window is consumed unless
+/// [`BorrowChunk::consumed`] was called.
 pub trait BorrowChunk: AsRef<[u8]> {
-    /// Reports that only the first `used_len` bytes were consumed, truncates the
-    /// chunk to that length and releases the remainder.
+    /// Reports that only the first `used_len` bytes were consumed.
     ///
-    /// `used_len` is clamped to the chunk length. After this call, [`AsRef::as_ref`]
-    /// exposes only the consumed bytes. Calling this more than once keeps the
-    /// smallest length reported.
-    fn truncate_release(&mut self, used_len: usize);
+    /// `used_len` is clamped to the chunk length.
+    fn consumed(&mut self, used_len: usize);
 }
 
-/// Passthrough chunks already live in the caller's buffer, so there is nothing
-/// to reclaim.
+/// Passthrough chunks already live in the caller's buffer.
 impl BorrowChunk for &[u8] {
-    fn truncate_release(&mut self, _used_len: usize) {}
+    fn consumed(&mut self, _used_len: usize) {}
 }
 
 /// Asynchronous byte-oriented input stream.
@@ -34,7 +30,10 @@ pub trait IStream {
     where
         Self: 'a;
 
-    /// Reads up to `buffer.len()` bytes and returns the bytes read.
+    /// Returns a window of bytes borrowed from the stream and/or from `buffer`.
+    ///
+    /// The window may be larger than `buffer` when the stream exposes its own
+    /// storage.
     async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error>;
 
     /// Reads into `buf`, copying from the returned chunk when it does not
@@ -59,11 +58,12 @@ pub trait IStream {
         let data_end = data_start + data_len;
 
         if data_start == buffer_start {
-            chunk.truncate_release(size);
+            chunk.consumed(size);
             return Ok(size);
         }
 
         if data_start < buffer_end && buffer_start < data_end {
+            chunk.consumed(0);
             return Err(error::failure!(
                 "read chunk overlaps the destination buffer at a non-zero offset"
             ));
@@ -72,7 +72,7 @@ pub trait IStream {
         // SAFETY: the ranges checked above are disjoint, so the chunk does not
         // alias the destination buffer, whose pointer stays valid.
         unsafe { core::ptr::copy_nonoverlapping(data_ptr, buffer_ptr, size) };
-        chunk.truncate_release(size);
+        chunk.consumed(size);
         Ok(size)
     }
 
@@ -153,7 +153,7 @@ mod tests {
     }
 
     impl BorrowChunk for WindowChunk<'_> {
-        fn truncate_release(&mut self, used_len: usize) {
+        fn consumed(&mut self, used_len: usize) {
             let used_len = used_len.min(self.data.len());
             let remaining = self.data.len() - used_len;
             self.consumed.set(self.consumed.get() + used_len);
@@ -213,16 +213,33 @@ mod tests {
         }
     }
 
-    struct OverlapStream;
+    struct OverlapStream {
+        consumed: core::cell::Cell<usize>,
+        returned: core::cell::Cell<usize>,
+    }
+
+    impl OverlapStream {
+        fn new() -> Self {
+            Self {
+                consumed: core::cell::Cell::new(0),
+                returned: core::cell::Cell::new(0),
+            }
+        }
+    }
 
     impl IStream for OverlapStream {
         type Chunk<'a>
-            = &'a [u8]
+            = WindowChunk<'a>
         where
             Self: 'a;
 
         async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
-            Ok(&buffer[1..3])
+            Ok(WindowChunk {
+                data: &buffer[1..3],
+                consumed: &self.consumed,
+                returned: &self.returned,
+                finalized: false,
+            })
         }
     }
 
@@ -307,12 +324,12 @@ mod tests {
     }
 
     #[test]
-    async fn test_chunk_truncate_release() -> TestResult {
+    async fn test_chunk_consumed() -> TestResult {
         let mut stream = WindowStream::new();
         let mut buffer = [0u8; 4];
         {
             let mut chunk = stream.read(&mut buffer).await?;
-            chunk.truncate_release(2);
+            chunk.consumed(2);
             assert_eq!(chunk.as_ref(), &b"da"[..])?;
         }
         assert_eq!(stream.consumed.get(), 2)?;
@@ -321,12 +338,12 @@ mod tests {
     }
 
     #[test]
-    async fn test_chunk_truncate_release_clamps() -> TestResult {
+    async fn test_chunk_consumed_clamps() -> TestResult {
         let mut stream = WindowStream::new();
         let mut buffer = [0u8; 4];
         {
             let mut chunk = stream.read(&mut buffer).await?;
-            chunk.truncate_release(10);
+            chunk.consumed(10);
             assert_eq!(chunk.as_ref(), &b"data"[..])?;
         }
         assert_eq!(stream.consumed.get(), 4)?;
@@ -347,7 +364,7 @@ mod tests {
     }
 
     #[test]
-    async fn test_read_into_truncates_to_destination() -> TestResult {
+    async fn test_read_into_consumes_destination_length() -> TestResult {
         let mut stream = WindowStream::new();
         let mut buffer = [0u8; 2];
         let size = stream.read_into(&mut buffer).await?;
@@ -390,7 +407,7 @@ mod tests {
 
     #[test]
     async fn test_read_into_rejects_offset_overlap() -> TestResult {
-        let mut stream = OverlapStream;
+        let mut stream = OverlapStream::new();
         let mut buffer = [0u8; 4];
         match stream.read_into(&mut buffer).await {
             Err(err) => {
@@ -402,6 +419,18 @@ mod tests {
             }
             Ok(_) => return Err(error::failure!("expected read_into to fail")),
         }
+        assert_eq!(stream.consumed.get(), 0)?;
+        assert_eq!(stream.returned.get(), 2)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_slice_chunk_consumed_is_noop() -> TestResult {
+        let mut chunk: &[u8] = b"hello";
+        chunk.consumed(2);
+        assert_eq!(chunk, &b"hello"[..])?;
+        chunk.consumed(10);
+        assert_eq!(chunk, &b"hello"[..])?;
         Ok(())
     }
 }
