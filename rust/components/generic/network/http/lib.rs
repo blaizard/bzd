@@ -9,7 +9,7 @@ pub use rust_components_generic_network_http_interface::{
 };
 
 use bzd::base::error::Error;
-use bzd_http::{Method, Request, ResponseInfo, Scheme, Url};
+use bzd_http::{Method, Request, ResponseInfo, Scheme};
 use core::net::SocketAddr;
 use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rust_interfaces_dns::BzdNetworkDnsInterface;
@@ -56,22 +56,17 @@ where
         body: &[u8],
         buffer: &mut [u8],
     ) -> Result<ResponseInfo, Error> {
-        let url = Url::parse(url)?;
+        let request = Request::new(method, url)?.headers(headers).body(body);
+        let url = request.url();
         let address = SocketAddr::new(
             self.context.dns.lock().await.resolve(url.host()).await?,
             url.port(),
         );
-        let request = Request {
-            method,
-            url,
-            headers,
-            body,
-        };
 
-        match request.url.scheme() {
+        match url.scheme() {
             Scheme::Http => {
                 let mut stream = self.context.tcp.lock().await.connect(address).await?;
-                bzd_http::request(&mut stream, request, buffer).await
+                request.send(&mut stream, buffer).await
             }
             Scheme::Https => {
                 let mut stream = self
@@ -79,9 +74,9 @@ where
                     .tls
                     .lock()
                     .await
-                    .connect(address, request.url.host())
+                    .connect(address, url.host())
                     .await?;
-                bzd_http::request(&mut stream, request, buffer).await
+                request.send(&mut stream, buffer).await
             }
         }
     }
