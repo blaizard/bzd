@@ -103,7 +103,8 @@ export class HttpClient {
 
 		// Add the content length
 		if (typeof data == "string") {
-			headers["Content-Length"] = data.length;
+			headers["Content-Length"] =
+				typeof Buffer === "undefined" ? new TextEncoder().encode(data).byteLength : Buffer.byteLength(data, "utf8");
 		}
 
 		// Update headers with authentication information
