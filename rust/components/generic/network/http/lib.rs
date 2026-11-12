@@ -9,7 +9,7 @@ pub use rust_components_generic_network_http_interface::{
 };
 
 use bzd::base::error::Error;
-use bzd_http::{Method, Request, ResponseInfo, Scheme};
+use bzd_http::{Request, ResponseInfo, Scheme};
 use core::net::SocketAddr;
 use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rust_interfaces_dns::BzdNetworkDnsInterface;
@@ -17,14 +17,11 @@ use rust_interfaces_tls::BzdNetworkTlsClientInterface;
 
 /// Performs HTTP requests over the component's network context.
 pub trait BzdNetworkHttpClientInterface {
-    async fn request(
-        &self,
-        method: Method,
-        url: &str,
-        headers: &[(&str, &str)],
-        body: &[u8],
-        buffer: &mut [u8],
-    ) -> Result<ResponseInfo, Error>;
+    /// Send `request` over the network and read the full response body.
+    ///
+    /// The buffer is used as scratch space for the response headers and then holds the
+    /// response body, available as `buffer[..body_length]`.
+    async fn send(&self, request: Request<'_>, buffer: &mut [u8]) -> Result<ResponseInfo, Error>;
 }
 
 /// HTTP client component.
@@ -48,15 +45,7 @@ impl<C> BzdNetworkHttpClientInterface for BzdComponentsGenericNetworkHttp<C>
 where
     C: BzdComponentsGenericNetworkHttpContextConstraint,
 {
-    async fn request(
-        &self,
-        method: Method,
-        url: &str,
-        headers: &[(&str, &str)],
-        body: &[u8],
-        buffer: &mut [u8],
-    ) -> Result<ResponseInfo, Error> {
-        let request = Request::new(method, url)?.headers(headers).body(body);
+    async fn send(&self, request: Request<'_>, buffer: &mut [u8]) -> Result<ResponseInfo, Error> {
         let url = request.url();
         let address = SocketAddr::new(
             self.context.dns.lock().await.resolve(url.host()).await?,

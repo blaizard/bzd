@@ -2,8 +2,9 @@
 //!
 //! This crate exposes a small `Request`/`ResponseInfo` API on top of
 //! `reqwless`. A request is built with [`Request::new`], optionally customized
-//! with [`Request::headers`] and [`Request::body`], and sent with
-//! [`Request::send`]. The underlying HTTP implementation is an internal detail.
+//! with [`Request::headers`] and [`Request::body`], and sent on a byte stream
+//! with [`Request::send`]. The underlying HTTP implementation is an internal
+//! detail.
 
 #![no_std]
 #![no_main]
@@ -75,6 +76,51 @@ impl<'a> Request<'a> {
         })
     }
 
+    /// Build a `GET` request.
+    pub fn get(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Get, url)
+    }
+
+    /// Build a `PUT` request.
+    pub fn put(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Put, url)
+    }
+
+    /// Build a `POST` request.
+    pub fn post(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Post, url)
+    }
+
+    /// Build a `DELETE` request.
+    pub fn delete(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Delete, url)
+    }
+
+    /// Build a `HEAD` request.
+    pub fn head(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Head, url)
+    }
+
+    /// Build a `PATCH` request.
+    pub fn patch(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Patch, url)
+    }
+
+    /// Build an `OPTIONS` request.
+    pub fn options(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Options, url)
+    }
+
+    /// Build a `CONNECT` request.
+    pub fn connect(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Connect, url)
+    }
+
+    /// Build a `TRACE` request.
+    pub fn trace(url: &'a str) -> Result<Self, Error> {
+        Self::new(Method::Trace, url)
+    }
+
     /// Set the additional headers.
     #[must_use]
     pub const fn headers(mut self, headers: &'a [(&'a str, &'a str)]) -> Self {
@@ -99,7 +145,7 @@ impl<'a> Request<'a> {
         self.url
     }
 
-    /// Send the request over a bzd stream and read the full response body.
+    /// Send the request over a byte stream and read the full response body.
     ///
     /// The buffer is used as scratch space for the response headers and then holds the
     /// response body, available as `buffer[..body_length]`. It must be large enough to
@@ -153,7 +199,7 @@ fn to_reqwless_method(method: Method) -> ReqwlessMethod {
 mod tests {
     use super::*;
     use crate::error::map_error;
-    use bzd::base::error::ErrorType;
+    use bzd::base::error::{Error, ErrorType};
     use bzd::base::stream::{IStream, OStream};
 
     struct MockStream {
@@ -172,6 +218,10 @@ mod tests {
                 output_length: 0,
             }
         }
+
+        fn output(&self) -> &[u8] {
+            &self.output[..self.output_length]
+        }
     }
 
     impl IStream for MockStream {
@@ -180,10 +230,7 @@ mod tests {
         where
             Self: 'a;
 
-        async fn read<'a>(
-            &'a mut self,
-            buffer: &'a mut [u8],
-        ) -> Result<Self::Chunk<'a>, bzd::base::error::Error> {
+        async fn read<'a>(&'a mut self, buffer: &'a mut [u8]) -> Result<Self::Chunk<'a>, Error> {
             assert_eq!(buffer.is_empty(), false)?;
             let remaining = &self.input[self.input_offset..];
             let size = buffer.len().min(remaining.len());
@@ -194,12 +241,12 @@ mod tests {
     }
 
     impl OStream for MockStream {
-        async fn write(&mut self, data: &[u8]) -> Result<usize, bzd::base::error::Error> {
+        async fn write(&mut self, data: &[u8]) -> Result<usize, Error> {
             assert_eq!(data.is_empty(), false)?;
-            let size = data.len().min(self.output.len() - self.output_length);
-            self.output[self.output_length..self.output_length + size]
-                .copy_from_slice(&data[..size]);
-            self.output_length += size;
+            let length = self.output_length;
+            let size = data.len().min(self.output.len() - length);
+            self.output[length..length + size].copy_from_slice(&data[..size]);
+            self.output_length = length + size;
             Ok(size)
         }
     }
@@ -216,11 +263,12 @@ mod tests {
         assert_eq!(response.body_length, 5)?;
         assert_eq!(&buffer[..response.body_length], &b"hello"[..])?;
         assert_eq!(
-            stream.output[..stream.output_length].starts_with(b"GET /status HTTP/1.1\r\n"),
+            stream.output().starts_with(b"GET /status HTTP/1.1\r\n"),
             true
         )?;
         assert_eq!(
-            stream.output[..stream.output_length]
+            stream
+                .output()
                 .windows(b"X-Test: 1\r\n".len())
                 .any(|window| window == b"X-Test: 1\r\n"),
             true
@@ -237,13 +285,10 @@ mod tests {
         assert_eq!(response.status, 204)?;
         assert_eq!(response.body_length, 0)?;
         assert_eq!(
-            stream.output[..stream.output_length].starts_with(b"POST /echo HTTP/1.1\r\n"),
+            stream.output().starts_with(b"POST /echo HTTP/1.1\r\n"),
             true
         )?;
-        assert_eq!(
-            stream.output[..stream.output_length].ends_with(b"\r\n\r\nPING"),
-            true
-        )?;
+        assert_eq!(stream.output().ends_with(b"\r\n\r\nPING"), true)?;
         Ok(())
     }
 
@@ -279,6 +324,21 @@ mod tests {
         assert_eq!(request.method(), Method::Put)?;
         assert_eq!(request.url().port(), 8443)?;
         assert_eq!(request.url().path(), "/resource")?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_helpers() -> TestResult {
+        let url = "http://example.com/";
+        assert_eq!(Request::get(url)?.method(), Method::Get)?;
+        assert_eq!(Request::put(url)?.method(), Method::Put)?;
+        assert_eq!(Request::post(url)?.method(), Method::Post)?;
+        assert_eq!(Request::delete(url)?.method(), Method::Delete)?;
+        assert_eq!(Request::head(url)?.method(), Method::Head)?;
+        assert_eq!(Request::patch(url)?.method(), Method::Patch)?;
+        assert_eq!(Request::options(url)?.method(), Method::Options)?;
+        assert_eq!(Request::connect(url)?.method(), Method::Connect)?;
+        assert_eq!(Request::trace(url)?.method(), Method::Trace)?;
         Ok(())
     }
 

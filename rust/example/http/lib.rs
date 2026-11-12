@@ -7,7 +7,7 @@ pub use rust_example_http_composition::{
 };
 
 use bzd::base::error::Error;
-use bzd_http::Method;
+use bzd_http::Request;
 use interfaces_stream::BzdOStreamInterface;
 use rust_components_generic_network_http::BzdNetworkHttpClientInterface;
 
@@ -39,20 +39,12 @@ where
         let mut out = self.context.out.lock().await;
         let mut buffer = [0u8; BUFFER_SIZE];
 
-        let response = http
-            .request(Method::Get, "http://example.com/", &[], &[], &mut buffer)
-            .await?;
+        let request = Request::get("http://example.com/")?;
+        let response = http.send(request, &mut buffer).await?;
         out.write_all(&buffer[..response.body_length]).await?;
 
-        let response = http
-            .request(
-                Method::Get,
-                "https://www.google.com/humans.txt",
-                &[],
-                &[],
-                &mut buffer,
-            )
-            .await?;
+        let request = Request::get("https://www.google.com/humans.txt")?;
+        let response = http.send(request, &mut buffer).await?;
         out.write_all(&buffer[..response.body_length]).await?;
 
         out.flush().await?;
