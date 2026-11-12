@@ -53,19 +53,6 @@ class Expression(EntityExpression):
 		)
 
 	@property
-	def interfaceType(self) -> Symbol:
-		return (
-			Symbol(
-				element=self.element,
-				kind="interface",
-				underlyingTypeFQN="fqn_interface",
-				const="const",
-			)
-			if self.isInterfaceType
-			else self.symbol
-		)
-
-	@property
 	def interfaceTypeResolved(self) -> Symbol:
 		return (
 			Symbol(
