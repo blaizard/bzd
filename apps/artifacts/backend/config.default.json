@@ -335,6 +335,13 @@
                     }
                 }
             },
+            "nodes.filestore": {
+                "storage": {
+                    "path": "./nodes.files",
+                    "type": "disk",
+                    "write": true
+                }
+            },
             "type": "nodes"
         },
         "nodes_mirror": {
