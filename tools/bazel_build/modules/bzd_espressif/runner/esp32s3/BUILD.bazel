@@ -31,7 +31,7 @@ sh_binary_wrapper(
     command = """
         {esptool} --chip esp32-s3 elf2image -o "./image" "$1"
         {builder} --size 4MB --chunk {bootloader},0x0 --chunk {partitions},0x8000 --chunk ./image,0x10000,0x150000 ./qemu_flash.bin
-        {esp_emu} --binary "$1" -- --chip esp32s3 --firmware ./qemu_flash.bin --exit-on "<exit code"
+        {esp_emu} --binary "$1" -- --chip esp32s3 --firmware ./qemu_flash.bin
     """,
     locations = {
         "//partition_table:partition_table_4mb_ota_3x1344kib.bin": "partitions",

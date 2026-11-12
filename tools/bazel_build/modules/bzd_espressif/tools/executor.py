@@ -5,7 +5,9 @@ import shutil
 import pathlib
 import typing
 
-from bzd.utils.run import localCommand
+from bzd.utils.run import Cancellation, localCommand, StreamCallback
+
+EXIT_CODE_PATTERN = re.compile(r"<exit code (-?[0-9]+)>")
 
 
 def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
@@ -37,19 +39,6 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 		print(f"#{index} {address} in {symbol} {source}", flush=True)
 
 
-def tryReadExitCode(output: str) -> typing.Optional[int]:
-	"""Identify the exit code if any.
-
-	Args:
-	        output: The output string.
-	"""
-
-	m = re.search(r"<exit code (-?[0-9])>", output)
-	if m is None:
-		return None
-	return int(m.group(1))
-
-
 def splitEndOfOptionsMarker(
 	args: typing.List[str],
 ) -> typing.Tuple[typing.List[str], typing.List[str]]:
@@ -74,14 +63,34 @@ if __name__ == "__main__":
 
 	# Note, wrapping QEMU within a python script allow easy killing of the process.
 	# Otherwise we cannot simply use CTRL+C.
-	result = localCommand([str(args.emulator)] + emulatorArgs, stdout=True, stderr=True, timeoutS=None)
+	# The emulator keeps running after the target exits, stop it once the exit code is reported.
+	# LINE mode ensures the complete exit code is received before the process is terminated.
+	cancellation = Cancellation()
+	maybeExitCode: typing.Optional[int] = None
+
+	def handleLine(line: str, stream: typing.TextIO) -> None:
+		global maybeExitCode
+		print(line, file=stream, flush=True)
+		m = EXIT_CODE_PATTERN.search(line)
+		if m is not None:
+			maybeExitCode = int(m.group(1))
+			cancellation.cancel()
+
+	stdout = StreamCallback(callback=lambda line: handleLine(line, sys.stdout), mode=StreamCallback.Mode.LINE)
+	stderr = StreamCallback(callback=lambda line: handleLine(line, sys.stderr), mode=StreamCallback.Mode.LINE)
+	result = localCommand(
+		[str(args.emulator)] + emulatorArgs,
+		stdout=stdout,  # type: ignore
+		stderr=stderr,  # type: ignore
+		timeoutS=None,
+		ignoreFailure=True,
+		cancellation=cancellation,
+	)
 
 	# Try to decode the stack trace if any.
 	if args.binary:
 		tryDecodeBacktrace(args.binary, result.getOutput())
 
-	# Decode the exit code if any.
-	maybeExitCode = tryReadExitCode(result.getOutput())
 	if maybeExitCode is not None:
 		sys.exit(maybeExitCode)
 	sys.exit(42)
