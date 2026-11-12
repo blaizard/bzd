@@ -1,6 +1,19 @@
 load("@rules_rust//rust:defs.bzl", "rust_library")
 
 rust_library(
+    name = "camera",
+    srcs = [
+        "camera.rs",
+    ],
+    visibility = [
+        "//rust/interfaces:__pkg__",
+    ],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_library(
     name = "stream",
     srcs = [
         "stream.rs",
