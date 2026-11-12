@@ -19,7 +19,7 @@ export class LoggerBackendNode {
 		/// Pending flush, or null when no flush is scheduled.
 		this.flushPromise = null;
 
-		/// Register as a log backend at 'trace' level: receives all log entries (all levels including trace).
+		/// Register as a log backend at 'info' level: receives info, warning and error entries.
 		this.logger.addBackend("artifacts", (...args) => this.processor(...args), "info");
 
 		/// Flush the buffered entries periodically.

@@ -144,7 +144,7 @@ export class Node extends ArtifactsBase {
 	/// \param path The path to be used. This must be a list of path segments.
 	/// \param children The number of children depth level to be included.
 	/// \param include The given path to be included. A list of list of path segments.
-	/// \param metadata Include metadata with each values.
+	/// \param metadata Include metadata with each value.
 	/// \param fresh If true, only return the entries that have not expired yet, otherwise all entries are returned.
 	async get({
 		remote,

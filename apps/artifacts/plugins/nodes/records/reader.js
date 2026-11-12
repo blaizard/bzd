@@ -131,7 +131,7 @@ export default class RecordsReader {
 	/// \param storageName The storage to read from.
 	/// \param tick Initial tick.
 	///
-	/// \return A tuple, containing the list of payload previously stored, and the next tick.
+	/// \return The list of payloads from the given tick onward.
 	///         In case there are no new payloads, null is returned.
 	async _readStorageByChunk(storageName, tick) {
 		/// Return null if the tick is null, to ease looping in _readStorage.

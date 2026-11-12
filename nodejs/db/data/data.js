@@ -120,7 +120,7 @@ export default class Data {
 	/// \param children The number of children to reach.
 	/// \param includeInner If true, the inner nodes are included, otherwise only the leaf nodes.
 	///
-	/// \return A dictionary of keys, or null if the key is not part of the tree.
+	/// \return A list of key entries (with `internal` and `leaf` fields), or null if the key is not part of the tree.
 	async getKeys_(uid, key, children, includeInner = true) {
 		const data = await this.getTree_(uid, key);
 		if (data === null) {
@@ -541,8 +541,8 @@ export default class Data {
 
 	/// Get direct children of a given key.
 	///
-	/// \return A dictionary which keys are the name of the children and value a boolean describing if
-	///         the data is nested of a leaf.
+	/// \return A list of children, each with its relative `key` and a `leaf` boolean, or null if the key is
+	///         not part of the tree.
 	async getChildren({ uid, key, children, includeInner }) {
 		const data = await this.getKeys_(uid, key, children, includeInner);
 		if (data === null) {
