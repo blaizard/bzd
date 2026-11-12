@@ -32,6 +32,7 @@ def unix():
         "tools": {
             "clang_format": "clang_format",
             "clang_tidy": "clang_tidy",
+            "libclang": "libclang",
             "llvm_symbolizer": "llvm_symbolizer",
             "package": "package",
         },

@@ -1,0 +1,44 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/interfaces:camera",
+    ],
+)
+
+rust_library(
+    name = "nokhwa",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_std_camera_nokhwa",
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/interfaces:camera",
+        "@crates_std//:nokhwa",
+    ],
+)
+
+rust_test(
+    name = "nokhwa_test",
+    crate = ":nokhwa",
+    target_compatible_with = select({
+        "@bzd_platforms//al:linux": [],
+        "@bzd_platforms//al:osx": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)

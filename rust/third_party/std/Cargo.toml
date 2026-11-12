@@ -8,6 +8,12 @@ version = "0.0.0"
 edition = "2024"
 publish = false
 
+[target.'cfg(target_os = "linux")'.dependencies]
+nokhwa = { version = "0.10.11", default-features = false, features = ["decoding", "input-v4l"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+nokhwa = { version = "0.10.11", default-features = false, features = ["decoding", "input-avfoundation"] }
+
 [dependencies]
 critical-section = { version = "1.2.0", features = ["std"] }
 embassy-executor = { version = "0.10.0", features = ["executor-thread", "platform-std"] }

@@ -10,4 +10,17 @@ crates_std.from_cargo(
     cargo_lockfile = "//rust/third_party/std:Cargo.lock",
     manifests = ["//rust/third_party/std:Cargo.toml"],
 )
+
+# `v4l2-sys-mit` runs bindgen at build time; point it at the libclang shipped
+# with the registered clang toolchain.
+crates_std.annotation(
+    build_script_data = ["@clang//:libclang"],
+    build_script_env = {
+        "LIBCLANG_PATH": "$(execpath @clang//:libclang)",
+    },
+    crate = "v4l2-sys-mit",
+    label_injections = {
+        "@clang": "@clang",
+    },
+)
 use_repo(crates_std, "crates_std")

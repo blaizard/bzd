@@ -8,3 +8,8 @@ filegroup(
         "lib/clang/17/include/**/*",
     ]),
 )
+
+filegroup(
+    name = "libclang",
+    srcs = ["lib/libclang.so"],
+)

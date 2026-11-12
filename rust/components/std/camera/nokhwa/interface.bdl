@@ -1,0 +1,14 @@
+use "rust/interfaces/camera.bdl"
+
+namespace bzd.components.std.camera;
+
+
+component Nokhwa : bzd.Camera {
+config:
+	device = Integer [min(0)];
+	
+interface:
+	
+}
+
+
