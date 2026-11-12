@@ -71,7 +71,7 @@ export default class Database {
 			if (records.length <= 1) {
 				throw Exception.fromError(e, "Unable to write record: {:?}", records[0]);
 			}
-			Log.warning("Writing {} records failed ({}), bisecting.", records.length, e.message);
+			Log.warning("Writing {} records failed ({}), bisecting (nothing is lost).", records.length, e.message);
 			const middle = Math.floor(records.length / 2);
 			await this.onRecordsBisect(records.slice(0, middle));
 			await this.onRecordsBisect(records.slice(middle));
