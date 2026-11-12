@@ -46,6 +46,14 @@ const fieldToKey = {
 	"|x5fa": ["_a"],
 	"a_b._c": ["a_b", "_c"],
 	"a|x5cb": ["a\\b"],
+	"a|x7cx2eb": ["a|x2eb"],
+	"|x7cx5fa": ["|x5fa"],
+	"|x5fa|x7cx2eb": ["_a|x2eb"],
+	"|xe6|x97|xa5|xe6|x9c|xac": ["日本"],
+	"a|xc2|xa0b": ["a\u00a0b"],
+	"a|xe2|x80|xa8b": ["a\u2028b"],
+	"a|x00b": ["a\u0000b"],
+	"|xf0|x9f|x9a|x80": ["🚀"],
 };
 
 describe("Influxdb", () => {

@@ -75,19 +75,19 @@ export default class DatabaseInfluxDB extends Database {
 
 	/// Convert a key to a field.
 	///
-	/// Here are some restrictions:
-	/// - You cannot use a comma ,.
-	/// - No Leading Underscores.
-	/// - Avoid Special Characters.
-	/// - Avoid \ to avoid escaping complexity.
+	/// Only printable ASCII characters that do not conflict with the field
+	/// encoding or the line protocol are kept as-is. Everything else is escaped
+	/// as UTF-8 bytes using `|xHH`.
 	static fromKeyToField(key) {
+		const escape = (character) => {
+			const code = character.charCodeAt(0);
+			return code < 0x80
+				? "|x" + code.toString(16).padStart(2, "0")
+				: Buffer.from(character, "utf8").toString("hex").replace(/(..)/g, "|x$1");
+		};
+
 		return key
-			.map((part) =>
-				part.replace(/[\s"',=\.\\]/g, (char) => {
-					const hexValue = char.charCodeAt(0).toString(16).padStart(2, "0");
-					return "|x" + hexValue;
-				}),
-			)
+			.map((part) => part.replace(/[^\x21-\x7e]|["',.=\\|]/gu, escape))
 			.join(".")
 			.replace(/^_/, "|x5f");
 	}
@@ -107,11 +107,17 @@ export default class DatabaseInfluxDB extends Database {
 
 	/// Convert a field to a key.
 	static fromFieldToKey(field) {
-		return field.split(".").map((part) =>
-			part.replace(/\|x([0-9a-fA-F]{2})/g, (match, hex) => {
-				return String.fromCharCode(parseInt(hex, 16));
-			}),
-		);
+		return field.split(".").map((part) => {
+			const buffers = [];
+			let index = 0;
+			for (const match of part.matchAll(/\|x([0-9a-fA-F]{2})/g)) {
+				buffers.push(Buffer.from(part.slice(index, match.index), "utf8"));
+				buffers.push(Buffer.from([parseInt(match[1], 16)]));
+				index = match.index + match[0].length;
+			}
+			buffers.push(Buffer.from(part.slice(index), "utf8"));
+			return Buffer.concat(buffers).toString("utf8");
+		});
 	}
 
 	/// Convert a value coming from the database to an actual value.
