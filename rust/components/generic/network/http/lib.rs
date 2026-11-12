@@ -9,7 +9,7 @@ pub use rust_components_generic_network_http_interface::{
 };
 
 use bzd::base::error::Error;
-use bzd_http::{Request, ResponseInfo, Scheme};
+use bzd_http::{Host, Request, ResponseInfo, Scheme};
 use core::net::SocketAddr;
 use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rust_interfaces_dns::BzdNetworkDnsInterface;
@@ -47,8 +47,12 @@ where
 {
     async fn send(&self, request: Request<'_>, buffer: &mut [u8]) -> Result<ResponseInfo, Error> {
         let url = request.url();
+        let host = url.host();
         let address = SocketAddr::new(
-            self.context.dns.lock().await.resolve(url.host()).await?,
+            match host {
+                Host::Ip(ip) => ip,
+                Host::Domain(domain) => self.context.dns.lock().await.resolve(domain).await?,
+            },
             url.port(),
         );
 
@@ -57,16 +61,21 @@ where
                 let mut stream = self.context.tcp.lock().await.connect(address).await?;
                 request.send(&mut stream, buffer).await
             }
-            Scheme::Https => {
-                let mut stream = self
-                    .context
-                    .tls
-                    .lock()
-                    .await
-                    .connect(address, url.host())
-                    .await?;
-                request.send(&mut stream, buffer).await
-            }
+            Scheme::Https => match host {
+                Host::Domain(domain) => {
+                    let mut stream = self
+                        .context
+                        .tls
+                        .lock()
+                        .await
+                        .connect(address, domain)
+                        .await?;
+                    request.send(&mut stream, buffer).await
+                }
+                Host::Ip(_) => Err(bzd::base::error::failure!(
+                    "http: TLS requires a domain name, not an IP literal"
+                )),
+            },
         }
     }
 }

@@ -12,7 +12,7 @@
 mod error;
 pub mod url;
 
-pub use url::{Scheme, Url};
+pub use url::{Host, Scheme, Url};
 
 use bzd::base::error::Error;
 use bzd::base::stream::{EmbeddedStream, IOStream};
@@ -201,6 +201,7 @@ mod tests {
     use crate::error::map_error;
     use bzd::base::error::{Error, ErrorType};
     use bzd::base::stream::{IStream, OStream};
+    use core::net::{IpAddr, Ipv4Addr};
 
     struct MockStream {
         input: &'static [u8],
@@ -271,6 +272,31 @@ mod tests {
                 .output()
                 .windows(b"X-Test: 1\r\n".len())
                 .any(|window| window == b"X-Test: 1\r\n"),
+            true
+        )?;
+        Ok(())
+    }
+
+    #[test]
+    async fn test_ip_literal() -> TestResult {
+        let mut stream = MockStream::new(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
+        let mut buffer = [0u8; 256];
+        let request = Request::get("http://10.0.0.1/hello")?;
+        assert_eq!(
+            request.url().host(),
+            Host::Ip(IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)))
+        )?;
+        let response = request.send(&mut stream, &mut buffer).await?;
+        assert_eq!(response.status, 200)?;
+        assert_eq!(
+            stream.output().starts_with(b"GET /hello HTTP/1.1\r\n"),
+            true
+        )?;
+        assert_eq!(
+            stream
+                .output()
+                .windows(b"Host: 10.0.0.1\r\n".len())
+                .any(|window| window == b"Host: 10.0.0.1\r\n"),
             true
         )?;
         Ok(())
