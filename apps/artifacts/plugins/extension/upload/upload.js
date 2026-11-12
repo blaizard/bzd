@@ -6,11 +6,12 @@ import { timestampMs } from "#bzd/nodejs/utils/timestamp.js";
 
 export default function extensionUpload(plugin, options, provider, endpoints) {
 	for (const [path, uploadOptions] of Object.entries(options["upload"] || {})) {
+		const limit = uploadOptions.limit || 20 * 1024 * 1024; // 20 MB
 		endpoints.register(
 			"put",
 			path + "/{path:*}",
 			async (context) => {
-				const body = context.getBody();
+				const body = context.getBodyStream(limit);
 				const storage = plugin.getStorage();
 				let fullPath = pathlib.path(path).joinPath(context.getParam("path"));
 
@@ -23,7 +24,7 @@ export default function extensionUpload(plugin, options, provider, endpoints) {
 					fullPath = fullPath.parent.joinPath(renamed);
 				}
 
-				await storage.writeFromChunk(fullPath, body);
+				await storage.write(fullPath, body);
 
 				// If only the last X files should be kept.
 				if ("rolling" in uploadOptions) {
@@ -34,7 +35,8 @@ export default function extensionUpload(plugin, options, provider, endpoints) {
 				context.sendStatus(200);
 			},
 			{
-				limit: uploadOptions.limit || 20 * 1024 * 1024, // 20 MB
+				type: [],
+				limit,
 				timeoutS: 30 * 60, // 30 min
 			},
 		);
