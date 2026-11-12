@@ -26,8 +26,12 @@ pub mod tests {
 }
 
 /// Create a failure error at the caller's location for use in `assert_eq!`.
+//
+// Keep this out of line: inlining the failure path makes LLVM 21 crash on
+// Xtensa with LTO and `-C opt-level=z` (llvm/llvm-project#227826).
 #[doc(hidden)]
 #[track_caller]
+#[inline(never)]
 pub fn assert_failed(message: &'static str) -> bzd::base::error::Error {
     bzd::base::error::Error::with_message(bzd::base::error::ErrorType::Failure, message)
 }
