@@ -38,7 +38,7 @@ const auto result = bzd::fromString(input, "{}:{:d}"_csv, month, year);
 matching against the keys of a sorted collection without scanning it linearly.
 
 ```c++
-bzd::Map<bzd::String<8>, bzd::UInt8> map{...};
+bzd::Map<bzd::String<8>, bzd::UInt8, 8> map{...};
 ToSortedRangeOfRanges sorted{map};
 const auto result = bzd::fromString(input, "{:?}"_csv, sorted); // lazy matching
 if (result && sorted.value() != bzd::end(map))

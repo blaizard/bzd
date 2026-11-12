@@ -51,7 +51,7 @@ Piped data can be of arbitrary type but the final substituted value must be a nu
 
 ### Builtin utility functions
 
-- `btl.merge`: merge different types together, ex: `btl.merge(a, b, c)`
+- `btl.merge`: merge containers of the same type together, ex: `btl.merge(a, b, c)`
 - `btl.set`: create a set from inputs passed into arguments, ex: `btl.set(a, b, c)`
 - `btl.any`: checks that any of the arguments evaluates to `true`, ex: `btl.any(a, b, c)`
 - `btl.all`: checks that all of the arguments evaluate to `true`, ex: `btl.all(a, b, c)`
