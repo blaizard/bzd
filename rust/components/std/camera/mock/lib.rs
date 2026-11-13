@@ -29,7 +29,7 @@ impl BzdCameraInterface for BzdComponentsStdCameraMock {
         Ok(Frame::new(
             WIDTH,
             HEIGHT,
-            RuntimeFormat::Mjpeg { data: IMAGE },
+            RuntimeFormat::Jpeg { data: IMAGE },
         ))
     }
 }
@@ -48,7 +48,7 @@ mod tests {
         assert_eq!(frame.width, WIDTH)?;
         assert_eq!(frame.height, HEIGHT)?;
         match frame.data {
-            RuntimeFormat::Mjpeg { data } => {
+            RuntimeFormat::Jpeg { data } => {
                 assert!(data.len() > 4);
                 assert_eq!(&data[..2], &[0xFF, 0xD8])?;
                 assert_eq!(&data[data.len() - 2..], &[0xFF, 0xD9])?;

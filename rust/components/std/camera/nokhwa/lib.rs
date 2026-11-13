@@ -93,7 +93,7 @@ fn map_runtime_format<'a>(
     width: usize,
 ) -> RuntimeFormat<'a> {
     match format {
-        NokhwaFrameFormat::MJPEG => RuntimeFormat::Mjpeg { data },
+        NokhwaFrameFormat::MJPEG => RuntimeFormat::Jpeg { data },
         NokhwaFrameFormat::YUYV => RuntimeFormat::Yuyv {
             data,
             stride: width.saturating_mul(2),
@@ -141,10 +141,10 @@ mod tests {
     use bzd::base::error::ErrorType as BzdErrorType;
 
     #[test]
-    fn test_map_mjpeg() -> TestResult {
+    fn test_map_jpeg() -> TestResult {
         let data = [0u8, 1, 2];
         match map_runtime_format(NokhwaFrameFormat::MJPEG, &data, 4) {
-            RuntimeFormat::Mjpeg { data: slice } => {
+            RuntimeFormat::Jpeg { data: slice } => {
                 assert_eq!(slice, &data[..])?;
             }
             _ => return Err(bzd::base::error::failure!("unexpected format")),

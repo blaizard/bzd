@@ -24,11 +24,25 @@ impl<Data> Frame<Data> {
     }
 }
 
+/// A JPEG-compressed frame payload.
+#[derive(Clone, Copy)]
+pub struct JpegFormat<'a> {
+    /// The compressed JPEG bytes.
+    pub data: &'a [u8],
+}
+
+impl<'a> JpegFormat<'a> {
+    /// Creates a new JPEG payload.
+    pub fn new(data: &'a [u8]) -> Self {
+        Self { data }
+    }
+}
+
 /// Runtime description of a captured frame payload.
 #[derive(Clone, Copy)]
 pub enum RuntimeFormat<'a> {
-    /// Motion-JPEG compressed frame.
-    Mjpeg { data: &'a [u8] },
+    /// JPEG-compressed frame.
+    Jpeg { data: &'a [u8] },
     /// Packed YUYV 4:2:2.
     Yuyv { data: &'a [u8], stride: usize },
     /// NV12: a Y plane followed by an interleaved UV plane.
