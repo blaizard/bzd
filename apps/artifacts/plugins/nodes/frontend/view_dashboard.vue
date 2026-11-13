@@ -46,6 +46,7 @@
 	import Base from "#bzd/apps/artifacts/plugins/base.vue";
 	import Component from "#bzd/nodejs/vue/components/layout/component.vue";
 	import ViewGraph from "#bzd/apps/artifacts/plugins/nodes/frontend/view_graph.vue";
+	import ViewImage from "#bzd/apps/artifacts/plugins/nodes/frontend/view_image.vue";
 	import ViewLog from "#bzd/apps/artifacts/plugins/nodes/frontend/view_log.vue";
 	import Form from "#bzd/nodejs/vue/components/form/form.vue";
 	import Utils from "#bzd/apps/artifacts/common/utils.js";
@@ -344,6 +345,8 @@
 						return ViewGraph;
 					case "bar":
 						return ViewGraph;
+					case "image":
+						return ViewImage;
 					case "log":
 						return ViewLog;
 				}

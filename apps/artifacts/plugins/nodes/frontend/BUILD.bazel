@@ -20,6 +20,7 @@ bzd_nodejs_library(
         "view.vue",
         "view_dashboard.vue",
         "view_graph.vue",
+        "view_image.vue",
         "view_log.vue",
     ],
     packages = [
@@ -27,6 +28,7 @@ bzd_nodejs_library(
         "@nodejs_deps//:chartjs-adapter-date-fns",
         "@nodejs_deps//:chartjs-plugin-zoom",
         "@nodejs_deps//:date-fns",
+        "@nodejs_deps//:thumbhash",
     ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",

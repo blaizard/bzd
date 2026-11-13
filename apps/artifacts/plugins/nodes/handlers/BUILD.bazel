@@ -5,7 +5,16 @@ bzd_nodejs_library(
     srcs = [
         "image.js",
     ],
+    packages = [
+        "@nodejs_deps//:jimp",
+        "@nodejs_deps//:thumbhash",
+    ],
     visibility = [
         "//apps/artifacts/plugins:__subpackages__",
+    ],
+    deps = [
+        "//apps/artifacts/plugins/nodes:files",
+        "//nodejs/core:exception",
+        "//nodejs/core:stream",
     ],
 )

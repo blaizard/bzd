@@ -1,0 +1,18 @@
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_test")
+
+bzd_nodejs_test(
+    name = "image",
+    srcs = ["image_test.js"],
+    main = "image_test.js",
+    packages = [
+        "@nodejs_deps//:jimp",
+        "@nodejs_deps//:thumbhash",
+    ],
+    deps = [
+        "//apps/artifacts/plugins/nodes:files",
+        "//apps/artifacts/plugins/nodes/handlers:image",
+        "//nodejs/core:exception",
+        "//nodejs/core:stream",
+        "//nodejs/db/data/handlers",
+    ],
+)

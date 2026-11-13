@@ -222,7 +222,13 @@ export default class Plugin extends PluginBase {
 				};
 			}
 
-			const handlers = new Handlers(optionsHandlers, { history: 10 }, { image: () => new ImageHandler() });
+			const handlers = new Handlers(
+				optionsHandlers,
+				{ history: 10 },
+				{
+					image: (options) => new ImageHandler(options ?? {}),
+				},
+			);
 			this.nodes = new Nodes(handlers, this.fileStore, optionsNodes);
 			for (const [uid, data] of Object.entries(options["nodes.data"] || {})) {
 				await this.nodes.insert({ uid: uid, key: ["data"], value: data });
@@ -341,10 +347,23 @@ export default class Plugin extends PluginBase {
 		if (optionsFilestore) {
 			const limit = optionsFilestore.limit || 20 * 1024 * 1024;
 
+			/// Extract metadata from headers prefixed with `bzd-metadata-`.
+			function getMetadataFromHeaders(context) {
+				const prefix = "bzd-metadata-";
+				const metadata = {};
+				for (const [name, value] of Object.entries(context.getHeaders())) {
+					if (name.startsWith(prefix)) {
+						metadata[name.slice(prefix.length)] = Array.isArray(value) ? value[0] : value;
+					}
+				}
+				return metadata;
+			}
+
 			/// Upload a file and store it as a time-series entry.
 			///
 			/// POST <endpoint>/@file/<uid>/<path:*>
 			/// The body is the raw content of the file.
+			/// Headers prefixed with `bzd-metadata-` are stored as file metadata.
 			endpoints.register(
 				"post",
 				"/@file/{path:*}",
@@ -358,6 +377,7 @@ export default class Plugin extends PluginBase {
 							stream: context.getBodyStream(limit),
 							mime: context.getHeader("content-type", "application/octet-stream"),
 							filename: context.getQuery("filename", null, String),
+							metadata: getMetadataFromHeaders(context),
 						}),
 						timestamp,
 						isAbsoluteTimestamp: true,
