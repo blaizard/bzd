@@ -75,6 +75,9 @@ ConfigValue = typing.Callable[[], typing.Any]
 		if "secret" in data.metadata:
 			value = f"decrypt({value})"
 			returnType = "str"
+		if "embed" in data.metadata:
+			value = f"pathFromRLocation({value}).read_bytes()"
+			returnType = "bytes"
 
 		processed[key] = (value, returnType)
 

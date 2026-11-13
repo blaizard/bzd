@@ -25,6 +25,9 @@ def _update_from_target(attr, runfiles, data):
         data = depset(transitive = [data, attr_data])
     return [file, runfiles, data]
 
+def _isConfigFile(file):
+    return file.basename.endswith(".json") or file.basename.endswith(".yaml") or file.basename.endswith(".yml")
+
 def _bzd_config_flag_impl(ctx):
     return BuildSettingInfo(value = ctx.build_setting_value)
 
@@ -50,16 +53,18 @@ def _bzd_config_impl(ctx):
     # Handle files at a given key.
     if ctx.attr.srcs_at:
         for key, target in ctx.attr.srcs_at.items():
-            # Handle secrets.
-            if ConfigSourceInfo in target:
-                args.add("--src-at", json.encode([key, target[ConfigSourceInfo].file.path, target[ConfigSourceInfo].metadata]))
-                input_files.append(target[ConfigSourceInfo].file)
+            metadata = target[ConfigSourceInfo].metadata if ConfigSourceInfo in target else []
+            [file, runfiles, data] = _update_from_target(target, runfiles, data)
+            rlocation = ctx.expand_location("$(rlocationpath {})".format(target.label), targets = [target])
 
-                # Handle other targets.
-            else:
-                [file, runfiles, data] = _update_from_target(target, runfiles, data)
-                args.add("--src-at", json.encode([key, file.path, []]))
-                input_files.append(file)
+            # merge.py reads file.path; embed entries store rlocation instead.
+            if "embed" in metadata or (not metadata and not _isConfigFile(file)):
+                metadata = ["embed"]
+                data = depset(direct = [file] + data.to_list())
+                runfiles = runfiles.merge(ctx.runfiles(files = [file]))
+
+            args.add("--src-at", json.encode([key, file.path, rlocation, metadata]))
+            input_files.append(file)
 
     # Handle inline values.
     for key, value in ctx.attr.values.items():

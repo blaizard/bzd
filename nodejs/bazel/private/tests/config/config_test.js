@@ -3,7 +3,7 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { stat } from "fs/promises";
 
-import { a, b, b_c, e, bin_hello_world } from "./config_nodejs.js";
+import { a, b, b_c, e, embed, bin_hello_world } from "./config_nodejs.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -23,5 +23,9 @@ describe("config", function () {
 
 		const { stdout } = await execFileAsync(binaryPath);
 		assert.strictEqual(stdout.trim(), "hello world");
+	});
+
+	it("embed", () => {
+		assert.deepStrictEqual(embed(), Buffer.from("hello\n"));
 	});
 });

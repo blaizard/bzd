@@ -50,6 +50,9 @@ if __name__ == "__main__":
 	content = """// This file was auto-generated.
 
 // @ts-ignore TS6133
+import * as fs from "fs";
+
+// @ts-ignore TS6133
 import { pathFromRLocation } from "#bzd/nodejs/utils/runfiles.js"
 // @ts-ignore TS6133
 import { decrypt } from "#bzd/nodejs/utils/secret.js"
@@ -73,6 +76,9 @@ type ConfigValue = () => unknown;
 		if "secret" in data.metadata:
 			value = f"decrypt({value})"
 			returnType = "string"
+		if "embed" in data.metadata:
+			value = f"fs.readFileSync(pathFromRLocation({value}))"
+			returnType = "Buffer"
 
 		processed[key] = (value, returnType)
 

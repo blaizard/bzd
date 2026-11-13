@@ -237,8 +237,11 @@ if __name__ == "__main__":
 
 	# - From files at a specified key.
 	for value in args.srcs_at:
-		keyStr, f, metadata = json.loads(value)
-		for subKeyStr, value, subMetadata, source in dataFromPath(pathlib.Path(f), mustBeDictionary=False):
+		keyStr, filePath, rlocation, metadata = json.loads(value)
+		if "embed" in metadata:
+			output.addKey(keyStr, rlocation, metadata=metadata, source="srcs_at", policy=UpdatePolicy.raiseOnConflict)
+			continue
+		for subKeyStr, value, subMetadata, source in dataFromPath(pathlib.Path(filePath), mustBeDictionary=False):
 			output.addKey(
 				f"{keyStr}.{subKeyStr}" if subKeyStr else keyStr,
 				value,

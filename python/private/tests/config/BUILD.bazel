@@ -13,6 +13,9 @@ bzd_config(
     data = [
         ":hello_world",
     ],
+    srcs_at = {
+        "embed": "embed.txt",
+    },
     values = {
         "bin.hello_world": "$(path :hello_world)",
     },
@@ -27,6 +30,7 @@ bzd_python_config(
         "b.c": "b_c",
         "bin.hello_world": "bin_hello_world",
         "e": "e",
+        "embed": "embed",
     },
 )
 
