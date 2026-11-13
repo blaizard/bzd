@@ -16,7 +16,6 @@ The implementation provides the following built-in types.
 | Float     | Represents a 32-bit floating-point value.                                                       |
 | Byte      | Type representing a byte.                                                                       |
 | String    | Type representing a string.                                                                     |
-| Span<T>   | A non-owning view over a contiguous sequence of values of type `T`.                             |
 | Result<T> | Templated type that contains either a value of type `T` or an error.                            |
 | Async<T>  | Templated type that contains an asynchronous promise returning a value of type `T` or an error. |
 | Array<T>  | A fixed length array of type `T`. Its capacity may be defined with contracts.                   |
