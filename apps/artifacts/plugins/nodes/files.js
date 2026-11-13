@@ -81,7 +81,14 @@ export class FileStore {
 	/// \param timestamp The timestamp in microseconds to be used in the filename.
 	async store({ uid, key, stream, mime: mimeType = null, metadata = {}, timestamp }) {
 		const extension = mime.extension(mimeType || "application/octet-stream") || "bin";
-		const directory = [uid, ...key];
+		const date = new Date(Number(timestamp) / 1000);
+		const directory = [
+			String(date.getUTCFullYear()).padStart(4, "0"),
+			String(date.getUTCMonth() + 1).padStart(2, "0"),
+			String(date.getUTCDate()).padStart(2, "0"),
+			uid,
+			...key,
+		];
 		let filename = String(timestamp) + "." + extension;
 		let counter = 0;
 		while (await this.storage.is([...directory, filename])) {
@@ -97,7 +104,7 @@ export class FileStore {
 
 		return {
 			...metadata,
-			$file: Utils.keyToPath([uid, ...key, filename]).slice(1),
+			$file: Utils.keyToPath(path).slice(1),
 		};
 	}
 

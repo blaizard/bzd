@@ -108,7 +108,7 @@ describe("Nodes", () => {
 			await fileStore.process(fragments, { uid: "uid01", timestamp: 123 });
 			Exception.assertEqual(fragments[0][1], {
 				hello: "world",
-				$file: "uid01/image/123.png",
+				$file: "1970/01/01/uid01/image/123.png",
 			});
 		});
 	});
