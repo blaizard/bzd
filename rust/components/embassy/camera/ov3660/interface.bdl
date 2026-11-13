@@ -1,0 +1,20 @@
+use "rust/interfaces/camera.bdl"
+
+namespace bzd.components.embassy.camera;
+
+
+component Ov3660 : bzd.Camera {
+config:
+	width = Integer(640) [min(2) max(2048)];
+	height = Integer(480) [min(2) max(1536)];
+	quality = Integer(12) [min(0) max(63)];
+	timeout_ms = Integer(5000) [min(1)];
+	xclk_mhz = Integer(20) [min(6) max(24)];
+	white_balance = Boolean(true);
+	
+interface:
+	method init() [init];
+	
+}
+
+

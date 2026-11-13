@@ -1,0 +1,60 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/interfaces:camera",
+    ],
+)
+
+rust_library(
+    name = "jpeg",
+    srcs = [
+        "jpeg.rs",
+    ],
+    crate_name = "rust_components_embassy_camera_ov3660_jpeg",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_test(
+    name = "jpeg_test",
+    crate = ":jpeg",
+)
+
+rust_library(
+    name = "ov3660",
+    srcs = [
+        "board.rs",
+        "dvp.rs",
+        "lib.rs",
+        "sccb.rs",
+        "sensor.rs",
+        "settings.rs",
+    ],
+    crate_name = "rust_components_embassy_camera_ov3660",
+    target_compatible_with = select({
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        ":jpeg",
+        "//rust/bzd",
+        "//rust/components/esp/hal",
+        "//rust/interfaces:camera",
+        "//rust/libs/embassy",
+        "//rust/libs/esp:rust",
+        "@crates//:static_cell",
+        "@crates_esp32s3//:esp-hal",
+    ],
+)
