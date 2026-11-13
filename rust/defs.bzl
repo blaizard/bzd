@@ -2,6 +2,7 @@
 
 load("@bzd_lib//:defs.bzl", "bzd_runner_factory")
 load("@rules_rust//rust:defs.bzl", "rust_common", rust_binary_original = "rust_binary", rust_test_original = "rust_test")
+load("//rust/private/config:config.bzl", _bzd_rust_config = "bzd_rust_config")
 
 _bzd_runner_rust_binary = bzd_runner_factory(is_test = False, providers = [rust_common.crate_info, rust_common.test_crate_info])
 _bzd_runner_rust_test = bzd_runner_factory(is_test = True, providers = [rust_common.crate_info, rust_common.test_crate_info])
@@ -55,3 +56,5 @@ rust_test = macro(
     },
     implementation = _rust_test_impl,
 )
+
+bzd_rust_config = _bzd_rust_config

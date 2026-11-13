@@ -1,0 +1,49 @@
+load("@bzd_lib//config:defs.bzl", "bzd_config")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "bzd_rust_config", "rust_test")
+
+bzd_config(
+    name = "config",
+    srcs_at = {
+        "data": "data.txt",
+        "group": "values.json",
+        "other": "//rust/private/config/tests/data:other.txt",
+    },
+    values = {
+        "a": "42",
+    },
+)
+
+bzd_rust_config(
+    name = "config_rust",
+    config = ":config",
+    expose = {
+        "a": "A",
+        "data": "DATA",
+        "group.b.c": "B_C",
+        "group.e": "E",
+        "other": "OTHER",
+    },
+    types = {
+        "a": "usize",
+        "data": "bytes",
+        "group.b.c": "bool",
+        "group.e": "f64",
+        "other": "bytes",
+    },
+)
+
+rust_library(
+    name = "lib",
+    srcs = [
+        "lib.rs",
+    ],
+    deps = [
+        ":config_rust",
+    ],
+)
+
+rust_test(
+    name = "test",
+    crate = ":lib",
+)

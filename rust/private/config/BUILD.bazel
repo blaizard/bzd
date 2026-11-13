@@ -1,0 +1,6 @@
+exports_files(
+    [
+        "config_generator.py",
+    ],
+    visibility = ["//visibility:public"],
+)
