@@ -1,0 +1,11 @@
+use "rust/interfaces/camera.bdl"
+
+namespace bzd.components.std.camera;
+
+
+component Mock : bzd.Camera {
+interface:
+	
+}
+
+

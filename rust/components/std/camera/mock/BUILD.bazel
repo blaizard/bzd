@@ -1,0 +1,63 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@bzd_lib//config:defs.bzl", "bzd_config_default")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+load("//rust:defs.bzl", "bzd_rust_config", "rust_test")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/interfaces:camera",
+    ],
+)
+
+bzd_config_default(
+    name = "config",
+    srcs_at = {
+        "image": "image.jpg",
+    },
+    values = {
+        "height": "480",
+        "width": "640",
+    },
+    visibility = ["//visibility:public"],
+)
+
+bzd_rust_config(
+    name = "config_rust",
+    config = ":config",
+    crate_name = "rust_components_std_camera_mock_config",
+    expose = {
+        "height": "HEIGHT",
+        "image": "IMAGE",
+        "width": "WIDTH",
+    },
+    types = {
+        "height": "usize",
+        "image": "bytes",
+        "width": "usize",
+    },
+)
+
+rust_library(
+    name = "mock",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_std_camera_mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":config_rust",
+        ":interface",
+        "//rust/bzd",
+        "//rust/interfaces:camera",
+    ],
+)
+
+rust_test(
+    name = "mock_test",
+    crate = ":mock",
+)
