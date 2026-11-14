@@ -1,0 +1,15 @@
+use "rust/interfaces/memory.bdl"
+
+namespace bzd.components.esp.memory;
+
+
+component Heap : bzd.Memory {
+config:
+	size = Integer [min(1) max(16777216)];
+	
+interface:
+	method init() [init];
+	
+}
+
+
