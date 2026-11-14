@@ -8,8 +8,9 @@ use core::mem::ManuallyDrop;
 use core::net::SocketAddr;
 use embedded_tls::pki::CertVerifier;
 use embedded_tls::{
-    Aes128GcmSha256, Certificate, CryptoProvider, CryptoRngCore, TlsClock, TlsConfig,
-    TlsConnection, TlsContext, TlsError, TlsVerifier,
+    Aes128GcmSha256, Certificate, CertificateEntryRef, CertificateRef, CertificateVerifyRef,
+    CryptoProvider, CryptoRngCore, TlsCipherSuite, TlsClock, TlsConfig, TlsConnection, TlsContext,
+    TlsError, TlsVerifier,
 };
 use interfaces_tcp::BzdNetworkTcpClientInterface;
 use rand_core::{CryptoRng, RngCore};
@@ -154,20 +155,99 @@ impl<S: IStream + OStream> Write for Transport<S> {
     }
 }
 
+/// Verifies the server certificate chain against any of the configured CA roots.
+struct MultiCertVerifier<'a> {
+    roots: &'a [Vec<u8>],
+    hostname: Option<String>,
+    verified: Option<CertVerifier<'a, Aes128GcmSha256, SystemClock, CERTIFICATE_SIZE>>,
+}
+
+impl<'a> MultiCertVerifier<'a> {
+    fn new(roots: &'a [Vec<u8>]) -> Self {
+        Self {
+            roots,
+            hostname: None,
+            verified: None,
+        }
+    }
+}
+
+impl TlsVerifier<Aes128GcmSha256> for MultiCertVerifier<'_> {
+    fn set_hostname_verification(&mut self, hostname: &str) -> Result<(), TlsError> {
+        self.hostname = Some(hostname.to_owned());
+        Ok(())
+    }
+
+    fn verify_certificate(
+        &mut self,
+        transcript: &<Aes128GcmSha256 as TlsCipherSuite>::Hash,
+        certificate: CertificateRef<'_>,
+    ) -> Result<(), TlsError> {
+        let mut matching = None;
+        for root in self.roots {
+            let mut verifier = CertVerifier::<Aes128GcmSha256, SystemClock, CERTIFICATE_SIZE>::new(
+                Certificate::X509(root.as_slice()),
+            );
+            if let Some(hostname) = &self.hostname {
+                verifier.set_hostname_verification(hostname)?;
+            }
+            if verifier
+                .verify_certificate(transcript, certificate_chain(&certificate)?)
+                .is_ok()
+            {
+                matching = Some(root.as_slice());
+                break;
+            }
+        }
+        let root = matching.ok_or(TlsError::InvalidCertificate)?;
+        // The certificate is verified again with the original chain, as the
+        // verifier keeps it to validate the handshake signature later.
+        let mut verifier = CertVerifier::<Aes128GcmSha256, SystemClock, CERTIFICATE_SIZE>::new(
+            Certificate::X509(root),
+        );
+        if let Some(hostname) = &self.hostname {
+            verifier.set_hostname_verification(hostname)?;
+        }
+        verifier.verify_certificate(transcript, certificate)?;
+        self.verified = Some(verifier);
+        Ok(())
+    }
+
+    fn verify_signature(&mut self, verify: CertificateVerifyRef) -> Result<(), TlsError> {
+        self.verified
+            .as_mut()
+            .ok_or(TlsError::InvalidCertificate)?
+            .verify_signature(verify)
+    }
+}
+
+/// Rebuilds the chain received from the server so it can be tried against several roots.
+fn certificate_chain<'a>(certificate: &CertificateRef<'a>) -> Result<CertificateRef<'a>, TlsError> {
+    let mut chain = CertificateRef::with_context(&[]);
+    for entry in &certificate.entries {
+        let entry = match entry {
+            CertificateEntryRef::X509(data) => CertificateEntryRef::X509(data),
+            CertificateEntryRef::RawPublicKey(key) => CertificateEntryRef::RawPublicKey(key),
+        };
+        chain.add(entry)?;
+    }
+    Ok(chain)
+}
+
 /// Crypto provider backed by the operating system RNG and the system clock.
 struct Provider<'a, R> {
     rng: R,
-    verifier: CertVerifier<'a, Aes128GcmSha256, SystemClock, CERTIFICATE_SIZE>,
+    verifier: MultiCertVerifier<'a>,
 }
 
 impl<'a, R> Provider<'a, R>
 where
     R: CryptoRngCore,
 {
-    fn new(rng: R, ca: &'a [u8]) -> Self {
+    fn new(rng: R, roots: &'a [Vec<u8>]) -> Self {
         Self {
             rng,
-            verifier: CertVerifier::new(Certificate::X509(ca)),
+            verifier: MultiCertVerifier::new(roots),
         }
     }
 }
@@ -223,15 +303,53 @@ impl TlsClock for SystemClock {
     }
 }
 
-fn pem_to_der(pem: &str) -> Result<Vec<u8>, Error> {
-    let (label, der) = pem_rfc7468::decode_vec(pem.as_bytes())
-        .map_err(|error| bzd::base::error::data!("invalid TLS CA certificate PEM: {error}"))?;
-    if label != "CERTIFICATE" {
+fn pem_to_der_bundle(pem: &str) -> Result<Vec<Vec<u8>>, Error> {
+    const BEGIN: &str = "-----BEGIN ";
+    const END: &str = "-----END ";
+    const CERTIFICATE: &str = "CERTIFICATE";
+
+    let mut certificates = Vec::new();
+    let mut remaining = pem;
+    while let Some(begin) = remaining.find(BEGIN) {
+        let document = &remaining[begin..];
+        let label_rest = &document[BEGIN.len()..];
+        let Some(label_end) = label_rest.find("-----") else {
+            return Err(bzd::base::error::data!(
+                "invalid TLS CA certificate PEM: malformed BEGIN marker"
+            ));
+        };
+        let label = &label_rest[..label_end];
+        if label != CERTIFICATE {
+            return Err(bzd::base::error::data!(
+                "unexpected TLS CA certificate PEM label: {label}"
+            ));
+        }
+        let Some(end) = document.find(END) else {
+            return Err(bzd::base::error::data!(
+                "invalid TLS CA certificate PEM: missing END marker"
+            ));
+        };
+        let end_rest = &document[end..];
+        let end_length = end_rest
+            .find('\n')
+            .map_or(end_rest.len(), |index| index + 1);
+        let document = &document[..end + end_length];
+        let (label, der) = pem_rfc7468::decode_vec(document.as_bytes())
+            .map_err(|error| bzd::base::error::data!("invalid TLS CA certificate PEM: {error}"))?;
+        if label != CERTIFICATE {
+            return Err(bzd::base::error::data!(
+                "unexpected TLS CA certificate PEM label: {label}"
+            ));
+        }
+        certificates.push(der);
+        remaining = &remaining[begin + end + end_length..];
+    }
+    if certificates.is_empty() {
         return Err(bzd::base::error::data!(
-            "unexpected TLS CA certificate PEM label: {label}"
+            "TLS CA certificate bundle is empty"
         ));
     }
-    Ok(der)
+    Ok(certificates)
 }
 
 fn map_tls_error(error: TlsError) -> Error {
@@ -262,16 +380,22 @@ where
             "TLS server name must not be empty"
         ));
     }
-    let ca = pem_to_der(ca_certificate)?;
+    let roots = pem_to_der_bundle(ca_certificate)?;
     let config = TlsConfig::new()
         .with_server_name(server_name)
         .enable_rsa_signatures();
-    let provider = Provider::new(OsRng, &ca);
+    let root_count = roots.len();
+    let provider = Provider::new(OsRng, &roots);
     let mut connection = OwnedConnection::new(Transport::new(transport));
     connection
         .open(TlsContext::new(&config, provider))
         .await
-        .map_err(map_tls_error)?;
+        .map_err(|error| match error {
+            TlsError::InvalidCertificate => bzd::base::error::data!(
+                "tls: certificate chain for '{server_name}' did not validate against any of the {root_count} configured CA roots"
+            ),
+            error => map_tls_error(error),
+        })?;
     Ok(TlsStream::new(connection))
 }
 
@@ -429,25 +553,112 @@ mod tests {
         Ok(())
     }
 
+    const CA_CERTIFICATE: &str = include_str!("testdata/ca_cert.pem");
+    const CHAIN_CERTIFICATE: &str = include_str!("testdata/chain_cert.pem");
+    const UNRELATED_CA_CERTIFICATE: &str = include_str!("testdata/rsa_ca_cert.pem");
+    const RSA_SERVER_CERTIFICATE: &str = include_str!("testdata/rsa_server_cert.pem");
+
+    fn certificate_chain_from(der: &[Vec<u8>]) -> Result<CertificateRef<'_>, Error> {
+        let mut chain = CertificateRef::with_context(&[]);
+        for certificate in der {
+            chain
+                .add(CertificateEntryRef::X509(certificate.as_slice()))
+                .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        }
+        Ok(chain)
+    }
+
     #[test]
-    fn test_pem_to_der_decodes_certificate() -> TestResult {
+    fn test_pem_to_der_bundle_decodes_certificates() -> TestResult {
         let pem = "-----BEGIN CERTIFICATE-----\nMAA=\n-----END CERTIFICATE-----\n";
-        assert_eq!(pem_to_der(pem)?, vec![0x30, 0x00])?;
+        assert_eq!(pem_to_der_bundle(pem)?, vec![vec![0x30, 0x00]])?;
+        let pem = "-----BEGIN CERTIFICATE-----\nMAA=\n-----END CERTIFICATE-----\n\
+                   -----BEGIN CERTIFICATE-----\nMAA=\n-----END CERTIFICATE-----\n";
+        assert_eq!(
+            pem_to_der_bundle(pem)?,
+            vec![vec![0x30, 0x00], vec![0x30, 0x00]]
+        )?;
         Ok(())
     }
 
     #[test]
-    fn test_pem_to_der_rejects_invalid_input() -> TestResult {
-        let error = pem_to_der("not a certificate").unwrap_err();
+    fn test_pem_to_der_bundle_rejects_invalid_input() -> TestResult {
+        let error = pem_to_der_bundle("not a certificate").unwrap_err();
         assert_eq!(error.error_type(), BzdErrorType::Data)?;
         Ok(())
     }
 
     #[test]
-    fn test_pem_to_der_rejects_unexpected_label() -> TestResult {
+    fn test_pem_to_der_bundle_rejects_unexpected_label() -> TestResult {
         let pem = "-----BEGIN PRIVATE KEY-----\nMAA=\n-----END PRIVATE KEY-----\n";
-        let error = pem_to_der(pem).unwrap_err();
+        let error = pem_to_der_bundle(pem).unwrap_err();
         assert_eq!(error.error_type(), BzdErrorType::Data)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_pem_to_der_bundle_rejects_empty_input() -> TestResult {
+        let error = pem_to_der_bundle("").unwrap_err();
+        assert_eq!(error.error_type(), BzdErrorType::Data)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_multi_cert_verifier_selects_matching_root() -> TestResult {
+        let mut bundle = String::from(UNRELATED_CA_CERTIFICATE);
+        bundle.push_str(CA_CERTIFICATE);
+        let roots = pem_to_der_bundle(&bundle)?;
+        let chain = pem_to_der_bundle(CHAIN_CERTIFICATE)?;
+        let transcript = <Aes128GcmSha256 as TlsCipherSuite>::Hash::default();
+        let mut verifier = MultiCertVerifier::new(&roots);
+        verifier
+            .set_hostname_verification("localhost")
+            .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        verifier
+            .verify_certificate(&transcript, certificate_chain_from(&chain)?)
+            .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_multi_cert_verifier_selects_rsa_root() -> TestResult {
+        let mut bundle = String::from(CA_CERTIFICATE);
+        bundle.push_str(UNRELATED_CA_CERTIFICATE);
+        let roots = pem_to_der_bundle(&bundle)?;
+        let chain = pem_to_der_bundle(RSA_SERVER_CERTIFICATE)?;
+        let transcript = <Aes128GcmSha256 as TlsCipherSuite>::Hash::default();
+        let mut verifier = MultiCertVerifier::new(&roots);
+        verifier
+            .set_hostname_verification("localhost")
+            .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        verifier
+            .verify_certificate(&transcript, certificate_chain_from(&chain)?)
+            .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_multi_cert_verifier_rejects_unknown_root() -> TestResult {
+        let roots = pem_to_der_bundle(UNRELATED_CA_CERTIFICATE)?;
+        let chain = pem_to_der_bundle(CHAIN_CERTIFICATE)?;
+        let transcript = <Aes128GcmSha256 as TlsCipherSuite>::Hash::default();
+        let mut verifier = MultiCertVerifier::new(&roots);
+        verifier
+            .set_hostname_verification("localhost")
+            .map_err(|error| bzd::base::error::failure!("unexpected TLS error: {error:?}"))?;
+        match verifier.verify_certificate(&transcript, certificate_chain_from(&chain)?) {
+            Err(TlsError::InvalidCertificate) => {}
+            Err(error) => {
+                return Err(bzd::base::error::failure!(
+                    "unexpected TLS error: {error:?}"
+                ))
+            }
+            Ok(()) => {
+                return Err(bzd::base::error::failure!(
+                    "expected certificate verification to fail"
+                ))
+            }
+        }
         Ok(())
     }
 

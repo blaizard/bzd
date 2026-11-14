@@ -19,6 +19,9 @@ rust_library(
     srcs = [
         "lib.rs",
     ],
+    compile_data = glob([
+        "testdata/**",
+    ]),
     crate_name = "rust_components_std_network_tls",
     target_compatible_with = select({
         "@bzd_platforms//al:linux": [],
