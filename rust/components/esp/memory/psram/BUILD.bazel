@@ -1,0 +1,42 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/interfaces:memory",
+    ],
+)
+
+rust_library(
+    name = "psram",
+    srcs = [
+        "lib.rs",
+    ],
+    crate_name = "rust_components_esp_memory_psram",
+    target_compatible_with = select({
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/bzd",
+        "//rust/components/esp/hal",
+        "//rust/interfaces:memory",
+        "//rust/libs/esp:rust",
+    ] + select({
+        "@bzd_platforms//al_isa:esp32-xtensa_lx6": [
+            "@crates_esp32//:critical-section",
+        ],
+        "@bzd_platforms//al_isa:esp32s3-xtensa_lx7": [
+            "@crates_esp32s3//:critical-section",
+        ],
+        "//conditions:default": [],
+    }),
+)
