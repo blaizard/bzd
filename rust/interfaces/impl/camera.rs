@@ -38,6 +38,12 @@ impl<'a> JpegFormat<'a> {
     }
 }
 
+impl<'a> From<JpegFormat<'a>> for RuntimeFormat<'a> {
+    fn from(value: JpegFormat<'a>) -> Self {
+        RuntimeFormat::Jpeg { data: value.data }
+    }
+}
+
 /// Runtime description of a captured frame payload.
 #[derive(Clone, Copy)]
 pub enum RuntimeFormat<'a> {

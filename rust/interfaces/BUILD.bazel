@@ -56,6 +56,17 @@ bdl_library(
 )
 
 bdl_library(
+    name = "memory",
+    srcs = [
+        "memory.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    implementation = {
+        "rust": "//rust/interfaces/impl:memory",
+    },
+)
+
+bdl_library(
     name = "network",
     srcs = [
         "network.bdl",

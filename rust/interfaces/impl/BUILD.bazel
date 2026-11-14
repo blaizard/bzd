@@ -65,6 +65,17 @@ rust_library(
 )
 
 rust_library(
+    name = "memory",
+    srcs = [
+        "memory.rs",
+    ],
+    visibility = ["//rust/interfaces:__pkg__"],
+    deps = [
+        "//rust/bzd",
+    ],
+)
+
+rust_library(
     name = "network",
     srcs = [
         "network.rs",
