@@ -31,32 +31,38 @@ PWDN and RESET are not wired on this board.
 ## Configuration
 
 ```bdl
+memory = bzd.components.esp.memory.Psram(size = 8 * 1024 * 1024);
 camera = bzd.components.embassy.camera.Ov3660(
-    width = 640,
-    height = 480,
-    quality = 12,
-    timeout_ms = 5000,
-    xclk_mhz = 20,
-    white_balance = true,
+    memory = memory,
+    width = 2048,
+    height = 1536,
+    timeout_ms = 10000,
 );
 ```
 
-Only the frame sizes listed in `settings.rs` are accepted, up to QXGA
-(2048×1536). The default VGA frame fits the internal-DRAM buffers used by this
-component.
+`memory` is required: use `Psram` for external PSRAM or `Heap` for the internal
+`esp-alloc` heap. The frame buffer is `2 * width * height`, clamped to the
+memory capacity.
 
-`xclk_mhz` defaults to 20 MHz. If the sensor does not stream reliably, try
-10 MHz, which is the value used by the `esp32s3-cam-async` OV3660 example.
+`xclk_mhz` defaults to 20 MHz; try 10 MHz if the sensor does not stream
+reliably. `white_balance` defaults to `true` and applies Espressif's Sunny
+preset to avoid a green cast on some modules.
 
-`white_balance` applies Espressif's manual Sunny white-balance preset, which
-avoids a green cast observed on some OV3660 modules. Set it to `false` to keep
-the sensor's automatic white balance.
+The hardware JPEG quality is automatic. The camera starts at the best quality
+and, if a frame is truncated before its EOI (possible at QXGA when the readout
+does not finish before the next frame), retries with a lower quality. On later
+captures it first tries one step better. The working value is kept in RAM for
+the component lifetime and resets on reboot or sleep.
+
+Only the sizes listed in `settings.rs` are accepted, up to QXGA (2048×1536).
 
 ## Limits
 
-- JPEG output only, returned as `JpegFormat`.
-- The DMA ring and frame buffer are 64 KiB each and live in internal DRAM.
-  Larger resolutions need larger constants or a PSRAM-backed buffer.
+- JPEG only, returned as `JpegFormat`.
+- The DMA ring (8 KiB) stays in internal DRAM.
+- The frame buffer comes from the configured `bzd.Memory`; large resolutions
+  need PSRAM.
+- `timeout_ms` bounds the whole capture, including quality retries.
 - The returned frame is valid until the next `capture`.
-- A `capture` future that is cancelled after the DMA transfer starts drops the
-  DMA ring; recreate the component in that case.
+- Cancelling a capture after the DMA starts drops the DMA ring; recreate the
+  component in that case.

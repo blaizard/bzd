@@ -57,7 +57,7 @@ impl Ov3660 {
         self.set_quality(quality)
     }
 
-    fn set_quality(&mut self, quality: u8) -> Result<(), Error> {
+    pub(crate) fn set_quality(&mut self, quality: u8) -> Result<(), Error> {
         self.sccb.write(COMPRESSION_CTRL07, quality & 0x3F)
     }
 

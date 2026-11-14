@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-//! Extracts one JPEG frame (SOI through EOI) from a byte stream.
+//! Extracts one JPEG frame (SOI through EOI) or detects a truncated stream.
 
 use bzd::base::error::Error;
 
@@ -10,9 +10,11 @@ pub struct JpegFramer<'a> {
     out: &'a mut [u8],
     offset: usize,
     complete: bool,
+    truncated: bool,
     state: State,
 }
 
+#[derive(Clone, Copy)]
 enum State {
     /// Looking for `FF D8`; `previous` carries the last byte across chunks.
     Scan {
@@ -44,6 +46,7 @@ impl<'a> JpegFramer<'a> {
             out,
             offset: 0,
             complete: false,
+            truncated: false,
             state: State::Scan { previous: 0 },
         }
     }
@@ -53,27 +56,66 @@ impl<'a> JpegFramer<'a> {
         self.complete.then_some(self.offset)
     }
 
+    /// Whether the frame ended before its EOI.
+    pub fn truncated(&self) -> bool {
+        self.truncated
+    }
+
+    /// Number of frame bytes extracted so far.
+    pub fn offset(&self) -> usize {
+        self.offset
+    }
+
     /// Feed bytes and return how many were consumed.
     pub fn feed(&mut self, bytes: &[u8]) -> Result<usize, Error> {
-        for (index, byte) in bytes.iter().copied().enumerate() {
+        let mut index = 0;
+        while index < bytes.len() {
             if self.complete {
                 return Ok(index);
             }
-            match &mut self.state {
+            match self.state {
                 State::Scan { previous } => {
-                    if *previous == 0xFF && byte == 0xD8 {
+                    let byte = bytes[index];
+                    if previous == 0xFF && byte == 0xD8 {
                         self.push(0xFF)?;
                         self.push(0xD8)?;
                         self.state = State::MarkerStart;
                     } else {
-                        *previous = byte;
+                        self.state = State::Scan { previous: byte };
+                    }
+                    index += 1;
+                }
+                // Entropy-coded data is the bulk of a JPEG frame. Copy runs up to
+                // the next marker as a slice to avoid a PSRAM store per byte.
+                State::Entropy => {
+                    let rest = &bytes[index..];
+                    match rest.iter().position(|&byte| byte == 0xFF) {
+                        Some(0) => {
+                            let byte = bytes[index];
+                            self.push(byte)?;
+                            self.step(byte)?;
+                            index += 1;
+                            if self.complete {
+                                return Ok(index);
+                            }
+                        }
+                        Some(position) => {
+                            self.push_slice(&rest[..position])?;
+                            index += position;
+                        }
+                        None => {
+                            self.push_slice(rest)?;
+                            return Ok(bytes.len());
+                        }
                     }
                 }
                 _ => {
+                    let byte = bytes[index];
                     self.push(byte)?;
                     self.step(byte)?;
+                    index += 1;
                     if self.complete {
-                        return Ok(index + 1);
+                        return Ok(index);
                     }
                 }
             }
@@ -90,6 +132,19 @@ impl<'a> JpegFramer<'a> {
         }
         self.out[self.offset] = byte;
         self.offset += 1;
+        Ok(())
+    }
+
+    fn push_slice(&mut self, bytes: &[u8]) -> Result<(), Error> {
+        let end = self.offset + bytes.len();
+        if end > self.out.len() {
+            return Err(bzd::base::error::failure!(
+                "OV3660: JPEG frame exceeds {} bytes",
+                self.out.len()
+            ));
+        }
+        self.out[self.offset..end].copy_from_slice(bytes);
+        self.offset = end;
         Ok(())
     }
 
@@ -165,7 +220,16 @@ impl<'a> JpegFramer<'a> {
         match code {
             0xD9 => self.complete = true,
             0xDA => self.state = State::LengthHigh { is_sos: true },
-            0xD0..=0xD7 | 0x01 | 0xD8 => self.state = State::MarkerStart,
+            0xD8 => {
+                // A second SOI before EOI means the current frame was truncated.
+                self.offset = self.offset.saturating_sub(2);
+                while self.offset > 2 && self.out[self.offset - 1] == 0xFF {
+                    self.offset -= 1;
+                }
+                self.truncated = true;
+                self.complete = true;
+            }
+            0xD0..=0xD7 | 0x01 => self.state = State::MarkerStart,
             _ => self.state = State::LengthHigh { is_sos: false },
         }
         Ok(())
@@ -214,6 +278,25 @@ mod tests {
     }
 
     #[test]
+    fn copies_long_entropy_runs() -> TestResult {
+        let mut input = [0x55u8; 1010];
+        input[..2].copy_from_slice(&[0xFF, 0xD8]); // SOI
+        input[2..8].copy_from_slice(&[0xFF, 0xDA, 0x00, 0x04, 0x00, 0x00]); // SOS header
+        input[1008..].copy_from_slice(&[0xFF, 0xD9]); // EOI
+
+        let mut out = [0u8; 1010];
+        let mut framer = JpegFramer::new(&mut out);
+        let mut consumed = 0;
+        for chunk in input.chunks(100) {
+            consumed += framer.feed(chunk)?;
+        }
+        assert_eq!(consumed, input.len())?;
+        assert_eq!(framer.length(), Some(input.len()))?;
+        assert_eq!(&out[..input.len()], &input)?;
+        Ok(())
+    }
+
+    #[test]
     fn skips_bytes_before_soi() -> TestResult {
         let mut input = [0x00, 0x11, 0x22];
         let mut out = [0u8; 128];
@@ -229,6 +312,29 @@ mod tests {
         let mut out = [0u8; 4];
         let mut framer = JpegFramer::new(&mut out);
         assert!(framer.feed(FRAME).is_err());
+        Ok(())
+    }
+
+    fn concatenated_frames(input: &mut [u8]) -> usize {
+        let truncated = &FRAME[..FRAME.len() - 2];
+        input[..truncated.len()].copy_from_slice(truncated);
+        input[truncated.len()..truncated.len() + FRAME.len()].copy_from_slice(FRAME);
+        truncated.len() + FRAME.len()
+    }
+
+    #[test]
+    fn stops_at_a_second_soi() -> TestResult {
+        let mut input = [0u8; FRAME.len() * 2];
+        let total = concatenated_frames(&mut input);
+        let truncated = FRAME.len() - 2;
+
+        let mut out = [0u8; 256];
+        let mut framer = JpegFramer::new(&mut out);
+        let consumed = framer.feed(&input[..total])?;
+        assert_eq!(consumed, truncated + 2)?;
+        assert_eq!(framer.truncated(), true)?;
+        assert_eq!(framer.length(), Some(truncated))?;
+        assert_eq!(&out[..truncated], &FRAME[..truncated])?;
         Ok(())
     }
 }

@@ -6,10 +6,21 @@ use esp_hal::dma::DmaRxStreamBuf;
 use esp_hal::lcd_cam::cam::{Camera, CameraTransfer};
 use rust_components_embassy_camera_ov3660_jpeg::JpegFramer;
 
+/// A truncated frame is detected this long after the last received byte.
+const IDLE_GAP_MS: u64 = 250;
+
 /// A camera streaming into a DMA ring, one JPEG frame at a time.
 pub struct DvpCamera {
     camera: Option<Camera<'static>>,
     ring: Option<DmaRxStreamBuf>,
+}
+
+/// Outcome of a capture attempt.
+pub struct Capture {
+    /// Number of bytes written to the frame buffer.
+    pub length: usize,
+    /// Whether the attempt ended without a complete JPEG frame.
+    pub truncated: bool,
 }
 
 impl DvpCamera {
@@ -20,8 +31,8 @@ impl DvpCamera {
         }
     }
 
-    /// Capture one complete JPEG frame into `frame`, returning its length.
-    pub async fn capture(&mut self, frame: &mut [u8], timeout_ms: u64) -> Result<usize, Error> {
+    /// Capture one JPEG frame into `frame`, returning its length.
+    pub async fn capture(&mut self, frame: &mut [u8], timeout_ms: u64) -> Result<Capture, Error> {
         let camera = self
             .camera
             .take()
@@ -54,15 +65,28 @@ async fn read_frame(
     mut transfer: CameraTransfer<'static, DmaRxStreamBuf>,
     frame: &mut [u8],
     timeout_ms: u64,
-) -> (Result<usize, Error>, Camera<'static>, DmaRxStreamBuf) {
+) -> (Result<Capture, Error>, Camera<'static>, DmaRxStreamBuf) {
     let mut framer = JpegFramer::new(frame);
     let started = Instant::now();
+    let mut last_data = started;
     let result = loop {
+        if framer.truncated() {
+            break Ok(Capture {
+                length: framer.offset(),
+                truncated: true,
+            });
+        }
         if let Some(length) = framer.length() {
-            break Ok(length);
+            break Ok(Capture {
+                length,
+                truncated: false,
+            });
         }
 
         let available = transfer.available_bytes();
+        if available > 0 {
+            last_data = Instant::now();
+        }
         let consumed = if available == 0 {
             0
         } else {
@@ -77,18 +101,30 @@ async fn read_frame(
         if framer.length().is_some() {
             continue;
         }
-        if started.elapsed().as_millis() > timeout_ms {
-            break Err(bzd::base::error::failure!(
-                "OV3660: JPEG frame capture timed out"
-            ));
-        }
         if transfer.is_done() && consumed == 0 {
-            break Err(bzd::base::error::failure!(
-                "OV3660: DMA stopped before a complete JPEG frame"
-            ));
+            break Ok(Capture {
+                length: framer.offset(),
+                truncated: true,
+            });
+        }
+        if framer.offset() > 0 && last_data.elapsed().as_millis() > IDLE_GAP_MS {
+            // The stream started but stopped without an EOI; this is the
+            // OV3660 frame-boundary truncation, detected before the next SOI.
+            break Ok(Capture {
+                length: framer.offset(),
+                truncated: true,
+            });
+        }
+        if started.elapsed().as_millis() > timeout_ms {
+            // Attempt budget exhausted (including no SOI at all).
+            break Ok(Capture {
+                length: framer.offset(),
+                truncated: true,
+            });
         }
         if consumed == 0 {
-            Timer::after(Duration::from_millis(1)).await;
+            // Poll often enough that the DMA cannot overrun the ring between wake-ups.
+            Timer::after(Duration::from_micros(100)).await;
         }
     };
 

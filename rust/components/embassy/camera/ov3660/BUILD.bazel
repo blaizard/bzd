@@ -10,6 +10,7 @@ bdl_library(
     visibility = ["//visibility:public"],
     deps = [
         "//rust/interfaces:camera",
+        "//rust/interfaces:memory",
     ],
 )
 
@@ -52,9 +53,9 @@ rust_library(
         "//rust/bzd",
         "//rust/components/esp/hal",
         "//rust/interfaces:camera",
+        "//rust/interfaces:memory",
         "//rust/libs/embassy",
         "//rust/libs/esp:rust",
-        "@crates//:static_cell",
         "@crates_esp32s3//:esp-hal",
     ],
 )
