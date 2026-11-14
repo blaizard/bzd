@@ -300,18 +300,9 @@
         "nodes": {
             "$refs": [
                 "apps/artifacts/backend/config.nodes.compute.json",
+                "apps/artifacts/backend/config.nodes.images.json",
                 "apps/artifacts/backend/config.nodes.log.json",
                 "apps/artifacts/backend/config.nodes.sensors.json"
-            ],
-            "nodes.dashboards": [
-                {
-                    "inputs": {
-                        "/picture": {}
-                    },
-                    "size": "large",
-                    "title": "Picture",
-                    "type": "image"
-                }
             ],
             "nodes.data": {
                 "testnode": {
@@ -350,14 +341,6 @@
                     "path": "./nodes.files",
                     "type": "disk",
                     "write": true
-                }
-            },
-            "nodes.handlers": {
-                "/picture": {
-                    "image": {
-                        "maxHeight": 1024,
-                        "maxWidth": 1024
-                    }
                 }
             },
             "type": "nodes"

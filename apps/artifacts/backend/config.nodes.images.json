@@ -1,0 +1,20 @@
+{
+    "nodes.dashboards": [
+        {
+            "inputs": {
+                "/data/image/{name}": {}
+            },
+            "size": "large",
+            "title": "Image",
+            "type": "image"
+        }
+    ],
+    "nodes.handlers": {
+        "/data/image": {
+            "image": {
+                "maxHeight": 1024,
+                "maxWidth": 1024
+            }
+        }
+    }
+}
