@@ -14,6 +14,24 @@ _compressionToArgs = {
 }
 
 
+def _escapeMtreeValue(value: typing.Union[str, pathlib.Path]) -> str:
+	"""Escape a value to be used in an mtree file.
+
+	Mtree fields are whitespace-delimited, therefore special characters must be escaped.
+
+	Args:
+		value: The value to be escaped.
+
+	Returns:
+		The escaped value.
+	"""
+
+	return "".join(
+		chr(byte) if 0x21 <= byte < 0x7F and byte not in (ord("\\"), ord("#")) else "\\{:03o}".format(byte)
+		for byte in os.fsencode(value)
+	)
+
+
 class Layers:
 	"""Represents the layers of the bundle, it keeps track of all layers and the files already added."""
 
@@ -54,7 +72,7 @@ class Mtree:
 		"""Add parent directories to a current path."""
 
 		while parent != pathlib.Path(".") and not self.layers.inCurrentLayer(parent):
-			self.mtree.append(f"./{parent} mode=0755 type=dir")
+			self.mtree.append(f"./{_escapeMtreeValue(parent)} mode=0755 type=dir")
 			self.layers.add(parent)
 			parent = parent.parent
 
@@ -64,7 +82,7 @@ class Mtree:
 		if path in self.layers:
 			return False
 		self.addParentDirectories(path.parent)
-		self.mtree.append(f"./{path} mode=0755 type=dir")
+		self.mtree.append(f"./{_escapeMtreeValue(path)} mode=0755 type=dir")
 		self.layers.add(path)
 		return True
 
@@ -75,9 +93,9 @@ class Mtree:
 			return
 		self.addParentDirectories(path.parent)
 		if os.access(path, os.X_OK):
-			self.mtree.append(f"./{path} mode=0755 type=file content={path.absolute()}")
+			self.mtree.append(f"./{_escapeMtreeValue(path)} mode=0755 type=file content={_escapeMtreeValue(path.absolute())}")
 		else:
-			self.mtree.append(f"./{path} mode=0644 type=file content={path.absolute()}")
+			self.mtree.append(f"./{_escapeMtreeValue(path)} mode=0644 type=file content={_escapeMtreeValue(path.absolute())}")
 		self.layers.add(path)
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
@@ -86,7 +104,7 @@ class Mtree:
 		if path in self.layers:
 			return
 		self.addParentDirectories(path.parent)
-		self.mtree.append(f"./{path} mode=0777 type=link link={target}")
+		self.mtree.append(f"./{_escapeMtreeValue(path)} mode=0777 type=link link={_escapeMtreeValue(target)}")
 		self.layers.add(path)
 
 	def toBytes(self) -> bytes:
