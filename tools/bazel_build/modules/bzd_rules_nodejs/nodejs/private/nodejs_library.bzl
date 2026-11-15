@@ -83,7 +83,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
         ctx: The context of the rule.
         packages: The packages to be installed.
         imports: Dictionary of imports to be added(name to path).
-        base_dir_name: The name of the directory where the node_modules should be located.
+        base_dir_name: The base name of the install directory.
 
     Returns:
         A struct containing the package.json file, the node_modules files and its runfiles path.
@@ -144,15 +144,15 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
     files = []
     links = {}
     for info in all_infos:
-        for alias, dep_canonical_name in info.deps.items():
-            if dep_canonical_name not in contents:
-                fail("Package '{}' depends on '{}' which is not part of the transitive closure.".format(info.canonical_name, dep_canonical_name))
+        for alias, dep in info.deps.items():
+            if dep.canonical_name not in contents:
+                fail("Package '{}' depends on '{}' which is not part of the transitive closure.".format(info.canonical_name, dep.canonical_name))
             _add_link(
                 ctx,
                 files,
                 links,
                 "{}/.store/{}/node_modules/{}".format(node_modules, info.canonical_name, alias),
-                "{}/.store/{}/pkg".format(node_modules, dep_canonical_name),
+                "{}/.store/{}/pkg".format(node_modules, dep.canonical_name),
             )
 
     # Top-level links.
@@ -177,7 +177,7 @@ def bzd_nodejs_layout_files(ctx, file_locations, base_dir_name, copy = False):
     Args:
         ctx: The context of the rule.
         file_locations: The files to be laid out.
-        base_dir_name: The name of the directory where the node_modules should be located.
+        base_dir_name: The base name of the install directory.
         copy: Whether to copy the files instead of symlinking them. Copies are required when Node
             resolves modules by their canonical path (without --preserve-symlinks), so that
             resolution stays rooted in this directory.
@@ -229,7 +229,7 @@ def bzd_nodejs_create_apis(ctx, apis, base_dir_name):
     Args:
         ctx: The context of the rule.
         apis: All the APIs to be merged.
-        base_dir_name: The name of the directory where the node_modules should be located.
+        base_dir_name: The base name of the install directory.
 
     Returns:
         The generated API file.
@@ -257,7 +257,7 @@ def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name
         packages: The packages to be installed.
         imports: Dictionary of imports to be added(name to path).
         apis: All the APIs to be merged.
-        base_dir_name: The name of the directory where the node_modules should be located.
+        base_dir_name: The base name of the install directory.
         copy_files: Whether to copy the files instead of symlinking them.
 
     Returns:

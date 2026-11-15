@@ -106,10 +106,6 @@ _vite_bundle = rule(
         "_build": attr.label(
             default = "@bzd_lib//settings/build",
         ),
-        "_metadata_json": attr.label(
-            default = Label("//nodejs/metadata:metadata_nodejs_web.json"),
-            allow_single_file = True,
-        ),
         "_vite_config": attr.label(
             default = Label("//toolchain/vite:vite.config.binary.js.template"),
             allow_single_file = True,

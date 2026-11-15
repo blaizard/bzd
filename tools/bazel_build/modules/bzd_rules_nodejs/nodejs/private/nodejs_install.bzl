@@ -35,22 +35,6 @@ def _bzd_nodejs_install_impl(ctx):
         copy_files = True,
     )
 
-    # --- Fill in the metadata
-
-    metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.json".format(ctx.label.name))
-    ctx.actions.run(
-        inputs = [setup.package_json, setup.api],
-        outputs = [metadata],
-        progress_message = "Generating manifest for {}".format(ctx.label),
-        mnemonic = "NodejsMetadata",
-        arguments = [
-            "--package_json",
-            setup.package_json.path,
-            metadata.path,
-        ],
-        executable = ctx.attr._metadata.files_to_run,
-    )
-
     # Return the providers (including outputs and dependencies)
     return [
         BzdNodeJsInstallInfo(
@@ -81,11 +65,6 @@ and the installation of the actual packages.
         ),
         "_json_merge": attr.label(
             default = Label("@bzd_lib//:json_merge"),
-            cfg = "exec",
-            executable = True,
-        ),
-        "_metadata": attr.label(
-            default = Label("//nodejs/metadata"),
             cfg = "exec",
             executable = True,
         ),

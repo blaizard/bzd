@@ -32,10 +32,6 @@ _COMMON_EXEC_ATTRS = {
         executable = True,
         cfg = "exec",
     ),
-    "_metadata_json": attr.label(
-        default = Label("//nodejs/metadata:metadata_nodejs.json"),
-        allow_single_file = True,
-    ),
 }
 
 def _bzd_nodejs_transition_impl(_settings, _attr):

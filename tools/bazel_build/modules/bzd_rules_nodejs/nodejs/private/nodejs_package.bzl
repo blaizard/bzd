@@ -13,7 +13,7 @@ BzdNodeJsPackageInfo = provider(
     "Provider for a single package",
     fields = {
         "canonical_name": "The canonical name of the package, ex: foo@1.0.0",
-        "deps": "Dictionary of dependency alias to canonical name.",
+        "deps": "Dictionary of dependency alias to package info.",
         "module_name": "The module name of the package, ex: foo",
         "srcs": "The files of the package.",
         "transitive_infos": "All transitive package infos (excluding itself).",
@@ -28,10 +28,10 @@ def _bzd_nodejs_package_impl(ctx):
     # Direct dependencies with their link alias, which may differ from the dependency module name
     # (npm aliases). This cannot be derived from `transitive_infos`, which only carries the closure.
     deps = {
-        module_name: dep[BzdNodeJsPackageInfo].canonical_name
-        for module_name, dep in ctx.attr.deps.items()
+        alias: dep[BzdNodeJsPackageInfo]
+        for alias, dep in ctx.attr.deps.items()
     }
-    dep_infos = [dep[BzdNodeJsPackageInfo] for dep in ctx.attr.deps.values()]
+    dep_infos = deps.values()
 
     return [DefaultInfo(files = srcs.transitive_files), BzdNodeJsPackageInfo(
         canonical_name = ctx.attr.canonical_name,
