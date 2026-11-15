@@ -111,59 +111,35 @@ class Mtree:
 		return "\n".join(self.mtree).encode() + b"\n"
 
 
-class PathCollection:
-	"""Represents a collection of paths, this is used to identify which file/directory should be copied and which should be symlinked."""
-
-	def __init__(self) -> None:
-		self.paths: typing.Set[pathlib.Path] = set()
-		self.path: typing.Optional[pathlib.Path] = None
-
-	def add(self, path: pathlib.Path) -> None:
-		self.paths.add(path)
-
-	def identifyPathAndSymlinks(self) -> typing.Tuple[pathlib.Path, typing.List[pathlib.Path]]:
-		"""Identify the actual path and the symlinks pointing to it."""
-
-		if self.path is None:
-			self.path = self._identifyPath(list(self.paths))
-		return self.path, sorted([p for p in self.paths if p != self.path])
-
-	@staticmethod
-	def _identifyPath(paths: typing.List[pathlib.Path]) -> pathlib.Path:
-		"""Given a list of paths, identify the actual path to be copied."""
-		if len(paths) != 1:
-			paths.sort(key=lambda p: (len(p.parts), str(p)))
-			# Look for the first non-symlink path, this is the actual file/directory. The rest are symlinks pointing to it.
-			for path in paths:
-				if not path.is_symlink():
-					return path
-		return paths[0]
-
-
 class TreeBuilder:
 	def __init__(self) -> None:
 		self.mtree: typing.Optional[Mtree] = None
 		self.entries: typing.Dict[pathlib.Path, str] = {}
-		self.files: typing.Dict[typing.Union[typing.Tuple[int, int], pathlib.Path], PathCollection] = {}
-		self.directories: typing.Dict[typing.Union[typing.Tuple[int, int], pathlib.Path], PathCollection] = {}
+		self.files: typing.List[pathlib.Path] = []
+		self.directories: typing.List[pathlib.Path] = []
 		self.links: typing.Dict[pathlib.Path, pathlib.Path] = {}
 
-	def _addEntry(self, path: pathlib.Path, data: typing.Any) -> None:
-		if path in self.entries and self.entries[path] != data:
-			raise Exception(
-				f"Duplicate entry for path '{path}' with different type, original entry: {self.entries[path]}, new entry: {data}"
-			)
+	def _addEntry(self, path: pathlib.Path, data: str) -> bool:
+		"""Register the type of a path, return whether it was added."""
+
+		if path in self.entries:
+			if self.entries[path] != data:
+				raise Exception(
+					f"Duplicate entry for path '{path}' with different type, original entry: {self.entries[path]}, new entry: {data}"
+				)
+			return False
 		self.entries[path] = data
+		return True
 
 	def addFile(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		self.files.setdefault(self._fileKey(path), PathCollection()).add(path)
-		self._addEntry(path, "file")
+		if self._addEntry(path, "file"):
+			self.files.append(path)
 
 	def addDirectory(self, path: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
-		self.directories.setdefault(self._fileKey(path), PathCollection()).add(path)
-		self._addEntry(path, "directory")
+		if self._addEntry(path, "directory"):
+			self.directories.append(path)
 
 	def addLink(self, path: pathlib.Path, target: pathlib.Path) -> None:
 		assert self.mtree is None, "Mtree already generated, cannot add new entry."
@@ -174,16 +150,6 @@ class TreeBuilder:
 	def addAbsoluteLink(self, path: pathlib.Path, targetPath: pathlib.Path) -> None:
 		target = self._linkFromPath(path, targetPath)
 		self.addLink(path, target)
-
-	@staticmethod
-	def _fileKey(path: pathlib.Path) -> typing.Union[typing.Tuple[int, int], pathlib.Path]:
-		"""Return a hashable key that uniquely identifies the underlying file."""
-
-		stat = path.stat()
-		# When st_ino == 0, inodes are not meaningful (for FAT/exFAT for example).
-		if stat.st_ino == 0:
-			return path.resolve()
-		return (stat.st_dev, stat.st_ino)
 
 	@staticmethod
 	def _linkFromPath(path: pathlib.Path, targetPath: pathlib.Path) -> pathlib.Path:
@@ -222,9 +188,7 @@ class TreeBuilder:
 		"""Generate the mtree content, this is a deterministic representation of the file system structure."""
 
 		# Set the directory entries, this ensure that parent directories are created before their content.
-		for collection in self.directories.values():
-			path, symlinks = collection.identifyPathAndSymlinks()
-
+		for path in self.directories:
 			if mtree.addDirectory(path):
 				for directoryPaths, filePaths, linkPaths in self._listDirectory(path):
 					for relative in directoryPaths:
@@ -238,17 +202,9 @@ class TreeBuilder:
 						else:
 							self.addLink(path / relative, target)
 
-			for symlink in symlinks:
-				target = self._linkFromPath(symlink, path)
-				mtree.addLink(symlink, target)
-
 		# Set the file entries.
-		for collection in self.files.values():
-			path, symlinks = collection.identifyPathAndSymlinks()
+		for path in self.files:
 			mtree.addFile(path)
-			for symlink in symlinks:
-				target = self._linkFromPath(symlink, path)
-				mtree.addLink(symlink, target)
 
 		# Set the link entries.
 		for symlink, target in self.links.items():
