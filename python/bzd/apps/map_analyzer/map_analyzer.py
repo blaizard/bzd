@@ -47,8 +47,8 @@ def generateBerkeleyConfig(
 	FLAG_SHF_EXECINSTR = 0x4
 
 	with open(filePath, "rb") as f:
-		elffile = ELFFile(f)  # type: ignore
-		for section in elffile.iter_sections():  # type: ignore
+		elffile = ELFFile(f)
+		for section in elffile.iter_sections():
 			if not section.name:
 				continue
 

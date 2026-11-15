@@ -13,7 +13,7 @@ class ConverterRawpy(Converter):
 	def tryConvert(self, path: pathlib.Path, outputFormat: OutputFormat, output: pathlib.Path) -> ConversionResult:
 		"""Attempt to convert the given file into the given format."""
 
-		with rawpy.imread(path.as_posix()) as raw:  # type: ignore
+		with rawpy.imread(path.as_posix()) as raw:
 			rgb = raw.postprocess(use_camera_wb=True, no_auto_bright=False, bright=1.0)
 
 		image = Image.fromarray(rgb)

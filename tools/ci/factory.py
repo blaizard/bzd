@@ -106,7 +106,7 @@ class Factory(ABC):
 			assert isinstance(item.get("name"), str), "Missing 'name' attribute, must be a string."
 			assert isinstance(item.get("commands"), list), "Missing 'commands' attribute, must be a list."
 			if item["category"] in configs:
-				config = configs[typing.cast(str, item["category"])]
+				config = configs[item["category"]]
 				# Check if not in excluded list.
 				if any(tag in item["tags"] for tag in config.exclude):
 					continue

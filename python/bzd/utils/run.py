@@ -241,7 +241,7 @@ def localCommand(
 					if not data:
 						# Unregister the stream if it is closed.
 						sel.unregister(key.fileobj)
-						activeStreams.discard(key.fileobj)  # type: ignore
+						activeStreams.discard(key.fileobj)
 					else:
 						(stream.addStdout if key.fileobj is proc.stdout else stream.addStderr)(data)
 

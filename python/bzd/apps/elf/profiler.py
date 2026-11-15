@@ -14,13 +14,13 @@ def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 	compilerList: List[str] = []
 
 	with open(path, "rb") as f:
-		elffile = ELFFile(f)  # type: ignore
+		elffile = ELFFile(f)
 		result: Dict[str, int] = {}
 
-		if not elffile.has_dwarf_info():  # type: ignore
+		if not elffile.has_dwarf_info():
 			return result, compilerList
 
-		dwarfInfo = elffile.get_dwarf_info()  # type: ignore
+		dwarfInfo = elffile.get_dwarf_info()
 		for CU in dwarfInfo.iter_CUs():
 			topDIE = CU.get_top_DIE()
 			name = topDIE.get_full_path()
