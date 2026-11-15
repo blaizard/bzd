@@ -1,6 +1,6 @@
-import unittest
-import typing
 import json
+import typing
+import unittest
 
 from apps.artifacts.api.python.common import NodePublishNoRemote
 from apps.artifacts.api.python.node.node import Node
@@ -12,7 +12,7 @@ class TestRun(unittest.TestCase):
 	def testPublish(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
 			self.assertEqual(method, "POST")
 			assert body is not None
@@ -29,7 +29,7 @@ class TestRun(unittest.TestCase):
 	def testPublishBulk(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
 			assert body is not None
 			data = json.loads(body.decode())
@@ -48,7 +48,7 @@ class TestRun(unittest.TestCase):
 	def testPublishBulkAbsoluteTimestamp(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
 			assert body is not None
 			data = json.loads(body.decode())
@@ -67,7 +67,7 @@ class TestRun(unittest.TestCase):
 	def testPublishMultiNodes(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
 			self.assertEqual(method, "POST")
 			self.assertEqual(url, "http://localhost:8081/x/nodes/?bulk=1")
@@ -85,19 +85,19 @@ class TestRun(unittest.TestCase):
 	def testPublishNoServer(self) -> None:
 
 		def callback(**kwargs: typing.Any) -> None:
-			raise Exception("Unreachable")
+			raise RuntimeError("Unreachable")
 
 		node = Node(uid="testuid", httpClient=HttpClientMock(callback=callback))
 		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
 
 	def testPublishNoServerWithBuffer(self) -> None:
 		self.calledCounter = 0
-		values: typing.List[typing.Any] = []
+		values: list[typing.Any] = []
 		self.callbackRaise = True
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			if self.callbackRaise:
-				raise Exception("Unreachable")
+				raise RuntimeError("Unreachable")
 			self.calledCounter += 1
 			assert body is not None
 			data = json.loads(body.decode())
@@ -121,9 +121,9 @@ class TestRun(unittest.TestCase):
 	def testPublishErrorNextRemote(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			if url.startswith("http://remote1"):
-				raise Exception("Unreachable")
+				raise RuntimeError("Unreachable")
 			self.calledCounter += 1
 
 		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
@@ -133,7 +133,7 @@ class TestRun(unittest.TestCase):
 	def testPublishErrorAllRemotes(self) -> None:
 
 		def callback(**kwargs: typing.Any) -> None:
-			raise Exception("Unreachable")
+			raise RuntimeError("Unreachable")
 
 		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
 		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
@@ -142,10 +142,10 @@ class TestRun(unittest.TestCase):
 		self.calledCounter = 0
 		self.callbackRaise = True
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> typing.Any:
 			self.calledCounter += 1
 			if self.callbackRaise:
-				raise Exception("Network is down")
+				raise RuntimeError("Network is down")
 			return "ok"
 
 		node = Node(uid="testuid", remotes=["http://remote1"], httpClient=HttpClientMock(callback=callback))
@@ -163,9 +163,9 @@ class TestRun(unittest.TestCase):
 	def testPublishBlockForSRetries(self) -> None:
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.calledCounter += 1
-			raise Exception("Unreachable")
+			raise RuntimeError("Unreachable")
 
 		node = Node(uid="testuid", remotes=["http://remote1"], httpClient=HttpClientMock(callback=callback), blockForS=0.05)
 		self.assertRaises(NodePublishNoRemote, lambda: node.publish(1))
@@ -192,10 +192,10 @@ class TestRun(unittest.TestCase):
 		for status in (400, 413, 422):
 			with self.subTest(status=status):
 
-				def callback(**kwargs: typing.Any) -> typing.Any:
+				def callback(_status: int = status, **kwargs: typing.Any) -> typing.Any:
 					raise HttpClientException(
-						message=f"HTTP Error ({status})",
-						status=status,
+						message=f"HTTP Error ({_status})",
+						status=_status,
 						reason="Malformed",
 						content=b"",
 					)
@@ -209,10 +209,10 @@ class TestRun(unittest.TestCase):
 		self.callbackMode = "network_error"
 		self.dropRemaining = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> typing.Any:
 			self.calledCounter += 1
 			if self.callbackMode == "network_error":
-				raise Exception("Unreachable")
+				raise RuntimeError("Unreachable")
 			if self.dropRemaining > 0:
 				self.dropRemaining -= 1
 				raise HttpClientException(
@@ -254,12 +254,12 @@ class TestRun(unittest.TestCase):
 
 	def testExportGetErrorContinues(self) -> None:
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> typing.Any:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> typing.Any:
 			if url.startswith("http://remote1"):
-				raise Exception("Unreachable")
+				raise RuntimeError("Unreachable")
 			if method == "GET":
 				return HttpResponseMock(status=200, content=b'{"key": "value"}', headers={})
-			raise Exception("Unexpected method")
+			raise RuntimeError("Unexpected method")
 
 		node = Node(uid="testuid", remotes=["http://remote1", "http://remote2"], httpClient=HttpClientMock(callback=callback))
 

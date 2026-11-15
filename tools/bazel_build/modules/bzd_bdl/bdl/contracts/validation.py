@@ -1,12 +1,18 @@
 import typing
 
+from bzd.validation.schema import Constraint
 from bzd.validation.validation import (
-	Validation as ValidationBase,
 	Schema,
+)
+from bzd.validation.validation import (
 	SchemaDict as SchemaDict_,
+)
+from bzd.validation.validation import (
 	SchemaList as SchemaList_,
 )
-from bzd.validation.schema import Constraint
+from bzd.validation.validation import (
+	Validation as ValidationBase,
+)
 
 from bdl.contracts.all import _Contracts
 
@@ -15,6 +21,6 @@ SchemaList = SchemaList_
 
 
 class Validation(ValidationBase[Schema]):
-	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
+	AVAILABLE_CONSTRAINTS: typing.ClassVar[dict[str, type[Constraint]]] = {
 		contract.name: contract.constraint for contract in _Contracts if contract.constraint
 	}

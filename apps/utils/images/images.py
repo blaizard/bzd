@@ -1,16 +1,16 @@
 import argparse
-import os
+import datetime
 import json
+import os
 import pathlib
+import shutil
+import subprocess
 import typing
 from functools import cached_property
-import subprocess
-import shutil
-import datetime
 
+from apps.utils.images.converter import ConversionResult, Converter, OutputFormat
 from apps.utils.images.pillow import ConverterPillow
 from apps.utils.images.rawpy import ConverterRawpy
-from apps.utils.images.converter import OutputFormat, ConversionResult, Converter
 
 
 class Converters:
@@ -18,7 +18,7 @@ class Converters:
 		self.converters = converters
 
 	@cached_property
-	def allExtensions(self) -> typing.Set[str]:
+	def allExtensions(self) -> set[str]:
 		return {
 			value
 			for converter in self.converters
@@ -33,7 +33,7 @@ class Converters:
 				for name in sorted(files):
 					self._processFile(root / name, outputFormat=outputFormat)
 
-	def _getOutput(self, path: pathlib.Path, outputFormat: OutputFormat) -> typing.Tuple[pathlib.Path, pathlib.Path]:
+	def _getOutput(self, path: pathlib.Path, outputFormat: OutputFormat) -> tuple[pathlib.Path, pathlib.Path]:
 
 		if outputFormat == OutputFormat.JPEG:
 			output = path.with_suffix(".jpg")
@@ -52,8 +52,8 @@ class Converters:
 		fileSize = path.stat().st_size
 		return f"{fileSize / (1024 * 1024):.2f}MB"
 
-	def _run(self, commands: typing.Sequence[str]) -> typing.Optional[str]:
-		result = subprocess.run(commands, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	def _run(self, commands: typing.Sequence[str]) -> str | None:
+		result = subprocess.run(commands, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False)
 		if result.returncode != 0:
 			print(f"Command {' '.join(commands)} failed:", result.stdout)
 			return None
@@ -62,7 +62,7 @@ class Converters:
 	def _mergeExif(self, path: pathlib.Path) -> None:
 		"""Read and merge sidecar exif attributes to the image."""
 
-		for extensions in {".xmp", ".XMP"}:
+		for extensions in (".xmp", ".XMP"):
 			file = path.with_name(path.name + extensions)
 			if not file.is_file():
 				continue
@@ -94,7 +94,7 @@ class Converters:
 		if not output:
 			return
 
-		tz = datetime.timezone.utc
+		tz = datetime.UTC
 		allDates = [
 			datetime.datetime.fromtimestamp(path.stat().st_atime, tz=tz),
 			datetime.datetime.fromtimestamp(path.stat().st_mtime, tz=tz),
@@ -121,7 +121,7 @@ class Converters:
 
 		originalTimes = (original.stat().st_atime, original.stat().st_mtime)
 
-		for extensions in {".xmp", ".XMP"}:
+		for extensions in (".xmp", ".XMP"):
 			sidecar = original.with_name(original.name + extensions)
 			if not sidecar.is_file():
 				continue
@@ -157,7 +157,7 @@ class Converters:
 		file.rename(output)
 		os.utime(output, originalTimes)
 
-	def _processFile(self, path: pathlib.Path, outputFormat: OutputFormat) -> typing.Optional[pathlib.Path]:
+	def _processFile(self, path: pathlib.Path, outputFormat: OutputFormat) -> pathlib.Path | None:
 		"""Process a single file."""
 
 		path = path.resolve().absolute()
@@ -175,8 +175,8 @@ class Converters:
 					path=path, outputFormat=OutputFormat.JPEG, output=outputTemporary
 				)
 
-			except Exception as e:
-				print(f" -> FAILED: {str(e)}")
+			except Exception as e:  # noqa: BLE001
+				print(f" -> FAILED: {e!s}")
 
 			else:
 				if result == ConversionResult.skipped:

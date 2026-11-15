@@ -1,14 +1,14 @@
 import pathlib
+import typing
 
 import rawpy
+from apps.utils.images.converter import ConversionResult, Converter, OutputFormat
 from PIL import Image
-
-from apps.utils.images.converter import Converter, OutputFormat, ConversionResult
 
 
 class ConverterRawpy(Converter):
-	extensions = {".arw"}
-	outputFormats = {OutputFormat.JPEG}
+	extensions: typing.ClassVar[set[str]] = {".arw"}
+	outputFormats: typing.ClassVar[set[OutputFormat]] = {OutputFormat.JPEG}
 
 	def tryConvert(self, path: pathlib.Path, outputFormat: OutputFormat, output: pathlib.Path) -> ConversionResult:
 		"""Attempt to convert the given file into the given format."""

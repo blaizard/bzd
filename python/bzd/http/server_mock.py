@@ -1,12 +1,10 @@
-import typing
 import io
+import typing
 
 from bzd.http.server import RESTServerContext, RESTServerContextRequest
 
 
-def makeRESTServerContext(
-	data: bytes = b"", headers: typing.Optional[typing.Mapping[str, str]] = None
-) -> RESTServerContext:
+def makeRESTServerContext(data: bytes = b"", headers: typing.Mapping[str, str] | None = None) -> RESTServerContext:
 	"""Build a custom RESTServerContext for testing."""
 
 	if headers is None:

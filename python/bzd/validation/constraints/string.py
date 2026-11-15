@@ -1,10 +1,10 @@
 import typing
 
-from bzd.validation.schema import Context, Constraint, ProcessedSchema
+from bzd.validation.schema import Constraint, Context, ProcessedSchema
 
 
 class Min(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 
 		def _process(arg: int, context: Context) -> None:
 			assert len(context.value) >= arg, f"the string '{context.value}' is shorter than its required minimum size: {arg}"
@@ -14,7 +14,7 @@ class Min(Constraint):
 
 
 class Max(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 
 		def _process(arg: int, context: Context) -> None:
 			assert len(context.value) <= arg, f"the string '{context.value}' is longer than its required maximum size: {arg}"
@@ -24,8 +24,8 @@ class Max(Constraint):
 
 
 class String(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 		self.validate(schema=[], values=args)
 		processedSchema.setType(self)
 
-	constraints = {"min": Min, "max": Max}
+	constraints: typing.ClassVar[dict[str, type[Constraint]]] = {"min": Min, "max": Max}

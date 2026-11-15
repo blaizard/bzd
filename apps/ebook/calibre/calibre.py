@@ -5,7 +5,6 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
-import typing
 
 
 class CalibreKey(enum.Enum):
@@ -23,7 +22,7 @@ class Calibre:
 		Calibre._uid += 1
 		return Calibre._uid
 
-	def autoDetectKeyType(self, path: pathlib.Path) -> typing.Optional[CalibreKey]:
+	def autoDetectKeyType(self, path: pathlib.Path) -> CalibreKey | None:
 		if str(path).lower().endswith(".der"):
 			return CalibreKey.adobe
 		return None
@@ -35,7 +34,7 @@ class Calibre:
 		config = {}
 		try:
 			config = json.loads(path.read_text())
-		except Exception:
+		except Exception:  # noqa: BLE001, S110
 			pass
 
 		# Update it.
@@ -78,6 +77,6 @@ class Calibre:
 
 			pattern = pathlib.Path(dirname) / f"**/*{ebook.suffix}"
 			matches = glob.glob(str(pattern), recursive=True)
-			assert len(matches) == 1, f"Cannot find the output file from calibredb: {str(matches)}"
+			assert len(matches) == 1, f"Cannot find the output file from calibredb: {matches!s}"
 
 			shutil.move(matches[0], output)

@@ -1,5 +1,4 @@
 import math
-import typing
 from dataclasses import dataclass
 
 
@@ -12,7 +11,7 @@ def sizeToString(sizeBytes: int) -> str:
 	# Define the units and their corresponding powers of 1024
 	units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
-	i = int(math.floor(math.log(sizeBytes, 1024)))
+	i = math.floor(math.log(sizeBytes, 1024))
 	p = math.pow(1024, i)
 	size = round(sizeBytes / p, 2)
 
@@ -25,9 +24,7 @@ def percentToString(ratio: float) -> str:
 	return f"{(ratio * 100):.1f}%"
 
 
-def clusteringDimensions(
-	dimensions: typing.List[typing.Tuple[int, int]], tolerance: float
-) -> typing.List[typing.List[typing.Tuple[int, int]]]:
+def clusteringDimensions(dimensions: list[tuple[int, int]], tolerance: float) -> list[list[tuple[int, int]]]:
 	"""Cluster dimensions using the max tolerance as deviation."""
 
 	# Sort the items. Sorting by width primarily and then by height
@@ -36,7 +33,7 @@ def clusteringDimensions(
 	sortedDimensions = sorted(dimensions, key=lambda x: (x[0], x[1]))
 
 	clusters = []
-	currentCluster: typing.Optional[typing.List[typing.Tuple[int, int]]] = None
+	currentCluster: list[tuple[int, int]] | None = None
 	maxAllowedWidth: float = 0
 	maxAllowedHeight: float = 0
 	for width, height in sortedDimensions:
@@ -57,8 +54,8 @@ def clusteringDimensions(
 
 
 def estimatePageDPIs(
-	dimensions: typing.List[typing.Tuple[int, int]],
-) -> typing.Optional[typing.List[float]]:
+	dimensions: list[tuple[int, int]],
+) -> list[float] | None:
 	"""Calculate the DPI of each pages based on the most common page size."""
 
 	@dataclass
@@ -98,7 +95,7 @@ def estimatePageDPIs(
 		"BD": (240, 320),
 		"BD Landscape": (320, 240),
 	}
-	dpis: typing.List[DPIPageEntry] = []
+	dpis: list[DPIPageEntry] = []
 	for name, (pageWidth, pageHeight) in pageType.items():
 		dpis.append(
 			DPIPageEntry(
@@ -123,7 +120,7 @@ def estimatePageDPIs(
 	)
 
 	# Check every pages, identify outliers and estimate the DPI per pages.
-	dpiPerPage: typing.List[float] = []
+	dpiPerPage: list[float] = []
 	area = width * height
 	for index, (pageWidth, pageHeight) in enumerate(dimensions):
 		pageArea = pageWidth * pageHeight

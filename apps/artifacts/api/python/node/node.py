@@ -1,24 +1,24 @@
 import math
-import typing
 import threading
+import typing
 from contextlib import contextmanager
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
-import bzd.utils.timestamp as timestamp
+from apps.artifacts.api.python.common import ArtifactsBase, NodePublishNoRemote
 from bzd.http.client import HttpClientException
 from bzd.http.utils import encodeURIComponent
 from bzd.logging.handler import LoggerHandler, LoggerHandlerData, LoggerHandlerFlow
-from apps.artifacts.api.python.common import ArtifactsBase, NodePublishNoRemote
+from bzd.utils import timestamp
 
 # The bulk payload.
-BulkData = typing.List[typing.Any]
+BulkData = list[typing.Any]
 # One entry of the bulk list: [subKey, [[ts, value], ...]].
-BulkEntry = typing.List[typing.Union[typing.List[str], typing.List[BulkData]]]
+BulkEntry = list[list[str] | list[BulkData]]
 # The bulk list shipped to the server for a single node.
-BulkEntries = typing.List[BulkEntry]
+BulkEntries = list[BulkEntry]
 # The bulk payload for a multi-node request: {uid: BulkEntries}.
-BulkMulti = typing.Dict[str, BulkEntries]
+BulkMulti = dict[str, BulkEntries]
 # HTTP status codes that indicate a request that is malformed and can never succeed.
 # 400 Bad Request
 # 413 Content Too Large
@@ -30,10 +30,10 @@ class PublisherProtocol(typing.Protocol):
 	def __call__(
 		self,
 		value: typing.Any,
-		timestampUs: typing.Optional[float] = None,
-		key: typing.Optional[typing.List[str]] = None,
-		expires: typing.Optional[float] = None,
-		unit: typing.Optional[str] = None,
+		timestampUs: float | None = None,
+		key: list[str] | None = None,
+		expires: float | None = None,
+		unit: str | None = None,
 	) -> None: ...
 
 
@@ -46,7 +46,7 @@ class BufferEntryBulk:
 	# The data to be published and their associated timestamp.
 	# - For a single-node bulk: a BulkEntries list of [subKey, [[ts, value], ...]] entries.
 	# - For a multi-node bulk: a BulkMulti mapping of node uid to a BulkEntries list.
-	data: typing.Union[BulkEntries, BulkMulti]
+	data: BulkEntries | BulkMulti
 	# If true, it means that the timestamp given for each entry are the client timestamp in microseconds.
 	# They might be adjusted to match the exact time at which they will be sent.
 	# If false, they will not be modified.
@@ -56,9 +56,9 @@ class BufferEntryBulk:
 class Node(ArtifactsBase):
 	def __init__(
 		self,
-		path: typing.Optional[typing.List[str]] = None,
+		path: list[str] | None = None,
 		maxBufferSize: int = 1000,
-		blockForS: typing.Optional[float] = None,
+		blockForS: float | None = None,
 		**kwargs: typing.Any,
 	) -> None:
 		"""Initialize the Node object.
@@ -74,7 +74,7 @@ class Node(ArtifactsBase):
 		self.path = path or []
 		self.maxBufferSize = maxBufferSize
 		self.blockForS = blockForS
-		self.buffer: typing.List[BufferEntryBulk] = []
+		self.buffer: list[BufferEntryBulk] = []
 		self._lock = threading.Lock()
 
 	@staticmethod
@@ -95,7 +95,7 @@ class Node(ArtifactsBase):
 
 		return Node(remotes=[remote], volume=volume, uid=uid, path=path)
 
-	def _repr(self) -> typing.List[str]:
+	def _repr(self) -> list[str]:
 		content = super()._repr()
 		if len(self.path):
 			content.append(f"path=/{'/'.join(self.path)}")
@@ -121,7 +121,7 @@ class Node(ArtifactsBase):
 			def publishOnRemote(remote: str) -> None:
 				while len(self.buffer):
 					entry = self.buffer[0]
-					content: typing.Dict[str, typing.Any] = {"data": entry.data}
+					content: dict[str, typing.Any] = {"data": entry.data}
 					url = remote + entry.uri
 					if entry.isClientTimestamp:
 						content["timestamp"] = timestamp.timestampUs()
@@ -129,7 +129,7 @@ class Node(ArtifactsBase):
 						self.httpClient.post(url, json=content, query={"bulk": 1}, headers=headers)
 					except HttpClientException as e:
 						if e.status in MalformedRequestStatusCodes:
-							self.logError(f"Remote '{remote}' dropped the malformed request: {str(e)}")
+							self.logError(f"Remote '{remote}' dropped the malformed request: {e!s}")
 							self.buffer.pop(0)
 							continue
 						raise
@@ -139,9 +139,9 @@ class Node(ArtifactsBase):
 
 	def _makeURI(
 		self,
-		uid: typing.Optional[str],
-		volume: typing.Optional[str] = None,
-		path: typing.Optional[typing.List[str]] = None,
+		uid: str | None,
+		volume: str | None = None,
+		path: list[str] | None = None,
 		endpoint: str = "data",
 	) -> str:
 		"""Generate the URI from the parameters."""
@@ -158,7 +158,7 @@ class Node(ArtifactsBase):
 			+ "/"
 		)
 
-	def publishMultiNodes(self, data: typing.Dict[str, typing.Any], volume: typing.Optional[str] = None) -> None:
+	def publishMultiNodes(self, data: dict[str, typing.Any], volume: str | None = None) -> None:
 		"""Publish data to a remote to multiple nodes.
 
 		Args:
@@ -181,9 +181,9 @@ class Node(ArtifactsBase):
 	def publish(
 		self,
 		data: typing.Any,
-		uid: typing.Optional[str] = None,
-		volume: typing.Optional[str] = None,
-		path: typing.Optional[typing.List[str]] = None,
+		uid: str | None = None,
+		volume: str | None = None,
+		path: list[str] | None = None,
 	) -> None:
 		"""Publish data to a remote.
 
@@ -216,9 +216,9 @@ class Node(ArtifactsBase):
 	@contextmanager
 	def publishBulk(
 		self,
-		uid: typing.Optional[str] = None,
-		volume: typing.Optional[str] = None,
-		path: typing.Optional[typing.List[str]] = None,
+		uid: str | None = None,
+		volume: str | None = None,
+		path: list[str] | None = None,
 		isClientTimestamp: bool = True,
 	) -> typing.Generator[PublisherProtocol, None, None]:
 		"""Publish a bulk of data to remote.
@@ -236,10 +236,10 @@ class Node(ArtifactsBase):
 
 		def publisher(
 			value: typing.Any,
-			timestampUs: typing.Optional[float] = None,
-			key: typing.Optional[typing.List[str]] = None,
-			expires: typing.Optional[float] = None,
-			unit: typing.Optional[str] = None,
+			timestampUs: float | None = None,
+			key: list[str] | None = None,
+			expires: float | None = None,
+			unit: str | None = None,
 		) -> None:
 			if timestampUs is None:
 				timestampUs = timestamp.timestampUs()
@@ -266,11 +266,11 @@ class Node(ArtifactsBase):
 
 	def export(
 		self,
-		uid: typing.Optional[str] = None,
-		volume: typing.Optional[str] = None,
-		path: typing.Optional[typing.List[str]] = None,
-		after: typing.Optional[int] = None,
-		before: typing.Optional[int] = None,
+		uid: str | None = None,
+		volume: str | None = None,
+		path: list[str] | None = None,
+		after: int | None = None,
+		before: int | None = None,
 		children: int = 0,
 		format: str = "csv",
 	) -> bytes:
@@ -309,14 +309,14 @@ class Node(ArtifactsBase):
 
 	def get(
 		self,
-		uid: typing.Optional[str] = None,
-		volume: typing.Optional[str] = None,
-		path: typing.Optional[typing.List[str]] = None,
-		after: typing.Optional[int] = None,
-		before: typing.Optional[int] = None,
-		children: typing.Optional[int] = None,
-		keys: typing.Optional[bool] = None,
-		fresh: typing.Optional[bool] = None,
+		uid: str | None = None,
+		volume: str | None = None,
+		path: list[str] | None = None,
+		after: int | None = None,
+		before: int | None = None,
+		children: int | None = None,
+		keys: bool | None = None,
+		fresh: bool | None = None,
 	) -> typing.Any:
 		"""Get data from the nodes remote volumes.."""
 
@@ -355,7 +355,7 @@ class LoggerHandlerNode(LoggerHandler):
 		        node: The node instance associated with this logger.
 		"""
 		self.node = node
-		self.name: typing.Optional[str] = None
+		self.name: str | None = None
 
 	def constructor(self, name: str) -> None:
 		self.name = name

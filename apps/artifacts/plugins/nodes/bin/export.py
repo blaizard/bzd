@@ -1,10 +1,10 @@
-import pathlib
 import argparse
-import dateutil.parser
 import datetime
+import pathlib
 
-from bzd.logging import Logger
+import dateutil.parser
 from apps.artifacts.api.python.node.node import Node
+from bzd.logging import Logger
 
 logger = Logger("apps.plugin.nodes")
 
@@ -61,11 +61,11 @@ if __name__ == "__main__":
 	else:
 		toProcess = [[[], args.output.with_suffix(f".{args.format}")]]
 
-	logger.info(f"Exporting {len(toProcess)} file(s) using {str(node)}")
+	logger.info(f"Exporting {len(toProcess)} file(s) using {node!s}")
 	if after is not None:
-		logger.info(f"Starting at {str(datetime.datetime.fromtimestamp(after / 1000000.0, tz=datetime.timezone.utc))}")
+		logger.info(f"Starting at {datetime.datetime.fromtimestamp(after / 1000000.0, tz=datetime.UTC)!s}")
 	if before is not None:
-		logger.info(f"Ending at {str(datetime.datetime.fromtimestamp(before / 1000000.0, tz=datetime.timezone.utc))}")
+		logger.info(f"Ending at {datetime.datetime.fromtimestamp(before / 1000000.0, tz=datetime.UTC)!s}")
 
 	for index, [key, path] in enumerate(toProcess):
 		logger.info(f"[{index + 1}/{len(toProcess)}] exporting {path}")

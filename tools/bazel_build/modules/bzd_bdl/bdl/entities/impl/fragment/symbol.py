@@ -1,8 +1,8 @@
 import typing
 
-from bzd.parser.element import Element, Sequence, ElementBuilder
+from bzd.parser.element import Element, ElementBuilder, Sequence
+from bzd.parser.error import AssertionResult, Error
 from bzd.parser.visitor import VisitorDepthFirst as VisitorDepthFirstBase
-from bzd.parser.error import Error, AssertionResult
 
 from bdl.entities.impl.fragment.contract import Contracts
 from bdl.entities.impl.fragment.parameters import Parameters
@@ -19,10 +19,10 @@ class Symbol:
 		self,
 		element: Element,
 		kind: str,
-		underlyingTypeFQN: typing.Optional[str] = None,
-		template: typing.Optional[str] = None,
-		contract: typing.Optional[str] = None,
-		const: typing.Optional[str] = None,
+		underlyingTypeFQN: str | None = None,
+		template: str | None = None,
+		contract: str | None = None,
+		const: str | None = None,
 	) -> None:
 		Error.assertHasAttr(element=element, attr=kind)
 		self.element = element
@@ -33,13 +33,13 @@ class Symbol:
 		self.constAttr = const
 
 	@property
-	def underlyingTypeFQN(self) -> typing.Optional[str]:
+	def underlyingTypeFQN(self) -> str | None:
 		if self.underlyingTypeAttr is None:
 			return None
 		return self.element.getAttrValue(self.underlyingTypeAttr)
 
 	@property
-	def dependencies(self) -> typing.Set[str]:
+	def dependencies(self) -> set[str]:
 		"""
 		Output the dependency list for this type.
 		"""
@@ -207,7 +207,7 @@ class Symbol:
 		return self.kinds[-1]
 
 	@property
-	def kinds(self) -> typing.List[str]:
+	def kinds(self) -> list[str]:
 		return (
 			self.element.getAttr(f"{self.kindAttr}_resolved").value.split(";")
 			if self.element.isAttr(f"{self.kindAttr}_resolved")
@@ -215,13 +215,13 @@ class Symbol:
 		)
 
 	@property
-	def namespace(self) -> typing.List[str]:
+	def namespace(self) -> list[str]:
 		"""Namespace associated with this symbol."""
 
 		return self.kind.split(".")[:-1]
 
 	@property
-	def comment(self) -> typing.Optional[str]:
+	def comment(self) -> str | None:
 		return self.element.getAttrValue("comment")
 
 	@property
@@ -270,7 +270,7 @@ class Symbol:
 		return hash(str(self))
 
 
-class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
+class Visitor(VisitorDepthFirstBase[list[str], str]):
 	nestedKind = "template"
 
 	def __init__(self, symbol: Symbol) -> None:
@@ -295,21 +295,21 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 	def isTopLevel(self) -> bool:
 		return self.level == 0
 
-	def _visit(self, sequence: Sequence) -> typing.List[str]:
+	def _visit(self, sequence: Sequence) -> list[str]:
 		self.level += 1
 		result = super()._visit(sequence=sequence)
 		self.level -= 1
 		return result
 
-	def visitBegin(self) -> typing.List[str]:
+	def visitBegin(self) -> list[str]:
 		return []
 
 	def visitElement(
 		self,
 		element: Element,
-		result: typing.List[str],
-		nested: typing.Optional[typing.List[str]],
-	) -> typing.List[str]:
+		result: list[str],
+		nested: list[str] | None,
+	) -> list[str]:
 		if element.isAttr("symbol"):
 			symbol = Symbol(
 				element=element,
@@ -340,21 +340,21 @@ class Visitor(VisitorDepthFirstBase[typing.List[str], str]):
 
 		return result
 
-	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
+	def visitValue(self, value: str, comment: str | None) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
 
 		return value
 
-	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitSymbol(self, symbol: Symbol, nested: list[str], parameters: ParametersResolved) -> str:
 		"""
 		Called when an element needs to be formatted.
 		"""
 
 		# Build the type. The first fqn is the element and the rest
 		# are the types.
-		kinds: typing.List[str] = []
+		kinds: list[str] = []
 		for index, fqn in enumerate(symbol.kinds):
 			if index == 0:
 				kinds.append(fqn)

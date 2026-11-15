@@ -1,6 +1,6 @@
 import argparse
-import pathlib
 import hashlib
+import pathlib
 import stat
 
 

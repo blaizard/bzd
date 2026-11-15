@@ -1,12 +1,12 @@
-import sys
 import os
 import pathlib
+import sys
 import typing
 
 from tools.shell.factory import Factory
 from tools.shell.sh.factory import Sh
 
-factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (Sh,)
+factories: typing.Final[typing.Iterable[type[Factory]]] = (Sh,)
 
 
 def buildAll(workspace: pathlib.Path) -> None:

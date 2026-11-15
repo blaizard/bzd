@@ -5,13 +5,12 @@ import json
 import os
 import pathlib
 import sys
-import typing
 
 from apps.utils.agent.json import loadAndRepair
 from bzd.utils.run import localCommand
 
 
-def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) -> typing.Optional[str]:
+def opencode(cwd: pathlib.Path, agent: str, prompt: str, continueSession: bool) -> str | None:
 	"""Run opencode."""
 
 	print("==== prompt ================================================", flush=True)

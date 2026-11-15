@@ -1,8 +1,9 @@
+import os
+import sys
+import typing
+
 import serial
 import serial.tools.list_ports
-import os
-import typing
-import sys
 
 Device = str
 
@@ -10,28 +11,28 @@ Device = str
 class Devices:
 	"""List and filter the available serial devices."""
 
-	def __init__(self, devices: typing.Optional[typing.List[typing.Any]] = None) -> None:
+	def __init__(self, devices: list[typing.Any] | None = None) -> None:
 		self.devices = (
 			sorted(serial.tools.list_ports.comports()) if devices is None else devices  # type: ignore
 		)
 
-	def filterByVidPids(self, vidPids: typing.Sequence[typing.Tuple[int, int]]) -> "Devices":
+	def filterByVidPids(self, vidPids: typing.Sequence[tuple[int, int]]) -> "Devices":
 		"""Filter ports by VIDs and PIDs."""
 		return Devices(
-			[info for info in self.devices if any([True for vid, pid in vidPids if (info.vid == vid and info.pid == pid)])]
+			[info for info in self.devices if any(True for vid, pid in vidPids if (info.vid == vid and info.pid == pid))]
 		)
 
 	def filterByAccess(self) -> "Devices":
 		"""Filter ports by user permission."""
 		return Devices([info for info in self.devices if os.access(info.device, os.R_OK | os.W_OK)])
 
-	def get(self) -> typing.List[Device]:
+	def get(self) -> list[Device]:
 		"""Get the remaining device paths."""
 		return [info.device for info in self.devices]
 
-	def getInfo(self) -> typing.Dict[Device, str]:
+	def getInfo(self) -> dict[Device, str]:
 		"""Get information about the remaining devices."""
-		return {info.device: "{}, {}".format(info.description, info.hwid) for info in self.devices}
+		return {info.device: f"{info.description}, {info.hwid}" for info in self.devices}
 
 	def empty(self) -> bool:
 		"""Return True if no devices remain."""
@@ -41,25 +42,25 @@ class Devices:
 class Uart:
 	"""Proxy a UART serial port to the standard output."""
 
-	dataBitsMapping = {
+	dataBitsMapping: typing.ClassVar[dict[int, int]] = {
 		5: serial.FIVEBITS,
 		6: serial.SIXBITS,
 		7: serial.SEVENBITS,
 		8: serial.EIGHTBITS,
 	}
-	parityMapping = {
+	parityMapping: typing.ClassVar[dict[str, str]] = {
 		"none": serial.PARITY_NONE,
 		"even": serial.PARITY_EVEN,
 		"odd": serial.PARITY_ODD,
 		"mark": serial.PARITY_MARK,
 		"space": serial.PARITY_SPACE,
 	}
-	stopBitsMapping = {
+	stopBitsMapping: typing.ClassVar[dict[float, float]] = {
 		1: serial.STOPBITS_ONE,
 		1.5: serial.STOPBITS_ONE_POINT_FIVE,
 		2: serial.STOPBITS_TWO,
 	}
-	controlFlowMapping = {"none", "xonxoff", "rtscts", "dsrdtr"}
+	controlFlowMapping: typing.ClassVar[set[str]] = {"none", "xonxoff", "rtscts", "dsrdtr"}
 
 	def __init__(
 		self,

@@ -1,28 +1,27 @@
-import typing
 import copy
 import sys
+import typing
 
-from bzd.utils.dict import isEqual
-
+from bzd.parser.context import Context
 from bzd.parser.fragments import (
-	Fragment,
-	Attributes,
+	IGNORE_INDEX_VALUE,
 	Attribute,
 	AttributeParser,
+	Attributes,
 	AttributesSerialize,
-	IGNORE_INDEX_VALUE,
+	Fragment,
 )
 from bzd.parser.grammar import Grammar
-from bzd.parser.context import Context
+from bzd.utils.dict import isEqual
 
-ElementSerialize = typing.MutableMapping[str, typing.Union[AttributesSerialize, typing.List[typing.Any]]]
-SequenceSerialize = typing.List[ElementSerialize]
+ElementSerialize = typing.MutableMapping[str, AttributesSerialize | list[typing.Any]]
+SequenceSerialize = list[ElementSerialize]
 
 
 class Sequence:
-	def __init__(self, context: typing.Optional[Context] = None) -> None:
+	def __init__(self, context: Context | None = None) -> None:
 		self.context = Context() if context is None else context
-		self.list: typing.List["Element"] = []
+		self.list: list[Element] = []
 
 	def __iter__(self) -> typing.Iterator["Element"]:
 		for element in self.list:
@@ -38,7 +37,7 @@ class Sequence:
 	def empty(self) -> bool:
 		return len(self) == 0
 
-	def __add__(self, other: typing.Union[typing.List["Element"], "Sequence"]) -> "Sequence":
+	def __add__(self, other: typing.Union[list["Element"], "Sequence"]) -> "Sequence":
 		if isinstance(other, Sequence):
 			self.list += other.list
 		else:
@@ -71,7 +70,7 @@ class Sequence:
 		return [element.serialize(ignoreContext=ignoreContext) for element in self]
 
 	@staticmethod
-	def fromSerialize(sequence: SequenceSerialize, context: typing.Optional[Context] = None) -> "Sequence":
+	def fromSerialize(sequence: SequenceSerialize, context: Context | None = None) -> "Sequence":
 		"""Create a sequence from a serialized sequence."""
 
 		s = SequenceBuilder(context)
@@ -87,7 +86,7 @@ class SequenceBuilder(Sequence):
 	"""Represents a sequence that can be built."""
 
 	@staticmethod
-	def cast(sequence: Sequence, classType: typing.Type[T]) -> T:
+	def cast(sequence: Sequence, classType: type[T]) -> T:
 		"""Return a copy of the sequence casted to a given type."""
 
 		assert isinstance(sequence, Sequence)
@@ -97,26 +96,26 @@ class SequenceBuilder(Sequence):
 		copiedSequence.__class__ = classType
 		return typing.cast(T, copiedSequence)
 
-	def merge(self: T, sequence: "Sequence") -> T:
+	def merge(self, sequence: "Sequence") -> typing.Self:
 		for element in sequence.list:
 			self.pushBackElement(element)
 		return self
 
-	def pushBackElement(self: T, element: "Element") -> T:
+	def pushBackElement(self, element: "Element") -> typing.Self:
 		"""Add an element to the sequence at the end of the list."""
 
 		element.context.setParent(self)
 		self.list.append(element)
 		return self
 
-	def pushFrontElement(self: T, element: "Element") -> T:
+	def pushFrontElement(self, element: "Element") -> typing.Self:
 		"""Add an element to the sequence at the beginning of the list."""
 
 		element.context.setParent(self)
 		self.list.insert(0, element)
 		return self
 
-	def removeElement(self: T, element: "Element") -> T:
+	def removeElement(self, element: "Element") -> typing.Self:
 		"""Remove an element from the sequence."""
 
 		element.context.clear()
@@ -129,7 +128,7 @@ class SequenceParser(Sequence):
 
 	def __init__(
 		self,
-		context: typing.Optional[Context],
+		context: Context | None,
 		grammar: Grammar,
 		parent: typing.Optional["ElementParser"],
 	) -> None:
@@ -137,7 +136,7 @@ class SequenceParser(Sequence):
 		self.grammar = grammar
 		self.parent = parent
 
-	def makeElement(self, grammar: typing.Optional[Grammar] = None) -> "ElementParser":
+	def makeElement(self, grammar: Grammar | None = None) -> "ElementParser":
 		"""Create a new element in the sequence.
 		Params:
 		- grammar: Optionally provides a grammar to the new element or reuse existing one.
@@ -159,13 +158,13 @@ class SequenceParser(Sequence):
 
 
 class Element:
-	def __init__(self, context: typing.Optional[Context] = None) -> None:
+	def __init__(self, context: Context | None = None) -> None:
 		self.context = Context() if context is None else context
 		self.attrs: Attributes = {}
-		self.sequences: typing.Dict[str, Sequence] = {}
+		self.sequences: dict[str, Sequence] = {}
 
 	@staticmethod
-	def fromSerialize(element: ElementSerialize, context: typing.Optional[Context] = None) -> "Element":
+	def fromSerialize(element: ElementSerialize, context: Context | None = None) -> "Element":
 		"""Create an element from a serialized element."""
 
 		e = Element(context)
@@ -191,10 +190,10 @@ class Element:
 	def getAttr(self, name: str) -> Attribute:
 		"""Return a specific name attribute value."""
 
-		assert name in self.attrs, f"Attribute '{name}' is not present in '{str(self)}'."
+		assert name in self.attrs, f"Attribute '{name}' is not present in '{self!s}'."
 		return self.attrs[name]
 
-	def getAttrValue(self, name: str, default: typing.Optional[str] = None) -> typing.Optional[str]:
+	def getAttrValue(self, name: str, default: str | None = None) -> str | None:
 		"""Return a specific name attribute value."""
 
 		if name in self.attrs:
@@ -204,16 +203,14 @@ class Element:
 	def isAttr(self, name: str) -> bool:
 		"""Check if an attribute is present."""
 
-		if name in self.attrs:
-			return True
-		return False
+		return name in self.attrs
 
 	def isNestedSequence(self, kind: str) -> bool:
 		"""Check if a sequence exists."""
 
 		return bool(kind in self.sequences)
 
-	def getNestedSequence(self, kind: str) -> typing.Optional[Sequence]:
+	def getNestedSequence(self, kind: str) -> Sequence | None:
 		"""Get the current sequence, or None if it does not exist."""
 
 		assert kind != "@", "Nested sequence name '@' cannot be used."
@@ -234,11 +231,10 @@ class Element:
 			return Sequence()
 		return maybeSequence
 
-	def getNestedSequences(self) -> typing.Iterator[typing.Tuple[str, Sequence]]:
+	def getNestedSequences(self) -> typing.Iterator[tuple[str, Sequence]]:
 		"""Generator going through all sequences."""
 
-		for kind, sequence in self.sequences.items():
-			yield kind, sequence
+		yield from self.sequences.items()
 
 	def serialize(self, ignoreContext: bool = False) -> ElementSerialize:
 		"""Serialize an element."""
@@ -250,17 +246,21 @@ class Element:
 			data[kind] = sequence.serialize(ignoreContext=ignoreContext)
 		return data
 
-	def copy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
+	def copy(self, ignoreNested: list[str] | None = None) -> "ElementBuilder":
 		"""Shallow copy an element to create a new element object."""
 
+		if ignoreNested is None:
+			ignoreNested = []
 		element = ElementBuilder(context=self.context)
 		element.attrs = copy.deepcopy(self.attrs)
 		element.sequences = {kind: sequence for kind, sequence in self.sequences.items() if kind not in ignoreNested}
 		return element
 
-	def deepCopy(self, ignoreNested: typing.List[str] = []) -> "ElementBuilder":
+	def deepCopy(self, ignoreNested: list[str] | None = None) -> "ElementBuilder":
 		"""Deep copy an element to create a new element object."""
 
+		if ignoreNested is None:
+			ignoreNested = []
 		element = ElementBuilder(context=self.context)
 		element.attrs = copy.deepcopy(self.attrs)
 		element.sequences = {
@@ -268,7 +268,7 @@ class Element:
 		}
 		return element
 
-	def getIndexes(self, attr: typing.Optional[str] = None) -> typing.Tuple[int, int]:
+	def getIndexes(self, attr: str | None = None) -> tuple[int, int]:
 		"""Calculate the index of this element."""
 
 		if attr is not None and self.isAttr(attr):
@@ -277,7 +277,7 @@ class Element:
 		# Use the beginning and the end of the element.
 		start = sys.maxsize
 		end = 0
-		for key, attrObj in self.getAttrs().items():
+		for attrObj in self.getAttrs().values():
 			# Ignore some attributes
 			if attrObj.index == IGNORE_INDEX_VALUE:
 				continue
@@ -289,7 +289,7 @@ class Element:
 		# Invalid span.
 		return IGNORE_INDEX_VALUE, 0
 
-	def makeContext(self, attr: typing.Optional[str] = None) -> typing.Tuple[Context, int, int]:
+	def makeContext(self, attr: str | None = None) -> tuple[Context, int, int]:
 		return self.context.resolve(element=self, attr=attr)
 
 	def __eq__(self, other: object) -> bool:
@@ -303,7 +303,7 @@ class Element:
 	def toString(self, nested: bool = True, simplified: bool = False) -> str:
 		"""Human readable string representation of the element."""
 
-		contentContext = [] if simplified else (['context="{}"'.format(self.context)] if self.context is not None else [])
+		contentContext = [] if simplified else ([f'context="{self.context}"'] if self.context is not None else [])
 		attributeFormat = '{key}="{value}"' if simplified else '{key}:{index}:{end}="{value}"'
 		content = "<Element {}/>".format(
 			" ".join(
@@ -318,7 +318,7 @@ class Element:
 
 		if nested:
 			for kind, sequence in self.sequences.items():
-				content += "\n{}:\n{}".format(kind, repr(sequence))
+				content += f"\n{kind}:\n{sequence!r}"
 
 		return content
 
@@ -331,7 +331,7 @@ U = typing.TypeVar("U", bound="ElementBuilder")
 
 class ElementBuilder(Element):
 	@staticmethod
-	def cast(element: Element, classType: typing.Type[U]) -> U:
+	def cast(element: Element, classType: type[U]) -> U:
 		"""Return a copy of the element casted to a given type."""
 
 		assert isinstance(element, Element)
@@ -347,45 +347,45 @@ class ElementBuilder(Element):
 		self.__class__ = Element  # type: ignore
 		return typing.cast(Element, self)
 
-	def removeAttr(self: U, key: str) -> U:
+	def removeAttr(self, key: str) -> typing.Self:
 		"""Remove an existing attribute from the element."""
 
 		del self.attrs[key]
 		return self
 
-	def setAttr(self: U, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> U:
+	def setAttr(self, key: str, value: str, index: int = IGNORE_INDEX_VALUE, end: int = 0) -> typing.Self:
 		"""Add an attribute to the element."""
 
 		self.attrs[key] = AttributeParser(index=index, end=end, value=value)
 		return self
 
-	def setAttrs(self: U, data: typing.Dict[str, str]) -> U:
+	def setAttrs(self, data: dict[str, str]) -> typing.Self:
 		"""Add multiple attributes to an element."""
 
 		for key, value in data.items():
 			self.setAttr(key, value)
 		return self
 
-	def updateAttr(self: U, key: str, value: str) -> U:
+	def updateAttr(self, key: str, value: str) -> typing.Self:
 		"""Update the value of an existing attribute."""
 
 		self.attrs[key].setValue(value)
 		return self
 
-	def setNestedSequence(self: U, kind: str, sequence: Sequence) -> U:
+	def setNestedSequence(self, kind: str, sequence: Sequence) -> typing.Self:
 		"""Set a nested sequence and overwrite existing one."""
 
 		sequence.context.setParent(self)
 		self.sequences[kind] = sequence
 		return self
 
-	def removeNestedSequence(self: U, kind: str) -> U:
+	def removeNestedSequence(self, kind: str) -> typing.Self:
 		"""Remove an existing nested sequence."""
 
 		del self.sequences[kind]
 		return self
 
-	def pushBackElementToNestedSequence(self: U, kind: str, element: Element) -> U:
+	def pushBackElementToNestedSequence(self, kind: str, element: Element) -> typing.Self:
 		"""Add an element to a new or existing nested sequence."""
 
 		if kind not in self.sequences:
@@ -393,7 +393,7 @@ class ElementBuilder(Element):
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushBackElement(element)
 		return self
 
-	def pushFrontElementToNestedSequence(self: U, kind: str, element: Element) -> U:
+	def pushFrontElementToNestedSequence(self, kind: str, element: Element) -> typing.Self:
 		"""Add an element to a new or existing nested sequence."""
 
 		if kind not in self.sequences:
@@ -401,7 +401,7 @@ class ElementBuilder(Element):
 		SequenceBuilder.cast(self.sequences[kind], SequenceBuilder).pushFrontElement(element)
 		return self
 
-	def removeElementFromNestedSequence(self: U, kind: str, element: Element) -> U:
+	def removeElementFromNestedSequence(self, kind: str, element: Element) -> typing.Self:
 		"""Remove an element from a nested sequence."""
 
 		if kind in self.sequences:
@@ -412,9 +412,9 @@ class ElementBuilder(Element):
 class ElementParser(Element):
 	def __init__(
 		self,
-		context: typing.Optional[Context],
+		context: Context | None,
 		grammar: Grammar,
-		parent: typing.Optional[SequenceParser] = None,
+		parent: SequenceParser | None = None,
 	) -> None:
 		super().__init__(context)
 		self.grammar = grammar
@@ -448,5 +448,5 @@ class ElementParser(Element):
 
 	def getSequence(self) -> SequenceParser:
 		assert not self.isRoot, "reached root element"
-		assert isinstance(self.parent, SequenceParser), "parent must be a sequence, instead {}".format(type(self.parent))
+		assert isinstance(self.parent, SequenceParser), f"parent must be a sequence, instead {type(self.parent)}"
 		return self.parent

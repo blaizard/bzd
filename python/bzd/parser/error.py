@@ -1,19 +1,20 @@
-import typing
 import logging
 import re
+import typing
 
+from bzd.parser.context import Context
+from bzd.parser.element import Element
 from bzd.utils.result import Result as ResultBase
 
-from bzd.parser.element import Element
-from bzd.parser.context import Context
-
 useColors: bool = False
+
+logger = logging.getLogger(__name__)
 
 V = typing.TypeVar("V")
 
 
 class Result(ResultBase[V, str]):
-	def assertValue(self, element: Element, attr: typing.Optional[str] = None) -> V:
+	def assertValue(self, element: Element, attr: str | None = None) -> V:
 		"""
 		Ensure the result holds a value, else print the error and throw.
 		"""
@@ -30,7 +31,7 @@ class ExceptionParser(Exception):
 class AssertionResult:
 	"""Type returned by an assertion."""
 
-	def __init__(self, message: typing.Optional[str] = None) -> None:
+	def __init__(self, message: str | None = None) -> None:
 		self.message = message
 
 	def __bool__(self) -> bool:
@@ -40,7 +41,7 @@ class AssertionResult:
 		self,
 		element: Element,
 		message: str,
-		attr: typing.Optional[str] = None,
+		attr: str | None = None,
 		throw: bool = True,
 	) -> "AssertionResult":
 		"""Extend an assertion message if any."""
@@ -70,7 +71,7 @@ class Error:
 		return valueStr
 
 	@staticmethod
-	def toString(context: typing.Optional[Context], index: int, end: int, message: str) -> str:
+	def toString(context: Context | None, index: int, end: int, message: str) -> str:
 		# Look for the content
 		if context is None:
 			return message
@@ -79,8 +80,8 @@ class Error:
 				return message
 			try:
 				content = context.path.read_text()
-			except Exception:
-				logging.warning("Could not open file '{}'.".format(context.path.as_posix()))
+			except Exception:  # noqa: BLE001
+				logger.warning(f"Could not open file '{context.path.as_posix()}'.")
 				return message
 		else:
 			content = context.content
@@ -109,14 +110,13 @@ class Error:
 			endLine += 1
 
 		# Set colors if any
-		global useColors
 		colorBegin = "\033[01;31m" if useColors else ""
 		colorEnd = "\033[0m" if useColors else ""
 
 		# Position the cursor.
 		# A padding must be created to correctly print special spaces such as tabs for example.
 		paddingLine = re.sub(r"[^\s]", " ", contentByLine[line])
-		contentByLine.insert(line + 1, "{padding}^".format(padding=paddingLine[0:column]))
+		contentByLine.insert(line + 1, f"{paddingLine[0:column]}^")
 		contentByLine.insert(
 			line + 2,
 			"{path}:{line}:{column}: {colorBegin}error: {message}{colorEnd}".format(
@@ -132,7 +132,7 @@ class Error:
 		return "\n" + "\n".join(contentByLine[max(0, line - 1) : endLine + 3])
 
 	@staticmethod
-	def toStringFromElement(element: Element, attr: typing.Optional[str] = None, message: str = "Error") -> str:
+	def toStringFromElement(element: Element, attr: str | None = None, message: str = "Error") -> str:
 		context, start, end = element.makeContext(attr=attr)
 		message += f"\nIn context of {element.toString(nested=False, simplified=True)}"
 		return Error.toString(context=context, index=start, end=end, message=message)
@@ -147,7 +147,7 @@ class Error:
 	@staticmethod
 	def handleFromElement(
 		element: Element,
-		attr: typing.Optional[str] = None,
+		attr: str | None = None,
 		message: str = "Error",
 		throw: bool = True,
 	) -> AssertionResult:
@@ -161,7 +161,7 @@ class Error:
 		element: Element,
 		condition: bool,
 		message: str,
-		attr: typing.Optional[str] = None,
+		attr: str | None = None,
 		throw: bool = True,
 	) -> AssertionResult:
 		"""
@@ -182,7 +182,7 @@ class Error:
 			return Error.handleFromElement(
 				element=element,
 				attr=None,
-				message="Missing mandatory attribute '{}'.".format(attr),
+				message=f"Missing mandatory attribute '{attr}'.",
 				throw=throw,
 			)
 		return AssertionResult()
@@ -197,7 +197,7 @@ class Error:
 			return Error.handleFromElement(
 				element=element,
 				attr=None,
-				message="Missing mandatory sequence '{}'.".format(sequence),
+				message=f"Missing mandatory sequence '{sequence}'.",
 				throw=throw,
 			)
 		return AssertionResult()

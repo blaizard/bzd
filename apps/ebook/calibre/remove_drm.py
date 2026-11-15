@@ -1,8 +1,7 @@
 import pathlib
-import typing
 
 from apps.ebook.calibre.calibre import Calibre
-from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
+from apps.ebook.flow import ActionInterface, FlowContext, FlowEnum
 from apps.ebook.providers import ProviderEbook
 
 
@@ -18,7 +17,7 @@ class RemoveDRM(ActionInterface):
 
 	def process(
 		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderEbook, FlowEnum | None]]:
 		if not provider.hasKeys:
 			print("No keys provided, therefore not removing the DRM.")
 			return [(provider, None)]

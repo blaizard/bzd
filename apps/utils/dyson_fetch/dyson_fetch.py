@@ -1,34 +1,32 @@
 import argparse
 import json
 import os
-import time
 import threading
+import time
 import typing
-import paho.mqtt.client as mqtt
-from paho.mqtt.enums import CallbackAPIVersion
 
+import paho.mqtt.client as mqtt
 from apps.artifacts.api.python.node.node import Node
+from paho.mqtt.enums import CallbackAPIVersion
 
 
 class Dyson:
-	def __init__(
-		self, serial: str, password: str, ip: str, type: str, intervalS: int, maybeNode: typing.Optional[Node]
-	) -> None:
+	def __init__(self, serial: str, password: str, ip: str, type: str, intervalS: int, maybeNode: Node | None) -> None:
 		self.serial = serial
 		self.password = password
 		self.ip = ip
 		self.type = type
 		self.intervalS = intervalS
 		self.maybeNode = maybeNode
-		self.client: typing.Optional[mqtt.Client] = None
+		self.client: mqtt.Client | None = None
 
-	def kelvin_to_celsius(self, kelvin_x10: int) -> typing.Optional[float]:
+	def kelvin_to_celsius(self, kelvin_x10: int) -> float | None:
 		try:
 			return round((float(kelvin_x10) / 10.0) - 273.15, 1)
 		except (ValueError, TypeError):
 			return None
 
-	def safe_int(self, val: str) -> typing.Optional[int]:
+	def safe_int(self, val: str) -> int | None:
 		try:
 			return int(val)
 		except (ValueError, TypeError):
@@ -141,7 +139,7 @@ class Dyson:
 						for entry in bulk:
 							publish(**entry)  # type: ignore
 
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			print(f"Error parsing message: {e}")
 
 

@@ -1,11 +1,11 @@
 import argparse
 import json
-import pathlib
-import typing
-import time
-import subprocess
 import os
+import pathlib
+import subprocess
 import sys
+import time
+import typing
 
 from apps.artifacts.api.python.common import NodePublishNoRemote
 from apps.artifacts.api.python.node.node import Node
@@ -26,10 +26,10 @@ class Utility:
 		if not condition:
 			self.fail(message, errorCode)
 
-	def cleanPathToList(self, data: str) -> typing.List[str]:
+	def cleanPathToList(self, data: str) -> list[str]:
 		"""Cleanup the given path."""
 
-		segments: typing.List[str] = []
+		segments: list[str] = []
 		for segment in data.split("/"):
 			segment = segment.strip()
 			if not segment or segment == ".":
@@ -41,7 +41,7 @@ class Utility:
 				segments.append(segment)
 		return segments
 
-	def _publish(self, path: typing.List[str], data: typing.Any) -> None:
+	def _publish(self, path: list[str], data: typing.Any) -> None:
 		"""Publish to a remote and ignore failure if any."""
 
 		try:
@@ -68,12 +68,12 @@ class Utility:
 		data = json.loads(file.read_text())
 		self._publish(data=data, path=pathAsList)
 
-	def timeit(self, path: str, args: typing.List[str]) -> None:
+	def timeit(self, path: str, args: list[str]) -> None:
 		"""Time the given command and publish it."""
 
 		timeStart = time.time()
 
-		result = subprocess.run(args, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None))
+		result = subprocess.run(args, cwd=os.environ.get("BUILD_WORKSPACE_DIRECTORY", None), check=False)
 		self.assertTrue(
 			result.returncode == 0,
 			f"Process failed with return code {result.returncode}",

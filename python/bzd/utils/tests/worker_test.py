@@ -1,7 +1,8 @@
-import unittest
-import bzd.utils.worker
 import time
 import typing
+import unittest
+
+import bzd.utils.worker
 
 
 class TestWorker(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestWorker(unittest.TestCase):
 
 	@staticmethod
 	def throwWorkload(x: int, stdout: typing.TextIO) -> None:
-		raise Exception("dummy")
+		raise RuntimeError("dummy")
 
 	@staticmethod
 	def blockingWorkload(x: int, stdout: typing.TextIO) -> None:

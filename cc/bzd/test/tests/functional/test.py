@@ -1,13 +1,12 @@
-import unittest
 import sys
-import typing
+import unittest
 
 from bzd.utils.run import localBazelBinary
 
 
 class TestRun(unittest.TestCase):
-	FAILURE_PATH: typing.Optional[str] = None
-	SUCCESS_PATH: typing.Optional[str] = None
+	FAILURE_PATH: str | None = None
+	SUCCESS_PATH: str | None = None
 
 	def testAssertFailed(self) -> None:
 		assert TestRun.FAILURE_PATH is not None

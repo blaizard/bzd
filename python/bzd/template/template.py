@@ -1,15 +1,14 @@
-import typing
 import pathlib
+import typing
 
 from bzd.parser.error import Error
-
 from bzd.template.parser import Parser
 from bzd.template.substitution import (
+	SubstitutionsAccessor,
 	SubstitutionsType,
 	SubstitutionWrapper,
-	SubstitutionsAccessor,
 )
-from bzd.template.visitor import Visitor, ResultType
+from bzd.template.visitor import ResultType, Visitor
 
 
 class Template:
@@ -30,8 +29,8 @@ class Template:
 		return "".join(output)
 
 	def _render(
-		self, substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper]
-	) -> typing.Tuple[ResultType, SubstitutionWrapper]:
+		self, substitutions: SubstitutionsAccessor | SubstitutionWrapper
+	) -> tuple[ResultType, SubstitutionWrapper]:
 		sequence = self.parser.parse()
 		# Get the last element of the sequence, if no element, use None
 		last = None

@@ -1,23 +1,23 @@
 import argparse
-import pathlib
-import typing
-import json
-import zlib
-import sys
-import os
-import subprocess
 import contextlib
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import typing
+import zlib
 
 from bzd.utils.runfiles import pathFromRLocation
-
-from private.secret.config import age as configAge, recipients as configRecipients
+from private.secret.config import age as configAge
+from private.secret.config import recipients as configRecipients
 
 
 class Secret:
 	def __init__(
 		self,
-		recipients: typing.Optional[typing.List[str]] = None,
-		keyFile: typing.Optional[pathlib.Path] = None,
+		recipients: list[str] | None = None,
+		keyFile: pathlib.Path | None = None,
 	) -> None:
 		self.recipients = Secret.loadRecipients(recipients or [])
 		self.recipientsHash = Secret.recipientsToHash(self.recipients)
@@ -33,11 +33,11 @@ class Secret:
 		return 1
 
 	@staticmethod
-	def loadRecipients(recipients: typing.List[str]) -> typing.List[str]:
+	def loadRecipients(recipients: list[str]) -> list[str]:
 		"""Load a list of recipients from the given or default file."""
 
 		data = json.loads(pathFromRLocation(configRecipients).read_text())
-		recipientNames = set([*data["required"], *recipients])
+		recipientNames = {*data["required"], *recipients}
 		recipientKeys = []
 		for name in recipientNames:
 			if name not in data["recipients"]:
@@ -104,7 +104,7 @@ class Secret:
 		return result.stdout.decode()
 
 	@contextlib.contextmanager
-	def _getKeyFile(self) -> typing.Generator[typing.Tuple[pathlib.Path, typing.List[int]], None, None]:
+	def _getKeyFile(self) -> typing.Generator[tuple[pathlib.Path, list[int]], None, None]:
 		"""Retrieve the current key file from the system or raise an exception."""
 
 		if self.keyFile is not None:
@@ -134,11 +134,11 @@ class Secret:
 			yield maybeKeyFileFromHome, []
 			return
 
-		raise Exception(
+		raise RuntimeError(
 			f"No key found, searched in:\n - Environment variable 'BZD_KEY'.\n - Environment variable 'BZD_KEY_FILE'.\n - Path at '{maybeKeyFileFromHome}'."
 		)
 
-	def tryReadSecret(self, payload: str) -> typing.Tuple[typing.Optional[str], typing.Optional[str]]:
+	def tryReadSecret(self, payload: str) -> tuple[str | None, str | None]:
 		"""Read the secret from the payload.
 
 		If the payload is not correctly formatted: return None + error string.
@@ -155,7 +155,7 @@ class Secret:
 		except json.JSONDecodeError:
 			return None, "invalid secret (decode)"
 		except AssertionError as e:
-			return None, f"invalid secret ({str(e)})"
+			return None, f"invalid secret ({e!s})"
 
 		try:
 			assert "version" in data, "missing version"
@@ -164,7 +164,7 @@ class Secret:
 			assert data["version"] == Secret.version(), f"wrong version '{data['version']}'"
 			assert data["recipients"] == self.recipientsHash, "wrong recipients"
 		except AssertionError as e:
-			return secret, f"not up to date ({str(e)})"
+			return secret, f"not up to date ({e!s})"
 
 		return secret, None
 

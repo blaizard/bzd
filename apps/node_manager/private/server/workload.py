@@ -1,7 +1,7 @@
-import typing
-import time
 import dataclasses
 import threading
+import time
+import typing
 
 from bzd.http.server import RESTServerContext
 from bzd.logging import Logger
@@ -20,8 +20,8 @@ class Workload:
 
 	def __init__(
 		self,
-		logger: typing.Optional[Logger] = None,
-		defaultTerminationPeriodS: typing.Optional[float] = None,
+		logger: Logger | None = None,
+		defaultTerminationPeriodS: float | None = None,
 		terminationGracePeriodS: int = 300,
 		terminateFn: typing.Callable[[], None] = lambda: None,
 		clockFn: typing.Callable[[], float] = time.monotonic,
@@ -36,13 +36,13 @@ class Workload:
 
 		self.logger = logger or Logger("workload")
 		self.terminationGracePeriodS_ = terminationGracePeriodS
-		self.leases_: typing.Dict[str, Lease] = {}
+		self.leases_: dict[str, Lease] = {}
 		self.uidCounter_ = 0
 		self.terminateFn_ = terminateFn
 		self.clockFn_ = clockFn
 		self.lock_ = threading.Lock()
 		self.shutingDown_ = False
-		self.terminationTimestamp_: typing.Optional[float] = (
+		self.terminationTimestamp_: float | None = (
 			None if defaultTerminationPeriodS is None else (self.clockFn_() + defaultTerminationPeriodS)
 		)
 
@@ -124,7 +124,7 @@ class Workload:
 			if self.terminationTimestamp_ <= now:
 				self.terminate()
 
-	def getActiveLeases(self) -> typing.Dict[str, typing.Any]:
+	def getActiveLeases(self) -> dict[str, typing.Any]:
 		"""Show the active leases."""
 
 		now = self.clockFn_()

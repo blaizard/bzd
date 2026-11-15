@@ -1,6 +1,6 @@
 import unittest
 
-from bzd.validation.validation import Validation, ExceptionValidation
+from bzd.validation.validation import ExceptionValidation, Validation
 
 
 class TestRun(unittest.TestCase):

@@ -1,7 +1,7 @@
+import datetime
+import json
 import pathlib
 import typing
-import json
-import datetime
 
 from bzd_sanitizer.filter import Filter
 
@@ -77,7 +77,7 @@ class Context:
 		self,
 		path: pathlib.Path,
 		excludeFile: str,
-		cache: typing.Dict[pathlib.Path, typing.Optional[Filter]],
+		cache: dict[pathlib.Path, Filter | None],
 	) -> bool:
 		"""Check if a file is excluded from the search."""
 
@@ -89,17 +89,16 @@ class Context:
 				ignoreFilePathFullPath = self.workspace / ignoreFilePath
 				cache[ignoreFilePath] = Filter.fromFile(ignoreFilePathFullPath) if ignoreFilePathFullPath.is_file() else None
 			excludeFilter = cache[ignoreFilePath]
-			if excludeFilter:
-				if excludeFilter.match(str(path.relative_to(searchDir))):
-					return True
+			if excludeFilter and excludeFilter.match(str(path.relative_to(searchDir))):
+				return True
 		return False
 
 	def data(
 		self,
-		endswith: typing.Optional[typing.Sequence[str]] = None,
-		include: typing.Optional[typing.Sequence[str]] = None,
-		includeFiles: typing.Optional[typing.Set[pathlib.Path]] = None,
-		excludeFile: typing.Optional[str] = None,
+		endswith: typing.Sequence[str] | None = None,
+		include: typing.Sequence[str] | None = None,
+		includeFiles: set[pathlib.Path] | None = None,
+		excludeFile: str | None = None,
 	) -> typing.Iterable[pathlib.Path]:
 		"""Enumerate the data.
 
@@ -112,7 +111,7 @@ class Context:
 
 		endswith = tuple(s.lower() for s in endswith) if endswith else None
 		includeFilter = Filter(include) if include else None
-		excludeFileCache: typing.Dict[pathlib.Path, typing.Optional[Filter]] = {}
+		excludeFileCache: dict[pathlib.Path, Filter | None] = {}
 
 		for pathStr in self.fileList:
 			path = pathlib.Path(pathStr)

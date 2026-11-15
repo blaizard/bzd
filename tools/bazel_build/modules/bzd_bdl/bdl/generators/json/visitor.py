@@ -1,12 +1,12 @@
 import json
 import typing
 
-from bdl.visitors.composition.visitor import CompositionView
-from bdl.visitors.composition.components import ExpressionEntry
 from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
+from bdl.visitors.composition.components import ExpressionEntry
+from bdl.visitors.composition.visitor import CompositionView
 
-Json = typing.Dict[str, typing.Any]
+Json = dict[str, typing.Any]
 
 
 def parametersToJson(parameters: ParametersResolved) -> typing.Sequence[Json]:
@@ -53,7 +53,7 @@ def expressionEntryToJson(entry: ExpressionEntry) -> Json:
 	}
 
 
-def ioToJson(io: typing.Dict[str, typing.Any]) -> Json:
+def ioToJson(io: dict[str, typing.Any]) -> Json:
 
 	result = {}
 	for name, data in io.items():

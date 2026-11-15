@@ -23,7 +23,7 @@ def toRustString(value: str) -> str:
 		elif character == "\t":
 			result.append("\\t")
 		elif ord(character) < 0x20:
-			result.append("\\u{{{:x}}}".format(ord(character)))
+			result.append(f"\\u{{{ord(character):x}}}")
 		else:
 			result.append(character)
 	result.append('"')
@@ -36,7 +36,7 @@ def toRustByteArray(content: bytes) -> str:
 	lines = ["&["]
 	for offset in range(0, len(content), 16):
 		chunk = content[offset : offset + 16]
-		lines.append("\t" + ", ".join("0x{:02X}".format(byte) for byte in chunk) + ",")
+		lines.append("\t" + ", ".join(f"0x{byte:02X}" for byte in chunk) + ",")
 	lines.append("]")
 	return "\n".join(lines)
 

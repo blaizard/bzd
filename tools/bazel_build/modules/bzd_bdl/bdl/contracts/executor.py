@@ -1,12 +1,10 @@
-import typing
-
 from bzd.validation.schema import Constraint, ProcessedSchema
 
 from bdl.contracts.traits import ContractTraits, Role
 
 
 class ExecutorConstraint_(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 		self.validate(schema=["string"], values=args)
 
 

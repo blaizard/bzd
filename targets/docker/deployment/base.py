@@ -1,5 +1,3 @@
-import typing
-
 from bdl.generators.json.ast.ast import Ast, Parameters
 
 
@@ -10,12 +8,12 @@ class Docker:
 			fqn: entity.expression.parameters for fqn, entity in ast.registry.items() if entity.expression.symbol == symbol
 		}
 
-	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
-		raise Exception("Unimplemented")
+	def makeDockerCompose(self, fqn: str, expression: Parameters) -> tuple[str, set[str]]:
+		raise RuntimeError("Unimplemented")
 
 	def makeDockerComposeForAllInstances(
 		self,
-	) -> typing.Tuple[typing.Dict[str, str], typing.Set[str]]:
+	) -> tuple[dict[str, str], set[str]]:
 		"""Generate content for the docker compose files.
 
 		This includes the docker compose yaml content as string keyed per instance and a set
@@ -29,7 +27,7 @@ class Docker:
 			images.update(currentImages)
 		return dockerComposeFiles, images
 
-	def getInterfaces(self, fqn: str, interface: str) -> typing.List[Parameters]:
+	def getInterfaces(self, fqn: str, interface: str) -> list[Parameters]:
 		"""Gather object instances of a specific type."""
 
 		return [

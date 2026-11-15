@@ -1,16 +1,18 @@
+import dataclasses
+
+# This is the standard library module, not a self-import.
+import http.server  # noqa: PLW0406
 import json
-import http.server
+import mimetypes
+import pathlib
 import socketserver
 import typing
-import pathlib
-import mimetypes
-import dataclasses
-from http import HTTPStatus
 from functools import partial
+from http import HTTPStatus
 
 HandlerCallback = typing.Callable[["RESTServerContext"], None]
-Handlers = typing.Dict[str, typing.Dict[str, HandlerCallback]]
-StaticRoutes = typing.Dict[str, pathlib.Path]
+Handlers = dict[str, dict[str, HandlerCallback]]
+StaticRoutes = dict[str, pathlib.Path]
 
 METHODS_ = {"get", "post", "put", "delete", "head", "patch"}
 
@@ -18,13 +20,13 @@ METHODS_ = {"get", "post", "put", "delete", "head", "patch"}
 @dataclasses.dataclass
 class RESTServerContextRequest:
 	headers: typing.Mapping[str, str]
-	data: typing.Union[typing.BinaryIO, bytes]
+	data: typing.BinaryIO | bytes
 
 
 @dataclasses.dataclass
 class RESTServerContextResponse:
-	headers: typing.List[typing.Tuple[str, str]] = dataclasses.field(default_factory=list)
-	data: typing.List[typing.Any] = dataclasses.field(default_factory=list)
+	headers: list[tuple[str, str]] = dataclasses.field(default_factory=list)
+	data: list[typing.Any] = dataclasses.field(default_factory=list)
 
 
 class RESTServerContext:
@@ -110,7 +112,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 			try:
 				self.handlers[method][self.path](context)
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				self.send_response(HTTPStatus.INTERNAL_SERVER_ERROR)
 				self.end_headers()
 				self.wfile.write(str(e).encode("utf8"))
@@ -134,9 +136,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 			self._notFound()
 
 	def do_GET(self) -> None:
-		if self._handle("get"):
-			pass
-		elif self._handleStatic():
+		if self._handle("get") or self._handleStatic():
 			pass
 		else:
 			self._notFound()
@@ -175,9 +175,7 @@ class HttpServer(socketserver.TCPServer):
 
 	def addRoute(self, method: str, uri: str, handler: HandlerCallback) -> None:
 		method = method.lower()
-		assert method in self.handlers, (
-			f"The route method {method} is not valid, expected any of {str(self.handlers.keys())}."
-		)
+		assert method in self.handlers, f"The route method {method} is not valid, expected any of {self.handlers.keys()!s}."
 		assert uri not in self.handlers[method], f"The route '{uri}' is already set for '{method}'."
 
 		self.handlers[method][uri] = handler

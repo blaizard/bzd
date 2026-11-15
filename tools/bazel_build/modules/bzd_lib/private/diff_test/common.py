@@ -1,11 +1,10 @@
 """Common utilities."""
 
-import pathlib
-import typing
 import difflib
+import pathlib
 
 
-def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> typing.Tuple[pathlib.Path, pathlib.Path]:
+def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> tuple[pathlib.Path, pathlib.Path]:
 	"""Get shortest distinct path given 2 paths."""
 
 	shortest1 = []
@@ -18,14 +17,14 @@ def getShortestDistinctPaths(path1: pathlib.Path, path2: pathlib.Path) -> typing
 	return pathlib.Path(*shortest1[::-1]), pathlib.Path(*shortest2[::-1])
 
 
-def maybeColorizeLine(text: str, color: typing.Optional[str]) -> str:
+def maybeColorizeLine(text: str, color: str | None) -> str:
 	"""Colorize the line if a color is set."""
 
 	return f"{color}{text}\033[0m" if color else text
 
 
 def printUnifiedDiff(
-	content1: typing.List[str], content2: typing.List[str], file1: pathlib.Path, file2: pathlib.Path, color: bool
+	content1: list[str], content2: list[str], file1: pathlib.Path, file2: pathlib.Path, color: bool
 ) -> None:
 	"""Print a diff between 2 list of strings."""
 

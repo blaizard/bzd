@@ -1,34 +1,44 @@
 import typing
 from pathlib import Path
 
-from bzd.template.template import Template
-
-from bdl.visitors.composition.visitor import CompositionView
-from bdl.visitors.composition.components import EntryType
-from bdl.object import Object
-from bdl.entities.all import Namespace, Expression
-from bdl.entities.impl.fragment.symbol import Symbol
+from bdl.entities.all import Expression, Namespace
 from bdl.entities.impl.fragment.parameters_resolved import (
 	ParametersResolved,
 	ParametersResolvedItem,
 )
+from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.types import Category as CategoryOriginal
-
-from cc.bdl.generator.impl.symbol import symbolToStr as symbolToStrOriginal
-from cc.bdl.generator.impl.value import (
-	valueToStr as valueToStrOriginal,
-	literalNativeToStr,
-)
+from bdl.object import Object
+from bdl.visitors.composition.components import EntryType
+from bdl.visitors.composition.visitor import CompositionView
+from bzd.template.template import Template
 from cc.bdl.generator.impl.comments import (
 	commentBlockToStr as commentBlockToStrOriginal,
+)
+from cc.bdl.generator.impl.comments import (
 	commentEmbeddedToStr as commentEmbeddedToStrOriginal,
+)
+from cc.bdl.generator.impl.comments import (
 	commentParametersResolvedToStr as commentParametersResolvedToStrOriginal,
 )
 from cc.bdl.generator.impl.fqn import (
-	fqnToStr as fqnToStrOriginal,
 	fqnToAdapterStr as fqnToAdapterStrOriginal,
-	fqnToNameStr as fqnToNameStrOriginal,
+)
+from cc.bdl.generator.impl.fqn import (
 	fqnToCapitalized as fqnToCapitalizedOriginal,
+)
+from cc.bdl.generator.impl.fqn import (
+	fqnToNameStr as fqnToNameStrOriginal,
+)
+from cc.bdl.generator.impl.fqn import (
+	fqnToStr as fqnToStrOriginal,
+)
+from cc.bdl.generator.impl.symbol import symbolToStr as symbolToStrOriginal
+from cc.bdl.generator.impl.value import (
+	literalNativeToStr,
+)
+from cc.bdl.generator.impl.value import (
+	valueToStr as valueToStrOriginal,
 )
 
 """
@@ -58,8 +68,8 @@ class Transform:
 
 	def __init__(
 		self,
-		composition: typing.Optional[CompositionView] = None,
-		data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+		composition: CompositionView | None = None,
+		data: dict[str, typing.Any] | None = None,
 	) -> None:
 		self.composition = composition
 		self.data = data if data else {}
@@ -70,12 +80,12 @@ class Transform:
 
 	# Inheritance related
 
-	def inheritanceToStr(self, inheritanceList: typing.List[Symbol]) -> str:
-		return ", ".join([f"public {str(symbolToStrOriginal(inheritance))}<Impl>" for inheritance in inheritanceList])
+	def inheritanceToStr(self, inheritanceList: list[Symbol]) -> str:
+		return ", ".join([f"public {symbolToStrOriginal(inheritance)!s}<Impl>" for inheritance in inheritanceList])
 
-	def inheritanceAdapterToStr(self, inheritanceList: typing.List[Symbol]) -> str:
+	def inheritanceAdapterToStr(self, inheritanceList: list[Symbol]) -> str:
 		return ", ".join(
-			["public {}<Impl>".format(str(symbolToStrOriginal(inheritance, adapter=True))) for inheritance in inheritanceList]
+			[f"public {symbolToStrOriginal(inheritance, adapter=True)!s}<Impl>" for inheritance in inheritanceList]
 		)
 
 	# Path related
@@ -131,7 +141,7 @@ class Transform:
 		item.error(message="Type not supported, should never happen.")
 		return ""
 
-	def paramsDeclarationToList_(self, params: ParametersResolved, isRegistry: bool = False) -> typing.List[str]:
+	def paramsDeclarationToList_(self, params: ParametersResolved, isRegistry: bool = False) -> list[str]:
 		"""Declare inline parameters.
 
 		Args:
@@ -285,7 +295,7 @@ class Transform:
 		return f"template <{', '.join(args)}>"
 
 
-def formatCc(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:
+def formatCc(bdl: Object, data: dict[str, typing.Any] | None = None) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/file.h.btl", indent=True)
 	output = template.render(bdl.tree, Transform(composition=None, data=data))
 
@@ -294,7 +304,7 @@ def formatCc(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = 
 
 def compositionCc(
 	composition: CompositionView,
-	data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+	data: dict[str, typing.Any] | None = None,
 ) -> str:
 	template = Template.fromPath(Path(__file__).parent / "template/composition.cc.btl", indent=True)
 	return template.render(composition, Transform(composition=composition, data=data))

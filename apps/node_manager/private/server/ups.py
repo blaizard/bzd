@@ -1,6 +1,6 @@
-import typing
-import socket
 import shlex
+import socket
+import typing
 from contextlib import contextmanager
 
 from apps.node_manager.private.server.config import Config
@@ -14,7 +14,7 @@ class NUTClientAccessor:
 	def send(self, command: str) -> None:
 		"""Sends a command to the server."""
 
-		self.sock.sendall(f"{command}\n".encode("utf-8"))
+		self.sock.sendall(f"{command}\n".encode())
 
 	def readLine(self) -> str:
 		"""Reads a single line from the socket buffer."""
@@ -25,13 +25,13 @@ class NUTClientAccessor:
 				if not chunk:
 					raise ConnectionError("Connection closed by server.")
 				self.buffer += chunk
-			except socket.timeout:
+			except TimeoutError:
 				raise TimeoutError("Server response timed out.")
 
 		line, self.buffer = self.buffer.split(b"\n", 1)
 		return line.decode("utf-8").strip()
 
-	def getUPSDevices(self) -> typing.Dict[str, str]:
+	def getUPSDevices(self) -> dict[str, str]:
 		"""Retrieves a list of UPS devices from the server.
 
 		Returns:
@@ -46,14 +46,14 @@ class NUTClientAccessor:
 
 		line = self.readLine()
 		if not line.startswith("BEGIN LIST UPS"):
-			raise IOError(f"Unexpected server response for LIST UPS: {line}")
+			raise OSError(f"Unexpected server response for LIST UPS: {line}")
 
 		while True:
 			line = self.readLine()
 			if line.startswith("END LIST UPS"):
 				break
 			if line.startswith("ERR"):
-				raise IOError(f"Server returned an error: {line}")
+				raise OSError(f"Server returned an error: {line}")
 
 			# Line format is: UPS <upsname> "<description>"
 			# shlex.split handles the quotes safely
@@ -82,14 +82,14 @@ class NUTClientAccessor:
 		line = self.readLine()
 
 		if line.startswith("ERR"):
-			raise IOError(f"Server returned an error for GET VAR: {line}")
+			raise OSError(f"Server returned an error for GET VAR: {line}")
 
 		# Line format is: VAR <upsname> <varname> "<value>"
 		parts = shlex.split(line)
 		if len(parts) == 4 and parts[0] == "VAR":
 			return parts[3]
 
-		raise IOError(f"Could not parse server response for GET VAR: {line}")
+		raise OSError(f"Could not parse server response for GET VAR: {line}")
 
 
 class NUTClient:
@@ -103,8 +103,8 @@ class NUTClient:
 		hostname: str = "localhost",
 		port: int = 3493,
 		timeout: int = 5,
-		username: typing.Optional[str] = None,
-		password: typing.Optional[str] = None,
+		username: str | None = None,
+		password: str | None = None,
 	) -> None:
 		"""Initializes the client.
 
@@ -125,8 +125,8 @@ class NUTClient:
 	def connect(self) -> typing.Generator[NUTClientAccessor, None, None]:
 		"""Establishes a connection to the NUT server and handles authentication."""
 
-		sock: typing.Optional[socket.socket] = None
-		accessor: typing.Optional[NUTClientAccessor] = None
+		sock: socket.socket | None = None
+		accessor: NUTClientAccessor | None = None
 		try:
 			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			sock.settimeout(self.timeout)
@@ -144,14 +144,14 @@ class NUTClient:
 
 			yield accessor
 
-		except socket.error as e:
+		except OSError as e:
 			raise ConnectionError(f"Failed to connect to {self.hostname}:{self.port}: {e}")
 
 		finally:
 			if accessor:
 				try:
 					accessor.send("LOGOUT")
-				except socket.error:
+				except OSError:
 					pass
 			if sock:
 				sock.close()
@@ -159,7 +159,7 @@ class NUTClient:
 
 class UPS:
 	def __init__(self, config: Config) -> None:
-		self.clients: typing.Dict[str, typing.Any] = {}
+		self.clients: dict[str, typing.Any] = {}
 		for name, ups in config.ups().items():
 			client = NUTClient(
 				hostname=ups.hostname,

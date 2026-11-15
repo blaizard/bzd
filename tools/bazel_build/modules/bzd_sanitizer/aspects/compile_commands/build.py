@@ -1,32 +1,32 @@
 import argparse
+import json
 import os
 import pathlib
-import typing
-import json
 import threading
+import typing
 
 from bzd.utils.run import localBazel, localCommand
 
-CompileCommandsType = typing.List[typing.Dict[str, str]]
+CompileCommandsType = list[dict[str, str]]
 
 
 class CompileCommands:
 	def __init__(self, compile_commands_path: pathlib.Path) -> None:
 		self.compile_commands_path = compile_commands_path
-		self.compile_commands: typing.Optional[CompileCommandsType] = None
+		self.compile_commands: CompileCommandsType | None = None
 
-	def __enter__(self) -> "CompileCommands":
+	def __enter__(self) -> typing.Self:
 		try:
 			self.compile_commands = json.loads(compile_commands_path.read_text())
-		except Exception:
+		except Exception:  # noqa: BLE001
 			self.compile_commands = []
 		return self
 
-	def __exit__(self, *_: typing.Any) -> None:
+	def __exit__(self, *_: object) -> None:
 		output = json.dumps(self.compile_commands, indent=4)
 		self.compile_commands_path.write_text(output)
 
-	def insert(self, fragment: typing.Dict[str, str]) -> None:
+	def insert(self, fragment: dict[str, str]) -> None:
 		file = fragment["file"]
 		assert self.compile_commands is not None
 		index = next((i for i, x in enumerate(self.compile_commands) if file == x["file"]), -1)
@@ -39,7 +39,7 @@ class CompileCommands:
 class Queue:
 	def __init__(self, trigger: typing.Callable[[], None]) -> None:
 		self.trigger = trigger
-		self.compile_commands_files: typing.Set[pathlib.Path] = set()
+		self.compile_commands_files: set[pathlib.Path] = set()
 
 	def empty(self) -> bool:
 		"""Check if the queue is empty."""
@@ -51,7 +51,7 @@ class Queue:
 
 		return not self.empty()
 
-	def next(self) -> typing.Optional[pathlib.Path]:
+	def next(self) -> pathlib.Path | None:
 		"""Get the next file to process."""
 
 		if self.empty():
@@ -82,7 +82,7 @@ class Manager:
 	def add(self, file: pathlib.Path) -> None:
 		self.queue.add(file)
 
-	def updateFragment(self, fragment: typing.Dict[str, str]) -> None:
+	def updateFragment(self, fragment: dict[str, str]) -> None:
 		"""Update a fragment."""
 
 		fragment["directory"] = str(self.workspace_path)
@@ -110,7 +110,7 @@ class Manager:
 						try:
 							assert f is not None
 							fragments = json.loads((self.workspace_path / f).read_text())
-						except Exception:
+						except Exception:  # noqa: BLE001, S112
 							continue
 						for fragment in fragments:
 							self.updateFragment(fragment)

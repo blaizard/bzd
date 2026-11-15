@@ -1,15 +1,15 @@
 import argparse
-import pathlib
-import typing
 import json
+import pathlib
 import sys
-import yaml
+import typing
 
-from bzd.utils.dict import updateDeep, UpdatePolicy
+import yaml
+from bzd.utils.dict import UpdatePolicy, updateDeep
 from config.reader import (
-	Metadata,
-	InternalFragmentList,
 	InternalFragment,
+	InternalFragmentList,
+	Metadata,
 	makeDictionary,
 )
 
@@ -22,7 +22,7 @@ def fatal(message: str) -> None:
 class Config:
 	def __init__(self) -> None:
 		self.data: InternalFragmentList = []
-		self.dataAsDict: typing.Dict[str, typing.Any] = {}
+		self.dataAsDict: dict[str, typing.Any] = {}
 
 	def addKey(
 		self,
@@ -42,13 +42,13 @@ class Config:
 		self._verifyData(data, source, policy)
 		self.data.append((key, value, metadata, source))
 
-	def addDict(self, data: typing.Dict[str, typing.Any], metadata: Metadata, source: str, policy: UpdatePolicy) -> None:
+	def addDict(self, data: dict[str, typing.Any], metadata: Metadata, source: str, policy: UpdatePolicy) -> None:
 		self._verifyData(data, source, policy)
 		self.data.append((None, data, metadata, source))
 
-	def _verifyData(self, data: typing.Dict[str, typing.Any], source: str, policy: UpdatePolicy) -> None:
+	def _verifyData(self, data: dict[str, typing.Any], source: str, policy: UpdatePolicy) -> None:
 
-		def policyOverride(originalValue: typing.Any, newValue: typing.Any, keys: typing.List[str]) -> None:
+		def policyOverride(originalValue: typing.Any, newValue: typing.Any, keys: list[str]) -> None:
 			if originalValue is None or newValue is None:
 				return
 			if isinstance(originalValue, list) and not isinstance(newValue, list):
@@ -81,7 +81,7 @@ def dataFromJson(path: pathlib.Path) -> typing.Any:
 		if not refPath.is_file():
 			refPath = path.parent / refPath
 			if not refPath.is_file():
-				fatal(f"Reference path '{ref}' not found from '{str(path)}'.")
+				fatal(f"Reference path '{ref}' not found from '{path!s}'.")
 		return refPath
 
 	def visitJson(data: typing.Any) -> typing.Any:
@@ -94,7 +94,7 @@ def dataFromJson(path: pathlib.Path) -> typing.Any:
 			for ref in refs:
 				refPath = resolvePath(ref)
 				refData = dataFromSrc(refPath)
-				assert refData is not None, f"Reference path '{ref}' from '{str(path)}' could not be loaded."
+				assert refData is not None, f"Reference path '{ref}' from '{path!s}' could not be loaded."
 				updateDeep(
 					data,
 					refData,
@@ -110,7 +110,7 @@ def dataFromJson(path: pathlib.Path) -> typing.Any:
 	return visitJson(data)
 
 
-def dataFromSrc(path: pathlib.Path) -> typing.Optional[typing.Any]:
+def dataFromSrc(path: pathlib.Path) -> typing.Any | None:
 	"""Load the content of a source file from its path."""
 
 	extension = path.suffix.lower()
@@ -136,11 +136,10 @@ def dataFromPath(path: pathlib.Path, mustBeDictionary: bool) -> typing.Iterator[
 
 	elif extension == ".internal":
 		fragments: InternalFragmentList = json.loads(path.read_text())
-		for key, value, metadata, source in fragments:
-			yield (key, value, metadata, source)
+		yield from fragments
 
 	elif mustBeDictionary:
-		fatal(f"File extension '{extension}' not supported: {str(path)}.")
+		fatal(f"File extension '{extension}' not supported: {path!s}.")
 
 	else:
 		yield (None, path.read_text(), [], str(path))
@@ -208,7 +207,7 @@ if __name__ == "__main__":
 	output = Config()
 
 	# - From workspace status files.
-	workspaceStatusKeysUsed: typing.Set[str] = set()
+	workspaceStatusKeysUsed: set[str] = set()
 	for workspaceStatusFile in args.workspaceStatusFiles:
 		workspaceStatus = {}
 		for line in workspaceStatusFile.read_text().split("\n"):

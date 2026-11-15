@@ -8,13 +8,13 @@ class Result(typing.Generic[V, E]):
 	"""Container for either a value or an error."""
 
 	def __init__(self, value: V) -> None:
-		self.value_: typing.Optional[V] = value
-		self.error_: typing.Optional[E] = None
+		self.value_: V | None = value
+		self.error_: E | None = None
 
 	U = typing.TypeVar("U", bound="Result[V, E]")
 
 	@classmethod
-	def makeError(cls: typing.Type[U], error: E) -> U:
+	def makeError(cls, error: E) -> typing.Self:
 		result = cls(value=typing.cast(V, None))
 		result.error_ = error
 		return result
@@ -40,5 +40,5 @@ class Result(typing.Generic[V, E]):
 
 	def __repr__(self) -> str:
 		if bool(self):
-			return f'<Result value="{str(self.value)}">'
-		return f'<Result error="{str(self.error)}">'
+			return f'<Result value="{self.value!s}">'
+		return f'<Result error="{self.error!s}">'

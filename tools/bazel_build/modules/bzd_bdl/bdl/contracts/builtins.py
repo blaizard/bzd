@@ -1,8 +1,8 @@
 import typing
 
-from bzd.validation.constraints.integer import Integer
-from bzd.validation.constraints.float import Float
 from bzd.validation.constraints.boolean import Boolean
+from bzd.validation.constraints.float import Float
+from bzd.validation.constraints.integer import Integer
 from bzd.validation.schema import TypeContext
 
 from bdl.contracts.traits import ContractTraits, Role
@@ -13,10 +13,10 @@ def getValueFromSingleParameter_(
 ) -> typing.Any:
 	"""Extract value of single parameter expressions."""
 
-	from bdl.visitors.symbol_map import Resolver
 	from bdl.entities.impl.expression import Expression
+	from bdl.visitors.symbol_map import Resolver
 
-	assert isinstance(resolver, Resolver), f"The resolver is not valid: {str(resolver)}."
+	assert isinstance(resolver, Resolver), f"The resolver is not valid: {resolver!s}."
 	if isinstance(value, Expression):
 		if value.isLiteral:
 			return value.literal
@@ -30,7 +30,9 @@ def getValueFromSingleParameter_(
 				return defaultValue
 			elif value.parametersResolved.size() == 1:
 				return value.parametersResolved[0].param.literal
-			raise Exception(f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}")
+			raise RuntimeError(
+				f"There are too many initializers for '{typeFQN}', only 1 is expected:\n{value.parametersResolved}"
+			)
 
 	return value
 

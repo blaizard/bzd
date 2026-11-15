@@ -2,20 +2,21 @@
 
 import argparse
 import json
-import re
 import os
+import re
 import sys
-from typing import Any, Tuple, Dict, List
+from typing import Any
+
 from elftools.elf.elffile import ELFFile
 
 
-def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
+def processElfDwarf(path: str) -> tuple[dict[str, int], list[str]]:
 	compilers = set()
-	compilerList: List[str] = []
+	compilerList: list[str] = []
 
 	with open(path, "rb") as f:
 		elffile = ELFFile(f)
-		result: Dict[str, int] = {}
+		result: dict[str, int] = {}
 
 		if not elffile.has_dwarf_info():
 			return result, compilerList
@@ -33,14 +34,13 @@ def processElfDwarf(path: str) -> Tuple[Dict[str, int], List[str]]:
 				result[name] += size
 
 			# Gather compilers
-			if topDIE.tag == "DW_TAG_compile_unit":
-				if "DW_AT_producer" in topDIE.attributes:
-					compiler = topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors="ignore").lower()
-					# Remove everything after the first argument
-					index = compiler.find(" -")
-					if index != -1:
-						compiler = compiler[0:index]
-					compilers.add(compiler)
+			if topDIE.tag == "DW_TAG_compile_unit" and "DW_AT_producer" in topDIE.attributes:
+				compiler = topDIE.attributes["DW_AT_producer"].value.decode("ascii", errors="ignore").lower()
+				# Remove everything after the first argument
+				index = compiler.find(" -")
+				if index != -1:
+					compiler = compiler[0:index]
+				compilers.add(compiler)
 
 	compilerList = list(compilers)
 	compilerList.sort()
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 	if args.format == "elf-dwarf":
 		result, compilers = processElfDwarf(args.binary)
 	else:
-		raise Exception("Unsupported format.")
+		raise RuntimeError("Unsupported format.")
 
 	groupedResult = {}
 

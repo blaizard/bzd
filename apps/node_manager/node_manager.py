@@ -1,20 +1,20 @@
 import argparse
 import json
-import sys
-import time
 import os
 import pathlib
+import sys
+import time
 
+from apps.artifacts.api.python.node.node import Node
+from apps.node_manager.private.server.config import Config
+from apps.node_manager.private.server.monitor import Monitor
+from apps.node_manager.private.server.power import handlerShutdown, handlerSuspend
+from apps.node_manager.private.server.workload import Workload
+from bzd.http.server import HttpServer
 from bzd.logging import Logger
 from bzd.logging.handler.stderr import LoggerHandlerStderr
-from apps.node_manager.private.server.power import handlerSuspend, handlerShutdown
-from apps.node_manager.private.server.monitor import Monitor
-from apps.node_manager.private.server.config import Config
-from apps.node_manager.private.server.workload import Workload
-from bzd.utils.scheduler import Scheduler
 from bzd.sync.singleton import Singleton
-from apps.artifacts.api.python.node.node import Node
-from bzd.http.server import HttpServer
+from bzd.utils.scheduler import Scheduler
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Node Manager.")
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 		try:
 			if not args.dry:
 				node.publish(data=data)
-		except Exception:
+		except Exception:  # noqa: BLE001, S110
 			# Ignore any errors, we don't want to crash if something is wrong on the server side.
 			pass
 

@@ -1,6 +1,3 @@
-import typing
-
-
 def getMatchingWeight(word: str, compareWith: str) -> float:
 	"""Calculate the matching weight of a word against another string.
 
@@ -15,7 +12,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 	start = -1
 	weight: float = 0.0
 
-	def compareWithGetCharAtOrNone(index: int) -> typing.Optional[str]:
+	def compareWithGetCharAtOrNone(index: int) -> str | None:
 		return compareWith[index] if index < len(compareWith) else None
 
 	while True:
@@ -50,7 +47,7 @@ def getMatchingWeight(word: str, compareWith: str) -> float:
 	return weight
 
 
-def sortMatchingWeight(word: str, compareWithList: typing.List[str], minWeight: float = 0.5) -> typing.List[str]:
+def sortMatchingWeight(word: str, compareWithList: list[str], minWeight: float = 0.5) -> list[str]:
 	weightList = [
 		(
 			compareWith,

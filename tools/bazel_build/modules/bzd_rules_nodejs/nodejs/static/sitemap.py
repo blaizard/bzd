@@ -1,12 +1,12 @@
 import argparse
+import json
 import pathlib
 import typing
-import json
 
 
 def getSitemap(
 	api: typing.Mapping[str, typing.Mapping[str, typing.Any]],
-) -> typing.Dict[str, typing.Any]:
+) -> dict[str, typing.Any]:
 	maps = {}
 	for path, data in api.get("routes", {}).items():
 		# Filter out entries that are not to be seen.
@@ -20,17 +20,17 @@ def makeUrl(hostname: str, path: str) -> str:
 	return hostname.rstrip("/") + "/" + path.lstrip("/")
 
 
-def formatXML(api: typing.Dict[str, typing.Any], args: typing.Any) -> str:
+def formatXML(api: dict[str, typing.Any], args: typing.Any) -> str:
 
 	content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 """
 
-	for path, data in api.items():
-		content += """<url>
-	<loc>{url}</loc>
+	for path in api:
+		content += f"""<url>
+	<loc>{makeUrl(args.hostname, path)}</loc>
 </url>
-""".format(url=makeUrl(args.hostname, path))
+"""
 
 	content += """</urlset>
 """

@@ -1,11 +1,11 @@
 import typing
 
 
-class cached_classproperty(object):
+class cached_classproperty:
 	def __init__(self, method: typing.Any = None) -> None:
 		self.fget = method
 
-	def get_result_field_name(self) -> typing.Optional[str]:
+	def get_result_field_name(self) -> str | None:
 		return self.fget.__name__ + "_property_result" if self.fget else None
 
 	def __get__(self, instance: typing.Any, cls: typing.Any = None) -> typing.Any:

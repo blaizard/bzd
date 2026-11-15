@@ -1,7 +1,6 @@
 import typing
 
 from bzd.http.client import HttpClient, HttpClientException, HttpResponse
-
 from dependencies.bazel_dep.version import Version
 
 DEFAULT_BCR_URL = "https://bcr.bazel.build"
@@ -17,9 +16,9 @@ class BcrRegistry:
 	) -> None:
 		self.get_ = get
 		self.baseUrl_ = baseUrl.rstrip("/")
-		self.versions_: typing.Dict[str, typing.Optional[typing.List[str]]] = {}
+		self.versions_: dict[str, list[str] | None] = {}
 
-	def getVersions(self, module: str) -> typing.Optional[typing.List[str]]:
+	def getVersions(self, module: str) -> list[str] | None:
 		"""Get the versions published for a module, or None if the module is not in the BCR."""
 
 		if module not in self.versions_:
@@ -33,13 +32,13 @@ class BcrRegistry:
 				self.versions_[module] = [str(entry) for entry in response.json.get("versions", [])]
 		return self.versions_[module]
 
-	def getLatestStable(self, module: str, currentVersion: str) -> typing.Optional[str]:
+	def getLatestStable(self, module: str, currentVersion: str) -> str | None:
 		"""Get the latest stable version of a module strictly newer than the current one, if any."""
 
 		current = Version.parse(currentVersion)
 		if current is None:
 			return None
-		latest: typing.Optional[Version] = None
+		latest: Version | None = None
 		for candidate in self.getVersions(module) or []:
 			parsed = Version.parse(candidate)
 			if parsed is None or not parsed.isStable or parsed <= current:

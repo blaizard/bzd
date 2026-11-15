@@ -1,6 +1,6 @@
 import argparse
-import pathlib
 import json
+import pathlib
 
 from bzd_dns.zones import Zones
 

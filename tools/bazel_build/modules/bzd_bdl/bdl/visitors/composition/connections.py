@@ -1,9 +1,8 @@
-import typing
 import dataclasses
 
-from bdl.visitors.symbol_map import SymbolMap
 from bdl.entities.impl.entity import EntityExpression
 from bdl.entities.impl.fragment.symbol import Symbol
+from bdl.visitors.symbol_map import SymbolMap
 
 
 @dataclasses.dataclass(frozen=True)
@@ -32,7 +31,7 @@ class Metadata:
 	# The type of symbol for this endpoint.
 	symbol: Symbol
 	# The connections associated with this endpoint.
-	connections: typing.Set[EndpointId] = dataclasses.field(default_factory=set)
+	connections: set[EndpointId] = dataclasses.field(default_factory=set)
 	# The maximum history required by this endpoint.
 	history: int = 1
 	# If it is intended to accept multiple connection on the same endpoint.
@@ -44,15 +43,15 @@ class ConnectionArguments:
 	# The source associated with this connection.
 	source: EntityExpression
 	# The set of sinks associated with the source.
-	sinks: typing.Set[EntityExpression]
+	sinks: set[EntityExpression]
 
 
 class Connections:
 	def __init__(self, symbols: SymbolMap) -> None:
 		self.resolver = symbols.makeResolver()
 		# List of all available endpoints. Endpoints are the end of each connection.
-		self.endpoints: typing.Dict[EndpointId, Metadata] = {}
-		self.connections: typing.List[ConnectionArguments] = []
+		self.endpoints: dict[EndpointId, Metadata] = {}
+		self.connections: list[ConnectionArguments] = []
 
 	def addEndpoint(self, this: EntityExpression, endpoint: EntityExpression) -> None:
 		"""Register a new endpoint."""
@@ -112,9 +111,9 @@ class Connections:
 	def getIdentifiers(
 		self,
 		entity: EntityExpression,
-		identifiers: typing.Set[EndpointId],
+		identifiers: set[EndpointId],
 		description: str,
-	) -> typing.Set[EndpointId]:
+	) -> set[EndpointId]:
 		"""Get the list of identifiers filtered by the entity."""
 
 		# If the entity contains a regular expression.
@@ -153,7 +152,7 @@ class Connections:
 		for connection in self.connections:
 			# Match the identifiers.
 			sources = self.getIdentifiers(connection.source, allSources, "source IO")
-			sinks: typing.Set[EndpointId] = set()
+			sinks: set[EndpointId] = set()
 			for entity in connection.sinks:
 				matches = self.getIdentifiers(entity, allSinks, "sink IO")
 				entity.assertTrue(

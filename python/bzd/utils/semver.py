@@ -113,7 +113,7 @@ class Semver:
 		return hash(self.core + self.preRelease)
 
 	def __repr__(self) -> str:
-		return f"<Semver {str(self)}>"
+		return f"<Semver {self!s}>"
 
 
 @dataclass
@@ -126,7 +126,7 @@ class _SemverConstraint:
 	build: str
 
 	@staticmethod
-	def fromString(string: str) -> typing.Tuple["_SemverConstraint", str]:
+	def fromString(string: str) -> tuple["_SemverConstraint", str]:
 		"""Build a _SemverConstraint object from a string and return the rest of the string that did not match."""
 
 		m = _REGEXPR_CONSTRAINT_FROM_BEGINING.match(string.strip())
@@ -181,7 +181,7 @@ class _SemverConstraint:
 			build=self.build,
 		)
 
-		maxVersions: typing.List[int] = []
+		maxVersions: list[int] = []
 		for v in [self.major, self.minor, self.patch]:
 			if self.isWildcard(v):
 				maxVersions[len(maxVersions) - 1] += 1
@@ -321,7 +321,7 @@ class SemverMatcher:
 
 		self.string = string
 		# Parse the string.
-		constraints: typing.List[typing.Union[_SemverConstraint, str]] = []
+		constraints: list[_SemverConstraint | str] = []
 		while string:
 			constraint, string = _SemverConstraint.fromString(string)
 			constraints.append(constraint)
@@ -339,7 +339,7 @@ class SemverMatcher:
 	def match(self, version: Semver) -> bool:
 		"""Match the given version."""
 
-		binaryOperators: typing.Dict[str, typing.Callable[[bool, bool], bool]] = {
+		binaryOperators: dict[str, typing.Callable[[bool, bool], bool]] = {
 			"||": lambda a, b: a or b,
 			"&&": lambda a, b: a and b,
 		}
@@ -365,7 +365,7 @@ class SemverMatcher:
 		assert len(stack) == 1, f"There should be a single data in the stack: {stack}, constraint: '{self.string}'"
 		return stack[0]
 
-	def matchLatest(self, versions: typing.Iterable[Semver]) -> typing.Optional[Semver]:
+	def matchLatest(self, versions: typing.Iterable[Semver]) -> Semver | None:
 		"""Match the latest version from the list."""
 
 		sortedVersions = sorted(versions, reverse=True)

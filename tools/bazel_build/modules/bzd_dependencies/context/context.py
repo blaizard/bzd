@@ -38,14 +38,14 @@ class Context:
 			if name in files:
 				yield pathlib.Path(root, name).relative_to(self.workspace)
 
-	def getLocalBzlmod(self) -> typing.Dict[str, pathlib.Path]:
+	def getLocalBzlmod(self) -> dict[str, pathlib.Path]:
 		"""Get the local bzlmod repositories mapped under the workspace."""
 
 		result = self.localBazel(
 			["mod", "show_repo", "--all_visible_repos", "--output=streamed_jsonproto"],
 			timeoutS=None,
 		)
-		repos: typing.Dict[str, pathlib.Path] = {}
+		repos: dict[str, pathlib.Path] = {}
 		for line in result.getStdout().splitlines():
 			if not line.strip():
 				continue

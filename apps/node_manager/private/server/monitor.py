@@ -1,14 +1,14 @@
-import os
-import psutil
-import typing
 import json
+import os
 import time
+import typing
 
-from bzd.http.server import RESTServerContext
+import psutil
+from apps.node_manager.private.server.config import Config
 from apps.node_manager.private.server.nvidia import Nvidia
 from apps.node_manager.private.server.ups import UPS
-from apps.node_manager.private.server.config import Config
 from apps.node_manager.private.server.workload import Workload
+from bzd.http.server import RESTServerContext
 
 # Virtual or transient filesystems. They do not represent persistent storage,
 # and their mount points often change with containers.
@@ -40,7 +40,7 @@ IGNORED_FSTYPES = {
 }
 
 
-def getNetworkInterfaces() -> typing.Set[str]:
+def getNetworkInterfaces() -> set[str]:
 	"""Return the network interfaces to report."""
 
 	interfaces = {
@@ -53,7 +53,7 @@ def getNetworkInterfaces() -> typing.Set[str]:
 	return physical or interfaces
 
 
-def getBlockDevices() -> typing.Set[str]:
+def getBlockDevices() -> set[str]:
 	"""Return the block devices to report."""
 
 	devices = set((psutil.disk_io_counters(perdisk=True, nowrap=True) or {}).keys())  # type: ignore
@@ -85,13 +85,13 @@ class Monitor:
 	CPU loads are in percent.
 	"""
 
-	def __init__(self, config: Config, workload: typing.Optional[Workload]) -> None:
+	def __init__(self, config: Config, workload: Workload | None) -> None:
 		self.config = config
 		self.workload = workload
 		self.nvidia = Nvidia()
 		self.ups = UPS(config=config)
-		self.networkPrevious: typing.Dict[str, typing.Any] = {}
-		self.ioPrevious: typing.Dict[str, typing.Any] = {}
+		self.networkPrevious: dict[str, typing.Any] = {}
+		self.ioPrevious: dict[str, typing.Any] = {}
 
 	def temperatures(self) -> typing.Any:
 		data = {}

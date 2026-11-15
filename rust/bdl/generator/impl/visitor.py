@@ -1,22 +1,20 @@
-import typing
 import json
 import pathlib
+import typing
+from typing import Any
 
-from typing import Any, Dict, Optional
-
-from bzd.template.template import Template
-from bdl.object import Object
 from bdl.entities.impl.entity import Entity, EntityExpression
 from bdl.entities.impl.expression import Expression
-from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.fragment.fqn import FQN
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
-from bdl.entities.impl.types import Category as CategoryOriginal
+from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.method import Method
 from bdl.entities.impl.nested import Nested
+from bdl.entities.impl.types import Category as CategoryOriginal
+from bdl.object import Object
 from bdl.visitors.composition.components import Context, ExpressionEntry
 from bdl.visitors.composition.visitor import CompositionView
-
+from bzd.template.template import Template
 from rust.bdl.generator.impl.symbol import fqnToCapitalized as fqnToCapitalizedOriginal
 from rust.bdl.generator.impl.symbol import symbolRustToStr
 
@@ -26,8 +24,8 @@ class Transform:
 
 	def __init__(
 		self,
-		composition: typing.Optional[CompositionView] = None,
-		data: Optional[Dict[str, Any]] = None,
+		composition: CompositionView | None = None,
+		data: dict[str, Any] | None = None,
 	) -> None:
 		self.data = data if data else {}
 		self.composition = composition
@@ -39,13 +37,13 @@ class Transform:
 		assert len(string), "String cannot be empty."
 		return "".join(part[0].upper() + part[1:] for part in string.split("_"))
 
-	def symbolToStr(self, symbol: Optional[Symbol]) -> str:
+	def symbolToStr(self, symbol: Symbol | None) -> str:
 		return symbolRustToStr(symbol)
 
-	def symbolNonConstToStr(self, symbol: Optional[Symbol]) -> str:
+	def symbolNonConstToStr(self, symbol: Symbol | None) -> str:
 		return symbolRustToStr(symbol, nonConst=True)
 
-	def symbolReferenceToStr(self, symbol: Optional[Symbol]) -> str:
+	def symbolReferenceToStr(self, symbol: Symbol | None) -> str:
 		return symbolRustToStr(symbol, reference=True)
 
 	def methodReturnToStr(self, method: Method) -> str:
@@ -66,7 +64,7 @@ class Transform:
 		parameters = "".join([f", {item.name}: {self.methodParameterTypeToStr(item)}" for item in method.parameters])
 		return f"async fn {method.name}(&mut self{parameters}) -> {self.methodReturnToStr(method)};"
 
-	def symbolInterfaceToStr(self, symbol: Optional[Symbol]) -> str:
+	def symbolInterfaceToStr(self, symbol: Symbol | None) -> str:
 		assert symbol is not None
 		return f"{fqnToCapitalizedOriginal(fqn=symbol.kind)}Interface"
 
@@ -80,13 +78,13 @@ class Transform:
 			return False
 		return bool(item.symbol.category == CategoryOriginal.builtin and item.symbol.kinds[-1] == "list")
 
-	def listItems(self, item: Expression) -> typing.List[ParametersResolvedItem]:
+	def listItems(self, item: Expression) -> list[ParametersResolvedItem]:
 		return list(item.parametersResolved)
 
 	def listSize(self, item: EntityExpression) -> int:
 		return len(self.listItems(typing.cast(Expression, item)))
 
-	def configDependencySymbol(self, item: EntityExpression) -> Optional[Symbol]:
+	def configDependencySymbol(self, item: EntityExpression) -> Symbol | None:
 		if isinstance(item, Expression) and item.isInterfaceType:
 			return item.interfaceType
 		if item.isSymbol and item.symbol.category in {CategoryOriginal.interface, CategoryOriginal.component}:
@@ -102,7 +100,7 @@ class Transform:
 		assert dependencySymbol is not None
 		return self.symbolInterfaceToStr(dependencySymbol)
 
-	def configTypeItems(self, entity: Entity) -> typing.List[EntityExpression]:
+	def configTypeItems(self, entity: Entity) -> list[EntityExpression]:
 		return [item for item in entity.getConfigAggregated() if self.configDependencySymbol(item) is not None]
 
 	def configTypeParameters(self, entity: Entity) -> str:
@@ -168,9 +166,7 @@ class Transform:
 		"""Convert a literal native type into its Rust representation."""
 
 		if isinstance(literalNative, dict):
-			assert "type" in literalNative, (
-				f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
-			)
+			assert "type" in literalNative, f"Extended literal must be a dictionary with a field 'type', not: {literalNative!s}"
 			literalType = literalNative["type"]
 			if literalType == "enum":
 				namespace = FQN.toNamespace(literalNative["fqn"])
@@ -192,13 +188,13 @@ class Transform:
 		return "{}Entry".format("".join(self.toCamelCase(part) for part in FQN.toNamespace(fqn)))
 
 	def runFunctionNameToStr(self, context: Context) -> str:
-		return "run{}".format(self.fqnToCapitalized(context.executorWithoutTarget))
+		return f"run{self.fqnToCapitalized(context.executorWithoutTarget)}"
 
 	def executorConstructorToStr(self, context: Context) -> str:
 		assert self.composition is not None
 		return self.entryConstructorToStr(self.composition.registry[context][context.executor], context)
 
-	def configDependencyItems(self, entity: ExpressionEntry) -> typing.List[ParametersResolvedItem]:
+	def configDependencyItems(self, entity: ExpressionEntry) -> list[ParametersResolvedItem]:
 		"""Get the resolved config items that reference a dependency (component or interface)."""
 
 		return [
@@ -219,9 +215,9 @@ class Transform:
 			return "[{}]".format(", ".join(values))
 		fqn = param.underlyingValueFQN
 		assert fqn is not None, f"The parameter '{param}' must reference a registry entry."
-		return "&{}::get().component.handle()".format(self.entryStructNameToStr(fqn))
+		return f"&{self.entryStructNameToStr(fqn)}::get().component.handle()"
 
-	def configParamConcreteType(self, item: ParametersResolvedItem, context: Context) -> Optional[str]:
+	def configParamConcreteType(self, item: ParametersResolvedItem, context: Context) -> str | None:
 		"""Resolve the concrete type of a config dependency, through the registry if possible."""
 
 		param = typing.cast(Expression, item.param)
@@ -258,32 +254,31 @@ class Transform:
 
 		baseType = self.symbolToStr(entity.expression.symbol)
 		constraint = self.constraintTypesToStr(entity, context)
-		return "{}<{}>".format(baseType, constraint) if constraint else baseType
+		return f"{baseType}<{constraint}>" if constraint else baseType
 
 	def entryConstructorToStr(self, entity: ExpressionEntry, context: Context) -> str:
 		"""Generate the construction call of a registry entry instance."""
 
 		entryType = self.entryTypeToStr(entity, context)
 		if not entity.expression.parametersResolved:
-			return "{}::new()".format(entryType)
+			return f"{entryType}::new()"
 		# In expression position, generic arguments must be given with turbofish.
 		constructorType = entryType.replace("<", "::<", 1) if "<" in entryType else entryType
-		return "{}::new({})".format(constructorType, self.contextNewToStr(entity, context))
+		return f"{constructorType}::new({self.contextNewToStr(entity, context)})"
 
 	def contextNewToStr(self, entity: ExpressionEntry, context: Context) -> str:
 		"""Generate the context construction call of a registry entry."""
 
-		contextType = "{}Context".format(self.symbolToStr(entity.expression.symbol))
+		contextType = f"{self.symbolToStr(entity.expression.symbol)}Context"
 		defaultTopic = entity.expression.fqn
 		if self.configDependencyItems(entity):
 			constraint = self.constraintTypesToStr(entity, context)
 			args = ", ".join(self.configFieldValueToStr(item, defaultTopic) for item in entity.expression.parametersResolved)
-			return "{}::<{}>::new({})".format(contextType, constraint, args)
+			return f"{contextType}::<{constraint}>::new({args})"
 		fields = ", ".join(
-			"{}: {}".format(item.name, self.configFieldValueToStr(item, defaultTopic))
-			for item in entity.expression.parametersResolved
+			f"{item.name}: {self.configFieldValueToStr(item, defaultTopic)}" for item in entity.expression.parametersResolved
 		)
-		return "{} {{ {} }}".format(contextType, fields)
+		return f"{contextType} {{ {fields} }}"
 
 	def initMethodNameToStr(self, expression: Expression) -> str:
 		"""Get the method name of an init/shutdown expression, used on the component instance."""
@@ -296,12 +291,10 @@ class Transform:
 		symbol = expression.symbol
 		assert symbol.this, f"The lifecycle '{expression}' must target a component instance."
 		receiver = (
-			"component"
-			if symbol.this == fqn
-			else "{}::get().component.lock().await".format(self.entryStructNameToStr(symbol.this))
+			"component" if symbol.this == fqn else f"{self.entryStructNameToStr(symbol.this)}::get().component.lock().await"
 		)
 		parameters = ", ".join(self.configParamValueToStr(item) for item in expression.parametersResolved)
-		return "{}.{}({})".format(receiver, symbol.propertyName, parameters)
+		return f"{receiver}.{symbol.propertyName}({parameters})"
 
 	def workloadMethodToStr(self, entry: ExpressionEntry) -> str:
 		"""Generate the method call of a workload/service entry on its component instance."""
@@ -309,19 +302,17 @@ class Transform:
 		symbol = entry.expression.symbol
 		assert symbol.this, f"The workload '{entry.expression}' must be a method call on a component instance."
 		parameters = ", ".join(self.configParamValueToStr(item) for item in entry.expression.parametersResolved)
-		return "{}::get().component.lock().await.{}({})".format(
-			self.entryStructNameToStr(symbol.this), symbol.propertyName, parameters
-		)
+		return f"{self.entryStructNameToStr(symbol.this)}::get().component.lock().await.{symbol.propertyName}({parameters})"
 
 
-def formatRust(bdl: Object, data: typing.Optional[typing.Dict[str, typing.Any]] = None) -> str:
+def formatRust(bdl: Object, data: dict[str, typing.Any] | None = None) -> str:
 	template = Template.fromPath(pathlib.Path(__file__).parent / "template/file.rs.btl", indent=True)
 	return template.render(bdl.tree, Transform(data=data))
 
 
 def compositionRust(
 	composition: CompositionView,
-	data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+	data: dict[str, typing.Any] | None = None,
 ) -> str:
 	template = Template.fromPath(pathlib.Path(__file__).parent / "template/composition.rs.btl", indent=True)
 	return template.render(composition, Transform(composition=composition, data=data))

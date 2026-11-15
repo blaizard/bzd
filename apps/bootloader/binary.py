@@ -1,12 +1,12 @@
-import pathlib
-import typing
-import threading
-import stat
 import enum
 import io
+import pathlib
+import stat
+import threading
+import typing
 
 from bzd.logging import Logger
-from bzd.utils.run import localCommand, Cancellation
+from bzd.utils.run import Cancellation, localCommand
 
 
 class StablePolicy(str, enum.Enum):
@@ -53,11 +53,11 @@ class StdOutputToLogger(io.TextIOBase):
 		self.timeEvent.set()
 		return len(text)
 
-	def __enter__(self) -> "StdOutputToLogger":
+	def __enter__(self) -> typing.Self:
 		self.worker.start()
 		return self
 
-	def __exit__(self, *_: typing.Any) -> None:
+	def __exit__(self, *_: object) -> None:
 		self.stopRequested = True
 		self.timeEvent.set()
 		self.worker.join()
@@ -92,7 +92,7 @@ class Binary:
 		"""
 
 		if not path.is_file():
-			raise Exception(f"The path '{path}' must point to an existing file.")
+			raise RuntimeError(f"The path '{path}' must point to an existing file.")
 
 		Binary.setPermissions(path)
 
@@ -100,10 +100,10 @@ class Binary:
 
 	def run(
 		self,
-		args: typing.Optional[typing.List[str]] = None,
-		stablePolicy: typing.Optional[StablePolicy] = None,
-		stableCallback: typing.Optional[typing.Callable[[], None]] = None,
-		env: typing.Optional[typing.Dict[str, str]] = None,
+		args: list[str] | None = None,
+		stablePolicy: StablePolicy | None = None,
+		stableCallback: typing.Callable[[], None] | None = None,
+		env: dict[str, str] | None = None,
 	) -> None:
 		"""Run the binary."""
 

@@ -3,10 +3,10 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
-from bdl.entities.impl.fragment.symbol import Symbol
-from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.entity import Entity, Role
+from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.fragment.parameters import Parameters
+from bdl.entities.impl.fragment.symbol import Symbol
 from bdl.entities.impl.types import Category
 
 
@@ -33,7 +33,7 @@ class Method(Entity):
 		return self.element.isAttr("symbol")
 
 	@property
-	def symbol(self) -> typing.Optional[Symbol]:
+	def symbol(self) -> Symbol | None:
 		return (
 			Symbol(
 				element=self.element,

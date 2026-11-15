@@ -4,7 +4,7 @@ import json
 import typing
 
 
-def loadAndRepair(content: str) -> typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]]:
+def loadAndRepair(content: str) -> dict[str, typing.Any] | list[typing.Any]:
 	"""Load the longest valid JSON object or array from a string."""
 
 	candidates = []
@@ -34,10 +34,10 @@ def loadAndRepair(content: str) -> typing.Union[typing.Dict[str, typing.Any], ty
 	candidates.sort(key=len, reverse=True)
 
 	# Decode
-	failedParses: typing.List[typing.Tuple[str, json.JSONDecodeError]] = []
+	failedParses: list[tuple[str, json.JSONDecodeError]] = []
 	for candidate in candidates:
 		try:
-			result: typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]] = json.loads(candidate)
+			result: dict[str, typing.Any] | list[typing.Any] = json.loads(candidate)
 			return result
 		except json.JSONDecodeError as parseError:
 			failedParses.append((candidate, parseError))

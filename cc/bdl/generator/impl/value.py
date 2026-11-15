@@ -1,23 +1,20 @@
-import typing
 import json
+import typing
 
-from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
-from bdl.visitors.symbol_map import SymbolMap
-from bdl.entities.impl.types import Category
 from bdl.entities.impl.expression import Expression
-
-from cc.bdl.generator.impl.symbol import symbolToStr
-from cc.bdl.generator.impl.fqn import fqnToNameStr, fqnToStr
+from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
+from bdl.entities.impl.types import Category
+from bdl.visitors.symbol_map import SymbolMap
 from cc.bdl.generator.impl.comments import commentParametersResolvedToStr
+from cc.bdl.generator.impl.fqn import fqnToNameStr, fqnToStr
+from cc.bdl.generator.impl.symbol import symbolToStr
 
 
 def literalNativeToStr(literalNative: typing.Any) -> str:
 	"""Convert a literal native type into its C++ representation."""
 
 	if isinstance(literalNative, dict):
-		assert "type" in literalNative, (
-			f"Extended literal must be a dictionary with a field 'type', not: {str(literalNative)}"
-		)
+		assert "type" in literalNative, f"Extended literal must be a dictionary with a field 'type', not: {literalNative!s}"
 		literalType = literalNative["type"]
 		if literalType == "enum":
 			return fqnToStr(literalNative["fqn"])
@@ -34,7 +31,7 @@ def literalNativeToStr(literalNative: typing.Any) -> str:
 
 def valueToStr(
 	item: ParametersResolvedItem,
-	symbols: typing.Optional[SymbolMap] = None,
+	symbols: SymbolMap | None = None,
 	registry: bool = False,
 	includeComment: bool = True,
 ) -> str:
@@ -51,7 +48,7 @@ def valueToStr(
 		message=f"'valueToStr' only applies to item with role values, not '{item}'.",
 	)
 
-	def bindTypeAndValue(values: typing.List[str]) -> str:
+	def bindTypeAndValue(values: list[str]) -> str:
 		"""Associate a value with its type."""
 
 		paramTypeStr = symbolToStr(item.param.symbol, values=values) if item.param.isSymbol else ""

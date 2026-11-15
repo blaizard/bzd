@@ -1,13 +1,13 @@
 import argparse
-import typing
-import socket
-import pathlib
 import json
+import pathlib
+import socket
+import typing
 from contextlib import closing
 
+from bzd.http.client import HttpClient
 from bzd.utils.run import localCommand
 from bzd.utils.scheduler import Scheduler
-from bzd.http.client import HttpClient
 
 
 def findFreePort() -> int:
@@ -27,7 +27,7 @@ def httpServerReady(port: int) -> bool:
 		HttpClient.get(url)
 		print(f"Application exposed at {url}")
 		return True
-	except Exception:
+	except Exception:  # noqa: BLE001, S110
 		pass
 	return False
 
@@ -35,7 +35,7 @@ def httpServerReady(port: int) -> bool:
 class DockerComposeService:
 	"""Modifier class for docker compose service."""
 
-	def __init__(self, data: typing.Dict[str, typing.Any], projectDirectory: pathlib.Path) -> None:
+	def __init__(self, data: dict[str, typing.Any], projectDirectory: pathlib.Path) -> None:
 		self.data = data
 		self.projectDirectory = projectDirectory
 
@@ -44,7 +44,7 @@ class DockerComposeService:
 
 		self.data[key] = value
 
-	def toCLI(self) -> typing.Tuple[typing.List[str], typing.List[int]]:
+	def toCLI(self) -> tuple[list[str], list[int]]:
 		"""Generate the CLI arguments for the service."""
 
 		args = []
@@ -92,7 +92,7 @@ class DockerComposeService:
 				assert value is None, f"Unsupported logging configuration: {value}"
 				args += ["--log-driver", "none"]
 			else:
-				raise Exception(f"Unsupported key: {key}={value}")
+				raise RuntimeError(f"Unsupported key: {key}={value}")
 		assert image is not None, "The service must have an image."
 		args += [image]
 		return args, exposedPorts
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 			scheduler.add(name=f"ping-{exposedPort}", intervalS=0.5, callback=httpServerReady, args=(exposedPort,))
 		scheduler.start()
 
-	kwargs: typing.Dict[str, typing.Any] = {}
+	kwargs: dict[str, typing.Any] = {}
 	if args.verbose:
 		kwargs["stdout"] = True
 		kwargs["stderr"] = True

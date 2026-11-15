@@ -1,16 +1,15 @@
-import pathlib
-import typing
-import time
 import os
-from PIL import Image
+import pathlib
+import time
 from enum import Enum
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from typing import Self
 
 from apps.ebook.epub.metadata import EPubMetadata
 from apps.ebook.utils import percentToString
+from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 
 class ScreenshotType(Enum):
@@ -32,7 +31,7 @@ class DriverSelenium:
 	def __init__(self) -> None:
 		pass
 
-	def __enter__(self) -> "DriverSelenium":
+	def __enter__(self) -> Self:
 		options = FirefoxOptions()
 		options.add_argument("--headless")
 		# --kiosk is needed to get the same size with the screenshot
@@ -49,7 +48,7 @@ class DriverSelenium:
 		metadata: EPubMetadata,
 		directory: pathlib.Path,
 		zoom: float,
-	) -> typing.List[pathlib.Path]:
+	) -> list[pathlib.Path]:
 		pageIndex = 1
 		screenshotType = ScreenshotType.document
 		outputs = []
@@ -115,5 +114,5 @@ class DriverSelenium:
 
 		return outputs
 
-	def __exit__(self, *args: typing.Any) -> None:
+	def __exit__(self, *args: object) -> None:
 		self.driver.close()

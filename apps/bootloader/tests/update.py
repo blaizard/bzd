@@ -1,6 +1,6 @@
 import pathlib
 
-from apps.bootloader.bootloader import bootloader, ContextCustomRelease
+from apps.bootloader.bootloader import ContextCustomRelease, bootloader
 from bzd.logging import Logger
 
 if __name__ == "__main__":

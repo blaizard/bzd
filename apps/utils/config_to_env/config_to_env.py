@@ -1,7 +1,6 @@
 import argparse
-import pathlib
 import os
-import typing
+import pathlib
 
 from apps.utils.config_to_env.config_python import secrets
 
@@ -12,7 +11,7 @@ class GithubEnvironment:
 		self.output = pathlib.Path(os.environ["GITHUB_OUTPUT"])
 		assert self.output.is_file(), "'GITHUB_OUTPUT' environment variable does not point to a valid file."
 
-	def _load(self, environmentVariables: typing.Dict[str, str]) -> None:
+	def _load(self, environmentVariables: dict[str, str]) -> None:
 		with self.output.open("a", encoding="utf-8") as f:
 			for key, value in environmentVariables.items():
 				# Use heredoc delimiter syntax for multiline values (e.g. SSH keys)
@@ -22,8 +21,8 @@ class GithubEnvironment:
 				else:
 					f.write(f"{key}={value}\n")
 
-	def loadSecrets(self, secrets: typing.Dict[str, str]) -> None:
-		for key, value in secrets.items():
+	def loadSecrets(self, secrets: dict[str, str]) -> None:
+		for value in secrets.values():
 			for line in value.splitlines():
 				if line.strip():
 					print(f"::add-mask::{line}")

@@ -1,5 +1,5 @@
-import unittest
 import typing
+import unittest
 
 from bdl.grammar import Parser
 
@@ -7,15 +7,15 @@ from bdl.grammar import Parser
 class TestRun(unittest.TestCase):
 	maxDiff = 4096
 
-	def _clearSertializedForCompare(self, sequence: typing.List[typing.Any]) -> None:
+	def _clearSertializedForCompare(self, sequence: list[typing.Any]) -> None:
 		for element in sequence:
-			for key in element.keys():
+			for key in element:
 				if key == "@":
 					element["@"] = {key: value["v"] for key, value in element["@"].items()}
 				else:
 					self._clearSertializedForCompare(element[key])
 
-	def assertParserEqual(self, parser: Parser, match: typing.List[typing.Any]) -> None:
+	def assertParserEqual(self, parser: Parser, match: list[typing.Any]) -> None:
 		"""
 		Check that a parsed data contains only the specified properties.
 		"""

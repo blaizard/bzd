@@ -1,7 +1,4 @@
-import typing
-
-
-def getHostPort(hostPort: str) -> typing.Tuple[str, int]:
+def getHostPort(hostPort: str) -> tuple[str, int]:
 	"""Separate the hostname from the port and return it."""
 
 	split = hostPort.split(":")

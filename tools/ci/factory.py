@@ -1,9 +1,9 @@
-import pathlib
-import typing
 import json
+import pathlib
 import re
+import typing
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 
 from bzd.template.template import Template
 
@@ -12,7 +12,7 @@ from bzd.template.template import Template
 class ConfigBase_:
 	"""Common configuration across all specialization."""
 
-	exclude: typing.Set[str] = field(default_factory=set)
+	exclude: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -48,43 +48,36 @@ class Factory(ABC):
 	@abstractmethod
 	def getName(self) -> str:
 		"""Give the name of the shell."""
-		pass
 
 	@abstractmethod
 	def build(self) -> None:
 		"""Build the CI files."""
-		pass
 
 	@abstractmethod
 	def install(self, workspace: pathlib.Path) -> None:
 		"""Install the CI files to their actual destination."""
-		pass
 
 	@abstractmethod
-	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: str | None) -> ConfigNormal | None:
 		"""Return the configuration associated with normal tests."""
-		pass
 
 	@abstractmethod
-	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: str | None) -> ConfigStress | None:
 		"""Return the configuration associated with stress tests."""
-		pass
 
 	@abstractmethod
-	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: str | None) -> ConfigCoverage | None:
 		"""Return the configuration associated with coverage tests."""
-		pass
 
 	@abstractmethod
-	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: str | None) -> ConfigSanitizer | None:
 		"""Return the configuration associated with sanitizer tests."""
-		pass
 
 	@staticmethod
 	def normalizeIdentifier(string: str) -> str:
 		return re.sub(r"[^a-zA-Z0-9_]+", "_", string).strip("_")
 
-	def renderTemplate(self, templatePath: pathlib.Path, variant: typing.Optional[str] = None) -> str:
+	def renderTemplate(self, templatePath: pathlib.Path, variant: str | None = None) -> str:
 		"""Render a template."""
 
 		configs = {

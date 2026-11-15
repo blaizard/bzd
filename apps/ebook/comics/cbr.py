@@ -1,9 +1,8 @@
 import pathlib
-import typing
-import rarfile
 
+import rarfile
 from apps.ebook.comics.comics import Comics
-from apps.ebook.flow import FlowEnum, FlowContext
+from apps.ebook.flow import FlowContext, FlowEnum
 from apps.ebook.providers import ProviderEbook, ProviderImages
 
 
@@ -12,7 +11,7 @@ class Cbr(Comics):
 
 	def process(
 		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderImages, FlowEnum | None]]:
 
 		with rarfile.RarFile(str(provider.ebook), "r") as rarInstance:  # type: ignore
 			rarInstance.extractall(directory / "extract")

@@ -1,7 +1,6 @@
 import unittest
 
 from bdl.object import Object, ObjectContext
-
 from rust.bdl.generator.impl.visitor import formatRust
 
 

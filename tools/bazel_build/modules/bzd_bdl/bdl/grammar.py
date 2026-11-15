@@ -1,16 +1,16 @@
 import re
 import typing
 
-from bzd.parser.parser import Parser as ParserBase
-from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import (
 	Fragment,
+	FragmentComment,
 	FragmentNestedStart,
 	FragmentNestedStopNewElement,
 	FragmentNewElement,
 	FragmentParentElement,
-	FragmentComment,
 )
+from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
+from bzd.parser.parser import Parser as ParserBase
 
 _regexprBaseName = r"(?!const\b|interface\b|struct\b|component\b|method\b|namespace\b|use\b|using\b|config\b|composition\b|preset\b|[0-9])[0-9a-zA-Z_]+"
 # Match name: abc
@@ -42,7 +42,7 @@ def makeGrammarNested(
 	nestedGrammar: Grammar,
 	name: str,
 	defaultNested: str = "invalid",
-	nested: typing.Optional[typing.Set[str]] = None,
+	nested: set[str] | None = None,
 ) -> Grammar:
 	"""
 	Generate a grammar for a nested entity, it accepts the following format:
@@ -120,7 +120,7 @@ def makeGrammarSymbol(nextGrammar: Grammar) -> Grammar:
 	class TemplateStart(FragmentNestedStart):
 		nestedName = "template"
 
-	def makeGrammar(continuation: Grammar, nested: typing.Optional[Grammar] = None) -> Grammar:
+	def makeGrammar(continuation: Grammar, nested: Grammar | None = None) -> Grammar:
 		grammar: Grammar = [GrammarItem(r"const", {"const": ""})]
 		grammar.append(
 			GrammarItem(
@@ -193,7 +193,7 @@ def makeGrammarContracts(name: str = "contract") -> Grammar:
 
 
 def makeGrammarExpressionFragment(
-	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)],
+	finalGrammar: Grammar | None = None,
 ) -> Grammar:
 	"""
 	Generate a grammar for an expression, it accepts the following format:
@@ -202,13 +202,16 @@ def makeGrammarExpressionFragment(
 	where argX is a recursive call to this grammar.
 	"""
 
+	if finalGrammar is None:
+		finalGrammar = [GrammarItem(r";", FragmentNewElement)]
+
 	class FragmentsStart(FragmentNestedStart):
 		nestedName = "fragments"
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
 
-	def makeGrammar(continuation: Grammar, nested: typing.Optional[Grammar] = None) -> Grammar:
+	def makeGrammar(continuation: Grammar, nested: Grammar | None = None) -> Grammar:
 		grammarValue: Grammar = []
 		grammarWrapper: Grammar = [GrammarItem("", FragmentsStart, grammarValue)]
 
@@ -261,7 +264,7 @@ def makeGrammarExpressionFragment(
 
 
 def makeGrammarVariable(
-	finalGrammar: Grammar = [GrammarItem(r";", FragmentNewElement)],
+	finalGrammar: Grammar | None = None,
 ) -> Grammar:
 	"""
 	Generate a grammar for Variables, it accepts the following format:
@@ -453,7 +456,7 @@ def makeGrammarNamespace() -> Grammar:
 	"""
 
 	class NamespaceStart(FragmentNestedStart):
-		default = {"category": "namespace"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "namespace"}
 		nestedName = "name"
 
 	return [

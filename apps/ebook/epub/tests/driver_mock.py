@@ -1,5 +1,5 @@
 import pathlib
-import typing
+from typing import Self
 
 from apps.ebook.epub.metadata import EPubMetadata
 
@@ -7,11 +7,11 @@ from apps.ebook.epub.metadata import EPubMetadata
 class DriverMock:
 	"""Mock driver to extract pages."""
 
-	def __init__(self, expected: typing.List[EPubMetadata]) -> None:
+	def __init__(self, expected: list[EPubMetadata]) -> None:
 		self.expected = expected
-		self.currentlyExpected: typing.List[EPubMetadata] = []
+		self.currentlyExpected: list[EPubMetadata] = []
 
-	def __enter__(self) -> "DriverMock":
+	def __enter__(self) -> Self:
 		self.currentlyExpected = [expectedMetadata.clone() for expectedMetadata in self.expected]
 		return self
 
@@ -21,7 +21,7 @@ class DriverMock:
 		metadata: EPubMetadata,
 		directory: pathlib.Path,
 		zoom: float,
-	) -> typing.List[pathlib.Path]:
+	) -> list[pathlib.Path]:
 
 		self.currentlyExpected = [expectedMetadata.clone() for expectedMetadata in self.expected]
 
@@ -54,8 +54,8 @@ class DriverMock:
 
 		return []
 
-	def __exit__(self, *args: typing.Any) -> None:
+	def __exit__(self, *args: object) -> None:
 		for documentIndex, expected in enumerate(self.currentlyExpected):
 			assert len(expected.document) == 0, (
-				f"Some pages in document {documentIndex} were expected but not found: {str(expected.document)}"
+				f"Some pages in document {documentIndex} were expected but not found: {expected.document!s}"
 			)

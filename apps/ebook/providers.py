@@ -1,13 +1,13 @@
 """Inputs and Outputs of the various flow elements."""
 
-import pathlib
-import typing
 import dataclasses
 import datetime
-import json
 import hashlib
+import json
+import pathlib
+import typing
 
-Json = typing.Dict[str, typing.Any]
+Json = dict[str, typing.Any]
 
 
 class ProviderBase:
@@ -27,19 +27,19 @@ class ProviderEbookMetadata(ProviderBase):
 	"""Provides the ebook metadata."""
 
 	# The title of this document.
-	title: typing.Optional[str] = None
+	title: str | None = None
 	# The identifier of this document.
-	identifier: typing.Optional[str] = None
+	identifier: str | None = None
 	# The language for this document.
-	language: typing.Optional[str] = None
+	language: str | None = None
 	# List of creators.
-	creators: typing.List[str] = dataclasses.field(default_factory=list)
+	creators: list[str] = dataclasses.field(default_factory=list)
 	# List of contributors that play a secondary role for this ebook.
-	contributors: typing.List[str] = dataclasses.field(default_factory=list)
+	contributors: list[str] = dataclasses.field(default_factory=list)
 	# Publication date.
-	date: typing.Optional[datetime.datetime] = None
+	date: datetime.datetime | None = None
 	# Publisher name.
-	publisher: typing.Optional[str] = None
+	publisher: str | None = None
 
 	def toJson(self) -> Json:
 		return {
@@ -72,7 +72,7 @@ class ProviderEbook(ProviderBase):
 	# Path of the input ebook.
 	ebook: pathlib.Path
 	# Keys associated to this ebook.
-	keys: typing.List[pathlib.Path] = dataclasses.field(default_factory=list)
+	keys: list[pathlib.Path] = dataclasses.field(default_factory=list)
 	# Metadata associated with this ebook.
 	metadata: ProviderEbookMetadata = dataclasses.field(default_factory=ProviderEbookMetadata)
 
@@ -106,7 +106,7 @@ class ProviderImages(ProviderBase):
 	"""Provides a sequence of images."""
 
 	# Ordered sequence of images.
-	images: typing.List[pathlib.Path]
+	images: list[pathlib.Path]
 	# Metadata associated with this ebook.
 	metadata: ProviderEbookMetadata = dataclasses.field(default_factory=ProviderEbookMetadata)
 
@@ -139,7 +139,7 @@ class ProviderPdf(ProviderBase):
 		return ProviderPdf(path=pathlib.Path(data["path"]))
 
 	@property
-	def outputs(self) -> typing.List[pathlib.Path]:
+	def outputs(self) -> list[pathlib.Path]:
 		"""Return the outputs of this provider."""
 		return [self.path]
 
@@ -159,12 +159,12 @@ class ProviderCover(ProviderBase):
 		return ProviderCover(path=pathlib.Path(data["path"]))
 
 	@property
-	def outputs(self) -> typing.List[pathlib.Path]:
+	def outputs(self) -> list[pathlib.Path]:
 		"""Return the outputs of this provider."""
 		return [self.path]
 
 
-Provider = typing.Union[ProviderEbook, ProviderImages, ProviderPdf, ProviderCover]
+Provider = ProviderEbook | ProviderImages | ProviderPdf | ProviderCover
 
 
 def providerSerialize(provider: Provider) -> str:
@@ -176,4 +176,4 @@ def providerDeserialize(data: str) -> Provider:
 	for providerType in typing.get_args(Provider):
 		if providerType.__name__ == content["type"]:
 			return providerType.fromJson(content["values"])  # type: ignore
-	raise Exception(f"Cannot deserialize the provider of type: '{content['type']}'.")
+	raise RuntimeError(f"Cannot deserialize the provider of type: '{content['type']}'.")

@@ -28,7 +28,7 @@ class ContractTraits:
 		self,
 		name: str,
 		role: int,
-		constraint: typing.Optional[typing.Type[Constraint]] = None,
+		constraint: type[Constraint] | None = None,
 	) -> None:
 		# Name of the contract
 		self.name = name
@@ -57,19 +57,19 @@ class ContractTraits:
 	def isRoleEntity(self) -> bool:
 		return bool(self.role & Role.Entity)
 
-	def resolveConflict(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
+	def resolveConflict(self, base: Contract, derived: Contract) -> Contract | None:
 		"""
 		Used to resolve a conflict between 2 contracts.
 		"""
 		try:
 			return self.resolveConflictInternals(base, derived)
-		except Exception as e:
-			raise Exception("Conflict with base contract [{}] and derived [{}]: {}".format(str(base), str(derived), str(e)))
+		except Exception as e:  # noqa: BLE001
+			raise RuntimeError(f"Conflict with base contract [{base!s}] and derived [{derived!s}]: {e!s}")
 
-	def resolveConflictInternals(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
+	def resolveConflictInternals(self, base: Contract, derived: Contract) -> Contract | None:
 		"""
 		Overload to resolve conflicts.
 		"""
 		if base == derived:
 			return base
-		raise Exception("cannot be merged.")
+		raise RuntimeError("cannot be merged.")

@@ -3,9 +3,9 @@ import typing
 from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
 from bzd.parser.error import Error
 
-from bdl.contracts.validation import Validation
-from bdl.contracts.contract import Contract
 from bdl.contracts.all import AllContracts
+from bdl.contracts.contract import Contract
+from bdl.contracts.validation import Validation
 
 
 class Contracts:
@@ -13,11 +13,11 @@ class Contracts:
 	A contract is an unsorted sequence of types associated with an optional value and/or comment.
 	"""
 
-	def __init__(self, element: Element, sequenceKind: typing.Optional[str] = None) -> None:
+	def __init__(self, element: Element, sequenceKind: str | None = None) -> None:
 		self.element = element
 		self.sequenceKind = "contract" if sequenceKind is None else sequenceKind
 
-	def get(self, kind: str) -> typing.Optional[Contract]:
+	def get(self, kind: str) -> Contract | None:
 		"""
 		Get a specific contract type if present.
 		"""
@@ -32,7 +32,7 @@ class Contracts:
 				return True
 		return False
 
-	def assertOnly(self, kinds: typing.Set[str]) -> None:
+	def assertOnly(self, kinds: set[str]) -> None:
 		"""Assert that only the contract kinds passed into argument are available in this one."""
 
 		for contract in self:
@@ -43,7 +43,7 @@ class Contracts:
 			)
 
 	@property
-	def validationForAll(self) -> typing.Optional[str]:
+	def validationForAll(self) -> str | None:
 		"""
 		Generate a validation string for all contracts
 		"""
@@ -51,7 +51,7 @@ class Contracts:
 		return " ".join(content) if content else None
 
 	@property
-	def validationForValue(self) -> typing.Optional[str]:
+	def validationForValue(self) -> str | None:
 		"""
 		Generate a validation string for a value out of the current contracts
 		"""
@@ -59,7 +59,7 @@ class Contracts:
 		return " ".join(content) if content else None
 
 	@property
-	def validationForTemplate(self) -> typing.Optional[str]:
+	def validationForTemplate(self) -> str | None:
 		"""
 		Generate a validation string for a template out of the current contracts
 		"""
@@ -67,7 +67,7 @@ class Contracts:
 		return " ".join(content) if content else None
 
 	@property
-	def validationForEntity(self) -> typing.Optional[str]:
+	def validationForEntity(self) -> str | None:
 		"""
 		Generate a validation string for an entity out of the current contracts
 		"""
@@ -92,7 +92,7 @@ class Contracts:
 			if contractTraits is None:
 				Error.handleFromElement(
 					element=self.element,
-					message="Contract of type '{}' is not supported.".format(contract.type),
+					message=f"Contract of type '{contract.type}' is not supported.",
 				)
 
 	def merge(self, contracts: "Contracts") -> None:
@@ -109,7 +109,7 @@ class Contracts:
 				assert contractTraits, "All contracts should have been validated already."
 				try:
 					contract = contractTraits.resolveConflict(base=contract, derived=existing)
-				except Exception as e:
+				except Exception as e:  # noqa: BLE001
 					Error.handleFromElement(element=self.element, message=str(e), throw=False).extend(
 						element=contracts.element, message="Base contract is here."
 					)

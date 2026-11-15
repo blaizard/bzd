@@ -1,18 +1,18 @@
-import typing
-import pathlib
 import json
+import pathlib
+import typing
 
 from apps.trader_python.recording.recording import (
-	Info,
+	OHLC,
 	Event,
 	EventKind,
-	OHLC,
-	RecordingPair,
+	Info,
 	Recording,
+	RecordingPair,
 )
 
 
-def _readCSV(path: pathlib.Path, separator: str) -> typing.Iterator[typing.List[str]]:
+def _readCSV(path: pathlib.Path, separator: str) -> typing.Iterator[list[str]]:
 	with path.open(mode="r") as f:
 		while True:
 			rawline = f.readline()
@@ -30,7 +30,7 @@ class RecordingPairFromPath(RecordingPair):
 
 		# Build the index from the given path.
 		assert self.path.is_dir(), f"The path '{self.path}' must point to a directory."
-		self.files = sorted(list(d for d in self.path.iterdir() if d.is_file() and d.name not in ["info.json"]))
+		self.files = sorted(d for d in self.path.iterdir() if d.is_file() and d.name not in ["info.json"])
 
 		# Load the info
 		if (self.path / "info.json").is_file():
@@ -57,8 +57,7 @@ class RecordingPairFromPath(RecordingPair):
 
 	def __iter__(self) -> typing.Iterator[OHLC]:
 		for f in self.files:
-			for ohlc in RecordingPairFromPath.readOHLCFromFile(f):
-				yield ohlc
+			yield from RecordingPairFromPath.readOHLCFromFile(f)
 
 
 class RecordingFromPath(Recording):
@@ -73,7 +72,7 @@ class RecordingFromPath(Recording):
 
 		# Look for the pairs.
 		self.pairs = []
-		directories = list(d for d in path.iterdir() if d.is_dir())
+		directories = [d for d in path.iterdir() if d.is_dir()]
 		for d in directories:
 			splitName = d.name.split("-")
 			assert len(splitName) == 2, "This directory '{d}' is not a valid pair recording."
@@ -81,5 +80,4 @@ class RecordingFromPath(Recording):
 			self.pairs.append(pair)
 
 	def __iter__(self) -> typing.Iterator[RecordingPair]:
-		for pair in self.pairs:
-			yield pair
+		yield from self.pairs

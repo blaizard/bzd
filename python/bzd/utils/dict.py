@@ -1,5 +1,5 @@
-import typing
 import enum
+import typing
 
 # Sentinel to distinguish a missing key from a key whose value is None.
 _MISSING: object = object()
@@ -34,13 +34,13 @@ class UpdatePolicy(enum.Enum):
 	raiseOnNonConflict = enum.auto()
 
 
-UpdatePolicyCallable = typing.Callable[[typing.Any, typing.Any, typing.List[str]], None]
+UpdatePolicyCallable = typing.Callable[[typing.Any, typing.Any, list[str]], None]
 
 
 def updateDeep(
 	d: typing.MutableMapping[typing.Any, typing.Any],
 	u: typing.MutableMapping[typing.Any, typing.Any],
-	policy: typing.Union[UpdatePolicy, UpdatePolicyCallable] = UpdatePolicy.override,
+	policy: UpdatePolicy | UpdatePolicyCallable = UpdatePolicy.override,
 	extendLists: bool = False,
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
 	"""Deep merge two dictionaries.
@@ -57,22 +57,22 @@ def updateDeep(
 
 	if policy == UpdatePolicy.override:
 
-		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+		def policyCallback(d: typing.Any, u: typing.Any, keys: list[str]) -> None:
 			pass
 	elif policy == UpdatePolicy.raiseOnConflict:
 
-		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+		def policyCallback(d: typing.Any, u: typing.Any, keys: list[str]) -> None:
 			if d is not _MISSING:
 				raise KeyError(".".join(keys))
 	elif policy == UpdatePolicy.raiseOnNonConflict:
 
-		def policyCallback(d: typing.Any, u: typing.Any, keys: typing.List[str]) -> None:
+		def policyCallback(d: typing.Any, u: typing.Any, keys: list[str]) -> None:
 			if d is _MISSING:
 				raise KeyError(".".join(keys))
 	elif callable(policy):
 		policyCallback = policy  # type: ignore
 	else:
-		raise Exception(f"Unsupported policy '{str(policy)}'")
+		raise RuntimeError(f"Unsupported policy '{policy!s}'")
 
 	return _updateDeep(d, u, policyCallback, extendLists, [])
 
@@ -82,7 +82,7 @@ def _updateDeep(
 	u: typing.MutableMapping[typing.Any, typing.Any],
 	policyCallback: UpdatePolicyCallable,
 	extendLists: bool,
-	keys: typing.List[str],
+	keys: list[str],
 ) -> typing.MutableMapping[typing.Any, typing.Any]:
 
 	for k, v in u.items():

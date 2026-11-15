@@ -1,5 +1,6 @@
-import pynvml
 import typing
+
+import pynvml
 
 
 class Nvidia:
@@ -11,7 +12,7 @@ class Nvidia:
 			self.init = False
 
 	@property
-	def handles(self) -> typing.Generator[typing.Tuple[str, typing.Any], None, None]:
+	def handles(self) -> typing.Generator[tuple[str, typing.Any], None, None]:
 		if not self.init:
 			return None
 		deviceCount = pynvml.nvmlDeviceGetCount()  # type: ignore

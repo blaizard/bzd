@@ -1,6 +1,6 @@
-import typing
-import enum
 import dataclasses
+import enum
+import typing
 
 from bzd.utils.result import Result
 
@@ -13,7 +13,7 @@ class DependencyGroup:
 	"""List of ordered dependencies."""
 
 	def __init__(self) -> None:
-		self.data: typing.Set[Expression] = set()
+		self.data: set[Expression] = set()
 
 	def copy(self) -> "DependencyGroup":
 		"""Create a copy of this object."""
@@ -30,7 +30,7 @@ class DependencyGroup:
 			return
 		self.data.add(expression)
 
-	def pushGroup(self, group: typing.Union["DependencyGroup", typing.List[Expression]]) -> None:
+	def pushGroup(self, group: typing.Union["DependencyGroup", list[Expression]]) -> None:
 		"""Push an ordered group of dependency to the list."""
 		for expression in group:
 			self.push(expression)
@@ -51,8 +51,7 @@ class DependencyGroup:
 		return dependencies
 
 	def __iter__(self) -> typing.Iterator[Expression]:
-		for expression in self.data:
-			yield expression
+		yield from self.data
 
 	def __len__(self) -> int:
 		return len(self.data)
@@ -119,8 +118,8 @@ class ExpressionEntry:
 
 	def __repr__(self) -> str:
 		content = [
-			f"type: {str(self.entryType)}",
-			f"expression: {str(self.expression)}",
+			f"type: {self.entryType!s}",
+			f"expression: {self.expression!s}",
 			f"deps: {self.deps}",
 			f"init: {self.init}",
 			f"intra: {self.intra}",
@@ -131,21 +130,21 @@ class ExpressionEntry:
 
 class Components:
 	def __init__(self) -> None:
-		self.map: typing.Dict[str, typing.Dict[Context, ExpressionEntry]] = {}
+		self.map: dict[str, dict[Context, ExpressionEntry]] = {}
 		# Flag flipped when the data is resolved.
 		self.isResolved = False
 		# Ordered view of the map, computed only after close.
-		self.resolved: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
+		self.resolved: dict[Context, list[ExpressionEntry]] = {}
 
 	@property
-	def contexts(self) -> typing.Set[Context]:
+	def contexts(self) -> set[Context]:
 		"""Collection of all context available in this instance."""
 
 		assert self.isResolved
 		return set(self.resolved.keys())
 
 	@property
-	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def all(self) -> dict[Context, list[ExpressionEntry]]:
 		"""Collection of all expression entities available in this instance."""
 
 		assert self.isResolved
@@ -177,12 +176,12 @@ class Components:
 		assert not self.isResolved
 
 		self.resolved = {}
-		contexts = {context for entries in self.map.values() for context in entries.keys()}
+		contexts = {context for entries in self.map.values() for context in entries}
 		for context in contexts:
 			self.resolved[context] = []
-			discovered = set()
+			discovered: set[str] = set()
 
-			def isExpressionDiscovered(expression: Expression) -> bool:
+			def isExpressionDiscovered(expression: Expression, discovered: set[str] = discovered) -> bool:
 				return self.makeId(expression) in discovered
 
 			def isSatisfied(group: DependencyGroup) -> bool:
@@ -195,7 +194,7 @@ class Components:
 
 			entries = [(identifier, entries[context]) for identifier, entries in self.map.items() if context in entries]
 			while entries:
-				remaining: typing.List[typing.Tuple[str, ExpressionEntry]] = []
+				remaining: list[tuple[str, ExpressionEntry]] = []
 				for identifier, entry in entries:
 					if isSatisfied(entry.deps):
 						self.resolved[context].append(entry)
@@ -215,7 +214,7 @@ class Components:
 	def close(self) -> None:
 		self.resolve()
 
-	def insert(self, expression: Expression, entryType: EntryType, context: Context) -> typing.Optional[ExpressionEntry]:
+	def insert(self, expression: Expression, entryType: EntryType, context: Context) -> ExpressionEntry | None:
 		"""Insert a new entry in the map, return the entry if it does not exist or if it can be updated,
 		otherwise it returns None."""
 

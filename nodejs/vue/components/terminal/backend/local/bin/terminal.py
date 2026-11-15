@@ -1,16 +1,16 @@
+import argparse
 import enum
+import fcntl
 import json
 import os
-import sys
-import select
-import termios
-import pty
-import subprocess
-import argparse
 import pathlib
-import typing
+import pty
+import select
 import struct
-import fcntl
+import subprocess
+import sys
+import termios
+import typing
 
 
 class ActionType(enum.Enum):
@@ -41,7 +41,7 @@ def inputDeserialize(data: bytes, callback: typing.Callable[[ActionType, typing.
 	return data[index:]
 
 
-def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) -> None:
+def main(cwd: pathlib.Path, env: dict[str, str], args: list[str]) -> None:
 	"""Spawns a command using Popen within a pseudo-terminal for real-time I/O."""
 
 	# Create a pseudo-terminal. `fdMaster` is for our I/O, `fdSlave` is for the child.
@@ -61,7 +61,7 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 			env=env,
 			bufsize=0,
 			# use os.setsid() make it run in a new process group, or bash job control will not be enabled
-			preexec_fn=os.setsid,
+			start_new_session=True,
 			# Working with bytes
 			text=False,
 			# This closes the fdSlave in the parent automatically

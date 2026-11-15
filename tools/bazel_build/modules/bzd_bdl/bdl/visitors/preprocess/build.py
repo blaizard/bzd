@@ -1,21 +1,20 @@
 import typing
 
-
-from bdl.visitor import Visitor, Group
 from bdl.entities.all import (
-	Preset,
-	Expression,
-	Nested,
-	Method,
-	Using,
-	Use,
+	EntityType,
 	Enum,
 	EnumValue,
+	Expression,
 	Extern,
-	EntityType,
+	Method,
 	Namespace,
+	Nested,
+	Preset,
+	Use,
+	Using,
 )
 from bdl.entities.builder import NamespaceBuilder
+from bdl.visitor import Group, Visitor
 from bdl.visitors.symbol_map import SymbolMap
 from bdl.visitors.symbol_tree import SymbolTree
 
@@ -24,7 +23,7 @@ class Build(Visitor[None]):
 	def __init__(
 		self,
 		objectContext: typing.Any,
-		namespace: typing.Optional[typing.List[str]] = None,
+		namespace: list[str] | None = None,
 	) -> None:
 		super().__init__(namespace=namespace)
 		self.objectContext = objectContext

@@ -1,18 +1,18 @@
-import typing
+import math
 import pathlib
+import shlex
+import stat
+import sys
 import tempfile
 import threading
 import time
-import math
+import typing
 from contextlib import contextmanager
-import paramiko
-import shlex
-import sys
-import stat
 
-from bzd.utils.run import localCommand, ExecuteResult, ExecuteResultStreamWriter
-from bzd.bin_python import ssh, scp
+import paramiko
+from bzd.bin_python import scp, ssh
 from bzd.http.client import HttpClient
+from bzd.utils.run import ExecuteResult, ExecuteResultStreamWriter, localCommand
 
 
 class _SSHInteractiveHandle:
@@ -23,12 +23,12 @@ class _SSHInteractiveHandle:
 
 	def command(
 		self,
-		cmds: typing.List[str],
+		cmds: list[str],
 		stdout: bool = False,
 		stderr: bool = False,
 		ignoreFailure: bool = False,
 		maxOutputSize: int = 1000000,
-		timeoutS: typing.Optional[float] = 600.0,
+		timeoutS: float | None = 600.0,
 	) -> ExecuteResult:
 		"""Execute a command on a remote host.
 
@@ -101,7 +101,7 @@ class SSH:
 		self,
 		host: str,
 		username: str,
-		identity: typing.Optional[pathlib.Path] = None,
+		identity: pathlib.Path | None = None,
 		port: int = 22,
 	) -> None:
 		self.host = host
@@ -125,13 +125,13 @@ class SSH:
 		<username>@<host>:<port>, where <username> and <host> are mandatory and <port> is optional.
 		"""
 
-		def splitLocation(location: str) -> typing.Tuple[str, int]:
+		def splitLocation(location: str) -> tuple[str, int]:
 			items = location.split(":")
 			if len(items) == 1:
 				return items[0], 22
 			elif len(items) == 2:
 				return items[0], int(items[1])
-			raise Exception("Location parsing error")
+			raise RuntimeError("Location parsing error")
 
 		items = string.split("@")
 		try:
@@ -139,9 +139,9 @@ class SSH:
 				username = items[0]
 				host, port = splitLocation(items[1])
 				return SSH(host=host, port=port, username=username)
-			raise Exception("String parsing error")
-		except Exception as e:
-			raise Exception(f"{str(e)}: SSH string must have the following format: '<username>@<host>:<port>', not '{string}'.")
+			raise RuntimeError("String parsing error")
+		except Exception as e:  # noqa: BLE001
+			raise RuntimeError(f"{e!s}: SSH string must have the following format: '<username>@<host>:<port>', not '{string}'.")
 
 	@contextmanager
 	def interactive(self) -> typing.Generator[_SSHInteractiveHandle, None, None]:
@@ -157,7 +157,7 @@ class SSH:
 			transport.set_keepalive(30)
 			try:
 				transport.send_ignore()
-			except Exception as _e:
+			except Exception as _e:  # noqa: BLE001
 				sys.stdout.write(str(_e))
 				sys.exit(1)
 		else:
@@ -169,8 +169,8 @@ class SSH:
 
 	def command(
 		self,
-		args: typing.Optional[typing.List[str]] = None,
-		sshArgs: typing.Optional[typing.List[str]] = None,
+		args: list[str] | None = None,
+		sshArgs: list[str] | None = None,
 		**kwargs: typing.Any,
 	) -> ExecuteResult:
 		"""Execute a remote command via SSH."""
@@ -203,7 +203,7 @@ class SSH:
 
 	@contextmanager
 	def forwardPort(
-		self, port: int, waitHTTP: typing.Optional[str] = None, waitTimeoutS: int = 20
+		self, port: int, waitHTTP: str | None = None, waitTimeoutS: int = 20
 	) -> typing.Generator[None, None, None]:
 		"""Forward a port."""
 
@@ -234,9 +234,8 @@ class SSH:
 						result = HttpClient.get(waitHTTP, timeoutS=math.ceil(timeLeftS))
 						if result.status == 200:
 							break
-					except Exception:
+					except Exception:  # noqa: BLE001
 						time.sleep(1)
-						pass
 				else:
 					time.sleep(1)
 			yield

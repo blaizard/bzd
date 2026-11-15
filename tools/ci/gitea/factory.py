@@ -1,36 +1,35 @@
 import pathlib
-import typing
 
 from tools.ci.factory import (
-	Factory,
-	ConfigNormal,
-	ConfigStress,
 	ConfigCoverage,
+	ConfigNormal,
 	ConfigSanitizer,
+	ConfigStress,
+	Factory,
 )
 
 
 class Gitea(Factory):
 	def __init__(self) -> None:
-		self.content: typing.Optional[typing.Dict[str, str]] = None
+		self.content: dict[str, str] | None = None
 
 	def getName(self) -> str:
 		return "Gitea Actions"
 
-	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: str | None) -> ConfigNormal | None:
 		return ConfigNormal()
 
-	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: str | None) -> ConfigStress | None:
 		if variant == "pr_gate":
 			return None
 		return ConfigStress(runs=10)
 
-	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: str | None) -> ConfigCoverage | None:
 		if variant == "pr_gate":
 			return None
 		return ConfigCoverage(exclude={"cc"})
 
-	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: str | None) -> ConfigSanitizer | None:
 		return ConfigSanitizer()
 
 	def build(self) -> None:

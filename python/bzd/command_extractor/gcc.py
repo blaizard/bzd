@@ -1,17 +1,19 @@
-import typing
+import enum
 import pathlib
 import re
-import enum
+import typing
 
 from bzd.command_extractor.common import (
 	CommandExtractor,
-	Processor,
 	Item,
-	ItemString,
+	ItemFactory,
 	ItemPath,
 	ItemPathOrString,
-	ItemFactory,
+	ItemString,
+	Processor,
 )
+
+_defaultItemFactory = ItemFactory()
 
 
 class Categories(enum.Enum):
@@ -46,29 +48,33 @@ class CommandExtractorGcc(CommandExtractor):
 	def __init__(
 		self,
 		cwd: pathlib.Path,
-		includeSearchPaths: typing.List[pathlib.Path] = [],
-		libSearchPaths: typing.List[pathlib.Path] = [],
+		includeSearchPaths: list[pathlib.Path] | None = None,
+		libSearchPaths: list[pathlib.Path] | None = None,
 	) -> None:
 		super().__init__()
 		self.cwd = cwd
+		if includeSearchPaths is None:
+			includeSearchPaths = []
+		if libSearchPaths is None:
+			libSearchPaths = []
 		for path in [cwd] + includeSearchPaths:
 			self.addSearchPath(Categories.includeSearchPath, path)
 		for path in [cwd] + libSearchPaths:
 			self.addSearchPath(Categories.librarySearchPath, path)
 
-	def addLibrary(self, name: str, factory: ItemFactory = ItemFactory()) -> None:
+	def addLibrary(self, name: str, factory: ItemFactory = _defaultItemFactory) -> None:
 		"""Add a new library to the list."""
 
-		fileName = name if re.match(r"lib.*\.a", pathlib.Path(name).name) else "lib{}.a".format(name)
+		fileName = name if re.match(r"lib.*\.a", pathlib.Path(name).name) else f"lib{name}.a"
 		for path in self.librarySearchPaths:
 			fullPath = path / fileName
 			if fullPath.is_file():
 				self.result.append(factory.make(ItemLibrary, Categories.library, fullPath))
 				return
 		self.result.append(factory.make(ItemLibrary, Categories.library, name))
-		print("WARNING: cannot locate library {}".format(name))
+		print(f"WARNING: cannot locate library {name}")
 
-	def addLinkerScript(self, fileName: str, factory: ItemFactory = ItemFactory()) -> None:
+	def addLinkerScript(self, fileName: str, factory: ItemFactory = _defaultItemFactory) -> None:
 		"""Add a new linker script to the list."""
 
 		for path in self.librarySearchPaths:
@@ -77,20 +83,20 @@ class CommandExtractorGcc(CommandExtractor):
 				self.result.append(factory.make(ItemPathOrString, Categories.linkerScript, fullPath))
 				return
 		self.result.append(factory.make(ItemPathOrString, Categories.linkerScript, fileName))
-		print("WARNING: cannot locate linker script {}".format(fileName))
+		print(f"WARNING: cannot locate linker script {fileName}")
 
 	def addSearchPath(
 		self,
 		category: Categories,
 		path: pathlib.Path,
-		factory: ItemFactory = ItemFactory(),
+		factory: ItemFactory = _defaultItemFactory,
 	) -> None:
 		"""Add a search path to a container."""
 
 		searchPath = factory.make(ItemPath, category, path)
 		self.result.append(searchPath)
 
-	def addOutputPath(self, path: pathlib.Path, factory: ItemFactory = ItemFactory()) -> None:
+	def addOutputPath(self, path: pathlib.Path, factory: ItemFactory = _defaultItemFactory) -> None:
 		"""Add the output path."""
 
 		self.result.append(factory.make(ItemPath, Categories.outputPath, self.cwd / path))

@@ -1,24 +1,24 @@
-import typing
-import json
 import copy
+import json
+import typing
 
 from bzd.parser.element import Element, ElementBuilder, SequenceBuilder
-from bzd.parser.error import Error, AssertionResult
+from bzd.parser.error import AssertionResult, Error
 
 from bdl.contracts.validation import Validation
 from bdl.entities.impl.fragment.contract import Contracts
-from bdl.entities.impl.fragment.parameters import Parameters
-from bdl.entities.impl.fragment.sequence import EntitySequence
 from bdl.entities.impl.fragment.fqn import FQN
-from bdl.entities.impl.fragment.symbol import Symbol
+from bdl.entities.impl.fragment.parameters import Parameters
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
-from bdl.entities.impl.types import Category
 from bdl.entities.impl.fragment.regexpr import Regexpr
+from bdl.entities.impl.fragment.sequence import EntitySequence
+from bdl.entities.impl.fragment.symbol import Symbol
+from bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
+	from bdl.entities.all import EntityType
 	from bdl.entities.impl.expression import Expression
 	from bdl.entities.impl.using import Using
-	from bdl.entities.all import EntityType
 	from bdl.visitors.symbol_map import Resolver
 
 
@@ -34,7 +34,7 @@ class Role:
 
 U = typing.TypeVar("U", bound="Entity")
 
-LiteralExtended = typing.Dict[str, typing.Union[str, int, float]]
+LiteralExtended = dict[str, str | int | float]
 
 
 class Entity:
@@ -48,21 +48,21 @@ class Entity:
 	def category(self) -> Category:
 		return Category(self.element.getAttrValue("category"))
 
-	def copy(self: U) -> U:
+	def copy(self) -> typing.Self:
 		"""Make a shallow copy of the current entity."""
 
 		copySelf = copy.copy(self)
 		copySelf.element = self.element.copy()
 		return copySelf
 
-	def deepCopy(self: U) -> U:
+	def deepCopy(self) -> typing.Self:
 		"""Make a deep copy of the current entity."""
 
 		copySelf = copy.copy(self)
 		copySelf.element = self.element.deepCopy()
 		return copySelf
 
-	def toLiteral(self, args: typing.Dict[str, "EntityExpression"]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, "EntityExpression"]) -> str | None:
 		"""Given the input parameters, generate the underlying literal of this object."""
 		return None
 
@@ -92,7 +92,7 @@ class Entity:
 	def compositionAttr(self) -> str:
 		return "composition"
 
-	def getParents(self) -> typing.List[str]:
+	def getParents(self) -> list[str]:
 		"""
 		Get the current entity direct parents.
 		"""
@@ -100,7 +100,7 @@ class Entity:
 			return self.element.getAttr("parents").value.split(";")
 		return []
 
-	def getUnderlyingTypeParents(self, resolver: "Resolver") -> typing.List[str]:
+	def getUnderlyingTypeParents(self, resolver: "Resolver") -> list[str]:
 		"""
 		Get the parents of the underlying type or the current entity if not present.
 		"""
@@ -108,7 +108,7 @@ class Entity:
 			return self.getParents()
 		return self.getEntityUnderlyingTypeResolved(resolver=resolver).getParents()
 
-	def addParents(self, fqn: typing.Optional[str], parents: typing.List[str]) -> None:
+	def addParents(self, fqn: str | None, parents: list[str]) -> None:
 		"""
 		Add parents to the current entity.
 		"""
@@ -119,7 +119,7 @@ class Entity:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("parents", ";".join(updatedParents))
 
 	@property
-	def underlyingTypeFQN(self) -> typing.Optional[str]:
+	def underlyingTypeFQN(self) -> str | None:
 		"""
 		Get the underlying element FQN if available.
 		"""
@@ -128,7 +128,7 @@ class Entity:
 	def setUnderlyingValueFQN(self, fqn: str) -> None:
 		ElementBuilder.cast(self.element, ElementBuilder).setAttr("fqn_value", fqn)
 
-	def _setLiteral(self, value: typing.Optional[typing.Union[str, LiteralExtended]]) -> None:
+	def _setLiteral(self, value: str | LiteralExtended | None) -> None:
 		"""Set or unset the literal associated with this element."""
 
 		if value is not None:
@@ -138,7 +138,7 @@ class Entity:
 			ElementBuilder.cast(self.element, ElementBuilder).removeAttr("literal")
 
 	@property
-	def underlyingValueFQN(self) -> typing.Optional[str]:
+	def underlyingValueFQN(self) -> str | None:
 		"""
 		Get the underlying element FQN that contains the value.
 		"""
@@ -169,7 +169,7 @@ class Entity:
 	def regexpr(self) -> Regexpr:
 		return Regexpr(self.element)
 
-	def _setRegexpr(self, regexpr: typing.Optional[Regexpr]) -> None:
+	def _setRegexpr(self, regexpr: Regexpr | None) -> None:
 		"""Set or unset the regular expression associated with this element."""
 
 		if regexpr is None:
@@ -183,7 +183,7 @@ class Entity:
 		return self.element.isAttr("literal")
 
 	@property
-	def literal(self) -> typing.Optional[str]:
+	def literal(self) -> str | None:
 		"""
 		Get the underlying literal value if any.
 		"""
@@ -192,7 +192,7 @@ class Entity:
 	@property
 	def literalNative(
 		self,
-	) -> typing.Optional[typing.Union[int, float, str, bool, LiteralExtended]]:
+	) -> int | float | str | bool | LiteralExtended | None:
 		"""Get the underlying literal value if any within its native type."""
 
 		literal = self.literal
@@ -229,7 +229,7 @@ class Entity:
 		return entity
 
 	@property
-	def dependencies(self) -> typing.Set[str]:
+	def dependencies(self) -> set[str]:
 		return set()
 
 	@property
@@ -303,7 +303,7 @@ class Entity:
 		return maybeExecutor is not None and not maybeExecutor.isValue
 
 	@property
-	def executor(self) -> typing.Optional[str]:
+	def executor(self) -> str | None:
 		"""Get the executor directly associated with this entity."""
 
 		maybeExecutor = self.contracts.get("executor")
@@ -314,7 +314,7 @@ class Entity:
 		return self.fqn
 
 	@property
-	def comment(self) -> typing.Optional[str]:
+	def comment(self) -> str | None:
 		return self.element.getAttrValue("comment")
 
 	@property
@@ -322,7 +322,7 @@ class Entity:
 		return self.isFQN
 
 	@property
-	def namespace(self) -> typing.List[str]:
+	def namespace(self) -> list[str]:
 		return FQN.toNamespace(self.fqn)[:-1]
 
 	@property
@@ -358,7 +358,7 @@ class Entity:
 
 		from bdl.entities.impl.expression import Expression
 
-		typeFqns: typing.List[str] = []
+		typeFqns: list[str] = []
 
 		# Look for the base type recursively.
 		if self.underlyingTypeFQN:
@@ -453,8 +453,8 @@ class Entity:
 	def _resolveTrailingFQN(
 		self,
 		resolver: "Resolver",
-		remaining: typing.List[str],
-	) -> typing.Optional[str]:
+		remaining: list[str],
+	) -> str | None:
 		"""Handle unresolved trailing FQN segments after the base symbol resolves.
 
 		Override in subclasses to implement custom resolution for trailing path segments
@@ -467,7 +467,7 @@ class Entity:
 		"""
 		return None
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
+	def error(self, message: str, element: Element | None = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(
 			element=self.element if element is None else element,
 			message=message,
@@ -478,7 +478,7 @@ class Entity:
 		self,
 		condition: bool,
 		message: str,
-		element: typing.Optional[Element] = None,
+		element: Element | None = None,
 		throw: bool = True,
 	) -> AssertionResult:
 		return Error.assertTrue(
@@ -488,8 +488,10 @@ class Entity:
 			throw=throw,
 		)
 
-	def toString(self, attrs: typing.MutableMapping[str, typing.Optional[str]] = {}) -> str:
-		entities = ['{}="{}"'.format(key, value) for key, value in attrs.items() if value]
+	def toString(self, attrs: typing.MutableMapping[str, str | None] | None = None) -> str:
+		if attrs is None:
+			attrs = {}
+		entities = [f'{key}="{value}"' for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 	def __repr__(self) -> str:
@@ -579,7 +581,7 @@ class EntityExpression(Entity):
 
 		return self.isRoleValue and self.isSymbol and self.underlyingValueFQN is not None
 
-	def toParametersResolvedItem(self, name: typing.Optional[str] = None) -> ParametersResolvedItem:
+	def toParametersResolvedItem(self, name: str | None = None) -> ParametersResolvedItem:
 		"""Create an item from this expression.
 
 		Args:
@@ -594,7 +596,7 @@ class EntityExpression(Entity):
 		return ParametersResolvedItem(param=self, expected=expected)
 
 	@property
-	def underlyingInterfaceFQN(self) -> typing.Optional[str]:
+	def underlyingInterfaceFQN(self) -> str | None:
 		"""Get the underlying element interface FQN if available."""
 
 		return self.element.getAttrValue("fqn_interface")

@@ -1,16 +1,15 @@
+import pathlib
 import sys
 import unittest
-import typing
-import pathlib
 
-from bzd.apps.map_analyzer.parser.gcc import ParserGcc
 from bzd.apps.map_analyzer.parser.clang import ParserClang
+from bzd.apps.map_analyzer.parser.gcc import ParserGcc
 
 
 class TestRun(unittest.TestCase):
-	pathGccEsp32XtensaLx6: typing.Optional[pathlib.Path] = None
-	pathGccX86: typing.Optional[pathlib.Path] = None
-	pathClang: typing.Optional[pathlib.Path] = None
+	pathGccEsp32XtensaLx6: pathlib.Path | None = None
+	pathGccX86: pathlib.Path | None = None
+	pathClang: pathlib.Path | None = None
 
 	def testParserGccEsp32XtensaLx6(self) -> None:
 		self.maxDiff = None

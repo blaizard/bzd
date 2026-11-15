@@ -9,10 +9,10 @@ import json
 import os
 import pathlib
 import re
-import tempfile
-import typing
 import subprocess
 import sys
+import tempfile
+import typing
 from functools import cached_property
 
 imageBase = "ubuntu:24.04"
@@ -25,18 +25,18 @@ class Feature:
 	def __init__(self, args: argparse.Namespace) -> None:
 		self.args = args
 		self.isAvailable: bool = True
-		self.groups: typing.List[typing.Union[int, str]] = []
-		self.volumes: typing.List[str] = []
-		self.dockerFile: typing.List[str] = []
-		self.dockerCompose: typing.Dict[str, typing.List[str]] = {}
+		self.groups: list[int | str] = []
+		self.volumes: list[str] = []
+		self.dockerFile: list[str] = []
+		self.dockerCompose: dict[str, list[str]] = {}
 
 	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def cli() -> dict[str, dict[str, typing.Any]]:
 		return {}
 
 	def process(self, context: "SandboxContainer") -> None:
 		"""Process the feature."""
-		raise Exception("Not Implemented")
+		raise RuntimeError("Not Implemented")
 
 	def includes(self, source: str, destination: str, context: "SandboxContainer") -> None:
 		"""Helper function to include a local code file/directory from bzd into the container."""
@@ -56,7 +56,7 @@ class FeatureVolume(Feature):
 		self.isAvailable = self.args.volumes is not None
 
 	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def cli() -> dict[str, dict[str, typing.Any]]:
 		return {
 			"volume": {
 				"dest": "volumes",
@@ -67,10 +67,10 @@ class FeatureVolume(Feature):
 		}
 
 	def process(self, context: "SandboxContainer") -> None:
-		self.namedVolumes: typing.Dict[str, str] = {}
-		self.bindVolumes: typing.Dict[str, str] = {}
+		self.namedVolumes: dict[str, str] = {}
+		self.bindVolumes: dict[str, str] = {}
 		for volume in self.args.volumes:
-			volumes = self.bindVolumes if volume.startswith("./") or volume.startswith("/") else self.namedVolumes
+			volumes = self.bindVolumes if volume.startswith(("./", "/")) else self.namedVolumes
 			volumeSplit = volume.split(":", 1)
 			volumes[volumeSplit[0]] = f"/bzd/volumes/{volumeSplit[0]}" if len(volumeSplit) == 1 else volumeSplit[1]
 
@@ -80,7 +80,7 @@ class FeatureVolume(Feature):
 				f"RUN echo 'sudo chown {context.uid}:{context.gid} {destination} && sudo chmod 755 {destination}' >> /bzd/startup.sh"
 				for destination in self.namedVolumes.values()
 			]
-		self.dockerCompose = {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes.keys()]}
+		self.dockerCompose = {"volumes": [f'{volume}:\n  name: "{volume}"' for volume in self.namedVolumes]}
 
 
 class FeatureSession(Feature):
@@ -106,7 +106,7 @@ class FeatureIsolation(Feature):
 	"""Feature: Add sandbox limitations to the container."""
 
 	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def cli() -> dict[str, dict[str, typing.Any]]:
 		return {
 			"isolate": {
 				"action": argparse.BooleanOptionalAction,
@@ -153,7 +153,7 @@ class FeatureOpenCode(Feature):
 	"""Feature: Add opencode CLI to the container."""
 
 	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def cli() -> dict[str, dict[str, typing.Any]]:
 		return {
 			"opencode": {
 				"action": "append",
@@ -223,7 +223,7 @@ class FeatureDocker(Feature):
 		self.isAvailable = self.mayberDockerSocket is not None
 
 	@staticmethod
-	def getDockerSocket() -> typing.Optional[pathlib.Path]:
+	def getDockerSocket() -> pathlib.Path | None:
 		"""Get the docker socket path if available."""
 
 		for dockerSocket in [
@@ -254,6 +254,7 @@ class FeatureDocker(Feature):
 				"/var/run/docker.sock",
 			],
 			capture_output=True,
+			check=False,
 		)
 		assert result.returncode == 0, "Failed to get docker group id from container."
 		return int(result.stdout.decode().strip().strip("'\""))
@@ -273,7 +274,7 @@ class FeaturePlatform(Feature):
 		self.isAvailable = self.platform is not None
 
 	@staticmethod
-	def cli() -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def cli() -> dict[str, dict[str, typing.Any]]:
 		return {
 			"platform": {
 				"choices": (
@@ -287,7 +288,7 @@ class FeaturePlatform(Feature):
 	def process(self, context: "SandboxContainer") -> None:
 		# See: https://stackoverflow.com/questions/72444103/what-does-running-the-multiarch-qemu-user-static-does-before-building-a-containe
 		# if self.isRootless:
-		subprocess.run(["sudo", "systemctl", "start", "docker"])
+		subprocess.run(["sudo", "systemctl", "start", "docker"], check=False)
 		subprocess.run(
 			[
 				"sudo",
@@ -299,7 +300,8 @@ class FeaturePlatform(Feature):
 				"--reset",
 				"-p",
 				"yes",
-			]
+			],
+			check=False,
 		)
 		# else:
 		# subprocess.run(["docker", "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes"])
@@ -327,7 +329,7 @@ class SandboxContainer:
 		self.args = args
 
 	@cached_property
-	def toHash(self) -> typing.List[str]:
+	def toHash(self) -> list[str]:
 		toHash = [
 			f"root={self.root.as_posix()}",
 			f"user={self.user}",
@@ -433,7 +435,7 @@ class SandboxContainer:
 			]
 			instructions += [f"RUN getent group '{name}' || groupadd '{name}'" for name in groupsStr]
 			instructions += [
-				f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join([str(gid) for gid in groupsInt.keys()] + groupsStr)} {self.user}",
+				f"RUN useradd --create-home -d {self.home} --no-log-init --uid {self.uid} --gid {self.gid} --groups {','.join([str(gid) for gid in groupsInt] + groupsStr)} {self.user}",
 				f"""RUN echo "\"{self.user}\" ALL=(ALL) NOPASSWD:ALL\" >> /etc/sudoers""",
 				f'RUN chown "{self.user}" /bzd/startup.sh',
 				f"USER {self.user}",
@@ -539,7 +541,7 @@ services:
 			check=True,
 		)
 
-	def run(self, args: typing.List[str], env: typing.List[str], recreate: bool) -> None:
+	def run(self, args: list[str], env: list[str], recreate: bool) -> None:
 		subprocess.run(
 			[
 				"docker",
@@ -563,10 +565,10 @@ services:
 
 	@staticmethod
 	def _exec(
-		imageName: str, root: pathlib.Path, interactive: bool, args: typing.List[str], env: typing.List[str] = []
+		imageName: str, root: pathlib.Path, interactive: bool, args: list[str], env: list[str] | None = None
 	) -> None:
 
-		env += [
+		env = ([] if env is None else list(env)) + [
 			"LANG",
 			"LC_CTYPE",
 			"TERM",
@@ -586,11 +588,12 @@ services:
 				str(workdir.absolute().resolve()),
 				imageName,
 				*(args or ["/bin/bash"]),
-			]
+			],
+			check=False,
 		)
 
 	@staticmethod
-	def _list_containers() -> typing.List[typing.Dict[str, typing.Any]]:
+	def _list_containers() -> list[dict[str, typing.Any]]:
 		result = subprocess.run(
 			["docker", "ps", "--filter", f"name={imagePrefix}", "-a", "--format", "json"],
 			capture_output=True,
@@ -607,7 +610,7 @@ services:
 			try:
 				root = pathlib.Path(labels["com.bzd.sandbox.root"]).resolve()
 				relativeRoot = pathlib.Path(os.path.relpath(root, pathlib.Path.cwd().resolve()))
-				kwargs: typing.Dict[str, typing.Any] = {
+				kwargs: dict[str, typing.Any] = {
 					"root": relativeRoot,
 				}
 				sameUser = labels.get("com.bzd.sandbox.user") == getpass.getuser()
@@ -619,7 +622,7 @@ services:
 				if interactive:
 					kwargs["interactive"] = True
 				order = len(relativeRoot.parts) + (0 if sameUser else 100) + (0 if interactive else 1)
-			except Exception:
+			except Exception:  # noqa: BLE001
 				kwargs, order = {}, 999
 			containers.append(
 				{
@@ -633,7 +636,7 @@ services:
 		return sorted(containers, key=lambda u: u["order"])
 
 	@staticmethod
-	def ls(_: typing.List[str]) -> None:
+	def ls(_: list[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		result = subprocess.run(
 			["docker", "stats", "--no-stream", "--format", "json"] + [container["name"] for container in containers],
@@ -644,7 +647,7 @@ services:
 		allStats = [json.loads(line) for line in result.stdout.splitlines()]
 		for container in containers:
 			color = "\033[32m" if container["active"] else "\033[31m"
-			stats: typing.Dict[str, str] = next((d for d in allStats if d.get("Container") == container["name"]), {})
+			stats: dict[str, str] = next((d for d in allStats if d.get("Container") == container["name"]), {})
 			infos = [
 				container["status"].lower(),
 				f"cpu={stats.get('CPUPerc', '?')}",
@@ -658,29 +661,33 @@ services:
 					print(f"    {name}: {container[name]}")
 
 	@staticmethod
-	def prune(_: typing.List[str]) -> None:
+	def prune(_: list[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		for container in containers:
 			if container["active"]:
 				continue
 			print(f"Deleting container '{container['name']}'.")
-			subprocess.run(["docker", "rm", "-f", container["name"]])
+			subprocess.run(["docker", "rm", "-f", container["name"]], check=False)
 		print("Pruning unused images/networks.")
-		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
-		subprocess.run(["docker", "network", "prune", "-f"])
+		subprocess.run(
+			["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"], check=False
+		)
+		subprocess.run(["docker", "network", "prune", "-f"], check=False)
 
 	@staticmethod
-	def clean(_: typing.List[str]) -> None:
+	def clean(_: list[str]) -> None:
 		containers = SandboxContainer._list_containers()
 		for container in containers:
 			print(f"Deleting container '{container['name']}'.")
-			subprocess.run(["docker", "rm", "-f", container["name"]])
+			subprocess.run(["docker", "rm", "-f", container["name"]], check=False)
 		print("Pruning unused images/networks.")
-		subprocess.run(["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"])
-		subprocess.run(["docker", "network", "prune", "-f"])
+		subprocess.run(
+			["docker", "image", "prune", "-a", "-f", "--filter", "label=com.docker.compose.service=bzd"], check=False
+		)
+		subprocess.run(["docker", "network", "prune", "-f"], check=False)
 
 	@staticmethod
-	def use(args: typing.List[str]) -> None:
+	def use(args: list[str]) -> None:
 		containers = [container for container in SandboxContainer._list_containers() if container["active"]]
 		if not containers:
 			print("No sandbox container found.")
@@ -692,7 +699,7 @@ services:
 		try:
 			index = int(input("Select a container: [0] ").strip() or "0")
 			container = containers[index]
-		except Exception:
+		except Exception:  # noqa: BLE001
 			print("Invalid selection.")
 			sys.exit(1)
 		SandboxContainer._exec(
@@ -704,9 +711,11 @@ services:
 
 	@staticmethod
 	def fromCLI(
-		argv: typing.Sequence[typing.Union[str, pathlib.Path]], additionalFeatures: typing.List[typing.Type[Feature]] = []
+		argv: typing.Sequence[str | pathlib.Path], additionalFeatures: list[type[Feature]] | None = None
 	) -> "SandboxContainer":
 
+		if additionalFeatures is None:
+			additionalFeatures = []
 		allFeatures = {
 			"docker": FeatureDocker,
 			"platform": FeaturePlatform,

@@ -1,15 +1,14 @@
-import unittest
 import pathlib
 import tempfile
-import typing
+import unittest
 
 from apps.ebook.comics.cbz import Cbz
-from apps.ebook.providers import ProviderEbook, ProviderImages
 from apps.ebook.flow import FlowContext
+from apps.ebook.providers import ProviderEbook, ProviderImages
 
 
 class TestRun(unittest.TestCase):
-	def assertProviderEbook(self, provider: ProviderImages, expectedImages: typing.List[str]) -> None:
+	def assertProviderEbook(self, provider: ProviderImages, expectedImages: list[str]) -> None:
 		self.assertEqual(
 			len(provider.images),
 			len(expectedImages),

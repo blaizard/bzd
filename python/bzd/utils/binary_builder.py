@@ -1,7 +1,7 @@
-import pathlib
 import argparse
-import typing
 import dataclasses
+import pathlib
+import typing
 
 
 @dataclasses.dataclass
@@ -10,7 +10,7 @@ class Chunk:
 
 	path: pathlib.Path
 	address: int
-	maxSize: typing.Optional[int]
+	maxSize: int | None
 
 	@property
 	def isMaxSize(self) -> bool:
@@ -21,8 +21,8 @@ class Chunk:
 class Binary:
 	"""Class to define a binary."""
 
-	chunks: typing.List[Chunk]
-	size: typing.Optional[int] = None
+	chunks: list[Chunk]
+	size: int | None = None
 
 	@property
 	def isSize(self) -> bool:
@@ -68,7 +68,7 @@ def readSize(arg: str) -> int:
 		raise
 
 
-def makeBinary(chunks: typing.Iterable[str], size: typing.Optional[str] = None) -> Binary:
+def makeBinary(chunks: typing.Iterable[str], size: str | None = None) -> Binary:
 	"""Convert a string representation of a binary into a binary."""
 
 	binary = Binary(chunks=[], size=None if size is None else readSize(size))

@@ -1,13 +1,13 @@
-import typing
-import pathlib
+import dataclasses
 import enum
 import json
-import dataclasses
+import pathlib
 import shutil
+import typing
 
-from apps.ebook.providers import Provider, providerSerialize, providerDeserialize
+from apps.ebook.providers import Provider, providerDeserialize, providerSerialize
 
-FlowSchemaType = typing.List[str]
+FlowSchemaType = list[str]
 
 
 class FlowEnum(enum.Enum):
@@ -18,7 +18,7 @@ class FlowEnum(enum.Enum):
 class FlowContext:
 	"""Context for the flow."""
 
-	schema: typing.Type[FlowEnum]
+	schema: type[FlowEnum]
 
 	@staticmethod
 	def forTesting() -> "FlowContext":
@@ -35,7 +35,7 @@ class ActionInterface(typing.Protocol):
 
 	def process(
 		self, input: ProviderInput, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderOutput, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderOutput, FlowEnum | None]]:
 		raise NotImplementedError()
 
 
@@ -50,7 +50,7 @@ class FlowState:
 	def completed(self) -> bool:
 		return len(self.flow) == 0
 
-	def toJson(self) -> typing.Dict[str, typing.Any]:
+	def toJson(self) -> dict[str, typing.Any]:
 		"""Serialize the current state."""
 		return {
 			"flow": self.flow,
@@ -59,7 +59,7 @@ class FlowState:
 		}
 
 	@staticmethod
-	def fromJson(data: typing.Dict[str, typing.Any]) -> "FlowState":
+	def fromJson(data: dict[str, typing.Any]) -> "FlowState":
 		return FlowState(
 			provider=providerDeserialize(data["provider"]),
 			flow=data["flow"],
@@ -68,7 +68,7 @@ class FlowState:
 
 
 class FlowRegistry:
-	def __init__(self, schema: typing.Type[FlowEnum], actions: typing.Dict[str, ActionInterface]) -> None:
+	def __init__(self, schema: type[FlowEnum], actions: dict[str, ActionInterface]) -> None:
 		self.schema = schema
 		self.actions = actions
 
@@ -84,7 +84,7 @@ class FlowRegistry:
 			try:
 				return self.restore(directory, provider)
 			except AssertionError as e:
-				print(f"Could not restore previous flow: {str(e)}, resetting flow state.")
+				print(f"Could not restore previous flow: {e!s}, resetting flow state.")
 		return self.reset(directory, flow, provider)
 
 	def reset(self, directory: pathlib.Path, flow: FlowSchemaType, provider: Provider) -> "Flow":
@@ -119,7 +119,7 @@ class Flow:
 		self,
 		registry: FlowRegistry,
 		directory: pathlib.Path,
-		states: typing.List[FlowState],
+		states: list[FlowState],
 	) -> None:
 		self.registry = registry
 		self.directory = directory
@@ -129,7 +129,7 @@ class Flow:
 	def stateJson(directory: pathlib.Path) -> pathlib.Path:
 		return directory / "state.json"
 
-	def run(self, uid: str) -> typing.List[Provider]:
+	def run(self, uid: str) -> list[Provider]:
 		"""Run a specific flow.
 
 		Args:
@@ -164,7 +164,7 @@ class Flow:
 			isFirst = True
 			currentFlow = state.flow.copy()
 			for provider, maybeFlow in outputs:
-				flow = ([] if maybeFlow is None else maybeFlow.value) + currentFlow
+				flow = ([] if maybeFlow is None else list(maybeFlow.value)) + currentFlow
 				if isFirst:
 					state.provider = provider
 					state.flow = flow

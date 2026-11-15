@@ -5,8 +5,8 @@ import sys
 
 from private.diff_test.compare_binary import compare as compareBinary
 from private.diff_test.compare_json import compare as compareJson
-from private.diff_test.compare_text import compare as compareText
 from private.diff_test.compare_lines import compare as compareLines
+from private.diff_test.compare_text import compare as compareText
 
 compareFunctions = {"binary": compareBinary, "json": compareJson, "text": compareText, "lines": compareLines}
 

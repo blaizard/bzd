@@ -1,17 +1,16 @@
 import argparse
-import os
-import re
 import json
+import os
 import pathlib
-import typing
+import re
 
 from bzd.utils.run import localCommand
 
 
-def resolvePath(path: pathlib.Path, workspace: pathlib.Path) -> typing.Optional[pathlib.Path]:
+def resolvePath(path: pathlib.Path, workspace: pathlib.Path) -> pathlib.Path | None:
 	"""Attempt to resolve the given path."""
 
-	def resolve(currentPath: pathlib.Path) -> typing.Optional[pathlib.Path]:
+	def resolve(currentPath: pathlib.Path) -> pathlib.Path | None:
 		while not (workspace / currentPath).is_file():
 			if not currentPath.parts:
 				return None
@@ -51,23 +50,22 @@ if __name__ == "__main__":
 	}
 
 	# Cleanup path and count the number of files
-	reportUpdate = pathlib.Path("{}.update".format(args.report.as_posix()))
-	with open(args.workspace / args.report, "r") as fin:
-		with open(args.workspace / reportUpdate, "w") as fout:
-			ignore = False
-			for line in fin:
-				if line.startswith("SF:"):
-					path = pathlib.Path(line[3:].strip())
-					maybePath = resolvePath(path, workspace=args.workspace)
-					if maybePath:
-						line = f"SF:{maybePath}\n"
-						ignore = False
-						data["files"] += 1
-					else:
-						ignore = True
-						print(f"Ignoring file {path}")
-				if not ignore:
-					fout.write(line)
+	reportUpdate = pathlib.Path(f"{args.report.as_posix()}.update")
+	with open(args.workspace / args.report, "r") as fin, open(args.workspace / reportUpdate, "w") as fout:
+		ignore = False
+		for line in fin:
+			if line.startswith("SF:"):
+				path = pathlib.Path(line[3:].strip())
+				maybePath = resolvePath(path, workspace=args.workspace)
+				if maybePath:
+					line = f"SF:{maybePath}\n"
+					ignore = False
+					data["files"] += 1
+				else:
+					ignore = True
+					print(f"Ignoring file {path}")
+			if not ignore:
+				fout.write(line)
 
 	# Generate the HTML output
 	result = localCommand(
@@ -94,7 +92,7 @@ if __name__ == "__main__":
 	]:
 		m = re.search(r"(\d+)\s+of\s+(\d+)\s+" + search_str, result.getStdout())
 		if m or required:
-			assert m, "Something went wrong in the report generation: {}".format(result.getOutput())
+			assert m, f"Something went wrong in the report generation: {result.getOutput()}"
 			data[tag] = int(m.group(2))
 			data["coverage_" + tag] = float(int(m.group(1)) / int(m.group(2)))
 
@@ -103,7 +101,7 @@ if __name__ == "__main__":
 
 	print(
 		"Includes: {}".format(
-			", ".join(["{} {}".format(data[tag], tag) for tag in ["files", "lines", "functions", "branches"] if tag in data])
+			", ".join([f"{data[tag]} {tag}" for tag in ["files", "lines", "functions", "branches"] if tag in data])
 		)
 	)
 	for tag, text in [

@@ -1,22 +1,21 @@
 import argparse
 import json
-import sys
 import pathlib
+import sys
 import typing
-
-from elftools.elf.elffile import ELFFile
 
 from bzd.apps.map_analyzer.parser.clang import ParserClang
 from bzd.apps.map_analyzer.parser.gcc import ParserGcc
 from bzd.apps.map_analyzer.parser.parser import Parser
+from elftools.elf.elffile import ELFFile
 
-FilterConfigType = typing.List[str]
-AggregateConfigType = typing.Dict[str, typing.List[str]]
+FilterConfigType = list[str]
+AggregateConfigType = dict[str, list[str]]
 
 
 def generateBerkeleyConfig(
 	filePath: pathlib.Path,
-) -> typing.Optional[typing.Tuple[FilterConfigType, AggregateConfigType]]:
+) -> tuple[FilterConfigType, AggregateConfigType] | None:
 	"""
 	Classify sections to match berkeley representation:
 	        remove: !SEC_ALLOC
@@ -77,7 +76,7 @@ def analyze(data: Parser) -> None:
 	"""
 
 	# Build a list sorted by addresses
-	byAddresses: typing.Dict[int, typing.Dict[str, typing.Any]] = {}
+	byAddresses: dict[int, dict[str, typing.Any]] = {}
 	for section, obj in data.getBySections().items():
 		address = obj.get("address")
 		if address:
@@ -94,7 +93,7 @@ def analyze(data: Parser) -> None:
 				"address": address,
 				"section": section,
 			}
-	sortedByAddresses: typing.List[typing.Dict[str, typing.Any]] = sorted(
+	sortedByAddresses: list[dict[str, typing.Any]] = sorted(
 		[obj for address, obj in byAddresses.items()], key=lambda x: x["address"]
 	)
 
@@ -109,7 +108,7 @@ def analyze(data: Parser) -> None:
 		assert isinstance(address, int)
 		if address < addressEnd:
 			print(
-				"Section '{}'@{:#08x} overlaps with previous section '{}'.".format(section, address, previousSection),
+				f"Section '{section}'@{address:#08x} overlaps with previous section '{previousSection}'.",
 				file=sys.stderr,
 			)
 

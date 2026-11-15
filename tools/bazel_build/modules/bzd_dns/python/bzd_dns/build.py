@@ -1,10 +1,9 @@
 import argparse
-import pathlib
-import typing
 import json
+import pathlib
 
-from bzd_dns.zones import Zones
 from bzd_dns.octodns import Octodns
+from bzd_dns.zones import Zones
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="DNS provider builder.")
@@ -33,7 +32,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	# Build up the domains zones.
-	domains: typing.Dict[str, Zones] = {}
+	domains: dict[str, Zones] = {}
 	for domain, path in args.inputs:
 		dataStr = pathlib.Path(path).read_text()
 		data = json.loads(dataStr)

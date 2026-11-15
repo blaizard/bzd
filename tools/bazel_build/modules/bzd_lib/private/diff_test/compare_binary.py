@@ -1,13 +1,13 @@
+import dataclasses
 import pathlib
 import typing
-import dataclasses
 
 from private.diff_test.common import getShortestDistinctPaths, maybeColorizeLine
 
 # Take a value of 0 if there is no diff, or a running number that corresponds to the
 # match in both contents.
 IsDiff = int
-DiffContent = typing.List[typing.Tuple[int, IsDiff]]
+DiffContent = list[tuple[int, IsDiff]]
 
 
 @dataclasses.dataclass
@@ -19,9 +19,9 @@ class Delta:
 	# Offset in the second content.
 	offset2: int = -1
 	# Diff of the first content.
-	diff1: DiffContent = dataclasses.field(default_factory=lambda: [])
+	diff1: DiffContent = dataclasses.field(default_factory=list)
 	# Diff of the second content.
-	diff2: DiffContent = dataclasses.field(default_factory=lambda: [])
+	diff2: DiffContent = dataclasses.field(default_factory=list)
 
 	@property
 	def isEmpty(self) -> bool:
@@ -68,13 +68,13 @@ class VisitorPrint:
 		self.width = width
 
 	@staticmethod
-	def maybeGetColorAsString(isDiff: IsDiff, color: bool) -> typing.Optional[str]:
+	def maybeGetColorAsString(isDiff: IsDiff, color: bool) -> str | None:
 		colors = ["\033[0;31m", "\033[0;33m", "\033[0;34m", "\033[0;35m"]
 		if color and isDiff > 0:
 			return colors[(isDiff - 1) % len(colors)]
 		return None
 
-	def toHexAsString(self, diff: DiffContent, padding: typing.Optional[int] = None) -> str:
+	def toHexAsString(self, diff: DiffContent, padding: int | None = None) -> str:
 		"""Convert a diff into its hexadecimal representation.
 
 		Args:
@@ -86,14 +86,13 @@ class VisitorPrint:
 		"""
 
 		content = [
-			maybeColorizeLine("{:02x}".format(byte), VisitorPrint.maybeGetColorAsString(isDiff, self.color))
-			for byte, isDiff in diff
+			maybeColorizeLine(f"{byte:02x}", VisitorPrint.maybeGetColorAsString(isDiff, self.color)) for byte, isDiff in diff
 		]
 		if padding is not None:
 			content += ["  "] * max(0, padding - len(diff))
 		return " ".join(content)
 
-	def toTextAsString(self, diffContent: DiffContent, padding: typing.Optional[int] = None) -> str:
+	def toTextAsString(self, diffContent: DiffContent, padding: int | None = None) -> str:
 		"""Convert a diff into its text representation.
 
 		Args:
@@ -118,7 +117,7 @@ class VisitorPrint:
 	@staticmethod
 	def chunkedIterator(
 		diffContent1: DiffContent, diffContent2: DiffContent, chunkSize: int
-	) -> typing.Generator[typing.Tuple[DiffContent, DiffContent], None, None]:
+	) -> typing.Generator[tuple[DiffContent, DiffContent], None, None]:
 		"""Iterates through two diff content buffers in chunks of a specified size.
 
 		Args:
@@ -148,8 +147,8 @@ class VisitorPrint:
 		# Number of bytes to print per line.
 		chunkSize = int((self.width - len(formatLine.format("", "")) - 1) / 4)
 
-		left: typing.List[str] = [f"== {self.file1}@{delta.offset1}"]
-		right: typing.List[str] = [f"== {self.file2}@{delta.offset2}"]
+		left: list[str] = [f"== {self.file1}@{delta.offset1}"]
+		right: list[str] = [f"== {self.file2}@{delta.offset2}"]
 
 		for chunk1, chunk2 in VisitorPrint.chunkedIterator(delta.diff1, delta.diff2, chunkSize):
 			if chunk1:
@@ -178,8 +177,8 @@ class VisitorPrint:
 		        delta: The delta to be printed.
 		"""
 
-		left: typing.List[str] = [f"== {self.file1}@{delta.offset1}"]
-		right: typing.List[str] = [f"== {self.file2}@{delta.offset2}"]
+		left: list[str] = [f"== {self.file1}@{delta.offset1}"]
+		right: list[str] = [f"== {self.file2}@{delta.offset2}"]
 
 		for chunk1, chunk2 in VisitorPrint.chunkedIterator(delta.diff1, delta.diff2, self.width):
 			left.append(self.toTextAsString(chunk1))
@@ -209,7 +208,7 @@ class Diff:
 		lcs = self.lcs()
 		index1 = 0
 		index2 = 0
-		self.diffs: typing.List[typing.Tuple[int, int, int, int]] = []
+		self.diffs: list[tuple[int, int, int, int]] = []
 
 		# Create the list of diffs
 		for b in lcs:

@@ -6,9 +6,7 @@ import unittest
 
 from bzd.http.client import HttpClientException
 from bzd.http.client_mock import HttpClientMock, HttpResponseMock
-
 from context.context import Context
-
 from dependencies.bazel_dep.bazel_dep import BazelDep
 from dependencies.bazel_dep.bcr import BcrRegistry
 
@@ -21,7 +19,7 @@ MODULE = (
 )
 
 
-def _registry(versions: typing.Dict[str, typing.List[str]]) -> BcrRegistry:
+def _registry(versions: dict[str, list[str]]) -> BcrRegistry:
 	def callback(**kwargs: typing.Any) -> HttpResponseMock:
 		module = str(kwargs["url"]).split("/modules/")[1].split("/")[0]
 		if module not in versions:

@@ -1,7 +1,7 @@
-import typing
-
-from bzd.parser.element import ElementBuilder as Element, SequenceBuilder as Sequence
+from bzd.parser.element import ElementBuilder as Element
+from bzd.parser.element import SequenceBuilder as Sequence
 from bzd.validation.validation import Validation
+
 from bdl.contracts.contract import Contract
 
 
@@ -20,11 +20,11 @@ class ElementBuilder(Element):
 
 	def addConfigValue(
 		self,
-		symbol: typing.Optional[str] = None,
-		literal: typing.Optional[str] = None,
-		name: typing.Optional[str] = None,
-		interface: typing.Optional[str] = None,
-		contract: typing.Optional[str] = None,
+		symbol: str | None = None,
+		literal: str | None = None,
+		name: str | None = None,
+		interface: str | None = None,
+		contract: str | None = None,
 	) -> "ElementBuilder":
 		"""Create a configuration entry."""
 
@@ -44,7 +44,7 @@ class ElementBuilder(Element):
 		self.pushBackElementToNestedSequence(kind="config", element=element)
 		return self
 
-	def addConfigType(self, symbol: str, name: str, contract: typing.Optional[str] = None) -> "ElementBuilder":
+	def addConfigType(self, symbol: str, name: str, contract: str | None = None) -> "ElementBuilder":
 		"""Create a configuration entry."""
 
 		element = ElementBuilder(category="using").setAttr("symbol", symbol).setAttr("name", name)
@@ -60,7 +60,7 @@ class NestedBuilder(ElementBuilder):
 
 
 class NamespaceBuilder(ElementBuilder):
-	def __init__(self, namespace: typing.List[str]) -> None:
+	def __init__(self, namespace: list[str]) -> None:
 		super().__init__("namespace")
 		for name in namespace:
 			element = Element().setAttr("name", name)
@@ -75,7 +75,7 @@ class MethodBuilder(ElementBuilder):
 
 
 class ExpressionBuilder(ElementBuilder):
-	def __init__(self, symbol: str, name: typing.Optional[str] = None) -> None:
+	def __init__(self, symbol: str, name: str | None = None) -> None:
 		super().__init__("expression")
 		if name is not None:
 			self.setAttr("name", name)

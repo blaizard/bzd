@@ -1,22 +1,21 @@
 import typing
 from functools import partial
 
-
 if typing.TYPE_CHECKING:
 	from bzd.validation.result import Result
 
-ValuesDict = typing.Dict[str, typing.Any]
-ValuesList = typing.List[typing.Any]
-Values = typing.Union[ValuesList, ValuesDict]
+ValuesDict = dict[str, typing.Any]
+ValuesList = list[typing.Any]
+Values = ValuesList | ValuesDict
 
-ValidationCallable = typing.Callable[[typing.Any, "Context"], typing.Optional[str]]
+ValidationCallable = typing.Callable[[typing.Any, "Context"], str | None]
 
 
 class Context:
 	def __init__(self, value: str, args: typing.Any) -> None:
 		self.value = value
 		self.args = args
-		self.underlying_: typing.Optional[typing.Any] = None
+		self.underlying_: typing.Any | None = None
 
 	@property
 	def underlying(self) -> typing.Any:
@@ -38,16 +37,16 @@ class TypeContext(Context):
 		self.underlying_ = value
 
 
-T = typing.TypeVar("T", typing.List[typing.Any], typing.Dict[typing.Any, typing.Any])
+T = typing.TypeVar("T", list[typing.Any], dict[typing.Any, typing.Any])
 
 
 class Constraint:
-	constraints: typing.Dict[str, typing.Type["Constraint"]] = {}
+	constraints: typing.ClassVar[dict[str, type["Constraint"]]] = {}
 
 	def __init__(self, name: str) -> None:
 		self.name = name
 
-	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
+	def install(self, processedSchema: "ProcessedSchema", args: list[str]) -> None:
 		"""
 		Install a constraint.
 		"""
@@ -62,8 +61,8 @@ class Constraint:
 			converted = float(value)
 			assert converted.is_integer()
 			return int(converted)
-		except Exception:
-			raise Exception("expects an integer, received: '{}'.".format(value))
+		except Exception:  # noqa: BLE001
+			raise RuntimeError(f"expects an integer, received: '{value}'.")
 
 	@staticmethod
 	def _toFloat(value: str) -> float:
@@ -72,8 +71,8 @@ class Constraint:
 		"""
 		try:
 			return float(value)
-		except Exception:
-			raise Exception("expects a floating point number, received: '{}'.".format(value))
+		except Exception:  # noqa: BLE001
+			raise RuntimeError(f"expects a floating point number, received: '{value}'.")
 
 	@staticmethod
 	def validate(schema: T, values: Values) -> "Result[T]":
@@ -83,14 +82,14 @@ class Constraint:
 
 
 class NoopConstraint(Constraint):
-	def install(self, processedSchema: "ProcessedSchema", args: typing.List[str]) -> None:
+	def install(self, processedSchema: "ProcessedSchema", args: list[str]) -> None:
 		pass
 
 
 class ProcessedResult:
 	def __init__(self) -> None:
-		self.value: typing.Optional[typing.Any] = None
-		self.errors: typing.List[str] = []
+		self.value: typing.Any | None = None
+		self.errors: list[str] = []
 
 	def addError(self, error: str) -> None:
 		self.errors.append(error)
@@ -106,8 +105,8 @@ class ProcessedResult:
 class ProcessedSchema:
 	def __init__(self) -> None:
 		self.mandatory_ = False
-		self.type: typing.Optional[Constraint] = None
-		self.validations: typing.List[typing.Callable[[Context], typing.Optional[str]]] = []
+		self.type: Constraint | None = None
+		self.validations: list[typing.Callable[[Context], str | None]] = []
 
 	@property
 	def isMandatory(self) -> bool:
@@ -125,14 +124,14 @@ class ProcessedSchema:
 		Set a specific constraint as a type.
 		"""
 
-		assert self.type is None, f"A type for this constraint is already specified: {str(self.type)}"
+		assert self.type is None, f"A type for this constraint is already specified: {self.type!s}"
 		self.type = constraint
 
 	def install(
 		self,
-		constraints: typing.Dict[str, typing.Type[Constraint]],
+		constraints: dict[str, type[Constraint]],
 		name: str,
-		args: typing.List[str],
+		args: list[str],
 	) -> None:
 		"""
 		Install a new constraint.
@@ -143,7 +142,7 @@ class ProcessedSchema:
 		if self.type is not None and name in self.type.constraints:
 			constraintClass = self.type.constraints[name]
 		else:
-			assert name in constraints, "Constraint of type '{}' is undefined.".format(name)
+			assert name in constraints, f"Constraint of type '{name}' is undefined."
 			constraintClass = constraints[name]
 
 		constraint = constraintClass(name=name)
@@ -175,7 +174,7 @@ class ProcessedSchema:
 		for validation in self.validations:
 			try:
 				validation(context=context)  # type: ignore
-			except BaseException as e:
+			except BaseException as e:  # noqa: BLE001
 				result.addError(str(e))
 
 		# If no error, set the value

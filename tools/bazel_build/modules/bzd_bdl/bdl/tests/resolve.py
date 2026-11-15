@@ -1,7 +1,7 @@
 import unittest
 
+from bdl.entities.all import EnumValue, Expression
 from bdl.object import Object, ObjectContext
-from bdl.entities.all import Expression, EnumValue
 from bdl.visitors.composition.visitor import Composition
 
 

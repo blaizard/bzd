@@ -1,3 +1,4 @@
+import itertools
 import typing
 
 
@@ -15,7 +16,7 @@ class BuiltinsBtl:
 		)
 
 		if isinstance(first, list):
-			return sum(args, [])
+			return list(itertools.chain.from_iterable(args))
 
 		if isinstance(first, dict):
 			return dict(map(dict.popitem, args))
@@ -23,7 +24,7 @@ class BuiltinsBtl:
 		assert False, f"The builtin function 'merge' cannot take arguments of type '{type(first)}'."
 
 	@staticmethod
-	def set(*args: typing.Any) -> typing.Set[typing.Any]:
+	def set(*args: typing.Any) -> set[typing.Any]:
 		"""Create a set from multiple elements."""
 
 		return set(args)
@@ -51,7 +52,7 @@ class BuiltinsBtl:
 	def error(message: str) -> None:
 		"""Print an unconditional error message and terminates."""
 
-		raise Exception(message)
+		raise RuntimeError(message)
 
 	@staticmethod
 	def unreachable() -> None:

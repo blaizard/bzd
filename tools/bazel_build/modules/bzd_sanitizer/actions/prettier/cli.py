@@ -2,17 +2,17 @@ import argparse
 import pathlib
 import typing
 
-from bzd_sanitizer.worker import worker
 from bzd.utils.run import localBazelBinary
+from bzd_sanitizer.worker import worker
 
 
 def workload(
-	args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str, str],
+	args: tuple[pathlib.Path, pathlib.Path, bool, str, str],
 	stdout: typing.TextIO,
 ) -> bool:
 	workspace, path, check, prettier, config = args
 
-	params: typing.List[str] = []
+	params: list[str] = []
 	params += ["--check"] if check else ["--write"]
 	params += ["--config", config] if config else []
 

@@ -1,6 +1,6 @@
+import pathlib
 import re
 import typing
-import pathlib
 
 
 class Filter:

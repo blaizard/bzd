@@ -4,14 +4,14 @@ import json
 import pathlib
 import typing
 
+from bzd.utils.run import localBazelBinary
 from bzd_sanitizer.context import Context
 from bzd_sanitizer.worker import worker
-from bzd.utils.run import localBazelBinary
 
 
 class SecretLocationFinder(ast.NodeVisitor):
 	def __init__(self) -> None:
-		self.nodes: typing.List[typing.Dict[str, typing.Any]] = []
+		self.nodes: list[dict[str, typing.Any]] = []
 
 	def visit_Call(self, node: ast.Call) -> None:
 		"""Find any bzd_secret with inline secret."""
@@ -41,7 +41,7 @@ def lineColToIndex(source: str, lineno: int, col: int) -> int:
 
 
 def workload(
-	args: typing.Tuple[pathlib.Path, pathlib.Path, bool, pathlib.Path],
+	args: tuple[pathlib.Path, pathlib.Path, bool, pathlib.Path],
 	stdout: typing.TextIO,
 ) -> bool:
 	workspace, path, check, secret = args

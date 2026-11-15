@@ -3,8 +3,8 @@ import typing
 from apps.artifacts.api.python.release.release import Update
 from bzd.http.utils import encodeURIComponent
 
-BinaryData = typing.Dict[str, typing.Any]
-TestData = typing.Dict[str, typing.List[BinaryData]]
+BinaryData = dict[str, typing.Any]
+TestData = dict[str, list[BinaryData]]
 
 
 class Response:
@@ -15,7 +15,7 @@ class Response:
 	def content(self) -> bytes:
 		return typing.cast(bytes, self.data["binary"])
 
-	def getHeader(self, key: str) -> typing.Optional[str]:
+	def getHeader(self, key: str) -> str | None:
 		headers = {
 			"content-disposition": f'attachment; filename="{encodeURIComponent(self.data["name"])}"',
 			"last-modified": "Sat, 28 Mar 2015 08:05:42 GMT",
@@ -39,9 +39,9 @@ class ReleaseMock:
 	def fetch(
 		self,
 		path: str,
-		uid: typing.Optional[str] = None,
-		ignore: typing.Optional[str] = None,
-	) -> typing.Optional[Update]:
+		uid: str | None = None,
+		ignore: str | None = None,
+	) -> Update | None:
 		"""Check if there is an update available.
 
 		    Args:

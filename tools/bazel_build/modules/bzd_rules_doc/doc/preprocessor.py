@@ -1,13 +1,12 @@
 import argparse
+import json
 import pathlib
 import re
-import typing
-import json
 import subprocess
 
 
 class Extensions:
-	def __init__(self, files: typing.List[pathlib.Path]) -> None:
+	def __init__(self, files: list[pathlib.Path]) -> None:
 		self.data = []
 		for file in files:
 			extension = json.loads(file.read_text())
@@ -25,12 +24,12 @@ class Extensions:
 		# Look for all the matches.
 		matches = [extension[action] for extension in self.data if action in extension]
 		if not matches:
-			raise Exception(f"There is no documentation extension for {action}.")
+			raise RuntimeError(f"There is no documentation extension for {action}.")
 
 		# Ensure that all the executables point to the same file.
 		executables = [m["executable"] for m in matches]
 		if len(set(executables)) != 1:
-			raise Exception(f"All executables must point to the same file: {str(matches)}.")
+			raise RuntimeError(f"All executables must point to the same file: {matches!s}.")
 
 		# Combine all arguments.
 		args = [arg for m in matches for arg in m["args"]]
@@ -39,7 +38,7 @@ class Extensions:
 		result = subprocess.run(
 			[executable] + args,
 			stdout=subprocess.PIPE,
-			universal_newlines=True,
+			text=True,
 			check=True,
 		)
 		return result.stdout

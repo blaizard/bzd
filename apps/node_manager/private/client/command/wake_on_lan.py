@@ -1,8 +1,7 @@
 import re
-import struct
 import socket
+import struct
 import time
-import typing
 
 from apps.node_manager.private.common import getHostPort
 from bzd.logging import Logger
@@ -54,16 +53,14 @@ def checkConnection(host: str, port: int, timeoutS: int = 1) -> bool:
 	sock.settimeout(timeoutS)
 	try:
 		sock.connect((host, port))
-	except Exception:
+	except Exception:  # noqa: BLE001
 		return False
 	else:
 		sock.close()
 		return True
 
 
-def commandWakeOnLan(
-	mac: str, broadcast: str, service: str, wait: typing.List[str], timeout: int, logger: Logger
-) -> None:
+def commandWakeOnLan(mac: str, broadcast: str, service: str, wait: list[str], timeout: int, logger: Logger) -> None:
 	"""Wake on LAN command."""
 
 	assert checkMAC(mac), f"Mac address '{mac}' should have the following format: XX:XX:XX:XX:XX:XX"

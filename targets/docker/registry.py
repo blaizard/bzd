@@ -1,7 +1,5 @@
 """Manage the Docker registry."""
 
-import typing
-
 from bzd.http.client import HttpClient
 
 
@@ -9,13 +7,13 @@ class DockerRegistry:
 	def __init__(self, url: str) -> None:
 		self.url = url
 
-	def listRepositories(self) -> typing.List[str]:
+	def listRepositories(self) -> list[str]:
 		"""List all repositories of this registry."""
 
 		response = HttpClient.get(f"{self.url}/v2/_catalog")
 		return response.json.get("repositories") or []
 
-	def listTags(self, repository: str) -> typing.List[str]:
+	def listTags(self, repository: str) -> list[str]:
 		"""List all tags associated with a repository."""
 
 		response = HttpClient.get(f"{self.url}/v2/{repository}/tags/list")
@@ -37,10 +35,10 @@ class DockerRegistry:
 		assert digest is not None
 		return digest
 
-	def getImages(self) -> typing.Dict[str, typing.Dict[str, str]]:
+	def getImages(self) -> dict[str, dict[str, str]]:
 		"""Get a dictionary of images, their tags and digests."""
 
-		images: typing.Dict[str, typing.Dict[str, str]] = {}
+		images: dict[str, dict[str, str]] = {}
 		repositories = self.listRepositories()
 		for repository in repositories:
 			images[repository] = {}

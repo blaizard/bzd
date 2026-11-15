@@ -1,7 +1,7 @@
 import argparse
 import pathlib
 
-from sandbox import SandboxContainer, Feature
+from sandbox import Feature, SandboxContainer
 
 
 class FeatureLinux(Feature):
@@ -65,6 +65,6 @@ if __name__ == "__main__":
 		)
 
 	else:
-		raise Exception(f"Unsupported image type '{args.image}'.")
+		raise RuntimeError(f"Unsupported image type '{args.image}'.")
 
 	args.output.write_text(sandbox.dockerFile)

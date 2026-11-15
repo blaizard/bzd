@@ -1,13 +1,13 @@
-import typing
 import re
+import typing
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
-from bdl.entities.impl.fragment.parameters import Parameters
 from bdl.entities.impl.entity import Entity, EntityExpression, Role
-from bdl.entities.impl.types import Category
 from bdl.entities.impl.fragment.contract import Contracts
+from bdl.entities.impl.fragment.parameters import Parameters
+from bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from bdl.visitors.symbol_map import Resolver
@@ -152,7 +152,7 @@ class RegexprFragment(ExpressionFragment):
 
 class SymbolFragment(ExpressionFragment):
 	@property
-	def parameters(self) -> typing.Optional[Parameters]:
+	def parameters(self) -> Parameters | None:
 		"""
 		Return the Parameters object if there are parameters. In case the expression
 		is declared with empty parenthesis or without the Parameters object will be empty.
@@ -244,11 +244,11 @@ class SymbolFragment(ExpressionFragment):
 		# Compute and set the literal value if any.
 		try:
 			maybeValue = resolvedTypeEntity.toLiteral(result.values)  # type: ignore
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			self.error(message=str(e))
 		if maybeValue is not None:
 			self.assertTrue(
 				condition=isinstance(maybeValue, str),
-				message=f"The returned value from toLiteral must be a string, not {str(maybeValue)}",
+				message=f"The returned value from toLiteral must be a string, not {maybeValue!s}",
 			)
 			self._setLiteral(maybeValue)

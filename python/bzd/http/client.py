@@ -1,12 +1,14 @@
+# This is the standard library module, not a self-import.
+import http.client  # noqa: PLW0406
 import json as JsonLibrary
-import urllib.request
-import urllib.parse
-import typing
-import pathlib
 import mimetypes
-import certifi
+import pathlib
 import ssl
-import http.client
+import typing
+import urllib.parse
+import urllib.request
+
+import certifi
 
 # ---- Interfaces ----
 
@@ -18,8 +20,8 @@ class HttpClientRequestProtocol(typing.Protocol):
 		self,
 		method: str,
 		url: str,
-		body: typing.Optional[bytes],
-		headers: typing.Dict[str, str],
+		body: bytes | None,
+		headers: dict[str, str],
 		timeoutS: int,
 	) -> "HttpResponse": ...
 
@@ -63,7 +65,7 @@ class HttpResponse(typing.Protocol):
 	@property
 	def content(self) -> bytes: ...
 
-	def getHeader(self, name: str) -> typing.Optional[str]: ...
+	def getHeader(self, name: str) -> str | None: ...
 
 	@property
 	def text(self) -> str:
@@ -100,12 +102,12 @@ class HttpClient:
 		request: HttpClientRequestProtocol,
 		method: str,
 		url: str,
-		query: typing.Optional[typing.Dict[str, str]] = None,
-		json: typing.Optional[typing.Dict[str, typing.Any]] = None,
-		file: typing.Optional[pathlib.Path] = None,
-		mimetype: typing.Optional[str] = None,
+		query: dict[str, str] | None = None,
+		json: dict[str, typing.Any] | None = None,
+		file: pathlib.Path | None = None,
+		mimetype: str | None = None,
 		timeoutS: int = 60,
-		headers: typing.Optional[typing.Dict[str, str]] = None,
+		headers: dict[str, str] | None = None,
 	) -> HttpResponse:
 
 		body = None
@@ -146,15 +148,15 @@ class _HTTPResponseAdapter(HttpResponse):
 	def content(self) -> bytes:
 		return self.response.read()
 
-	def getHeader(self, name: str) -> typing.Optional[str]:
+	def getHeader(self, name: str) -> str | None:
 		return self.response.getheader(name, None)
 
 
 def _request(
 	method: str,
 	url: str,
-	body: typing.Optional[bytes],
-	headers: typing.Dict[str, str],
+	body: bytes | None,
+	headers: dict[str, str],
 	timeoutS: int,
 ) -> HttpResponse:
 	"""Send an HTTP request using urllib."""
@@ -176,4 +178,4 @@ def _request(
 		) from e
 
 	except urllib.error.URLError as e:
-		raise Exception(f"URL Error: {e.reason} calling {url}")
+		raise RuntimeError(f"URL Error: {e.reason} calling {url}")

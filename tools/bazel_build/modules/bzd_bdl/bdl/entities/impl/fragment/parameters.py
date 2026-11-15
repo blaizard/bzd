@@ -1,23 +1,23 @@
-import typing
 import math
+import typing
 from dataclasses import dataclass
 
-from bzd.parser.element import Element, Sequence, ElementBuilder, SequenceBuilder
-from bzd.parser.error import Error, AssertionResult
+from bzd.parser.element import Element, ElementBuilder, Sequence, SequenceBuilder
+from bzd.parser.error import AssertionResult, Error
 
-from bdl.contracts.validation import Validation, SchemaDict
+from bdl.contracts.validation import SchemaDict, Validation
 from bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
-	from bdl.visitors.symbol_map import Resolver
-	from bdl.entities.impl.fragment.symbol import Symbol
 	from bdl.entities.impl.entity import EntityExpression
+	from bdl.entities.impl.fragment.symbol import Symbol
+	from bdl.visitors.symbol_map import Resolver
 
 
 @dataclass
 class Data:
 	# The name associated with this entry.
-	name: typing.Optional[str]
+	name: str | None
 	# The entity of this element.
 	entity: "EntityExpression"
 	# If this value is the default value, or one assigned during instantiation.
@@ -32,7 +32,7 @@ class Key:
 	# The index related to this key.
 	index: int
 	# The name related to this key, if available.
-	name: typing.Optional[str] = None
+	name: str | None = None
 
 	def __str__(self) -> str:
 		return str(self.index) if self.name is None else self.name
@@ -41,7 +41,7 @@ class Key:
 class ParametersCommon:
 	def __init__(self, element: Element) -> None:
 		self.element = element
-		self.list: typing.List[Data] = []
+		self.list: list[Data] = []
 
 	def __iter__(self) -> typing.Iterator["EntityExpression"]:
 		for parameter in self.list:
@@ -66,13 +66,13 @@ class ParametersCommon:
 		return self.list[index].entity
 
 	@property
-	def names(self) -> typing.Set[str]:
+	def names(self) -> set[str]:
 		"""Retrieve the set of names of the various elements from the list."""
 
 		return {data.name for data in self.list if data.name is not None}
 
 	@property
-	def isNamed(self) -> typing.Optional[bool]:
+	def isNamed(self) -> bool | None:
 		"""
 		Whether or not a parameter pack contains named parameters or not.
 		Returns None if it contains no parameters.
@@ -82,7 +82,7 @@ class ParametersCommon:
 		return None
 
 	@property
-	def isVarArgs(self) -> typing.Optional[bool]:
+	def isVarArgs(self) -> bool | None:
 		"""
 		Whether or not the last parameter is a var args.
 		"""
@@ -99,7 +99,7 @@ class ParametersCommon:
 	) -> Data:
 		entity.assertTrue(
 			condition=not self.isVarArgs or allowMultiVarArgs,
-			message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{str(self)}",
+			message=f"Variable arguments '{entity}' can only be present at the end of the parameter list.\n{self!s}",
 		)
 		name = entity.name if entity.isName else None
 		entity.assertTrue(
@@ -112,7 +112,7 @@ class ParametersCommon:
 		# (name1 = 0, name2 = 2, ...) or (0, 2, ...)
 		entity.assertTrue(
 			condition=allowMix or self.isNamed == entity.isName,
-			message=f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size() - 1}:'{entity}':\nParameters:\n{str(self)}",
+			message=f"Cannot mix named and unnamed parameters: 0:'{self.at(0)}' and {self.size() - 1}:'{entity}':\nParameters:\n{self!s}",
 		)
 		return self.list[-1]
 
@@ -132,11 +132,11 @@ class ParametersCommon:
 			else:
 				self.error(element=param.element, message="Unsupported parameter.")
 
-	def items(self, includeVarArgs: bool) -> typing.Iterator[typing.Tuple[Key, "EntityExpression"]]:
+	def items(self, includeVarArgs: bool) -> typing.Iterator[tuple[Key, "EntityExpression"]]:
 		for key, entity, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
 			yield key, entity
 
-	def itemsMetadata(self, includeVarArgs: bool) -> typing.Iterator[typing.Tuple[Key, "EntityExpression", Data]]:
+	def itemsMetadata(self, includeVarArgs: bool) -> typing.Iterator[tuple[Key, "EntityExpression", Data]]:
 		for index, data in enumerate(self.list):
 			if not data.entity.isVarArgs or includeVarArgs:
 				yield Key(index=index, name=data.name), data.entity, data
@@ -145,7 +145,7 @@ class ParametersCommon:
 		for key, _, _ in self.itemsMetadata(includeVarArgs=includeVarArgs):
 			yield key
 
-	def getOrders(self) -> typing.Tuple[int, int]:
+	def getOrders(self) -> tuple[int, int]:
 		"""Get the min and max of the order field of the data."""
 
 		if len(self.list) == 0:
@@ -157,7 +157,7 @@ class ParametersCommon:
 			retMax = max(retMax, data.order)
 		return int(retMin), int(retMax)
 
-	def getMetadata(self, key: Key) -> typing.Optional[Data]:
+	def getMetadata(self, key: Key) -> Data | None:
 		"""Return the metadata at a specific key or None if not available"""
 
 		searchByName = key.name is not None
@@ -178,7 +178,7 @@ class ParametersCommon:
 		return None
 
 	@property
-	def dependencies(self) -> typing.Set[str]:
+	def dependencies(self) -> set[str]:
 		"""Output the dependency list for this entity."""
 
 		dependencies = set()
@@ -189,7 +189,7 @@ class ParametersCommon:
 	def makeValidation(self, resolver: "Resolver", forTemplate: bool) -> Validation[SchemaDict]:
 		"""Generate the validation object."""
 
-		schema: typing.Dict[str, str] = {}
+		schema: dict[str, str] = {}
 		for key, expression in self.items(includeVarArgs=True):
 			keyStr = "*" if expression.isVarArgs else str(key.index if forTemplate else key)
 			maybeContracts = (
@@ -202,12 +202,12 @@ class ParametersCommon:
 					condition=expression.underlyingTypeFQN is not None,
 					message=f"The type '{expression}' was not resolved.",
 				)
-				schema[keyStr] += f" convertible({str(expression.underlyingTypeFQN)})"
+				schema[keyStr] += f" convertible({expression.underlyingTypeFQN!s})"
 
 		if schema:
 			try:
 				return Validation(schema=schema, args={"resolver": resolver})
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				self.error(message=str(e))
 
 		return Validation(schema={}, args={"resolver": resolver})
@@ -225,10 +225,10 @@ class ParametersCommon:
 	def __repr__(self) -> str:
 		content = []
 		for key, expression, metadata in self.itemsMetadata(includeVarArgs=True):
-			content.append("{}: {}".format(str(key), str(metadata)))
+			content.append(f"{key!s}: {metadata!s}")
 		return "\n".join(content)
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
+	def error(self, message: str, element: Element | None = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(
 			element=self.element if element is None else element,
 			message=message,
@@ -239,7 +239,7 @@ class ParametersCommon:
 		self,
 		condition: bool,
 		message: str,
-		element: typing.Optional[Element] = None,
+		element: Element | None = None,
 		throw: bool = True,
 	) -> AssertionResult:
 		return Error.assertTrue(
@@ -261,9 +261,9 @@ class Parameters(ParametersCommon):
 	def __init__(
 		self,
 		element: Element,
-		NestedElementType: typing.Type["EntityExpression"],
-		nestedKind: typing.Optional[str] = None,
-		filterFct: typing.Optional[typing.Callable[["EntityExpression"], bool]] = None,
+		NestedElementType: type["EntityExpression"],
+		nestedKind: str | None = None,
+		filterFct: typing.Callable[["EntityExpression"], bool] | None = None,
 	) -> None:
 		super().__init__(element=element)
 		self.NestedElementType = NestedElementType
@@ -321,14 +321,14 @@ class Parameters(ParametersCommon):
 			if maybeMetadata is None:
 				default.assertTrue(
 					condition=default.isValueSet,
-					message=f"Missing mandatory parameter: '{str(key)}'.",
+					message=f"Missing mandatory parameter: '{key!s}'.",
 				)
 				maybeMetadata = self.append(default, allowMix=True, default=True)
 			# Merge the metadata
 			maybeMetadata.name = default.name
 			maybeMetadata.order = key.index
 
-	def getValuesOrTypesAsDict(self, resolver: "Resolver", varArgs: bool) -> typing.Dict[str, ResolvedType]:
+	def getValuesOrTypesAsDict(self, resolver: "Resolver", varArgs: bool) -> dict[str, ResolvedType]:
 		"""
 		Get the values as a dictionary.
 		"""

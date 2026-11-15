@@ -1,12 +1,11 @@
 import unittest
-import typing
 
-from bdl.object import Object
 from bdl.generators.bdl.visitor import formatBdl
+from bdl.object import Object
 
 
 class TestRun(unittest.TestCase):
-	def _stripString(self, content: str) -> typing.List[str]:
+	def _stripString(self, content: str) -> list[str]:
 		return [line.strip() for line in content.split("\n") if line.strip()]
 
 	def testFormatter(self) -> None:

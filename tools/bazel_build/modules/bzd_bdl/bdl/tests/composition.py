@@ -170,7 +170,7 @@ class TestRun(unittest.TestCase):
 
 		composition = Composition()
 		composition.visit(bdl).process()
-		composition.symbols.getEntityResolved("default.user.bdlDefaultDep").value
+		composition.symbols.getEntityResolved("default.user.bdlDefaultDep").value  # noqa: B018
 		entries = next(iter(composition.registry.values()))
 		self.assertIn("default.user.bdlDefaultDep", entries)
 		dep = next(item for item in entries["default.user"].expression.parametersResolved if item.name == "dep")

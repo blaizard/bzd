@@ -1,18 +1,19 @@
-import os
-import sys
-import queue
-import time
-import multiprocessing
-import traceback
-from io import StringIO
-from typing import Optional, Iterable, Any, Tuple, TextIO, Callable
 import ctypes
+import multiprocessing
+import os
+import queue
 import signal
+import sys
+import time
+import traceback
 import types
+from collections.abc import Callable, Iterable
+from io import StringIO
+from typing import Any, Self, TextIO
 
 
 class _WorkerResult:
-	def __init__(self, output: Tuple[bool, Any, str, Any]) -> None:
+	def __init__(self, output: tuple[bool, Any, str, Any]) -> None:
 		self.output = output
 
 	def isException(self) -> bool:
@@ -42,7 +43,7 @@ class _Context:
 	def __init__(self) -> None:
 		self.stop = multiprocessing.Value(ctypes.c_int, 0)
 		self.count = multiprocessing.Value(ctypes.c_int, 0)
-		self.output: multiprocessing.queues.Queue[Tuple[bool, Optional[Any], str, Any]] = multiprocessing.Queue()
+		self.output: multiprocessing.queues.Queue[tuple[bool, Any | None, str, Any]] = multiprocessing.Queue()
 		self.data: multiprocessing.queues.Queue[_WorkloadContext] = multiprocessing.Queue()
 
 
@@ -52,10 +53,15 @@ class WorkerContextManager:
 		self.throwOnException = throwOnException
 		self.isException = False
 
-	def __enter__(self) -> "WorkerContextManager":
+	def __enter__(self) -> Self:
 		return self
 
-	def __exit__(self, exc_type: Any, exc_value: Any, exc_tb: Any) -> None:
+	def __exit__(
+		self,
+		exc_type: type[BaseException] | None,
+		exc_value: BaseException | None,
+		exc_tb: types.TracebackType | None,
+	) -> None:
 		for _ in self.data():
 			pass
 		# Stop and join the processes.
@@ -64,7 +70,7 @@ class WorkerContextManager:
 			worker.join()
 		# Throw.
 		if self.throwOnException and self.isException:
-			raise Exception("At least one of the worker failed.")
+			raise RuntimeError("At least one of the worker failed.")
 
 	def data(self) -> Iterable[_WorkerResult]:
 		while self.worker.expectedData > 0:
@@ -92,7 +98,7 @@ class Worker:
 	def __init__(
 		self,
 		task: Callable[[Any, TextIO], Any],
-		maxWorker: Optional[int] = os.cpu_count(),
+		maxWorker: int | None = os.cpu_count(),
 	) -> None:
 		self.context = _Context()
 		assert maxWorker
@@ -122,7 +128,7 @@ class Worker:
 			# Handle timeout if needed
 			if workloadContext.timeoutS > 0:
 
-				def _timeoutHandler(signum: int, frame: Optional[types.FrameType]) -> None:
+				def _timeoutHandler(signum: int, frame: types.FrameType | None, workloadContext: Any = workloadContext) -> None:
 					raise TimeoutError(f"Function timed out after {workloadContext.timeoutS}s.")
 
 				signal.signal(signal.SIGALRM, _timeoutHandler)
@@ -130,7 +136,7 @@ class Worker:
 
 			try:
 				result = task(workloadContext.data, stdout)
-			except Exception:
+			except Exception:  # noqa: BLE001
 				signal.alarm(0)
 				isException = True
 				exceptionType, exceptionValue = sys.exc_info()[:2]
@@ -138,7 +144,7 @@ class Worker:
 					exceptionTypeStr = exceptionType.__name__
 				else:
 					exceptionTypeStr = str(exceptionType)
-				stdout.write("Failed with exception of type '{}' and message: {}\n".format(exceptionTypeStr, exceptionValue))
+				stdout.write(f"Failed with exception of type '{exceptionTypeStr}' and message: {exceptionValue}\n")
 				stdout.write(traceback.format_exc())
 
 			context.output.put((isException, result, stdout.getvalue(), workloadContext.data))

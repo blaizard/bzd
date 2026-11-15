@@ -1,22 +1,22 @@
 import argparse
-import pathlib
-import json
-import re
-import typing
-import sys
 import dataclasses
+import json
+import pathlib
+import re
+import sys
+import typing
 
-from bzd.utils.dict import updateDeep, UpdatePolicy
+from bzd.utils.dict import UpdatePolicy, updateDeep
 
-Metadata = typing.List[str]
-InternalFragment = typing.Tuple[typing.Optional[str], typing.Any, Metadata, str]
-InternalFragmentList = typing.List[InternalFragment]
+Metadata = list[str]
+InternalFragment = tuple[str | None, typing.Any, Metadata, str]
+InternalFragmentList = list[InternalFragment]
 
 # Escape character used within flat key strings to represent a literal '.' or '\'.
 _ESCAPE_CHAR = "\\"
 
 
-def _splitKey(keyStr: str) -> typing.List[str]:
+def _splitKey(keyStr: str) -> list[str]:
 	"""Split a flat key into its elements, unescaping escaped dots and backslashes."""
 
 	# Protect escaped characters from the split, so only unescaped dots separate the elements.
@@ -43,23 +43,23 @@ class Data:
 @dataclasses.dataclass
 class KeyData:
 	# Flat representation of the key/data.
-	flat: typing.Dict[str, Data]
+	flat: dict[str, Data]
 	# Nested representation of the key/data.
-	nested: typing.Dict[str, Data]
+	nested: dict[str, Data]
 
 
 def processKeyData(
-	data: typing.Dict[str, typing.Any],
-	metadata: typing.Dict[str, typing.Any],
+	data: dict[str, typing.Any],
+	metadata: dict[str, typing.Any],
 ) -> KeyData:
 	"""Gather all the key/values."""
 
-	valuesFlat: typing.Dict[str, Data] = {}
+	valuesFlat: dict[str, Data] = {}
 
 	def recursive(
-		currentData: typing.Dict[str, typing.Any],
-		currentRoot: typing.Optional[str],
-	) -> typing.Dict[str, Data]:
+		currentData: dict[str, typing.Any],
+		currentRoot: str | None,
+	) -> dict[str, Data]:
 		values = {}
 		for key, value in currentData.items():
 			keyStr = _escapeKeyElement(key) if currentRoot is None else f"{currentRoot}.{_escapeKeyElement(key)}"
@@ -88,11 +88,11 @@ def internalToKeyData(
 
 def internalToDictionary(
 	internal: InternalFragmentList,
-) -> typing.Tuple[typing.Dict[str, typing.Any], typing.Dict[str, Metadata]]:
+) -> tuple[dict[str, typing.Any], dict[str, Metadata]]:
 	"""Convert the internal representation of the configuration into a dictionary."""
 
-	output: typing.Dict[str, typing.Any] = {}
-	outputMetadata: typing.Dict[str, Metadata] = {}
+	output: dict[str, typing.Any] = {}
+	outputMetadata: dict[str, Metadata] = {}
 	for keyStr, value, metadata, source in internal:
 		data = makeDictionary(keyStr, value)
 		updateDeep(output, data, UpdatePolicy.override)
@@ -101,7 +101,7 @@ def internalToDictionary(
 	return output, outputMetadata
 
 
-def makeDictionary(keyStr: typing.Optional[str], value: typing.Any) -> typing.Dict[str, typing.Any]:
+def makeDictionary(keyStr: str | None, value: typing.Any) -> dict[str, typing.Any]:
 	"""Make a dictionary from a key string.
 
 	If the key string is None, return the value directly.
@@ -111,7 +111,7 @@ def makeDictionary(keyStr: typing.Optional[str], value: typing.Any) -> typing.Di
 		assert isinstance(value, dict), "Value must be a dictionary if keyStr is None."
 		return value
 
-	root: typing.Dict[str, typing.Any] = {}
+	root: dict[str, typing.Any] = {}
 	data = root
 	[*keys, key] = _splitKey(keyStr)
 	for k in keys:

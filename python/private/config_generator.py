@@ -1,12 +1,12 @@
 import argparse
+import json
 import pathlib
 import typing
-import json
 
 from config.reader import internalToKeyData
 
 
-def toPython(data: typing.Any) -> typing.Tuple[str, str]:
+def toPython(data: typing.Any) -> tuple[str, str]:
 	"""Convert data to Python format."""
 
 	if isinstance(data, bool):

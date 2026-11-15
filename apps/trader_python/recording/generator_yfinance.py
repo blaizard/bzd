@@ -1,18 +1,18 @@
-import yfinance
-import pathlib
 import datetime
-import typing
+import pathlib
 import traceback
+import typing
 
+import yfinance
+from apps.trader_python.recording.recording import Event, EventKind, Info
 from apps.trader_python.recording.recording_from_data import (
 	RecordingFromData,
 	RecordingPairFromData,
 )
 from apps.trader_python.recording.recording_to_path import recordingToPath
-from apps.trader_python.recording.recording import Info, Event, EventKind
 from bzd.utils.worker import Worker
 
-Date = typing.Union[str, int]
+Date = str | int
 
 
 class Generator:
@@ -24,17 +24,17 @@ class Generator:
 	@staticmethod
 	def dateToDatetime(date: Date) -> datetime.datetime:
 		if isinstance(date, str):
-			return datetime.datetime.strptime(date, "%Y-%m-%d")
+			return datetime.datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
 		else:
-			return datetime.datetime.utcfromtimestamp(date)
+			return datetime.datetime.fromtimestamp(date, tz=datetime.UTC)
 
 	def generate(
 		self,
-		startTime: typing.Optional[Date] = None,
-		endTime: typing.Optional[Date] = None,
+		startTime: Date | None = None,
+		endTime: Date | None = None,
 	) -> RecordingFromData:
 
-		today = datetime.datetime.now()
+		today = datetime.datetime.now(datetime.UTC)
 		start = (today - datetime.timedelta(days=30)) if startTime is None else Generator.dateToDatetime(startTime)
 		end = today if endTime is None else Generator.dateToDatetime(endTime)
 
@@ -57,16 +57,14 @@ class Generator:
 
 		slicesDays = 5
 		while start < end:
-			endHistory = (
-				(start + datetime.timedelta(days=slicesDays)) if (start + datetime.timedelta(days=slicesDays)) <= end else end
-			)
+			endHistory = min(start + datetime.timedelta(days=slicesDays), end)
 
 			try:
 				history = obj.history(start=start, end=endHistory, interval="1m")
 			except IndexError as e:
 				# There are some issues with "index 0 is out of bounds for axis 0 with size 0" due to some logging
 				# this will ignore this.
-				print(f"ERROR: {str(e)}")
+				print(f"ERROR: {e!s}")
 				continue
 			finally:
 				start += datetime.timedelta(days=slicesDays)
@@ -111,7 +109,7 @@ class Generator:
 		return recording
 
 
-def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bool:
+def workload(args: tuple[str, pathlib.Path], stdout: typing.TextIO) -> bool:
 
 	ticker, path = args
 
@@ -119,7 +117,7 @@ def workload(args: typing.Tuple[str, pathlib.Path], stdout: typing.TextIO) -> bo
 	try:
 		recording = Generator(ticker).generate()
 		recordingToPath(recording, path)
-	except Exception as e:
+	except Exception as e:  # noqa: BLE001
 		stdout.write(f"{ticker}:\n")
 		stdout.write(str(e) + "\n")
 		stdout.write(str(traceback.format_exc()))

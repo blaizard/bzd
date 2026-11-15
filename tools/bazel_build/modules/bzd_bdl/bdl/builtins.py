@@ -1,17 +1,15 @@
-import typing
-
-from bdl.entities.impl.builtin import Builtin
 from bdl.entities.builder import ElementBuilder
+from bdl.entities.impl.builtin import Builtin
 from bdl.entities.impl.entity import EntityExpression
 
 
-def toLiteralSingleValue_(self: Builtin, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+def toLiteralSingleValue_(self: Builtin, args: dict[str, EntityExpression]) -> str | None:
 	"""Helper function to return the literal of the only argument 'value' or None if there is no literal."""
 
 	self.assertTrue(len(args) == 1, "There must always be a single argument.")
 	self.assertTrue(
 		"value" in args,
-		f"There must always be a single argument named 'value', not '{str(args)}'.",
+		f"There must always be a single argument named 'value', not '{args!s}'.",
 	)
 	if args["value"].isLiteral:
 		return args["value"].literal
@@ -78,7 +76,7 @@ class Integer(Builtin):
 			.addConfigValue(name="value", symbol="Any")
 		)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 		return toLiteralSingleValue_(self, args)
 
 
@@ -88,7 +86,7 @@ class Float(Builtin):
 			ElementBuilder("builtin").setAttr("name", "Float").addContract("float").addConfigValue(name="value", symbol="Any")
 		)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 		return toLiteralSingleValue_(self, args)
 
 
@@ -101,7 +99,7 @@ class Boolean(Builtin):
 			.addConfigValue(name="value", symbol="Any")
 		)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 		return toLiteralSingleValue_(self, args)
 
 
@@ -114,7 +112,7 @@ class Byte(Builtin):
 			.addConfigValue(name="value", symbol="Any")
 		)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 		return toLiteralSingleValue_(self, args)
 
 
@@ -124,7 +122,7 @@ class String(Builtin):
 			ElementBuilder("builtin").setAttr("name", "String").addContract("string").addConfigValue(name="value", symbol="Any")
 		)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 		return toLiteralSingleValue_(self, args)
 
 

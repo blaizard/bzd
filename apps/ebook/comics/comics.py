@@ -1,14 +1,12 @@
-import pathlib
-import typing
-import statistics
 import os
+import pathlib
 import re
+import statistics
 from collections import Counter
-
-from PIL import Image
 
 from apps.ebook.flow import ActionInterface, FlowEnum
 from apps.ebook.providers import ProviderEbook, ProviderImages
+from PIL import Image
 
 
 class Comics(ActionInterface):
@@ -21,15 +19,13 @@ class Comics(ActionInterface):
 		super().__init__()
 		self.coefficient = coefficient
 
-	def generateNGrams(self, text: str, n: int) -> typing.List[str]:
+	def generateNGrams(self, text: str, n: int) -> list[str]:
 		"""Generate the ngrams for a string."""
 
 		ngrams = zip(*[text[i:] for i in range(n)])
 		return ["".join(ngram) for ngram in ngrams]
 
-	def outliers(
-		self, images: typing.List[pathlib.Path], coefficient: float
-	) -> typing.Tuple[typing.List[pathlib.Path], typing.List[pathlib.Path]]:
+	def outliers(self, images: list[pathlib.Path], coefficient: float) -> tuple[list[pathlib.Path], list[pathlib.Path]]:
 		"""Identify outliers in the file name."""
 
 		nGramsAll = {}
@@ -70,10 +66,10 @@ class Comics(ActionInterface):
 
 	def processDirectory(
 		self, provider: ProviderEbook, directory: pathlib.Path
-	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderImages, FlowEnum | None]]:
 
 		# Find all images per directory.
-		allImagesByDirectory: typing.Dict[pathlib.Path, typing.List[pathlib.Path]] = {}
+		allImagesByDirectory: dict[pathlib.Path, list[pathlib.Path]] = {}
 		for subdir, dirs, files in os.walk(directory):
 			for file in files:
 				# Check if this is a valid image.
@@ -81,11 +77,11 @@ class Comics(ActionInterface):
 				try:
 					with Image.open(subdirectory / file) as img:
 						img.verify()
-				except (IOError, SyntaxError):
+				except (OSError, SyntaxError):
 					continue
 				allImagesByDirectory.setdefault(subdirectory, []).append(subdirectory / file)
 
-		outputs: typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]] = []
+		outputs: list[tuple[ProviderImages, FlowEnum | None]] = []
 		for subdirectory, allImages in allImagesByDirectory.items():
 			# Sort all images.
 			allImages.sort()

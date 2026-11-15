@@ -3,15 +3,13 @@ import os
 import pathlib
 import sys
 import time
-import typing
 
 from context.context import Context
-
 from dependencies.bazel_dep.bazel_dep import BazelDep
 from dependencies.interface import DependencyInterface
 from dependencies.pip_requirements.pip_requirements import PipRequirements
 
-AllDependencies: typing.Dict[str, typing.Type[DependencyInterface]] = {
+AllDependencies: dict[str, type[DependencyInterface]] = {
 	"bazel_dep": BazelDep,
 	"pip_requirements": PipRequirements,
 }
@@ -61,7 +59,7 @@ if __name__ == "__main__":
 				print(f" ({time.monotonic() - startTime:.1f}s)")
 				print(dependencies)
 			passed = True
-		except Exception as error:
+		except Exception as error:  # noqa: BLE001
 			print(f"{name}... FAILED ({time.monotonic() - startTime:.1f}s)")
 			print(str(error))
 			passed = False

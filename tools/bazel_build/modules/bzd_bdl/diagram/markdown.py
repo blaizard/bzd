@@ -1,7 +1,7 @@
 import argparse
 import pathlib
-import time
 import random
+import time
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Create diagram explorer in markdown.")

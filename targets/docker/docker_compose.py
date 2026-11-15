@@ -4,13 +4,13 @@ import typing
 
 
 class DockerCompose:
-	def __init__(self, data: typing.Dict[str, typing.Any]) -> None:
+	def __init__(self, data: dict[str, typing.Any]) -> None:
 		self.data = data
 
-	def getImages(self) -> typing.Dict[str, typing.Set[str]]:
+	def getImages(self) -> dict[str, set[str]]:
 		"""Extract all images and their tags from the docker compose file."""
 
-		images: typing.Dict[str, typing.Set[str]] = {}
+		images: dict[str, set[str]] = {}
 		for service in self.data.get("services", {}).values():
 			if "image" in service:
 				image = service["image"]

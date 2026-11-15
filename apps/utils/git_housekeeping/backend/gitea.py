@@ -1,5 +1,4 @@
 import json
-import typing
 
 from bzd.http.client import HttpClient
 
@@ -15,7 +14,7 @@ class Gitea:
 		self.url = url
 		self.token = token
 
-	def fetchOpenPullRequestBranches(self, repo: str) -> typing.Set[str]:
+	def fetchOpenPullRequestBranches(self, repo: str) -> set[str]:
 		"""Fetch the branch names of all open pull requests from the Gitea API.
 
 		Args:
@@ -29,7 +28,7 @@ class Gitea:
 		"""
 
 		url = f"{self.url}/repos/{repo}/pulls"
-		branches: typing.Set[str] = set()
+		branches: set[str] = set()
 		page = 1
 		limit = 50
 
@@ -46,11 +45,11 @@ class Gitea:
 				raise RuntimeError(f"Failed to fetch open pull requests (page {page}): {e}") from e
 
 			if not isinstance(pulls, list):
-				raise RuntimeError(f"Failed to fetch open pull requests (page {page}): unexpected response.")
+				raise TypeError(f"Failed to fetch open pull requests (page {page}): unexpected response.")
 
 			for pull in pulls:
 				if not isinstance(pull, dict):
-					raise RuntimeError(f"Failed to fetch open pull requests (page {page}): unexpected entry.")
+					raise TypeError(f"Failed to fetch open pull requests (page {page}): unexpected entry.")
 				head = pull.get("head")
 				if not isinstance(head, dict) or not head.get("ref"):
 					raise RuntimeError(f"Failed to fetch open pull requests (page {page}): missing head reference.")

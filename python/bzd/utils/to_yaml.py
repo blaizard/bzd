@@ -1,7 +1,7 @@
-import typing
 import json
+import typing
 
-Yaml = typing.Union[typing.Dict[str, typing.Any], typing.List[typing.Any]]
+Yaml = dict[str, typing.Any] | list[typing.Any]
 
 
 def _valueToYaml(value: typing.Any) -> str:
@@ -18,10 +18,10 @@ def _valueToYaml(value: typing.Any) -> str:
 	if isinstance(value, str):
 		return json.dumps(value)
 
-	raise Exception(f"Unsupported type: '{value}'")
+	raise RuntimeError(f"Unsupported type: '{value}'")
 
 
-def _toYaml(data: Yaml, indent: int) -> typing.List[str]:
+def _toYaml(data: Yaml, indent: int) -> list[str]:
 	"""Recursively convert a JSON-like data structure into YAML lines.
 
 	Args:
@@ -32,7 +32,7 @@ def _toYaml(data: Yaml, indent: int) -> typing.List[str]:
 	        A list of strings, where each string is a line of YAML.
 	"""
 
-	lines: typing.List[str] = []
+	lines: list[str] = []
 	indentStr = " " * (indent * 2)
 
 	if isinstance(data, dict):

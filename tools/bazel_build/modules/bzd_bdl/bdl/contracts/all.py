@@ -2,16 +2,16 @@ import typing
 
 from bzd.utils.decorators import cached_classproperty
 
-from bdl.contracts.traits import ContractTraits
-from bdl.contracts.min import ContractMin
-from bdl.contracts.max import ContractMax
-from bdl.contracts.builtins import ContractInteger, ContractFloat, ContractBoolean
-from bdl.contracts.string import ContractString
+from bdl.contracts.builtins import ContractBoolean, ContractFloat, ContractInteger
 from bdl.contracts.capacity import ContractCapacity
-from bdl.contracts.init import ContractInit
-from bdl.contracts.shutdown import ContractShutdown
 from bdl.contracts.convertible import ContractConvertible
 from bdl.contracts.executor import ContractExecutor
+from bdl.contracts.init import ContractInit
+from bdl.contracts.max import ContractMax
+from bdl.contracts.min import ContractMin
+from bdl.contracts.shutdown import ContractShutdown
+from bdl.contracts.string import ContractString
+from bdl.contracts.traits import ContractTraits
 
 _Contracts = [
 	ContractInteger(),

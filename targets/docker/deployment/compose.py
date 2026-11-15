@@ -1,9 +1,9 @@
-import typing
 import pathlib
-import yaml
+import typing
 
-from targets.docker.deployment.base import Docker
+import yaml
 from bdl.generators.json.ast.ast import Ast, Parameters
+from targets.docker.deployment.base import Docker
 
 
 class DeploymentDockerCompose(Docker):
@@ -11,7 +11,7 @@ class DeploymentDockerCompose(Docker):
 		super().__init__(ast=ast, symbol="docker.Compose")
 		self.common = common
 
-	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
+	def makeDockerCompose(self, fqn: str, expression: Parameters) -> tuple[str, set[str]]:
 		dockers = self.getInterfaces(fqn, "image")
 		path = self.getConfig(fqn).path
 		content = pathlib.Path(path).read_text()
@@ -25,4 +25,4 @@ class DeploymentDockerCompose(Docker):
 				raise KeyError(f"Service '{docker.service}' is not present in '{path}'.")
 		content = yaml.dump(data)  # type: ignore
 
-		return content, set([docker.image for docker in dockers])
+		return content, {docker.image for docker in dockers}

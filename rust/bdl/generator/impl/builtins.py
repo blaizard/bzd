@@ -1,9 +1,9 @@
 import typing
 
-from bzd.parser.error import Error
 from bdl.entities.impl.fragment.symbol import Symbol
+from bzd.parser.error import Error
 
-TypeConversionCallableReturn = typing.Tuple[str, typing.List[str]]
+TypeConversionCallableReturn = tuple[str, list[str]]
 
 
 class IntegerType:
@@ -13,12 +13,12 @@ class IntegerType:
 	@staticmethod
 	def toType(
 		entity: Symbol,
-		nested: typing.List[str],
+		nested: list[str],
 		reference: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> TypeConversionCallableReturn:
 		maybeContractMin = entity.contracts.get("min")
-		isSigned = True if maybeContractMin is None or maybeContractMin.valueNumber < 0 else False
+		isSigned = bool(maybeContractMin is None or maybeContractMin.valueNumber < 0)
 		maybeContractMax = entity.contracts.get("max")
 		bits = 32
 		if maybeContractMax is not None:
@@ -37,8 +37,8 @@ class IntegerType:
 					message="Value too large, max supported is 64-bit.",
 				)
 		if isSigned:
-			return "i{}".format(bits), nested
-		return "u{}".format(bits), nested
+			return f"i{bits}", nested
+		return f"u{bits}", nested
 
 
 class FloatType:
@@ -90,12 +90,12 @@ class SpanType:
 	@staticmethod
 	def toType(
 		entity: Symbol,
-		nested: typing.List[str],
+		nested: list[str],
 		reference: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> TypeConversionCallableReturn:
 		element = nested[0] if nested else "()"
-		return "&'static [{}]".format(element), []
+		return f"&'static [{element}]", []
 
 
 class ArrayType:
@@ -104,14 +104,14 @@ class ArrayType:
 	@staticmethod
 	def toType(
 		entity: Symbol,
-		nested: typing.List[str],
+		nested: list[str],
 		reference: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> TypeConversionCallableReturn:
 		maybeContractCapacity = entity.contracts.get("capacity")
 		capacity = int(maybeContractCapacity.valueNumber) if maybeContractCapacity else 1
 		element = nested[0] if nested else "()"
-		return "&[{}; {}]".format(element, capacity), []
+		return f"&[{element}; {capacity}]", []
 
 
 class VectorType:
@@ -120,12 +120,12 @@ class VectorType:
 	@staticmethod
 	def toType(
 		entity: Symbol,
-		nested: typing.List[str],
+		nested: list[str],
 		reference: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> TypeConversionCallableReturn:
 		element = nested[0] if nested else "()"
-		return "&[{}]".format(element), []
+		return f"&[{element}]", []
 
 
 class ResultType:
@@ -134,9 +134,9 @@ class ResultType:
 	@staticmethod
 	def toType(
 		entity: Symbol,
-		nested: typing.List[str],
+		nested: list[str],
 		reference: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> TypeConversionCallableReturn:
 		if len(nested) == 0:
 			nested.append("()")
@@ -145,7 +145,7 @@ class ResultType:
 		return "Result", nested
 
 
-builtins: typing.Dict[str, typing.Any] = {
+builtins: dict[str, typing.Any] = {
 	"Any": AnyType,
 	"list": ListType,
 	"Integer": IntegerType,

@@ -34,7 +34,7 @@ class Singleton:
 		try:
 			fcntl.lockf(lockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
 			locked = True
-		except IOError:
+		except OSError:
 			pass
 
 		return locked

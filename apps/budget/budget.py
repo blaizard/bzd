@@ -1,9 +1,9 @@
-from pathlib import Path
 import argparse
 import datetime
+import json
 import re
 import typing
-import json
+from pathlib import Path
 
 from bzd.validation.validation import Validation
 
@@ -24,7 +24,7 @@ def parse_number(string: str, args: typing.Any) -> float:
 	return float(string)
 
 
-def parse_category(string: str, args: typing.Any) -> typing.List[str]:
+def parse_category(string: str, args: typing.Any) -> list[str]:
 	string = string.lower()
 	outputs = []
 	for category, regexprMaybeList in args.items():
@@ -32,7 +32,7 @@ def parse_category(string: str, args: typing.Any) -> typing.List[str]:
 			if re.search(regexpr, string):
 				outputs.append(category)
 	if not outputs:
-		print("No match for '{}'".format(string))
+		print(f"No match for '{string}'")
 		return [string]
 	return outputs
 
@@ -61,11 +61,11 @@ def extract(data: typing.Any, config: typing.Any) -> typing.Any:
 			try:
 				parsed = types[attr["type"]](string, attr.get("args", {}))
 				output[attr["output"]] = parsed
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				print("Error while parsing: '{}' with type '{}': '{}'".format(string, attr["type"], str(e)))
 				return None
 		else:
-			print("Entry '{}' is missing from data: {}".format(key, data))
+			print(f"Entry '{key}' is missing from data: {data}")
 
 	return output
 

@@ -1,18 +1,18 @@
 import argparse
 import json
 import pathlib
-import typing
 import sys
+import typing
 
+from bzd.utils.run import StreamCallback, localBazelBinary, localCommand
 from bzd_sanitizer.context import Context
 from bzd_sanitizer.worker import worker
-from bzd.utils.run import localBazelBinary, localCommand, StreamCallback
 
-Secrets = typing.Dict[pathlib.Path, typing.Dict[str, typing.Any]]
+Secrets = dict[pathlib.Path, dict[str, typing.Any]]
 
 
 def workload(
-	args: typing.Tuple[pathlib.Path, pathlib.Path, bool, pathlib.Path, Secrets],
+	args: tuple[pathlib.Path, pathlib.Path, bool, pathlib.Path, Secrets],
 	stdout: typing.TextIO,
 ) -> bool:
 	workspace, path, check, secret, secrets = args
@@ -35,8 +35,8 @@ def workload(
 
 
 def listAllSecrets(workspace: pathlib.Path) -> Secrets:
-	secrets: typing.Dict[str, pathlib.Path] = {}
-	rules: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+	secrets: dict[str, pathlib.Path] = {}
+	rules: dict[str, dict[str, typing.Any]] = {}
 
 	def fetchFileNames(line: str) -> None:
 		data = json.loads(line)

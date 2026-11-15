@@ -1,5 +1,4 @@
 import unittest
-import typing
 
 from apps.ebook.utils import clusteringDimensions
 
@@ -55,7 +54,7 @@ class TestRun(unittest.TestCase):
 
 	def testClusterEmpty(self) -> None:
 
-		dimensions: typing.List[typing.Tuple[int, int]] = []
+		dimensions: list[tuple[int, int]] = []
 		clusters = clusteringDimensions(dimensions, tolerance=0.1)
 		self.assertEqual(clusters, [])
 

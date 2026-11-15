@@ -3,16 +3,16 @@ import typing
 
 import yaml
 
-from bzd_dns.zones import Zones
 from bzd_dns.record import Record
+from bzd_dns.zones import Zones
 
 
 class Builder:
 	def __init__(self, record: Record) -> None:
 		self.record = record
-		self.data: typing.Dict[str, typing.Any] = {}
+		self.data: dict[str, typing.Any] = {}
 
-	def add(self, attribute: str, yaml: typing.Optional[str] = None, formatStr: str = "{}") -> "Builder":
+	def add(self, attribute: str, yaml: str | None = None, formatStr: str = "{}") -> "Builder":
 		if attribute in self.record.data:
 			self.data[yaml if yaml else attribute] = formatStr.format(self.record.data[attribute])
 		return self
@@ -24,13 +24,13 @@ class Builder:
 
 class Visitor:
 	def __init__(self) -> None:
-		self.content: typing.Dict[str, typing.Dict[str, typing.Any]] = {}
+		self.content: dict[str, dict[str, typing.Any]] = {}
 
 	@staticmethod
 	def insertKV(
-		data: typing.Dict[str, typing.Any],
+		data: dict[str, typing.Any],
 		key: str,
-		value: typing.Optional[typing.Any] = None,
+		value: typing.Any | None = None,
 	) -> None:
 		if value is not None:
 			if data.get(key) is not None:
@@ -76,7 +76,7 @@ class Octodns:
 		self,
 		output: pathlib.Path,
 		relative: pathlib.Path,
-		config: typing.Dict[str, str],
+		config: dict[str, str],
 	) -> None:
 		self.output = output
 		self.relative = relative
@@ -84,7 +84,7 @@ class Octodns:
 		self.zones = output / "zones"
 		self.zones.mkdir(parents=True, exist_ok=True)
 
-	def process(self, domains: typing.Dict[str, Zones]) -> None:
+	def process(self, domains: dict[str, Zones]) -> None:
 
 		for domain, zones in domains.items():
 			content = {}

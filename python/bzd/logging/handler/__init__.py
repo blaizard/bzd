@@ -1,5 +1,5 @@
-import typing
 import dataclasses
+import typing
 
 
 @dataclasses.dataclass
@@ -18,7 +18,7 @@ class Log:
 	line: int
 
 
-LoggerHandlerData = typing.List[Log]
+LoggerHandlerData = list[Log]
 LoggerHandlerCallback = typing.Callable[[LoggerHandlerData, "LoggerHandlerFlow"], None]
 
 
@@ -40,7 +40,7 @@ class LoggerHandlerScope(_LoggerHandlerCommon):
 
 
 class LoggerHandlerFlow:
-	def __init__(self, handlers: typing.List[LoggerHandlerCallback]) -> None:
+	def __init__(self, handlers: list[LoggerHandlerCallback]) -> None:
 		self._handlers = handlers
 
 	def next(self, data: LoggerHandlerData) -> None:

@@ -1,5 +1,3 @@
-import typing
-
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
 
@@ -10,7 +8,7 @@ class Contract:
 		self.element = element
 
 	@staticmethod
-	def add(element: Element, kind: str, values: typing.Optional[typing.List[str]] = None) -> None:
+	def add(element: Element, kind: str, values: list[str] | None = None) -> None:
 		"""
 		Add a contract to the element.
 		"""
@@ -26,14 +24,14 @@ class Contract:
 		return self.element.getAttr("type").value
 
 	@property
-	def values(self) -> typing.List[str]:
+	def values(self) -> list[str]:
 		values = self.element.getNestedSequence("values")
 		if values:
 			return [e.getAttr("value").value for e in values]
 		return []
 
 	@property
-	def value(self) -> typing.Optional[str]:
+	def value(self) -> str | None:
 		values = self.element.getNestedSequence("values")
 		if values:
 			return values[0].getAttr("value").value
@@ -43,7 +41,7 @@ class Contract:
 	def valueNumber(self) -> float:
 		try:
 			return float(self.valueString)
-		except Exception:
+		except Exception:  # noqa: BLE001
 			Error.handleFromElement(element=self.element, message="Expected a valid number.")
 		return 0.0  # To make mypy happy
 
@@ -60,7 +58,7 @@ class Contract:
 		return self.element.isNestedSequence("values")
 
 	@property
-	def comment(self) -> typing.Optional[str]:
+	def comment(self) -> str | None:
 		return self.element.getAttrValue("comment")
 
 	def __eq__(self, other: object) -> bool:

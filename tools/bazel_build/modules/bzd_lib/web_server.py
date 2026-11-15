@@ -1,14 +1,13 @@
 import argparse
-import http.server
-import os
-import socketserver
-import tarfile
-import sys
-import pathlib
-import mimetypes
 import functools
+import http.server
+import mimetypes
+import os
+import pathlib
+import socketserver
+import sys
+import tarfile
 import typing
-
 from urllib.parse import unquote
 
 
@@ -33,7 +32,7 @@ class WebServer(socketserver.TCPServer):
 class ArchiveRequestHandler(http.server.SimpleHTTPRequestHandler):
 	def __init__(self, archive: pathlib.Path, *args: typing.Any, **kwargs: typing.Any) -> None:
 		mimetypes.init()
-		self.archive = tarfile.open(archive, "r")
+		self.archive = tarfile.open(archive, "r")  # noqa: SIM115
 		prefix = os.path.commonprefix(self.archive.getnames())
 		prefix = "." if prefix == "." else "/".join(prefix.split("/")[:-1])
 		self.prefix = prefix + "/" if prefix else ""
@@ -87,7 +86,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	handler: typing.Type[http.server.BaseHTTPRequestHandler]
+	handler: type[http.server.BaseHTTPRequestHandler]
 
 	# If archive is set, serve files from this specific archive
 	if os.path.isfile(args.path):

@@ -1,21 +1,21 @@
 import argparse
-import json
-import sys
-import socket
-import pathlib
-import typing
-import os
 import datetime
+import json
+import os
+import pathlib
+import socket
 import subprocess
-import time
+import sys
 import threading
+import time
+import typing
 
+from apps.artifacts.api.python.node.node import Node
 from bzd.http.parser import HttpParser
 from bzd.utils.scheduler import Scheduler
-from apps.artifacts.api.python.node.node import Node
 
-Container = typing.Dict[str, typing.Any]
-DiskSpace = typing.Dict[str, typing.Any]
+Container = dict[str, typing.Any]
+DiskSpace = dict[str, typing.Any]
 
 T = typing.TypeVar("T")
 
@@ -23,7 +23,7 @@ T = typing.TypeVar("T")
 class Cache(typing.Generic[T]):
 	def __init__(self, function: typing.Callable[[], T], defaultValue: T, expireS: int) -> None:
 		self.function = function
-		self.worker: typing.Optional[threading.Thread] = None
+		self.worker: threading.Thread | None = None
 		self.result = defaultValue
 		self.expireS = expireS
 		self.lastRunS: float = 0
@@ -62,10 +62,10 @@ class Cache(typing.Generic[T]):
 
 
 class Docker:
-	def __init__(self, socket: typing.Optional[pathlib.Path]) -> None:
+	def __init__(self, socket: pathlib.Path | None) -> None:
 		self.socket = self.getDockerSocketPath() if socket is None else socket
-		self.previousIO: typing.Dict[str, typing.Any] = {}
-		self.previousNetwork: typing.Dict[str, typing.Any] = {}
+		self.previousIO: dict[str, typing.Any] = {}
+		self.previousNetwork: dict[str, typing.Any] = {}
 		self.diskSpace: Cache[DiskSpace] = Cache(self.getDiskSpace, defaultValue={}, expireS=3600 * 6)
 
 	@staticmethod
@@ -74,7 +74,7 @@ class Docker:
 
 		socket = "/var/run/docker.sock"
 
-		def dockerInspect() -> typing.Optional[bytes]:
+		def dockerInspect() -> bytes | None:
 			try:
 				return subprocess.check_output(
 					[
@@ -85,7 +85,7 @@ class Docker:
 						"{{ .Endpoints.docker.Host }}",
 					]
 				)
-			except Exception:
+			except Exception:  # noqa: BLE001
 				return None
 
 		maybeData = dockerInspect()
@@ -108,7 +108,7 @@ class Docker:
 			content = parser.readAll().decode()
 			return json.loads(content)
 
-	def getContainers(self) -> typing.List[Container]:
+	def getContainers(self) -> list[Container]:
 		raw = self.request("GET", "/containers/json?all=true&size=true", timeoutS=600)
 
 		containers = []
@@ -117,7 +117,7 @@ class Docker:
 				"id": data["Id"],
 				"image": data["Image"],
 				"name": data["Names"][0],
-				"active": True if data["State"].lower() == "running" else False,
+				"active": data["State"].lower() == "running",
 				"version": {},
 				"volumes": {mount["Name"]: mount["Destination"] for mount in data.get("Mounts", []) if mount["Type"] == "volume"},
 				"size": data.get("SizeRootFs"),
@@ -301,7 +301,7 @@ class Docker:
 
 		return output
 
-	def getContainerUpTime(self, container: Container) -> typing.Optional[float]:
+	def getContainerUpTime(self, container: Container) -> float | None:
 		"""Retrieves the uptime of a Docker container.
 
 		Args:
@@ -314,8 +314,8 @@ class Docker:
 
 		try:
 			startedAtStr = raw["State"]["StartedAt"]
-			startedAt = datetime.datetime.fromisoformat(startedAtStr.replace("Z", "+00:00"))
-			uptime = datetime.datetime.now(datetime.timezone.utc) - startedAt
+			startedAt = datetime.datetime.fromisoformat(startedAtStr)
+			uptime = datetime.datetime.now(datetime.UTC) - startedAt
 
 			return uptime.total_seconds()
 

@@ -1,14 +1,13 @@
-from bzd.http.client import HttpClient
-from apps.artifacts.api.python.node.node import Node
-
-from lxml import html
 import argparse
-import os
 import json
-import typing
+import os
+
+from apps.artifacts.api.python.node.node import Node
+from bzd.http.client import HttpClient
+from lxml import html
 
 
-def getSP500Companies() -> typing.List[typing.Dict[str, str]]:
+def getSP500Companies() -> list[dict[str, str]]:
 	"""Fetches the S&P 500 company list from Wikipedia."""
 
 	url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"

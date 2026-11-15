@@ -10,5 +10,5 @@ def commandSuspend(server: str, logger: Logger) -> None:
 
 	try:
 		HttpClient.get(f"http://{host}:{port}/suspend")
-	except Exception as e:
+	except Exception as e:  # noqa: BLE001
 		logger.error(str(e))

@@ -1,6 +1,6 @@
-import shutil
-import pathlib
 import os
+import pathlib
+import shutil
 import typing
 from abc import ABC, abstractmethod
 
@@ -11,27 +11,22 @@ class Factory(ABC):
 	@abstractmethod
 	def getName(self) -> str:
 		"""Give the name of the shell."""
-		pass
 
 	@abstractmethod
 	def isCompatible(self) -> bool:
 		"""Tell if this is a compatible shell."""
-		pass
 
 	@abstractmethod
 	def build(self, workspace: pathlib.Path) -> None:
 		"""Build the configuration."""
-		pass
 
 	@abstractmethod
 	def check(self, workspace: pathlib.Path) -> bool:
 		"""Check that the configuration has been correctly generated."""
-		pass
 
 	@abstractmethod
 	def install(self) -> None:
 		"""Install the shell."""
-		pass
 
 	@staticmethod
 	def copyTree(source: pathlib.Path, destination: pathlib.Path, symlinks: bool = False) -> None:

@@ -2,11 +2,11 @@ import typing
 
 from bzd.parser.element import Element, ElementBuilder
 from bzd.parser.error import Error
-from bdl.entities.impl.fragment.parameters import Parameters
 
-from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.entity import Entity, EntityExpression, Role
+from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.fragment.fqn import FQN
+from bdl.entities.impl.fragment.parameters import Parameters
 
 
 class EnumValue(Entity):
@@ -24,7 +24,7 @@ class EnumValue(Entity):
 		super().resolve(resolver)
 
 	@property
-	def comment(self) -> typing.Optional[str]:
+	def comment(self) -> str | None:
 		return self.element.getAttrValue("comment")
 
 	def __repr__(self) -> str:
@@ -51,7 +51,7 @@ class Enum(Entity):
 		self._setUnderlyingTypeFQN(self.fqn)
 		super().resolve(resolver)
 
-	def toLiteral(self, args: typing.Dict[str, EntityExpression]) -> typing.Optional[str]:
+	def toLiteral(self, args: dict[str, EntityExpression]) -> str | None:
 
 		assert "value" in args, f"There must be a value argument: {args}."
 		value = args["value"]

@@ -1,10 +1,10 @@
 import typing
 
-Json = typing.Dict[str, typing.Any]
+Json = dict[str, typing.Any]
 
 
 class Parameters:
-	def __init__(self, data: typing.List[Json]) -> None:
+	def __init__(self, data: list[Json]) -> None:
 		self.data = data
 
 	def get(self, name: str, default: typing.Any = None) -> typing.Any:
@@ -47,7 +47,7 @@ class Context:
 		self.data = data
 
 	@property
-	def registry(self) -> typing.Dict[str, ExpressionEntry]:
+	def registry(self) -> dict[str, ExpressionEntry]:
 		return {fqn: ExpressionEntry(data) for fqn, data in self.data.get("registry", {}).items()}
 
 	@property
@@ -71,8 +71,8 @@ class Ast:
 			yield Context(context)
 
 	@property
-	def registry(self) -> typing.Dict[str, ExpressionEntry]:
-		output: typing.Dict[str, ExpressionEntry] = {}
+	def registry(self) -> dict[str, ExpressionEntry]:
+		output: dict[str, ExpressionEntry] = {}
 		for context in self.contexts:
 			output |= context.registry
 		return output
@@ -80,11 +80,9 @@ class Ast:
 	@property
 	def workloads(self) -> typing.Iterator[ExpressionEntry]:
 		for context in self.contexts:
-			for workload in context.workloads:
-				yield workload
+			yield from context.workloads
 
 	@property
 	def services(self) -> typing.Iterator[ExpressionEntry]:
 		for context in self.contexts:
-			for service in context.services:
-				yield service
+			yield from context.services

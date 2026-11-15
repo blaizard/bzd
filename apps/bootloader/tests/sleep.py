@@ -1,5 +1,5 @@
-import time
 import argparse
+import time
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Sleep command.")

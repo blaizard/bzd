@@ -1,32 +1,31 @@
 import pathlib
-import typing
 
 from tools.ci.factory import (
-	Factory,
-	ConfigNormal,
-	ConfigStress,
 	ConfigCoverage,
+	ConfigNormal,
 	ConfigSanitizer,
+	ConfigStress,
+	Factory,
 )
 
 
 class Travis(Factory):
 	def __init__(self) -> None:
-		self.jenkinsFile: typing.Optional[str] = None
+		self.jenkinsFile: str | None = None
 
 	def getName(self) -> str:
 		return "Travis CI"
 
-	def getConfigNormal(self, variant: typing.Optional[str]) -> typing.Optional[ConfigNormal]:
+	def getConfigNormal(self, variant: str | None) -> ConfigNormal | None:
 		return ConfigNormal(exclude={"esp32"})
 
-	def getConfigStress(self, variant: typing.Optional[str]) -> typing.Optional[ConfigStress]:
+	def getConfigStress(self, variant: str | None) -> ConfigStress | None:
 		return None
 
-	def getConfigCoverage(self, variant: typing.Optional[str]) -> typing.Optional[ConfigCoverage]:
+	def getConfigCoverage(self, variant: str | None) -> ConfigCoverage | None:
 		return None
 
-	def getConfigSanitizer(self, variant: typing.Optional[str]) -> typing.Optional[ConfigSanitizer]:
+	def getConfigSanitizer(self, variant: str | None) -> ConfigSanitizer | None:
 		return ConfigSanitizer(exclude={"static_analyzer"})
 
 	def build(self) -> None:

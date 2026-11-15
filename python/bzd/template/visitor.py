@@ -1,16 +1,15 @@
-import typing
 import pathlib
 import re
-
-from bzd.parser.element import Element, Sequence
-from bzd.parser.visitor import Visitor as VisitorBase
-from bzd.parser.error import Error, ExceptionParser
+import typing
 
 # Needed by the include method
 import bzd.template.template
+from bzd.parser.element import Element, Sequence
+from bzd.parser.error import Error, ExceptionParser
+from bzd.parser.visitor import Visitor as VisitorBase
 from bzd.template.substitution import SubstitutionsAccessor, SubstitutionWrapper
 
-ResultType = typing.List[str]
+ResultType = list[str]
 
 
 class Loop:
@@ -31,7 +30,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 	def __init__(
 		self,
-		substitutions: typing.Union[SubstitutionsAccessor, SubstitutionWrapper],
+		substitutions: SubstitutionsAccessor | SubstitutionWrapper,
 		# Default include directories are the module root and the _main within this root.
 		# This ensures that includes can be found in both locations.
 		includeDirs: typing.Sequence[pathlib.Path] = [
@@ -56,13 +55,13 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 	def visitBegin(self, result: ResultType) -> ResultType:
 		return []
 
-	def resolveExpressions(self, sequence: Sequence) -> typing.List[typing.Any]:
+	def resolveExpressions(self, sequence: Sequence) -> list[typing.Any]:
 		"""Resolve expressions into their values.
 		Expression is a nested sequence that might correspond to callable arguments, pipeable expression or more
 		simply a single expression.
 		"""
 
-		values: typing.List[typing.Any] = []
+		values: list[typing.Any] = []
 		operator = None
 		operatorUnary = None
 
@@ -71,12 +70,12 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				return getattr(value, key)
 			try:
 				return value[key]
-			except Exception as e:
-				raise Exception(
-					f"Substitution value for the key '{key}' does not exists ({str(e)}). Value is: '{Error.valueExtract(value)}'"
+			except Exception as e:  # noqa: BLE001
+				raise RuntimeError(
+					f"Substitution value for the key '{key}' does not exists ({e!s}). Value is: '{Error.valueExtract(value)}'"
 				)
 
-		operators: typing.Dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
+		operators: dict[str, typing.Callable[[typing.Any, typing.Any], typing.Any]] = {
 			"|": (lambda left, right: right(left)),
 			"==": (lambda left, right: left == right),
 			"!=": (lambda left, right: left != right),
@@ -87,7 +86,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			"in": (lambda left, right: left in right),
 		}
 
-		operatorsUnary: typing.Dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda right: not right)}
+		operatorsUnary: dict[str, typing.Callable[[typing.Any], typing.Any]] = {"not": (lambda right: not right)}
 
 		for element in sequence:
 			try:
@@ -144,7 +143,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 					else:
 						values.append(value)
 
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				Error.handleFromElement(element=element, message=str(e))
 
 		assert operator is None and operatorUnary is None, "Unterminated expression."
@@ -216,7 +215,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 
 		# Loop through the elements
 		iterable = self.resolveExpression(sequence=element.getNestedSequenceAssert("iterable"))
-		loop = Loop(self.substitutions["loop"] if "loop" in self.substitutions else None)
+		loop = Loop(self.substitutions.get("loop", None))
 		self.substitutions.register(element=element, key="loop", value=loop)
 		if value2 is None:
 			for value in iterable:
@@ -305,7 +304,7 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 			element=element,
 			attr="name",
 			condition=(name not in self.substitutions),
-			message="Name conflict with macro and an already existing name: '{}'.".format(name),
+			message=f"Name conflict with macro and an already existing name: '{name}'.",
 		)
 
 		# Register the macro
@@ -326,14 +325,14 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 		Error.assertTrue(
 			element=element,
 			condition=isinstance(includePathStr, str),
-			message="The include path must resolve into a string, instead: '{}'.".format(includePathStr),
+			message=f"The include path must resolve into a string, instead: '{includePathStr}'.",
 		)
 		path = pathlib.Path(includePathStr)
 		paths = [(base / path) for base in self.includeDirs if (base / path).is_file()]
 		Error.assertTrue(
 			element=element,
 			condition=len(paths) > 0,
-			message="Unable to find '{}' within {}".format(includePathStr, str([f.as_posix() for f in self.includeDirs])),
+			message=f"Unable to find '{includePathStr}' within {[f.as_posix() for f in self.includeDirs]!s}",
 		)
 
 		template = bzd.template.template.Template(
@@ -409,13 +408,13 @@ class Visitor(VisitorBase[ResultType, ResultType]):
 				result.append(string)
 
 			else:
-				raise Exception("Unsupported category: '{}'.".format(category))
+				raise RuntimeError(f"Unsupported category: '{category}'.")
 
 		# Propagate processed exception to the top layer
-		except ExceptionParser as e:
-			raise e
+		except ExceptionParser:
+			raise
 
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			Error.handleFromElement(element=element, message=str(e))
 
 		return result

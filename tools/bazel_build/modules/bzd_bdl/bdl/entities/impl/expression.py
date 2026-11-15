@@ -3,14 +3,14 @@ import typing
 from bzd.parser.element import Element, ElementBuilder
 
 from bdl.contracts.validation import Validation
-from bdl.entities.impl.fragment.symbol import Symbol
-from bdl.entities.impl.fragment.parameters import Parameters
-from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bdl.entities.impl.entity import EntityExpression, Role
 from bdl.entities.impl.fragment.expression_fragment import (
 	ExpressionFragment,
 	OperatorFragment,
 )
+from bdl.entities.impl.fragment.parameters import Parameters
+from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
+from bdl.entities.impl.fragment.symbol import Symbol
 
 if typing.TYPE_CHECKING:
 	from bdl.visitors.symbol_map import Resolver, SymbolMap
@@ -66,13 +66,13 @@ class Expression(EntityExpression):
 		)
 
 	@property
-	def fragments(self) -> typing.List[ExpressionFragment]:
+	def fragments(self) -> list[ExpressionFragment]:
 		"""Return a list with all fragments."""
 
 		return [ExpressionFragment.make(element) for element in self.element.getNestedSequenceOrEmpty("fragments")]
 
 	@property
-	def dependencies(self) -> typing.Set[str]:
+	def dependencies(self) -> set[str]:
 		"""Output the dependency list for this entity."""
 
 		dependencies = set()
@@ -83,7 +83,7 @@ class Expression(EntityExpression):
 		return dependencies
 
 	@property
-	def this(self) -> typing.Optional[str]:
+	def this(self) -> str | None:
 		"""Get the fqn of 'this' from this expression if available."""
 
 		return self.symbol.this if self.isSymbol and self.symbol.isThis else None
@@ -115,11 +115,11 @@ class Expression(EntityExpression):
 		]
 
 		for kind, operators in operatorsPrecedence:
-			fragmentPrevious: typing.Optional[ExpressionFragment] = None
+			fragmentPrevious: ExpressionFragment | None = None
 			index = 0
 			while index < len(fragments):
 				fragment = fragments[index]
-				fragmentNext: typing.Optional[ExpressionFragment] = fragments[index + 1] if index + 1 < len(fragments) else None
+				fragmentNext: ExpressionFragment | None = fragments[index + 1] if index + 1 < len(fragments) else None
 				if isinstance(fragment, OperatorFragment) and fragment.operator in operators:
 					# Look for operators that are preceded by another operator or at the beginning.
 					isUnary = kind == "unary"

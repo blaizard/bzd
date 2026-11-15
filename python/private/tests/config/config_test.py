@@ -1,7 +1,7 @@
 import subprocess
 import unittest
 
-from config_python import a, b, b_c, e, embed, bin_hello_world
+from config_python import a, b, b_c, bin_hello_world, e, embed
 
 
 class TestRun(unittest.TestCase):

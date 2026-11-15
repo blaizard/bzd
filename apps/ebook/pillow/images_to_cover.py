@@ -1,11 +1,9 @@
-import pathlib
-import typing
 import math
+import pathlib
 
-from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
-from apps.ebook.providers import ProviderImages, ProviderCover
+from apps.ebook.flow import ActionInterface, FlowContext, FlowEnum
+from apps.ebook.providers import ProviderCover, ProviderImages
 from apps.ebook.utils import sizeToString
-
 from PIL import Image
 
 
@@ -23,7 +21,7 @@ class ImagesToCover(ActionInterface):
 
 	def process(
 		self, provider: ProviderImages, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderCover, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderCover, FlowEnum | None]]:
 
 		output = directory / f"{provider.metadata.title or 'output'}{self.suffix}.jpg"
 		assert len(provider.images) >= 1, "The provider should contain at least 1 image."

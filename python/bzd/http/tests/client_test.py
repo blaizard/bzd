@@ -1,5 +1,5 @@
-import unittest
 import typing
+import unittest
 
 from bzd.http.client import HttpClient, HttpClientProtocol
 from bzd.http.client_mock import HttpClientMock
@@ -10,7 +10,7 @@ class TestRun(unittest.TestCase):
 
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.assertEqual(method, "GET")
 			self.assertEqual(url, "http://hello.com")
 			self.assertTrue(body is None)
@@ -23,7 +23,7 @@ class TestRun(unittest.TestCase):
 
 		self.calledCounter = 0
 
-		def callback(method: str, url: str, body: typing.Optional[bytes], **kwargs: typing.Any) -> None:
+		def callback(method: str, url: str, body: bytes | None, **kwargs: typing.Any) -> None:
 			self.assertEqual(method, "DELETE")
 			self.assertEqual(url, "http://hello.com?hello=world")
 			self.assertTrue(body is None)
@@ -39,8 +39,8 @@ class TestRun(unittest.TestCase):
 		def callback(
 			method: str,
 			url: str,
-			body: typing.Optional[bytes],
-			headers: typing.Dict[str, str],
+			body: bytes | None,
+			headers: dict[str, str],
 			**kwargs: typing.Any,
 		) -> None:
 			self.assertEqual(method, "PUT")

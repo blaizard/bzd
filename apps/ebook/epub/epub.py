@@ -1,14 +1,16 @@
-import re
 import datetime
 import pathlib
+import re
 import typing
-import zipfile
 import xml.etree.ElementTree as ET
+import zipfile
 
 from apps.ebook.epub.driver_selenium import DriverSelenium
 from apps.ebook.epub.metadata import EPubMetadata
-from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
+from apps.ebook.flow import ActionInterface, FlowContext, FlowEnum
 from apps.ebook.providers import ProviderEbook, ProviderImages
+
+_defaultDriver = DriverSelenium()
 
 
 class EPub(ActionInterface):
@@ -17,13 +19,13 @@ class EPub(ActionInterface):
 	ProviderInput = ProviderEbook
 	ProviderOutput = ProviderImages
 
-	def __init__(self, driver: typing.Any = DriverSelenium(), zoom: float = 1.0) -> None:
+	def __init__(self, driver: typing.Any = _defaultDriver, zoom: float = 1.0) -> None:
 		super().__init__()
 		self.driver = driver
 		self.zoom = zoom
 
 	@staticmethod
-	def parseDate(string: str) -> typing.Optional[datetime.datetime]:
+	def parseDate(string: str) -> datetime.datetime | None:
 		pattern = re.compile(r"(?P<year>[0-9]+)(?:-(?P<month>[0-9]+)(?:-(?P<day>[0-9]+))?)?")
 		maybeMatch = pattern.match(string)
 		if maybeMatch:
@@ -59,13 +61,13 @@ class EPub(ActionInterface):
 				metadata.metadata.publisher = elt.text
 		return metadata
 
-	def readMetadata(self, dirname: pathlib.Path) -> typing.List[EPubMetadata]:
+	def readMetadata(self, dirname: pathlib.Path) -> list[EPubMetadata]:
 		"""Read the metadata from an epub."""
 
 		tree = ET.parse(dirname / "META-INF/container.xml")
 		root = tree.getroot()
 		rootfiles = [elt.attrib["full-path"] for elt in root.iter() if elt.tag.endswith("rootfile")]
-		documents: typing.List[EPubMetadata] = []
+		documents: list[EPubMetadata] = []
 		for rootfile in rootfiles:
 			tree = ET.parse(dirname / rootfile)
 			root = tree.getroot()
@@ -89,9 +91,9 @@ class EPub(ActionInterface):
 
 	def process(
 		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderImages, FlowEnum | None]]:
 
-		outputs: typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]] = []
+		outputs: list[tuple[ProviderImages, FlowEnum | None]] = []
 		with self.driver as driver:
 			with zipfile.ZipFile(str(provider.ebook), "r") as zipInstance:
 				zipInstance.extractall(directory / "extract")

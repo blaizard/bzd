@@ -1,3 +1,4 @@
+import itertools
 import unittest
 
 from bzd.utils.timestamp import timestampMs, timestampUs
@@ -14,7 +15,7 @@ class TestTimestamp(unittest.TestCase):
 	def testTimestampMonotonic(self) -> None:
 		samples = [timestampUs() for _ in range(64)]
 		# The clock must never go backwards.
-		for previous, current in zip(samples, samples[1:]):
+		for previous, current in itertools.pairwise(samples):
 			self.assertGreaterEqual(current, previous)
 
 	def testTimestampUsHasSubMillisecondPrecision(self) -> None:

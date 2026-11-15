@@ -4,7 +4,6 @@ import pathlib
 import typing
 
 from context.context import Context
-
 from dependencies.bazel_dep.bcr import BcrRegistry
 from dependencies.interface import Dependencies
 
@@ -13,11 +12,11 @@ class _Location(typing.NamedTuple):
 	"""Location of a version literal within a MODULE.bazel file."""
 
 	path: pathlib.Path
-	start: typing.Optional[int]
-	end: typing.Optional[int]
+	start: int | None
+	end: int | None
 
 
-def _lineStarts(content: bytes) -> typing.List[int]:
+def _lineStarts(content: bytes) -> list[int]:
 	"""Get the byte offset of the start of every line."""
 
 	starts = [0]
@@ -28,9 +27,9 @@ def _lineStarts(content: bytes) -> typing.List[int]:
 
 def _versionRange(
 	content: bytes,
-	lineStarts: typing.List[int],
+	lineStarts: list[int],
 	node: ast.Constant,
-) -> typing.Tuple[typing.Optional[int], typing.Optional[int]]:
+) -> tuple[int | None, int | None]:
 	"""Get the byte range of a version literal content, None if it cannot be edited safely."""
 
 	if node.end_lineno is None or node.end_col_offset is None:
@@ -47,7 +46,7 @@ def _versionRange(
 class BazelDep:
 	"""Discover and upgrade bazel_dep entries declared in the workspace MODULE.bazel files."""
 
-	def __init__(self, context: Context, registry: typing.Optional[BcrRegistry] = None) -> None:
+	def __init__(self, context: Context, registry: BcrRegistry | None = None) -> None:
 		self.context = context
 		self.registry_ = registry or BcrRegistry()
 
@@ -76,7 +75,7 @@ class BazelDep:
 	def upgrade(self, dependencies: Dependencies) -> None:
 		"""Upgrade every bazel_dep entry to the latest stable version published in the BCR."""
 
-		edits: typing.Dict[pathlib.Path, typing.List[typing.Tuple[int, int, str]]] = collections.defaultdict(list)
+		edits: dict[pathlib.Path, list[tuple[int, int, str]]] = collections.defaultdict(list)
 
 		for name, declaredVersion, occurrences in dependencies.items():
 			latestVersion = self.registry_.getLatestStable(name, declaredVersion)

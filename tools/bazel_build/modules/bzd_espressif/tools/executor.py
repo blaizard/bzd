@@ -1,11 +1,11 @@
 import argparse
-import sys
+import pathlib
 import re
 import shutil
-import pathlib
+import sys
 import typing
 
-from bzd.utils.run import Cancellation, localCommand, StreamCallback
+from bzd.utils.run import Cancellation, StreamCallback, localCommand
 
 EXIT_CODE_PATTERN = re.compile(r"<exit code (-?[0-9]+)>")
 
@@ -18,7 +18,7 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 	        output: The output string.
 	"""
 
-	def findStackTrace(output: str) -> typing.Optional[typing.List[str]]:
+	def findStackTrace(output: str) -> list[str] | None:
 		for line in output.split("\n"):
 			if line.strip().startswith("Backtrace: "):
 				return line.strip().split(" ")[1:]
@@ -40,8 +40,8 @@ def tryDecodeBacktrace(binary: pathlib.Path, output: str) -> None:
 
 
 def splitEndOfOptionsMarker(
-	args: typing.List[str],
-) -> typing.Tuple[typing.List[str], typing.List[str]]:
+	args: list[str],
+) -> tuple[list[str], list[str]]:
 	"""Split the given argument list at the end-of-options marker if any."""
 	try:
 		index = args.index("--")
@@ -66,7 +66,7 @@ if __name__ == "__main__":
 	# The emulator keeps running after the target exits, stop it once the exit code is reported.
 	# LINE mode ensures the complete exit code is received before the process is terminated.
 	cancellation = Cancellation()
-	maybeExitCode: typing.Optional[int] = None
+	maybeExitCode: int | None = None
 
 	def handleLine(line: str, stream: typing.TextIO) -> None:
 		global maybeExitCode

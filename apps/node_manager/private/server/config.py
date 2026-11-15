@@ -1,7 +1,7 @@
-import pathlib
 import json
-import typing
+import pathlib
 import re
+import typing
 from dataclasses import dataclass
 
 
@@ -9,8 +9,8 @@ from dataclasses import dataclass
 class UPSClient:
 	hostname: str = "127.0.0.1"
 	port: int = 3493
-	username: typing.Optional[str] = None
-	password: typing.Optional[str] = None
+	username: str | None = None
+	password: str | None = None
 
 
 class Config:
@@ -27,8 +27,8 @@ class Config:
 	}
 	"""
 
-	def __init__(self, path: typing.Optional[pathlib.Path] = None) -> None:
-		self.config: typing.Dict[str, typing.Any] = {}
+	def __init__(self, path: pathlib.Path | None = None) -> None:
+		self.config: dict[str, typing.Any] = {}
 		if path is not None:
 			self.config = json.loads(path.read_text())
 		self.preprocess()
@@ -36,7 +36,7 @@ class Config:
 	def preprocess(self) -> None:
 		"""Preprocess the configuration."""
 
-		self.preprocessed: typing.Dict[str, typing.Any] = {}
+		self.preprocessed: dict[str, typing.Any] = {}
 
 		# Preprocess the mapping for the disks. Ensure the order
 		# is reproducible by sorting the keys.
@@ -46,14 +46,14 @@ class Config:
 			newMapping.append((re.compile(regexpr), identifier))
 		self.preprocessed["disks.mappings"] = newMapping
 
-	def disksMappings(self, dictionary: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+	def disksMappings(self, dictionary: dict[str, typing.Any]) -> dict[str, typing.Any]:
 		"""Convert a disk identifier to a custom identifier if set by the configuration.
 
 		Otherwise return the original identifier.
 		"""
 
 		# Look for the first match per replacement, this to handle duplicates in a reproducible manner.
-		matchesPerReplacement: typing.Dict[str, typing.List[str]] = {}
+		matchesPerReplacement: dict[str, list[str]] = {}
 		for identifier in sorted(dictionary.keys()):
 			for regexpr, replacement in self.preprocessed["disks.mappings"]:
 				if regexpr.fullmatch(identifier):
@@ -61,7 +61,7 @@ class Config:
 					break
 
 		# Create the dictionary for matches only.
-		matches: typing.Dict[str, str] = {}
+		matches: dict[str, str] = {}
 		for replacement, identifiers in matchesPerReplacement.items():
 			if len(identifiers) == 1:
 				matches[identifiers[0]] = replacement
@@ -71,7 +71,7 @@ class Config:
 
 		return {matches.get(k, k): v for k, v in dictionary.items()}
 
-	def ups(self) -> typing.Dict[str, UPSClient]:
+	def ups(self) -> dict[str, UPSClient]:
 		"""Get all the ups clients."""
 
 		ups = {name: UPSClient(**data) for name, data in self.config.get("ups", {}).items()}

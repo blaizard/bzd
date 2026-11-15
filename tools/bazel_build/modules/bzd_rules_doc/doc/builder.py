@@ -1,16 +1,14 @@
 import argparse
-import pathlib
 import json
 import os
-import typing
-import tempfile
-import tarfile
+import pathlib
 import subprocess
+import tarfile
+import tempfile
+import typing
 
 
-def navigationToMkDocsList(
-	root: pathlib.Path, navigation: typing.List[typing.Tuple[str, typing.Any]]
-) -> typing.List[str]:
+def navigationToMkDocsList(root: pathlib.Path, navigation: list[tuple[str, typing.Any]]) -> list[str]:
 	content = []
 	for name, path in navigation:
 		if isinstance(path, list):
@@ -22,8 +20,8 @@ def navigationToMkDocsList(
 
 
 def navigationToPathList(
-	navigation: typing.List[typing.Tuple[str, typing.Any]],
-) -> typing.List[pathlib.Path]:
+	navigation: list[tuple[str, typing.Any]],
+) -> list[pathlib.Path]:
 
 	content = []
 	for name, path in navigation:
@@ -34,9 +32,7 @@ def navigationToPathList(
 	return content
 
 
-def searchForEntryPoint(
-	output: pathlib.Path, navigation: typing.List[typing.Tuple[str, typing.Any]]
-) -> typing.Optional[pathlib.Path]:
+def searchForEntryPoint(output: pathlib.Path, navigation: list[tuple[str, typing.Any]]) -> pathlib.Path | None:
 	"""Look for the first entry point for the documentation.
 
 	Args:

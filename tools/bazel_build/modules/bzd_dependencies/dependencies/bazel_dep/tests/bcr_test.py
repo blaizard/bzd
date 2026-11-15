@@ -4,17 +4,16 @@ import unittest
 
 from bzd.http.client import HttpClientException
 from bzd.http.client_mock import HttpClientMock, HttpResponseMock
-
 from dependencies.bazel_dep.bcr import BcrRegistry
 
 
-def _makeResponse(payload: typing.Dict[str, typing.Any]) -> HttpResponseMock:
+def _makeResponse(payload: dict[str, typing.Any]) -> HttpResponseMock:
 	return HttpResponseMock(200, json.dumps(payload).encode("utf-8"), {})
 
 
 class TestBcrRegistry(unittest.TestCase):
 	def testLatestStable(self) -> None:
-		urls: typing.List[str] = []
+		urls: list[str] = []
 
 		def callback(**kwargs: typing.Any) -> HttpResponseMock:
 			urls.append(kwargs["url"])

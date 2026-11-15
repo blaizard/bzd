@@ -1,6 +1,7 @@
-import unittest
-import bzd.utils.run
 import threading
+import unittest
+
+import bzd.utils.run
 
 
 class TestRun(unittest.TestCase):
@@ -19,7 +20,7 @@ class TestRun(unittest.TestCase):
 		self.assertIn("timed out", result.getOutput())  # codespell:ignore
 
 	def testLocalCommandException(self) -> None:
-		with self.assertRaises(Exception):
+		with self.assertRaises(AssertionError):
 			bzd.utils.run.localCommand(["sleep", "5"], timeoutS=0.1)
 
 	def testLocalCommandCancellation(self) -> None:

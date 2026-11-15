@@ -1,12 +1,12 @@
-from bzd.parser.parser import Parser
-from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import (
 	Fragment,
+	FragmentComment,
 	FragmentNestedStart,
 	FragmentNestedStopNewElement,
 	FragmentNewElement,
-	FragmentComment,
 )
+from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
+from bzd.parser.parser import Parser
 
 # Simple Grammar
 

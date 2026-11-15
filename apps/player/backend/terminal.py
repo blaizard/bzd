@@ -1,14 +1,13 @@
-import os
-import sys
-import select
-import termios
-import pty
-import subprocess
 import argparse
-import pathlib
-import typing
-import struct
 import fcntl
+import os
+import pathlib
+import pty
+import select
+import struct
+import subprocess
+import sys
+import termios
 
 
 def resize(fd: int, rows: int, columns: int) -> None:
@@ -16,7 +15,7 @@ def resize(fd: int, rows: int, columns: int) -> None:
 	fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
 
 
-def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) -> None:
+def main(cwd: pathlib.Path, env: dict[str, str], args: list[str]) -> None:
 	# Save original tty setting then set it to raw mode
 	# old_tty = termios.tcgetattr(sys.stdin)
 	# tty.setraw(sys.stdin.fileno())
@@ -35,7 +34,7 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 			cwd=cwd,
 			env=env,
 			bufsize=0,
-			preexec_fn=os.setsid,
+			start_new_session=True,
 			stdin=slave,
 			stdout=slave,
 			stderr=slave,
@@ -43,7 +42,7 @@ def main(cwd: pathlib.Path, env: typing.Dict[str, str], args: typing.List[str]) 
 		)
 
 		while p.poll() is None:
-			r, w, e = select.select([sys.stdin, master], [], [])
+			r, _w, _e = select.select([sys.stdin, master], [], [])
 			if sys.stdin in r:
 				data = os.read(sys.stdin.fileno(), 1024)
 				os.write(master, data)

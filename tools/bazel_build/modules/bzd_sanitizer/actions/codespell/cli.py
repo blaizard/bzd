@@ -1,10 +1,10 @@
 import argparse
 import pathlib
-import typing
 import re
+import typing
 
-from bzd_sanitizer.worker import chunkWorker, OutputWithPath
 from bzd.utils.run import localBazelBinary
+from bzd_sanitizer.worker import OutputWithPath, chunkWorker
 
 
 def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Generator[OutputWithPath, None, None]:
@@ -17,13 +17,13 @@ def stdoutParser(stdout: str, workspace: pathlib.Path) -> typing.Generator[Outpu
 
 
 def workload(
-	args: typing.Tuple[
+	args: tuple[
 		pathlib.Path,
 		typing.Sequence[pathlib.Path],
 		bool,
 		str,
-		typing.Optional[pathlib.Path],
-		typing.Optional[pathlib.Path],
+		pathlib.Path | None,
+		pathlib.Path | None,
 	],
 	stdout: typing.TextIO,
 ) -> bool:

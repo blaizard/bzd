@@ -1,7 +1,7 @@
 import re
 import typing
 
-PartsType = typing.List[str]
+PartsType = list[str]
 
 
 class _Row:
@@ -13,7 +13,7 @@ class _Row:
 		self.table = table
 		self.parts = parts
 
-	def get(self, identifier: typing.Union[int, str], strip: bool = True) -> typing.Optional[str]:
+	def get(self, identifier: int | str, strip: bool = True) -> str | None:
 		"""
 		Access a single element from the row.
 
@@ -24,7 +24,7 @@ class _Row:
 		Returns:
 		        The element, or None if no element is present.
 		"""
-		assert self.table.isValidIdentifier(identifier), "Invalid identifier: {}".format(identifier)
+		assert self.table.isValidIdentifier(identifier), f"Invalid identifier: {identifier}"
 
 		if isinstance(identifier, int):
 			if identifier < self.size():
@@ -61,13 +61,13 @@ class FixedTable:
 
 	def __init__(
 		self,
-		separations: typing.List[int],
-		nameToIndex: typing.Optional[typing.Dict[str, int]] = None,
+		separations: list[int],
+		nameToIndex: dict[str, int] | None = None,
 	) -> None:
 		self.separations = separations
 		self.nameToIndex = nameToIndex if nameToIndex else {}
 
-	def isValidIdentifier(self, identifier: typing.Union[int, str]) -> bool:
+	def isValidIdentifier(self, identifier: int | str) -> bool:
 		"""
 		Tells if a specific identifier is valid.
 
@@ -86,7 +86,7 @@ class FixedTable:
 		return False
 
 	@staticmethod
-	def fromHeader(header: str, schema: typing.Dict[str, typing.Any]) -> typing.Optional["FixedTable"]:
+	def fromHeader(header: str, schema: dict[str, typing.Any]) -> typing.Optional["FixedTable"]:
 		"""
 		Make a FixedTable instance from the header line.
 
@@ -104,7 +104,7 @@ class FixedTable:
 		start = 0
 		for name in header.split():
 			result = header.find(name, start)
-			assert result > -1, "Couldn't find {}".format(result)
+			assert result > -1, f"Couldn't find {result}"
 			curSchema = schema.get(name, {})
 
 			if curSchema.get("align", "left") == "right":
@@ -114,7 +114,7 @@ class FixedTable:
 				nbBlanks = re.search(r"\S", header[end:])
 				end += nbBlanks.start() if nbBlanks else 0
 
-			assert name not in nameToIndex, "Cell name already discovered: {}".format(name)
+			assert name not in nameToIndex, f"Cell name already discovered: {name}"
 			nameToIndex[name] = len(separations) - 1
 			separations.append(end - 1)
 			start = end

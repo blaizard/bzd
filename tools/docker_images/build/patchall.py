@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
+import argparse
 import os
 import pathlib
-import argparse
 import subprocess
-import typing
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Update the rpath of all files within a directory.")
@@ -15,18 +14,18 @@ if __name__ == "__main__":
 	directory = pathlib.Path(args.path).resolve()
 
 	# Build the executables and libraries map.
-	executables: typing.Dict[pathlib.Path, typing.Set[str]] = {}
-	libraries: typing.Dict[str, pathlib.Path] = {}
+	executables: dict[pathlib.Path, set[str]] = {}
+	libraries: dict[str, pathlib.Path] = {}
 
 	for root, dirs, files in os.walk(directory):
 		rootPath = pathlib.Path(root).resolve()
 		for filename in files:
 			f = rootPath / filename
-			result = subprocess.run(["ldd", str(f)], capture_output=True)
+			result = subprocess.run(["ldd", str(f)], capture_output=True, check=False)
 			# If the operation fails, it means that this is not a dynamic executable/library.
 			if result.returncode != 0:
 				continue
-			libs = set([line.strip().split()[0].decode() for line in result.stdout.split(b"\n")[1:] if line.strip()])
+			libs = {line.strip().split()[0].decode() for line in result.stdout.split(b"\n")[1:] if line.strip()}
 			path = f.relative_to(directory)
 			executables[path] = libs
 			if path.name in libraries:
@@ -37,8 +36,8 @@ if __name__ == "__main__":
 				libraries[path.name] = path.parent
 
 	# Do the mapping.
-	assigned: typing.Dict[str, pathlib.Path] = {}
-	unassigned: typing.Dict[str, typing.Set[pathlib.Path]] = {}
+	assigned: dict[str, pathlib.Path] = {}
+	unassigned: dict[str, set[pathlib.Path]] = {}
 	for path, libs in executables.items():
 		for lib in libs:
 			if lib in libraries:

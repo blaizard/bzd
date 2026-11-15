@@ -1,34 +1,36 @@
 import typing
 from pathlib import Path
 
-from bzd.parser.error import Error, Result
-from bzd.parser.element import Element, SequenceBuilder
 from bzd.parser.context import Context
+from bzd.parser.element import Element, SequenceBuilder
+from bzd.parser.error import Error, Result
 from bzd.utils.match import sortMatchingWeight
 
-from bdl.visitor import Group, NestedSequence
 from bdl.builtins import Builtins
-from bdl.entities.all import elementToEntity, EntityType
+from bdl.entities.all import EntityType, elementToEntity
 from bdl.entities.builder import ElementBuilder
-from bdl.entities.impl.reference import Reference
-from bdl.entities.impl.fragment.fqn import FQN
 from bdl.entities.impl.expression import Expression
+from bdl.entities.impl.fragment.fqn import FQN
+from bdl.entities.impl.reference import Reference
+from bdl.visitor import Group, NestedSequence
 
-ResolveShallowFQNResult = Result[typing.Tuple[str, typing.List[str]]]
-ResolveFQNResult = Result[typing.List[str]]
+ResolveShallowFQNResult = Result[tuple[str, list[str]]]
+ResolveFQNResult = Result[list[str]]
 
 
 class Resolver:
 	def __init__(
 		self,
 		symbols: "SymbolMap",
-		namespace: typing.List[str] = [],
-		exclude: typing.Optional[typing.List[Group]] = None,
-		this: typing.Optional[str] = None,
-		target: typing.Optional[str] = None,
+		namespace: list[str] | None = None,
+		exclude: list[Group] | None = None,
+		this: str | None = None,
+		target: str | None = None,
 		memoize: bool = False,
 	) -> None:
 		self.symbols = symbols
+		if namespace is None:
+			namespace = []
 		self.namespace = namespace
 		self.exclude = exclude
 		self.this = this
@@ -37,9 +39,9 @@ class Resolver:
 
 	def make(
 		self,
-		namespace: typing.Optional[typing.List[str]] = None,
-		expression: typing.Optional[Expression] = None,
-		this: typing.Optional[str] = None,
+		namespace: list[str] | None = None,
+		expression: Expression | None = None,
+		this: str | None = None,
 	) -> "Resolver":
 		"""Create a new resolver with an updated namespace.
 
@@ -106,7 +108,7 @@ class Resolver:
 
 		# Attempt to resolve as much as possible.
 		potentialNamespace = FQN.toNamespace(fqn) + FQN.toNamespace(name)[1:]
-		remainingNamespace: typing.List[str] = []
+		remainingNamespace: list[str] = []
 		while potentialNamespace:
 			fqn = FQN.fromNamespace(namespace=potentialNamespace)
 			if self.symbols.contains(fqn=fqn, exclude=self.exclude):
@@ -125,11 +127,11 @@ class Resolver:
 		if not maybeFQN:
 			return ResolveFQNResult.makeError(maybeFQN.error)
 
-		fqn: typing.Optional[str]
+		fqn: str | None
 		fqn, unresolvedFQN = maybeFQN.value
 
 		# List of matching FQNs
-		fqns: typing.List[str] = [fqn]
+		fqns: list[str] = [fqn]
 
 		# Re-iterate the process with the next items
 		for nextName in unresolvedFQN:
@@ -166,7 +168,7 @@ class Resolver:
 			"exclude": self.exclude,
 		}
 
-		entities = ['{}="{}"'.format(key, value) for key, value in attrs.items() if value]
+		entities = [f'{key}="{value}"' for key, value in attrs.items() if value]
 		return "<{}/>".format(" ".join([type(self).__name__] + entities))
 
 
@@ -190,10 +192,10 @@ class SymbolMap:
 
 	def __init__(self) -> None:
 		self.staticUid: int = 0
-		self.map: typing.Dict[str, typing.Any] = {}
-		self.builtins: typing.Dict[str, typing.Any] = {}
+		self.map: dict[str, typing.Any] = {}
+		self.builtins: dict[str, typing.Any] = {}
 		# Memoized entities.
-		self.entities: typing.Dict[str, EntityType] = {}
+		self.entities: dict[str, EntityType] = {}
 		self.isClosed = False
 
 		# Register builtins
@@ -220,13 +222,13 @@ class SymbolMap:
 		}
 		self.entities[name] = entity
 
-	def contains(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> bool:
+	def contains(self, fqn: str, exclude: list[Group] | None = None) -> bool:
 		"""
 		Check if the fqn is registered.
 		"""
-		return False if self._get(fqn=fqn, exclude=exclude) is None else True
+		return not self._get(fqn=fqn, exclude=exclude) is None
 
-	def _get(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> typing.Optional[typing.Any]:
+	def _get(self, fqn: str, exclude: list[Group] | None = None) -> typing.Any | None:
 		"""
 		Return the raw data if it exists.
 		"""
@@ -242,9 +244,7 @@ class SymbolMap:
 					return None
 		return data
 
-	def items(
-		self, groups: typing.Set[Group], startsWith: str = "", depth: int = 0
-	) -> typing.Iterator[typing.Tuple[str, EntityType]]:
+	def items(self, groups: set[Group], startsWith: str = "", depth: int = 0) -> typing.Iterator[tuple[str, EntityType]]:
 		"""
 		Iterate through entities optionally filtered by their groups.
 
@@ -255,17 +255,19 @@ class SymbolMap:
 		"""
 
 		for fqn, meta in self.map.items():
-			if any(group in Group(meta["g"]) for group in groups):
-				if fqn.startswith(startsWith):
-					if depth == 0 or fqn[len(startsWith) :].count(".") < depth:
-						entity = self.getEntityResolved(fqn=fqn).value
-						yield fqn, entity
+			if (
+				any(group in Group(meta["g"]) for group in groups)
+				and fqn.startswith(startsWith)
+				and (depth == 0 or fqn[len(startsWith) :].count(".") < depth)
+			):
+				entity = self.getEntityResolved(fqn=fqn).value
+				yield fqn, entity
 
 	def insert(
 		self,
-		name: typing.Optional[str],
-		namespace: typing.List[str],
-		path: typing.Optional[Path],
+		name: str | None,
+		namespace: list[str],
+		path: Path | None,
 		element: Element,
 		group: Group,
 		conflicts: bool = False,
@@ -345,11 +347,11 @@ class SymbolMap:
 				)
 			self.map[fqn] = element
 
-	def makeReference(self, fqn: str, group: typing.Optional[Group] = None) -> Element:
+	def makeReference(self, fqn: str, group: Group | None = None) -> Element:
 		"""
 		Create a reference from an existing FQN.
 		"""
-		assert self.contains(fqn=fqn), "The FQN '{}' is not part of the symbol map.".format(fqn)
+		assert self.contains(fqn=fqn), f"The FQN '{fqn}' is not part of the symbol map."
 		return ElementBuilder("reference").setAttr(key="name", value=fqn)
 
 	def close(self) -> None:
@@ -358,7 +360,7 @@ class SymbolMap:
 		"""
 
 		# Create serialized blobs for elements present in the entities map.
-		removeFQNs: typing.Set[str] = set()
+		removeFQNs: set[str] = set()
 		for fqn, entity in self.entities.items():
 			# Ignore builtins
 			if fqn in self.builtins:
@@ -366,12 +368,12 @@ class SymbolMap:
 
 			entity.assertTrue(
 				condition=fqn in self.map,
-				message="Entry '{}' was not properly created before being added to the entities map.".format(fqn),
+				message=f"Entry '{fqn}' was not properly created before being added to the entities map.",
 			)
 			element = entity.element
 
 			# Remove nested element and change them to references.
-			if any([element.isNestedSequence(group.value) for group in NestedSequence]):
+			if any(element.isNestedSequence(group.value) for group in NestedSequence):
 				preparedElement = element.copy(ignoreNested=[group.value for group in NestedSequence])
 				for group in NestedSequence:
 					nested = element.getNestedSequence(group.value)
@@ -405,13 +407,13 @@ class SymbolMap:
 		# Sanity check to ensure that all entries in the map are valid.
 		for fqn, entry in self.map.items():
 			_ = Group(entry["g"])
-			assert "e" in entry and entry["e"], f"Invalid element in the map: {entry}."
+			assert entry.get("e"), f"Invalid element in the map: {entry}."
 			assert "p" in entry, f"Missing path in the map: {entry}."
 
 		# Mark as closed.
 		self.isClosed = True
 
-	def serialize(self) -> typing.Dict[str, typing.Any]:
+	def serialize(self) -> dict[str, typing.Any]:
 		"""
 		Return a serialized version of this map.
 		"""
@@ -422,7 +424,7 @@ class SymbolMap:
 	def metaToElement(meta: typing.Any) -> Element:
 		return Element.fromSerialize(element=meta["e"], context=Context(path=Path(meta["p"])))
 
-	def similarFQN(self, fqn: str) -> typing.List[str]:
+	def similarFQN(self, fqn: str) -> list[str]:
 		"""Find a related FQN that has similar name to the one in argument."""
 
 		all_fqns = [k for k in [*self.map.keys(), *self.builtins.keys()] if not k.endswith("~")]
@@ -439,7 +441,7 @@ class SymbolMap:
 			return ", did you mean:\n" + "\n".join([f"\t- {w}" for w in similar])
 		return "."
 
-	def getEntityResolved(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
+	def getEntityResolved(self, fqn: str, exclude: list[Group] | None = None) -> Result[EntityType]:
 		"""
 		Return an element from the symbol map.
 		This call assumes that FQN is already resolved.
@@ -474,10 +476,10 @@ class SymbolMap:
 		# Return the entity.
 		return Result[EntityType](self.entities[fqn])
 
-	def getEntity(self, fqn: str, exclude: typing.Optional[typing.List[Group]] = None) -> Result[EntityType]:
+	def getEntity(self, fqn: str, exclude: list[Group] | None = None) -> Result[EntityType]:
 		"""Return an element from the symbol map and resolves underlying types if needed."""
 
-		namespaceChoices: typing.List[typing.List[str]] = [[]]
+		namespaceChoices: list[list[str]] = [[]]
 		result = None
 		for name in FQN.toNamespace(fqn):
 			for namespace in namespaceChoices:
@@ -488,8 +490,8 @@ class SymbolMap:
 				if result.value.underlyingTypeFQN is not None:
 					# If there is a type associated with this entity, add it to the namespace and its parents.
 					namespaceChoices = [FQN.toNamespace(result.value.underlyingTypeFQN)]
-					for fqn in self.getEntityResolved(result.value.underlyingTypeFQN).value.getParents():
-						namespaceChoices.append(FQN.toNamespace(fqn))
+					for fqnParent in self.getEntityResolved(result.value.underlyingTypeFQN).value.getParents():
+						namespaceChoices.append(FQN.toNamespace(fqnParent))
 				else:
 					# Use the entity as a namespace for the following entries.
 					namespaceChoices = [namespace]
@@ -500,7 +502,7 @@ class SymbolMap:
 
 		return Result(result.value)
 
-	def getChildren(self, fqn: str, groups: typing.Set[Group]) -> Result[typing.Dict[str, EntityType]]:
+	def getChildren(self, fqn: str, groups: set[Group]) -> Result[dict[str, EntityType]]:
 		"""Get all children of a specific element, the fqn passed into argument must already be resolved."""
 
 		result = self.getEntityResolved(fqn=fqn)
@@ -512,17 +514,17 @@ class SymbolMap:
 				f"The entity {result.value.fqn} does not have an underlying type, hence cannot have children."
 			)
 
-		children: typing.Dict[str, EntityType] = {}
+		children: dict[str, EntityType] = {}
 		for prefix in [result.value.underlyingTypeFQN] + self.getEntityResolved(
 			result.value.underlyingTypeFQN
 		).value.getParents():
-			for fqn, item in self.items(groups=groups, startsWith=f"{prefix}.", depth=1):
-				if fqn not in children:
-					children[fqn] = item
+			for childFqn, item in self.items(groups=groups, startsWith=f"{prefix}.", depth=1):
+				if childFqn not in children:
+					children[childFqn] = item
 		return Result(children)
 
 	@staticmethod
-	def fromSerialize(data: typing.Dict[str, typing.Any]) -> "SymbolMap":
+	def fromSerialize(data: dict[str, typing.Any]) -> "SymbolMap":
 		"""Create a symbol map from a serialized object."""
 
 		symbols = SymbolMap()

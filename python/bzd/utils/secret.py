@@ -1,10 +1,9 @@
 import pathlib
-import typing
 
 from private.secret.secret import Secret
 
 
-def decrypt(payload: str, keyFile: typing.Optional[pathlib.Path] = None) -> str:
+def decrypt(payload: str, keyFile: pathlib.Path | None = None) -> str:
 	"""Decrypt the given payload.
 
 	Args:
@@ -19,7 +18,7 @@ def decrypt(payload: str, keyFile: typing.Optional[pathlib.Path] = None) -> str:
 	return secret.decrypt(payload=payload)
 
 
-def maybeDecrypt(payload: str, keyFile: typing.Optional[pathlib.Path] = None) -> str:
+def maybeDecrypt(payload: str, keyFile: pathlib.Path | None = None) -> str:
 	"""Decrypt the given payload if it is a secret, otherwise return it unchanged.
 
 	Args:

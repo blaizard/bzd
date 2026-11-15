@@ -1,7 +1,7 @@
-import typing
-import threading
 import dataclasses
+import threading
 import time
+import typing
 
 from bzd.logging import Logger
 
@@ -9,7 +9,7 @@ logger = Logger("scheduler")
 
 Ts = typing.TypeVarTuple("Ts")
 
-CallbackType: typing.TypeAlias = typing.Union[typing.Callable[..., None], typing.Callable[..., bool]]
+CallbackType: typing.TypeAlias = typing.Callable[..., None] | typing.Callable[..., bool]
 
 
 @dataclasses.dataclass
@@ -19,8 +19,8 @@ class Workload:
 	name: str
 	intervalS: float
 	callback: CallbackType
-	args: typing.List[typing.Any]
-	kwargs: typing.Dict[str, typing.Any]
+	args: list[typing.Any]
+	kwargs: dict[str, typing.Any]
 	# The workload should start immediately.
 	immediate: bool
 	# Timestamp for the next call.
@@ -35,9 +35,9 @@ class Scheduler:
 		        blocking: If set, the scheduler will be blocking once it is started.
 		"""
 
-		self.workloads: typing.List[Workload] = []
-		self.queue: typing.List[Workload] = []
-		self.worker = threading.Thread(target=self._process, daemon=False if blocking else True)
+		self.workloads: list[Workload] = []
+		self.queue: list[Workload] = []
+		self.worker = threading.Thread(target=self._process, daemon=not blocking)
 		self.triggerStop = threading.Event()
 
 	def start(self) -> None:
@@ -62,8 +62,8 @@ class Scheduler:
 		intervalS: float,
 		callback: CallbackType,
 		immediate: bool = False,
-		args: typing.Optional[typing.Tuple[*Ts]] = None,
-		kwargs: typing.Optional[typing.Dict[str, typing.Any]] = None,
+		args: tuple[*Ts,] | None = None,
+		kwargs: dict[str, typing.Any] | None = None,
 	) -> None:
 		"""Add a new workload to be scheduled."""
 
@@ -104,11 +104,11 @@ class Scheduler:
 			if self.triggerStop.wait(timeout=timeoutS):
 				break
 
-			maybeStop: typing.Optional[bool] = None
+			maybeStop: bool | None = None
 			try:
 				maybeStop = workload.callback(*workload.args, **workload.kwargs)
-			except Exception as e:
-				logger.error(f"Workload '{workload.name}' failed with error: {str(e)}")
+			except Exception as e:  # noqa: BLE001
+				logger.error(f"Workload '{workload.name}' failed with error: {e!s}")
 			finally:
 				if not maybeStop:
 					self._enqueue(workload, time.time())

@@ -1,6 +1,6 @@
 import argparse
-import pathlib
 import json
+import pathlib
 import tarfile
 import tempfile
 

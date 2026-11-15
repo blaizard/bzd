@@ -19,7 +19,7 @@ class PairShortImpl(PairImpl, typing.Protocol):
 
 
 class Pair:
-	def __init__(self, first: str, second: str, impl: typing.Union[PairLongImpl, PairShortImpl]) -> None:
+	def __init__(self, first: str, second: str, impl: PairLongImpl | PairShortImpl) -> None:
 		self.first = first
 		self.second = second
 		self.impl = impl

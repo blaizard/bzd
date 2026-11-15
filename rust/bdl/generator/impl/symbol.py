@@ -1,11 +1,9 @@
 import typing
 
-
-from bdl.entities.impl.fragment.symbol import Symbol, Visitor
-from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bdl.entities.impl.fragment.fqn import FQN
+from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
+from bdl.entities.impl.fragment.symbol import Symbol, Visitor
 from bdl.entities.impl.types import Category
-
 from rust.bdl.generator.impl.builtins import builtins
 
 
@@ -21,7 +19,7 @@ class _VisitorRustSymbol(Visitor):
 		symbol: Symbol,
 		reference: bool,
 		nonConst: bool = False,
-		values: typing.Optional[typing.Sequence[str]] = None,
+		values: typing.Sequence[str] | None = None,
 	) -> None:
 		self.reference = reference
 		self.nonConst = nonConst
@@ -30,16 +28,16 @@ class _VisitorRustSymbol(Visitor):
 		super().__init__(symbol=symbol)
 
 	@property
-	def values(self) -> typing.Optional[typing.Sequence[str]]:
+	def values(self) -> typing.Sequence[str] | None:
 		if self.isTopLevel:
 			return self.values_
 		return None
 
-	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
+	def visitValue(self, value: str, comment: str | None) -> str:
 		self.symbol.error(message="No values are allowed within a type.")
 		return ""
 
-	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitSymbol(self, symbol: Symbol, nested: list[str], parameters: ParametersResolved) -> str:
 		"""Called when an element needs to be formatted."""
 
 		# Whether this type should be a reference or not.
@@ -49,7 +47,7 @@ class _VisitorRustSymbol(Visitor):
 			else (symbol.category == Category.interface or symbol.category == Category.component)
 		)
 
-		outputList: typing.List[str] = []
+		outputList: list[str] = []
 		output: str
 		for fqn in symbol.kinds:
 			if fqn in builtins:
@@ -89,7 +87,7 @@ class _VisitorRustSymbol(Visitor):
 
 
 def symbolRustToStr(
-	symbol: typing.Optional[Symbol],
+	symbol: Symbol | None,
 	reference: bool = False,
 	nonConst: bool = False,
 ) -> str:

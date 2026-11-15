@@ -1,7 +1,7 @@
-import unittest
-from unittest.mock import MagicMock, patch
 import threading
 import typing
+import unittest
+from unittest.mock import MagicMock, patch
 
 from apps.node_manager.private.client.command.lease import commandLease
 from bzd.http.client_mock import HttpClientMock

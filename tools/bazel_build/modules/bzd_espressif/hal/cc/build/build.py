@@ -1,14 +1,14 @@
+import argparse
+import dataclasses
+import json
 import os
 import pathlib
-import json
+import re
 import shutil
 import typing
-import argparse
-import re
-import dataclasses
 
+from bzd.command_extractor.gcc import Categories, CommandExtractorGcc, ItemLibrary
 from bzd.utils.run import localCommand
-from bzd.command_extractor.gcc import CommandExtractorGcc, Categories, ItemLibrary
 
 
 def copyFiles(output: pathlib.Path, paths: typing.Iterable[pathlib.Path]) -> None:
@@ -41,7 +41,7 @@ def copyDirectory(output: pathlib.Path, directory: pathlib.Path) -> None:
 @dataclasses.dataclass
 class CommandEntry:
 	destination: str
-	command: typing.Optional[str] = None
+	command: str | None = None
 
 	@property
 	def isDiscovered(self) -> bool:
@@ -54,8 +54,8 @@ def copyArtifacts(output: pathlib.Path, gcc: CommandExtractorGcc) -> None:
 	copyFileTree(output / "include", gcc.includeSearchPaths, r".*\.h")
 
 
-def envToDict(env: str) -> typing.Dict[str, str]:
-	result: typing.Dict[str, str] = {}
+def envToDict(env: str) -> dict[str, str]:
+	result: dict[str, str] = {}
 	for line in env.split("\n"):
 		key, value = line.split("=", maxsplit=1)
 		result[key.strip()] = value.strip()
@@ -109,9 +109,8 @@ if __name__ == "__main__":
 	outputSDK.mkdir(parents=True, exist_ok=True)
 
 	# Cleanup the project
-	if args.rebuild:
-		if project.is_dir():
-			shutil.rmtree(project)
+	if args.rebuild and project.is_dir():
+		shutil.rmtree(project)
 
 	# Copy the important files to the output dir.
 	copyDirectory(project, args.project)

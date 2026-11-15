@@ -1,7 +1,5 @@
 import typing
 
-from bzd.parser.parser import Parser as ParserBase
-from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
 from bzd.parser.fragments import (
 	Fragment,
 	FragmentNestedStart,
@@ -9,6 +7,8 @@ from bzd.parser.fragments import (
 	FragmentNewElement,
 	FragmentParentElement,
 )
+from bzd.parser.grammar import Grammar, GrammarItem, GrammarItemSpaces
+from bzd.parser.parser import Parser as ParserBase
 
 # Match all remaining content
 _regexprContent = r"(?P<content>((?!{[{%#]).)+?)(?={[{%#])"
@@ -43,7 +43,7 @@ def makeRegexprSymbol(name: str) -> str:
 	return r"(?P<" + name + r">([a-zA-Z_\-0-9]+))"
 
 
-def makeGrammarExpression(name: str, continuation: Grammar, attrs: typing.Dict[str, str] = {}) -> Grammar:
+def makeGrammarExpression(name: str, continuation: Grammar, attrs: dict[str, str] | None = None) -> Grammar:
 	"""Grammar for an expression type, which can be either an integer,
 	a boolean, a string or a symbol.
 	It supports arrays, pipes, callable and nested expressions.
@@ -100,9 +100,13 @@ def makeGrammarExpression(name: str, continuation: Grammar, attrs: typing.Dict[s
 
 	"""
 
+	if attrs is None:
+		attrs = {}
+	defaultAttrs: dict[str, str] = attrs
+
 	class ExpressionStart(FragmentNestedStart):
 		nestedName = name
-		default = attrs
+		default: typing.ClassVar[dict[str, str]] = defaultAttrs
 
 	return [
 		GrammarItem(
@@ -117,20 +121,20 @@ def makeGrammarExpressionImpl(continuation: Grammar) -> Grammar:
 
 	class SymbolStart(FragmentNestedStart):
 		nestedName = "symbol"
-		default = {"type": "symbol"}
+		default: typing.ClassVar[dict[str, str]] = {"type": "symbol"}
 
 	class CallableStart(FragmentNestedStart):
 		nestedName = "callable"
-		default = {"type": "callable"}
+		default: typing.ClassVar[dict[str, str]] = {"type": "callable"}
 
 	class ArrayStart(FragmentNestedStart):
 		nestedName = "array"
-		default = {"type": "array"}
+		default: typing.ClassVar[dict[str, str]] = {"type": "array"}
 
-	def makeFragmentNewElement(elementType: str) -> typing.Type[FragmentNewElement]:
+	def makeFragmentNewElement(elementType: str) -> type[FragmentNewElement]:
 
 		class Custom(FragmentNewElement):
-			default = {"type": elementType}
+			default: typing.ClassVar[dict[str, str]] = {"type": elementType}
 
 		return Custom
 
@@ -214,7 +218,7 @@ def makeGrammarContent() -> Grammar:
 	"""
 
 	class FragmentContent(FragmentNewElement):
-		default = {"category": "content"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "content"}
 
 	return [
 		# Note the order is important here.
@@ -241,7 +245,7 @@ def makeGrammarCommentStart(grammar: Grammar) -> Grammar:
 	]
 
 
-def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
+def makeGrammarSubstitutionStop(fragment: type[Fragment]) -> Grammar:
 	return [
 		GrammarItem(r"(?=}})", Fragment, [GrammarItem(r"}}", fragment)]),
 		GrammarItem(r"(?=-}})", Fragment, [GrammarItem(r"-}}\s*", fragment)]),
@@ -249,8 +253,8 @@ def makeGrammarSubstitutionStop(fragment: typing.Type[Fragment]) -> Grammar:
 
 
 def makeGrammarControlStop(
-	fragment: typing.Type[Fragment],
-	grammar: typing.Optional[typing.Union[Grammar, str]] = None,
+	fragment: type[Fragment],
+	grammar: Grammar | str | None = None,
 ) -> Grammar:
 	return [
 		GrammarItem(
@@ -262,7 +266,7 @@ def makeGrammarControlStop(
 	]
 
 
-def makeGrammarCommentStop(fragment: typing.Type[Fragment]) -> Grammar:
+def makeGrammarCommentStop(fragment: type[Fragment]) -> Grammar:
 	return [
 		GrammarItem(
 			r"(?=#})",
@@ -380,7 +384,7 @@ def makeGrammarControlElseIf() -> Grammar:
 	"""
 
 	class ElseFragment(FragmentNestedStart):
-		default = {"category": "else"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "else"}
 
 	return [
 		GrammarItem(
@@ -410,7 +414,7 @@ def makeGrammarControlMacro() -> Grammar:
 
 	class ArgumentStart(FragmentNestedStart):
 		nestedName = "argument"
-		default = {"category": "macro"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "macro"}
 
 	return makeGrammarControlStart(
 		r"macro",
@@ -448,7 +452,7 @@ def makeGrammarControlEnd() -> Grammar:
 	"""
 
 	class FragmentEndElement(FragmentNewElement):
-		default = {"category": "end"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "end"}
 
 	return [
 		GrammarItem(
@@ -509,7 +513,7 @@ def makeGrammarEscape() -> Grammar:
 	"""
 
 	class FragmentEscape(FragmentNewElement):
-		default = {"category": "escape"}
+		default: typing.ClassVar[dict[str, str]] = {"category": "escape"}
 
 	return [GrammarItem(_regexprEscape, FragmentEscape)]
 

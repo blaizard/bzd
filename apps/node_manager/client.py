@@ -2,15 +2,15 @@ import argparse
 import sys
 import typing
 
-from bzd.logging import Logger
-from bzd.logging.handler.stderr import LoggerHandlerStderr
-from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLan
-from apps.node_manager.private.client.command.suspend import commandSuspend
-from apps.node_manager.private.client.command.shutdown import commandShutdown
 from apps.node_manager.private.client.command.lease import commandLease
 from apps.node_manager.private.client.command.lease_period import commandLeasePeriod
+from apps.node_manager.private.client.command.shutdown import commandShutdown
+from apps.node_manager.private.client.command.suspend import commandSuspend
+from apps.node_manager.private.client.command.wake_on_lan import commandWakeOnLan
+from bzd.logging import Logger
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 
-ARGUMENTS: typing.Dict[str, typing.Dict[str, typing.Any]] = {
+ARGUMENTS: dict[str, dict[str, typing.Any]] = {
 	"broadcast": {
 		"default": "255.255.255.255",
 		"help": "The broadcast address to be used.",
@@ -48,12 +48,12 @@ ARGUMENTS: typing.Dict[str, typing.Dict[str, typing.Any]] = {
 
 
 def exceptionToString(exception: Exception) -> str:
-	lines = [f"{type(exception).__name__}: {str(exception)}"]
+	lines = [f"{type(exception).__name__}: {exception!s}"]
 	cause = exception.__cause__
 	count = 0
 	while cause:
 		count += 1
-		lines.append(f"{'  ' * count}-> Caused by {type(cause).__name__}: {str(cause)}")
+		lines.append(f"{'  ' * count}-> Caused by {type(cause).__name__}: {cause!s}")
 		cause = cause.__cause__
 		if count > 10:
 			lines.append("Too many nested exceptions, stopping here.")
@@ -65,7 +65,7 @@ def commandWoLLeasePeriod(
 	mac: str,
 	broadcast: str,
 	service: str,
-	wait: typing.List[str],
+	wait: list[str],
 	timeout: int,
 	server: str,
 	name: str,
@@ -78,30 +78,30 @@ def commandWoLLeasePeriod(
 			leaseId = commandLeasePeriod(server=server, name=name, ttl=ttl)
 			logger.info(f"Lease id={leaseId} secured for '{name}' for {ttl}s.")
 			return leaseId
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			logger.error(exceptionToString(e))
 
 		logger.info(f"Lease attempt {attempt} for '{name}' failed. Sending WOL...")
 		try:
 			commandWakeOnLan(mac=mac, broadcast=broadcast, service=service, wait=wait, timeout=timeout, logger=logger)
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			logger.error(exceptionToString(e))
 
-	raise Exception(f"Error: Could not secure lease for '{name}' after 3 attempts.")
+	raise RuntimeError(f"Error: Could not secure lease for '{name}' after 3 attempts.")
 
 
 def commandWoLLease(
 	mac: str,
 	broadcast: str,
 	service: str,
-	wait: typing.List[str],
+	wait: list[str],
 	timeout: int,
 	server: str,
 	name: str,
 	ttl: int,
-	command: typing.List[str],
+	command: list[str],
 	logger: Logger,
-	undefine: typing.Optional[typing.List[str]] = None,
+	undefine: list[str] | None = None,
 ) -> int:
 	leaseId = commandWoLLeasePeriod(
 		mac=mac,
@@ -126,7 +126,7 @@ def commandWoLLease(
 	)
 
 
-def setupArgs(parser: argparse.ArgumentParser, args: typing.List[str]) -> None:
+def setupArgs(parser: argparse.ArgumentParser, args: list[str]) -> None:
 	for arg in args:
 		assert arg in ARGUMENTS, f"Unknown argument '{arg}'."
 		parser.add_argument(
@@ -231,6 +231,6 @@ if __name__ == "__main__":
 			)
 		else:
 			assert False, f"Unknown command: '{args.command}'."
-	except Exception as e:
+	except Exception as e:  # noqa: BLE001
 		logger.error(exceptionToString(e))
 		sys.exit(1)

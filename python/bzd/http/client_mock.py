@@ -4,7 +4,7 @@ from bzd.http.client import HttpClient, HttpResponse
 
 
 class HttpResponseMock(HttpResponse):
-	def __init__(self, status: int, content: bytes, headers: typing.Dict[str, str]) -> None:
+	def __init__(self, status: int, content: bytes, headers: dict[str, str]) -> None:
 		self._status = status
 		self._content = content
 		self._headers = headers
@@ -17,7 +17,7 @@ class HttpResponseMock(HttpResponse):
 	def content(self) -> bytes:
 		return self._content
 
-	def getHeader(self, name: str) -> typing.Optional[str]:
+	def getHeader(self, name: str) -> str | None:
 		return self._headers.get(name, None)
 
 
@@ -29,8 +29,8 @@ class HttpClientMock:
 		self,
 		method: str,
 		url: str,
-		body: typing.Optional[bytes],
-		headers: typing.Dict[str, str],
+		body: bytes | None,
+		headers: dict[str, str],
 		timeoutS: int,
 	) -> HttpResponse:
 		response = self.callback(method=method, url=url, body=body, headers=headers, timeoutS=timeoutS)
@@ -38,11 +38,11 @@ class HttpClientMock:
 
 	@staticmethod
 	def makeResponse(
-		response: typing.Optional[typing.Union[str, bytes, HttpResponse]],
+		response: str | bytes | HttpResponse | None,
 	) -> HttpResponseMock:
 		status = 200
 		content = b""
-		headers: typing.Dict[str, str] = {}
+		headers: dict[str, str] = {}
 
 		if isinstance(response, HttpResponseMock):
 			return response

@@ -1,9 +1,9 @@
 import argparse
 import json
-import pathlib
-import tempfile
-import subprocess
 import os
+import pathlib
+import subprocess
+import tempfile
 import typing
 
 _compressionToArgs = {
@@ -14,7 +14,7 @@ _compressionToArgs = {
 }
 
 
-def _escapeMtreeValue(value: typing.Union[str, pathlib.Path]) -> str:
+def _escapeMtreeValue(value: str | pathlib.Path) -> str:
 	"""Escape a value to be used in an mtree file.
 
 	Mtree fields are whitespace-delimited, therefore special characters must be escaped.
@@ -27,7 +27,7 @@ def _escapeMtreeValue(value: typing.Union[str, pathlib.Path]) -> str:
 	"""
 
 	return "".join(
-		chr(byte) if 0x21 <= byte < 0x7F and byte not in (ord("\\"), ord("#")) else "\\{:03o}".format(byte)
+		chr(byte) if 0x21 <= byte < 0x7F and byte not in (ord("\\"), ord("#")) else f"\\{byte:03o}"
 		for byte in os.fsencode(value)
 	)
 
@@ -36,8 +36,8 @@ class Layers:
 	"""Represents the layers of the bundle, it keeps track of all layers and the files already added."""
 
 	def __init__(self) -> None:
-		self.all: typing.Set[pathlib.Path] = set([pathlib.Path()])
-		self.current: typing.Set[pathlib.Path] = set([pathlib.Path()])
+		self.all: set[pathlib.Path] = {pathlib.Path()}
+		self.current: set[pathlib.Path] = {pathlib.Path()}
 
 	def __contains__(self, path: pathlib.Path) -> bool:
 		"""Check if a path is already written."""
@@ -53,7 +53,7 @@ class Layers:
 		"""Create a new layer."""
 
 		self.all.update(self.current)
-		self.current = set([pathlib.Path()])
+		self.current = {pathlib.Path()}
 
 	def add(self, path: pathlib.Path) -> None:
 		"""Add a path to the current layer."""
@@ -113,18 +113,18 @@ class Mtree:
 
 class TreeBuilder:
 	def __init__(self) -> None:
-		self.mtree: typing.Optional[Mtree] = None
-		self.entries: typing.Dict[pathlib.Path, str] = {}
-		self.files: typing.List[pathlib.Path] = []
-		self.directories: typing.List[pathlib.Path] = []
-		self.links: typing.Dict[pathlib.Path, pathlib.Path] = {}
+		self.mtree: Mtree | None = None
+		self.entries: dict[pathlib.Path, str] = {}
+		self.files: list[pathlib.Path] = []
+		self.directories: list[pathlib.Path] = []
+		self.links: dict[pathlib.Path, pathlib.Path] = {}
 
 	def _addEntry(self, path: pathlib.Path, data: str) -> bool:
 		"""Register the type of a path, return whether it was added."""
 
 		if path in self.entries:
 			if self.entries[path] != data:
-				raise Exception(
+				raise RuntimeError(
 					f"Duplicate entry for path '{path}' with different type, original entry: {self.entries[path]}, new entry: {data}"
 				)
 			return False
@@ -160,7 +160,7 @@ class TreeBuilder:
 	@staticmethod
 	def _listDirectory(
 		root: pathlib.Path,
-	) -> typing.Iterator[typing.Tuple[typing.List[pathlib.Path], typing.List[pathlib.Path], typing.List[pathlib.Path]]]:
+	) -> typing.Iterator[tuple[list[pathlib.Path], list[pathlib.Path], list[pathlib.Path]]]:
 		"""List the content of a directory, including and preserving symlinks.
 
 		The paths returned are relative to the root.
@@ -173,9 +173,9 @@ class TreeBuilder:
 			fileNames.sort()
 
 			relativePath = pathlib.Path(dirPath).relative_to(root)
-			symlinks: typing.List[pathlib.Path] = []
-			directories: typing.List[pathlib.Path] = []
-			files: typing.List[pathlib.Path] = []
+			symlinks: list[pathlib.Path] = []
+			directories: list[pathlib.Path] = []
+			files: list[pathlib.Path] = []
 			for name in dirNames:
 				current = relativePath / name
 				(symlinks if (root / current).is_symlink() else directories).append(current)
@@ -213,7 +213,7 @@ class TreeBuilder:
 		return mtree.toBytes()
 
 
-def normalize(path: typing.Union[str, pathlib.Path]) -> pathlib.Path:
+def normalize(path: str | pathlib.Path) -> pathlib.Path:
 	"""Normalize a path by removing redundant parts."""
 
 	return pathlib.Path(os.path.normpath(path))
@@ -267,7 +267,7 @@ if __name__ == "__main__":
 				# Dangling symlink, such as a declare_symlink() file, it is handled through the symlink entries.
 				continue
 			else:
-				raise Exception(f"Path '{path}' is neither a file, a directory or a symlink.")
+				raise RuntimeError(f"Path '{path}' is neither a file, a directory or a symlink.")
 
 		# Process the symlinks, this will add the link entries to the mtree.
 		for path, info in layer["symlinks"].items():
@@ -282,7 +282,7 @@ if __name__ == "__main__":
 				# tree, resolve the actual target at execution time.
 				builder.addLink(symlink, target.readlink())
 			else:
-				raise Exception(f"Unsupported symlink type '{info['type']}' for path '{path}'.")
+				raise RuntimeError(f"Unsupported symlink type '{info['type']}' for path '{path}'.")
 
 		with tempfile.NamedTemporaryFile() as mtreeFile:
 			mtreeBytes = builder.generate(Mtree(layers))

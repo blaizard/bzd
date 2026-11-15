@@ -1,13 +1,11 @@
-import typing
-
 from bzd.validation.schema import Constraint, ProcessedSchema, TypeContext
-from bdl.entities.impl.types import Category
 
 from bdl.contracts.traits import ContractTraits, Role
+from bdl.entities.impl.types import Category
 
 
 class ShutdownConstraint_(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 		self.validate(schema=["string"] * len(args), values=args)
 
 	def check(self, context: TypeContext) -> None:

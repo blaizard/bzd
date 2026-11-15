@@ -1,16 +1,16 @@
 import argparse
 import pathlib
-import typing
 import re
+import typing
 
 from bzd_sanitizer.worker import worker
 
 
 def workload(
-	args: typing.Tuple[pathlib.Path, pathlib.Path, bool, typing.Pattern[str]],
+	args: tuple[pathlib.Path, pathlib.Path, bool, typing.Pattern[str]],
 	stdout: typing.TextIO,
 ) -> bool:
-	workspace, path, check, regexpr = args
+	_workspace, path, _check, regexpr = args
 
 	if not regexpr.match(str(path)):
 		stdout.write(f"This path does not match the naming convention '{regexpr}'.\n")

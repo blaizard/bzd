@@ -1,32 +1,32 @@
-import pathlib
-import typing
 import argparse
 import os
+import pathlib
+import shutil
 import sys
 import time
-import shutil
+import typing
 
-from apps.bootloader.binary import Binary, StablePolicy, ExceptionBinaryAbort
+from apps.artifacts.api.python.node.node import Node
+from apps.artifacts.api.python.release.mock import ReleaseMock
+from apps.artifacts.api.python.release.release import Release
+from apps.bootloader.binary import Binary, ExceptionBinaryAbort, StablePolicy
 from apps.bootloader.config_python import STABLE_VERSION, application, updatePath, updatePolicy
 from apps.bootloader.utils import RollingNamedTemporaryFile
-from apps.artifacts.api.python.release.release import Release
-from apps.artifacts.api.python.release.mock import ReleaseMock
-from apps.artifacts.api.python.node.node import Node
-from bzd.utils.scheduler import Scheduler
 from bzd.logging import Logger
-from bzd.logging.handler.in_memory import LoggerHandlerInMemory
-from bzd.logging.handler.stub import LoggerHandlerStub
 from bzd.logging.handler.async_buffered import LoggerHandlerAsyncBuffered
+from bzd.logging.handler.in_memory import LoggerHandlerInMemory
 from bzd.logging.handler.stderr import LoggerHandlerStderr
+from bzd.logging.handler.stub import LoggerHandlerStub
+from bzd.utils.scheduler import Scheduler
 
 
 class Context:
-	def __init__(self, args: typing.List[str], logger: Logger) -> None:
+	def __init__(self, args: list[str], logger: Logger) -> None:
 		self.args = args
 		self.values, self.rest = Context.parse(args)
 		self.running = True
-		self.newBinary: typing.Optional[pathlib.Path] = None
-		self.updateIgnoreOverride: typing.Optional[str] = None
+		self.newBinary: pathlib.Path | None = None
+		self.updateIgnoreOverride: str | None = None
 		self.logger = logger
 		self.release = Release(uid=self.uid, token=self.token)
 		self.node = Node(uid=self.uid, token=self.token)
@@ -34,8 +34,8 @@ class Context:
 
 	@staticmethod
 	def parse(
-		args: typing.List[str],
-	) -> typing.Tuple[argparse.Namespace, typing.List[str]]:
+		args: list[str],
+	) -> tuple[argparse.Namespace, list[str]]:
 		parser = argparse.ArgumentParser(description="Bootloader.", add_help=False)
 		parser.add_argument("--bootloader-help", action="help")
 		parser.add_argument(
@@ -100,31 +100,31 @@ class Context:
 		return self.values.bootloader_update_interval or 3600
 
 	@property
-	def updatePath(self) -> typing.Optional[pathlib.Path]:
-		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_update_path) or pathlib.Path(updatePath())
+	def updatePath(self) -> pathlib.Path | None:
+		return typing.cast(pathlib.Path | None, self.values.bootloader_update_path) or pathlib.Path(updatePath())
 
 	@property
-	def updateIgnore(self) -> typing.Optional[str]:
-		return self.updateIgnoreOverride or typing.cast(typing.Optional[str], self.values.bootloader_update_ignore)
+	def updateIgnore(self) -> str | None:
+		return self.updateIgnoreOverride or typing.cast(str | None, self.values.bootloader_update_ignore)
 
 	@property
-	def stablePath(self) -> typing.Optional[pathlib.Path]:
-		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_stable_path)
+	def stablePath(self) -> pathlib.Path | None:
+		return typing.cast(pathlib.Path | None, self.values.bootloader_stable_path)
 
 	@property
-	def selfPath(self) -> typing.Optional[pathlib.Path]:
-		return typing.cast(typing.Optional[pathlib.Path], self.values.bootloader_self_path)
+	def selfPath(self) -> pathlib.Path | None:
+		return typing.cast(pathlib.Path | None, self.values.bootloader_self_path)
 
 	@property
-	def uid(self) -> typing.Optional[str]:
-		return typing.cast(typing.Optional[str], self.values.bootloader_uid)
+	def uid(self) -> str | None:
+		return typing.cast(str | None, self.values.bootloader_uid)
 
 	@property
-	def token(self) -> typing.Optional[str]:
-		return typing.cast(typing.Optional[str], self.values.bootloader_token)
+	def token(self) -> str | None:
+		return typing.cast(str | None, self.values.bootloader_token)
 
 	@property
-	def env(self) -> typing.Dict[str, str]:
+	def env(self) -> dict[str, str]:
 		env = dict(os.environ)
 		if self.uid:
 			env["BZD_NODE_UID"] = self.uid
@@ -132,7 +132,7 @@ class Context:
 			env["BZD_NODE_TOKEN"] = self.token
 		return env
 
-	def argsForBinary(self, binary: pathlib.Path) -> typing.List[str]:
+	def argsForBinary(self, binary: pathlib.Path) -> list[str]:
 		"""Recreate the command line."""
 
 		args = ["--bootloader-self-path", str(binary)]
@@ -181,7 +181,7 @@ class Context:
 	def setUpdateIgnore(self, ignore: str) -> None:
 		self.updateIgnoreOverride = ignore
 
-	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
+	def switchProcessToBinary(self, path: pathlib.Path, args: list[str]) -> None:
 		assert path.exists(), f"Path '{path}' does not exists."
 		assert path.is_file(), f"Path '{path}' does not point to a file."
 		assert os.access(path, os.X_OK), f"File '{path}' does not have execution permissions."
@@ -189,20 +189,20 @@ class Context:
 
 
 class ContextCustomRelease(Context):
-	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
+	def __init__(self, args: list[str], logger: Logger, release: typing.Any = None) -> None:
 		super().__init__(args=args, logger=logger)
 		self.release = typing.cast(Release, ReleaseMock(data=release))
 
 
 class ContextForTest(ContextCustomRelease):
-	def __init__(self, args: typing.List[str], logger: Logger, release: typing.Any = None) -> None:
+	def __init__(self, args: list[str], logger: Logger, release: typing.Any = None) -> None:
 		super().__init__(args=args, logger=logger, release=release)
-		self.stableBinary: typing.Optional[pathlib.Path] = None
+		self.stableBinary: pathlib.Path | None = None
 
 	def setStableBinary(self, path: pathlib.Path, stablePath: pathlib.Path) -> None:
 		self.stableBinary = path
 
-	def switchProcessToBinary(self, path: pathlib.Path, args: typing.List[str]) -> None:
+	def switchProcessToBinary(self, path: pathlib.Path, args: list[str]) -> None:
 		pass
 
 
@@ -226,7 +226,7 @@ def autoUpdateApplication(context: Context, path: pathlib.Path, uid: str) -> Non
 		binary = Binary(binary=updatePath, logger=Logger("binary").handlers(LoggerHandlerStub()))
 		try:
 			binary.run()
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			context.logger.error(f"Validation of the update ({maybeUpdate.name}) failed with error: {e}")
 			context.logger.info("Keeping the current application.")
 		else:
@@ -239,7 +239,7 @@ def updateInfo(node: Node) -> None:
 
 	try:
 		node.publish(data={"version": {"bootloader": STABLE_VERSION()}})
-	except Exception:
+	except Exception:  # noqa: BLE001, S110
 		# Ignore any errors, we don't want to crash if something is wrong.
 		pass
 
@@ -304,7 +304,7 @@ def bootloader(context: Context) -> int:
 		except ExceptionBinaryAbort:
 			context.logger.info("Application aborted.")
 			continue
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			context.logger.error(str(e))
 			if context.stablePath and context.stablePath != context.selfPath:
 				context.logger.info("Rolling back to a stable binary.")

@@ -60,7 +60,7 @@ class RollingNamedTemporaryFile:
 
 			return path
 
-	def all(self) -> typing.List[pathlib.Path]:
+	def all(self) -> list[pathlib.Path]:
 		"""Get all the files sorted by modification date, the newest the first."""
 
 		allFiles = self.temporaryDirectory.glob("tmp.*")

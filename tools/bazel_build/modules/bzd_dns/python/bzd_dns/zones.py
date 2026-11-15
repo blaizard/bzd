@@ -2,12 +2,12 @@ import typing
 
 from bzd_dns.record import Record, RecordsJson
 
-ZonesJson = typing.Dict[str, typing.List[RecordsJson]]
+ZonesJson = dict[str, list[RecordsJson]]
 
 
 class Zones:
 	def __init__(self) -> None:
-		self.data: typing.Dict[str, typing.List[Record]] = {}
+		self.data: dict[str, list[Record]] = {}
 
 	def add(self, data: ZonesJson) -> None:
 		"""Convert or merge a json input into a zones structure."""
@@ -24,6 +24,5 @@ class Zones:
 
 		return {subdomain: [record.data for record in records] for subdomain, records in self.data.items()}
 
-	def items(self) -> typing.Iterator[typing.Tuple[str, typing.List[Record]]]:
-		for subdomain, records in self.data.items():
-			yield subdomain, records
+	def items(self) -> typing.Iterator[tuple[str, list[Record]]]:
+		yield from self.data.items()

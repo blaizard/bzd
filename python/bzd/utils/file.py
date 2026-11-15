@@ -1,6 +1,6 @@
-import typing
 import pathlib
 import time
+import typing
 
 
 class Watcher:

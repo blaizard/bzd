@@ -1,4 +1,5 @@
 import typing
+
 from bzd.parser.element import Element
 from bzd.template.builtins import Builtins
 
@@ -7,7 +8,7 @@ SubstitutionsType = typing.Any
 
 class SubstitutionsAccessor:
 	def __init__(self, *args: SubstitutionsType) -> None:
-		self.substitutionsList: typing.List[SubstitutionsType] = [*args]
+		self.substitutionsList: list[SubstitutionsType] = [*args]
 
 	def __getitem__(self, key: str) -> typing.Any:
 		for substitutions in self.substitutionsList:
@@ -15,15 +16,18 @@ class SubstitutionsAccessor:
 				return getattr(substitutions, key)
 			elif hasattr(substitutions, "__contains__") and key in substitutions:
 				return substitutions[key]
-		raise KeyError("Key '{}' does not exists.".format(key))
+		raise KeyError(f"Key '{key}' does not exists.")
 
 	def __contains__(self, key: str) -> bool:
 		for substitutions in self.substitutionsList:
-			if hasattr(substitutions, key):
-				return True
-			elif hasattr(substitutions, "__contains__") and key in substitutions:
+			if hasattr(substitutions, key) or hasattr(substitutions, "__contains__") and key in substitutions:
 				return True
 		return False
+
+	def get(self, key: str, default: typing.Any = None) -> typing.Any:
+		if key in self:
+			return self[key]
+		return default
 
 	def __repr__(self) -> str:
 		content = "\n".join(["\t" + str(substitutions).split("\n")[0] for substitutions in self.substitutionsList])
@@ -33,7 +37,7 @@ class SubstitutionsAccessor:
 class SubstitutionWrapper:
 	def __init__(self, substitutions: SubstitutionsAccessor) -> None:
 		self.substitutions = substitutions
-		self.ext: typing.Dict[str, typing.List[typing.Any]] = {}
+		self.ext: dict[str, list[typing.Any]] = {}
 
 	def register(self, element: Element, key: str, value: typing.Any) -> None:
 		if key not in self.ext:
@@ -67,6 +71,11 @@ class SubstitutionWrapper:
 			return True
 		return bool(self.ext.get(key))
 
+	def get(self, key: str, default: typing.Any = None) -> typing.Any:
+		if key in self:
+			return self[key]
+		return default
+
 	def __repr__(self) -> str:
 		content = "\n".join([f"\t{substitution}" for substitution in str(self.substitutions).split("\n")])
-		return f"<SubstitutionWrapper>\n{content}\n\t<Extensions {', '.join([k for k in self.ext.keys()])}/>\n</SubstitutionWrapper>"
+		return f"<SubstitutionWrapper>\n{content}\n\t<Extensions {', '.join([k for k in self.ext])}/>\n</SubstitutionWrapper>"

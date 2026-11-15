@@ -1,7 +1,7 @@
 import unittest
 
-from bzd.parser.tests.support.parser import TestParser
 from bzd.parser.element import Sequence
+from bzd.parser.tests.support.parser import TestParser
 
 
 class TestRun(unittest.TestCase):

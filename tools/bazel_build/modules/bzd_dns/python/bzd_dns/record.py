@@ -7,8 +7,8 @@ class Record:
 	"""Base class for records."""
 
 	multiple = False
-	mandatory: typing.List[str] = []
-	optional: typing.List[str] = []
+	mandatory: typing.ClassVar[list[str]] = []
+	optional: typing.ClassVar[list[str]] = []
 
 	def __init__(self, data: RecordsJson) -> None:
 		self.data = data
@@ -22,7 +22,7 @@ class Record:
 		for attribute in self.optional + ["ttl"]:
 			checked.add(attribute)
 		# Check that all attributes have been processed
-		for attribute in self.data.keys():
+		for attribute in self.data:
 			assert attribute in checked, f"The attribute '{attribute}' is not valid for {self}."
 
 	@staticmethod
@@ -43,9 +43,9 @@ class Record:
 			return self.data[attribute]
 		return defaultValue
 
-	def merge(self, subdomain: str, zone: typing.List["Record"]) -> None:
+	def merge(self, subdomain: str, zone: list["Record"]) -> None:
 		if not self.multiple:
-			assert not any([isinstance(record, type(self)) for record in zone]), (
+			assert not any(isinstance(record, type(self)) for record in zone), (
 				f"There can be only a single record {self} for the subdomain '{subdomain}'."
 			)
 		zone.append(self)
@@ -64,25 +64,25 @@ class Record:
 class RecordA(Record):
 	"""A records are for IPv4 addresses only and tell a request where your domain should direct to."""
 
-	mandatory = ["value"]
+	mandatory: typing.ClassVar[list[str]] = ["value"]
 
 
 class RecordAAAA(Record):
 	"""AAAA records are for IPv6 addresses only and tell a request where your domain should direct to."""
 
-	mandatory = ["value"]
+	mandatory: typing.ClassVar[list[str]] = ["value"]
 
 
 class RecordCNAME(Record):
 	"""CNAME records act as an alias by mapping a hostname to another hostname."""
 
-	mandatory = ["value"]
+	mandatory: typing.ClassVar[list[str]] = ["value"]
 
 
 class RecordTXT(Record):
 	"""TXT records are used to associate a string of text with a hostname. These are primarily used for verification."""
 
-	mandatory = ["value"]
+	mandatory: typing.ClassVar[list[str]] = ["value"]
 
 
 class RecordMX(Record):
@@ -91,4 +91,4 @@ class RecordMX(Record):
 	"""
 
 	multiple = True
-	mandatory = ["value", "priority"]
+	mandatory: typing.ClassVar[list[str]] = ["value", "priority"]

@@ -1,24 +1,24 @@
 import argparse
+import multiprocessing
 import pathlib
+import shutil
 import tempfile
 import typing
-import shutil
-import multiprocessing
 
 from apps.ebook.calibre.remove_drm import RemoveDRM
-from apps.ebook.epub.epub import EPub
-from apps.ebook.comics.cbz import Cbz
 from apps.ebook.comics.cbr import Cbr
-from apps.ebook.pdf.pdf_to_images import PdfToImages
-from apps.ebook.pillow.images_to_pdf import ImagesToPdf
-from apps.ebook.pillow.images_to_cover import ImagesToCover
-from apps.ebook.pillow.images_converter import ImagesConverter
+from apps.ebook.comics.cbz import Cbz
+from apps.ebook.epub.epub import EPub
 from apps.ebook.flow import (
 	ActionInterface,
-	FlowRegistry,
-	FlowEnum,
 	FlowContext,
+	FlowEnum,
+	FlowRegistry,
 )
+from apps.ebook.pdf.pdf_to_images import PdfToImages
+from apps.ebook.pillow.images_converter import ImagesConverter
+from apps.ebook.pillow.images_to_cover import ImagesToCover
+from apps.ebook.pillow.images_to_pdf import ImagesToPdf
 from apps.ebook.providers import (
 	ProviderEbook,
 	ProviderEbookMetadata,
@@ -27,16 +27,16 @@ from apps.ebook.utils import sizeToString
 
 
 class FlowSchemaPdf(FlowEnum):
-	epub = ["removeDRM", "epub", "imagesConverter", "imagesToPdf"]
-	cbz = ["cbz", "imagesConverter", "imagesToPdf"]
-	cbr = ["cbr", "imagesConverter", "imagesToPdf"]
-	pdf = ["pdfToImages", "imagesConverter", "imagesToPdf"]
-	auto = ["discover"]
+	epub = ("removeDRM", "epub", "imagesConverter", "imagesToPdf")
+	cbz = ("cbz", "imagesConverter", "imagesToPdf")
+	cbr = ("cbr", "imagesConverter", "imagesToPdf")
+	pdf = ("pdfToImages", "imagesConverter", "imagesToPdf")
+	auto = ("discover",)
 
 
 class FlowSchemaCover(FlowEnum):
-	pdf = ["pdfToCoverImage", "imagesToCover"]
-	auto = ["discover"]
+	pdf = ("pdfToCoverImage", "imagesToCover")
+	auto = ("discover",)
 
 
 flowSchemas = {
@@ -51,12 +51,12 @@ class Discover(ActionInterface):
 	ProviderInput = ProviderEbook
 	ProviderOutput = ProviderEbook
 
-	def __init__(self, ebookFormat: typing.Optional[str]) -> None:
+	def __init__(self, ebookFormat: str | None) -> None:
 		self.ebookFormat = ebookFormat
 
 	def process(
 		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderEbook, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderEbook, FlowEnum | None]]:
 
 		ebookFormat = self.ebookFormat or provider.ebook.suffix.removeprefix(".").lower()
 		print(f"Ebook of format '{ebookFormat}'.")
@@ -64,7 +64,7 @@ class Discover(ActionInterface):
 			return [(provider, getattr(context.schema, ebookFormat))]
 
 		assert False, (
-			f"Unsupported ebook extension '.{ebookFormat}', only the following are supported for this flow: {str(', '.join([value.name for value in context.schema]))}."
+			f"Unsupported ebook extension '.{ebookFormat}', only the following are supported for this flow: {', '.join([value.name for value in context.schema])!s}."
 		)
 
 
@@ -186,10 +186,9 @@ if __name__ == "__main__":
 		"discover": Discover(ebookFormat=args.format),
 	}
 
-	if args.clean:
-		if args.sandbox is not None and args.sandbox.exists():
-			print(f"Cleaning sandbox {args.sandbox}.")
-			shutil.rmtree(args.sandbox)
+	if args.clean and args.sandbox is not None and args.sandbox.exists():
+		print(f"Cleaning sandbox {args.sandbox}.")
+		shutil.rmtree(args.sandbox)
 
 	assert args.ebook.exists(), f"File or directory '{args.ebook}' does not exists."
 

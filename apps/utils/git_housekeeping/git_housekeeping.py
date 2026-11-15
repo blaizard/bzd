@@ -2,7 +2,6 @@ import argparse
 import datetime
 import os
 import re
-import typing
 
 from apps.utils.git_housekeeping.backend.gitea import Gitea
 from bzd.logging import Logger
@@ -55,7 +54,7 @@ def isMergedInto(mainBranch: str, branch: str) -> bool:
 	raise RuntimeError(f"Failed to check if branch '{branch}' is merged into '{mainBranch}'.")
 
 
-def getRemoteBranches() -> typing.List[typing.Tuple[str, int]]:
+def getRemoteBranches() -> list[tuple[str, int]]:
 	"""Read the remote branch names and their last commit timestamps.
 
 	Returns:
@@ -65,7 +64,7 @@ def getRemoteBranches() -> typing.List[typing.Tuple[str, int]]:
 	result = localCommand(
 		["git", "for-each-ref", "--format=%(refname)|%(committerdate:unix)", "refs/remotes/origin/"]
 	).getStdout()
-	branches: typing.List[typing.Tuple[str, int]] = []
+	branches: list[tuple[str, int]] = []
 	for line in result.splitlines():
 		ref, commitTimestampStr = line.split("|", 1)
 		branch = ref[len("refs/remotes/origin/") :]
@@ -112,7 +111,7 @@ def main() -> None:
 	parser.add_argument(
 		"--days-old",
 		type=int,
-		default=int(os.environ.get("DAYS_OLD", 60)),
+		default=int(os.environ.get("DAYS_OLD", "60")),
 		help="The number of days after which a branch is considered stale.",
 	)
 	parser.add_argument(

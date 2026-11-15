@@ -1,26 +1,24 @@
 import argparse
 import json
 import pathlib
-import typing
-import sys
 import re
+import sys
 import time
 import traceback
+import typing
 from contextlib import contextmanager
 from dataclasses import dataclass
 
 from bdl.generators.json.ast.ast import Ast
 from bzd.template.template import Template
-from bzd_oci.run import ociPush
 from bzd.utils.result import Result
-
+from bzd_oci.run import ociPush
+from targets.docker.config_nodejs import STABLE_VERSION, configKey
 from targets.docker.deployment.compose import DeploymentDockerCompose
 from targets.docker.deployment.traefik import DeploymentDockerTraefik
-
-from targets.docker.transport.ssh import TransportSSH
-from targets.docker.registry import DockerRegistry
 from targets.docker.docker_compose import DockerCompose
-from targets.docker.config_nodejs import STABLE_VERSION, configKey
+from targets.docker.registry import DockerRegistry
+from targets.docker.transport.ssh import TransportSSH
 
 # Maximum time in seconds to wait for a deploy or rollback command to complete before failing.
 COMMAND_TIMEOUT_S = 600
@@ -54,11 +52,11 @@ class CommonParameters:
 
 
 def getAllImagesFromDockerComposeFiles(
-	handle: typing.Any, dockerComposeFiles: typing.List[pathlib.Path]
-) -> typing.Dict[str, typing.Set[str]]:
+	handle: typing.Any, dockerComposeFiles: list[pathlib.Path]
+) -> dict[str, set[str]]:
 	"""Gather all images referred to in the docker compose files."""
 
-	images: typing.Dict[str, typing.Set[str]] = {}
+	images: dict[str, set[str]] = {}
 	for path in dockerComposeFiles:
 		result = handle.command(["docker", "compose", "--file", str(path), "config", "--format", "json"])
 		output = json.loads(result.getStdout())
@@ -77,9 +75,9 @@ class ContainerState:
 	"""Container state information."""
 
 	# Result of socker inspect
-	inspect: typing.Dict[str, typing.Any]
+	inspect: dict[str, typing.Any]
 
-	def isHealthy(self) -> typing.Optional[Result[bool, str]]:
+	def isHealthy(self) -> Result[bool, str] | None:
 		"""Check if the container is healthy.
 
 		A container is considered healthy if it is currently running, regardless of past restarts.
@@ -114,7 +112,7 @@ class ContainerState:
 
 def jsonArrayOrStreamToItems(
 	string: str,
-) -> typing.Iterator[typing.Dict[str, typing.Any]]:
+) -> typing.Iterator[dict[str, typing.Any]]:
 	"""Convert a json array or stream into items."""
 
 	for line in string.split("\n"):
@@ -123,13 +121,12 @@ def jsonArrayOrStreamToItems(
 			continue
 		data = json.loads(line)
 		if isinstance(data, list):
-			for item in data:
-				yield item
+			yield from data
 		else:
 			yield data
 
 
-def getStatesFromDockerCompose(handle: typing.Any, dockerComposeFile: pathlib.Path) -> typing.Dict[str, ContainerState]:
+def getStatesFromDockerCompose(handle: typing.Any, dockerComposeFile: pathlib.Path) -> dict[str, ContainerState]:
 	"""Get the status of the containers of a docker compose file."""
 
 	result = handle.command(
@@ -143,7 +140,7 @@ def getStatesFromDockerCompose(handle: typing.Any, dockerComposeFile: pathlib.Pa
 			"json",
 		]
 	)
-	statuses: typing.Dict[str, ContainerState] = {}
+	statuses: dict[str, ContainerState] = {}
 
 	# docker-compose ps --format json can return either a json array or a stream of json objects.
 	# depending on the version of docker-compose.
@@ -196,7 +193,7 @@ def usingDockerRegistry(handle: typing.Any, dockerComposeFile: pathlib.Path) -> 
 	try:
 		yield
 
-	except Exception:
+	except Exception:  # noqa: BLE001
 		print("==== ERROR ====", flush=True)
 		traceback.print_exc()
 		sys.stderr.flush()
@@ -222,7 +219,7 @@ def rollbackUnhealthyContainer(
 	directory: pathlib.Path,
 	name: str,
 	state: ContainerState,
-	error: typing.Optional[str] = None,
+	error: str | None = None,
 ) -> None:
 	"""Report an unhealthy container, roll back the application and exit."""
 
@@ -284,7 +281,7 @@ if __name__ == "__main__":
 		transport = TransportSSH(connection)
 
 	else:
-		raise Exception(f"Unknown transport type for '{args.transport}'.")
+		raise RuntimeError(f"Unknown transport type for '{args.transport}'.")
 
 	with transport.session() as handle:
 		handle.command(["mkdir", "-p", str(applicationsDirectory)])
@@ -347,7 +344,7 @@ if __name__ == "__main__":
 				handle.command(["rm", "-rfd", str(directory)])
 
 			# Start applications
-			allDockerComposeFiles: typing.List[pathlib.Path] = []
+			allDockerComposeFiles: list[pathlib.Path] = []
 			for application, content in dockerCompose.items():
 				print(f"==== Application {application} ====", flush=True)
 
@@ -454,7 +451,7 @@ if __name__ == "__main__":
 				allImages = dockerRegistry.getImages()
 
 				# Only keep unused image tags.
-				usedDigests: typing.Set[str] = set()
+				usedDigests: set[str] = set()
 				for repository, tags in usedImages.items():
 					if repository in allImages:
 						for tag in tags:
@@ -464,7 +461,7 @@ if __name__ == "__main__":
 								print(f"- Keeping image {repository}:{tag}", flush=True)
 
 				# Multiple tags can reference the same manifest digest.
-				removedDigests: typing.Set[str] = set()
+				removedDigests: set[str] = set()
 				for repository, tagsDigest in allImages.items():
 					for tag, digest in tagsDigest.items():
 						# Skip digests still referenced by a kept tag.

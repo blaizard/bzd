@@ -1,5 +1,6 @@
 import unittest
-from bzd.utils.dict import updateDeep, UpdatePolicy
+
+from bzd.utils.dict import UpdatePolicy, updateDeep
 
 
 class TestRun(unittest.TestCase):

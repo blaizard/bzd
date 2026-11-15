@@ -1,15 +1,14 @@
-import typing
 import enum
+import typing
 
-
-from bdl.visitor import Group
-from bdl.visitors.symbol_map import SymbolMap
-from bdl.visitors.composition.entities import Entities
-from bdl.visitors.composition.components import Context, ExpressionEntry
-from bdl.object import Object
 from bdl.entities.impl.entity import Entity
 from bdl.entities.impl.expression import Expression
 from bdl.entities.impl.types import Category
+from bdl.object import Object
+from bdl.visitor import Group
+from bdl.visitors.composition.components import Context, ExpressionEntry
+from bdl.visitors.composition.entities import Entities
+from bdl.visitors.symbol_map import SymbolMap
 
 
 class AsyncType(enum.Enum):
@@ -26,23 +25,23 @@ class CompositionView:
 		self.contexts = {context for context in self.composition.contexts if context.target == target}
 
 	@property
-	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
+	def registry(self) -> dict[Context, dict[str, ExpressionEntry]]:
 		return {context: data for context, data in self.composition.registry.items() if context in self.contexts}
 
 	@property
-	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def services(self) -> dict[Context, list[ExpressionEntry]]:
 		return {context: data for context, data in self.composition.services.items() if context in self.contexts}
 
 	@property
-	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def workloads(self) -> dict[Context, list[ExpressionEntry]]:
 		return {context: data for context, data in self.composition.workloads.items() if context in self.contexts}
 
 	@property
-	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
+	def ios(self) -> dict[Context, list[dict[str, typing.Any]]]:
 		return {context: data for context, data in self.composition.ios.items() if context in self.contexts}
 
 	@property
-	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def iosRegistry(self) -> dict[str, dict[str, typing.Any]]:
 		return self.composition.iosRegistry
 
 	def isValidTarget(self, target: str) -> bool:
@@ -58,7 +57,7 @@ class CompositionView:
 		return self.composition.symbols
 
 	@property
-	def uids(self) -> typing.Dict[str, int]:
+	def uids(self) -> dict[str, int]:
 		return self.composition.uids
 
 	def __str__(self) -> str:
@@ -70,30 +69,30 @@ class Composition:
 		self.symbols = SymbolMap()
 		self.entities = Entities(symbols=self.symbols)
 		# Unique identifiers
-		self.uids: typing.Dict[str, int] = {}
+		self.uids: dict[str, int] = {}
 
 	@property
-	def contexts(self) -> typing.Set[Context]:
+	def contexts(self) -> set[Context]:
 		return self.entities.contexts
 
 	@property
-	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
+	def registry(self) -> dict[Context, dict[str, ExpressionEntry]]:
 		return self.entities.registry
 
 	@property
-	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def services(self) -> dict[Context, list[ExpressionEntry]]:
 		return self.entities.services
 
 	@property
-	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def workloads(self) -> dict[Context, list[ExpressionEntry]]:
 		return self.entities.workloads
 
 	@property
-	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
+	def ios(self) -> dict[Context, list[dict[str, typing.Any]]]:
 		return self.entities.ios
 
 	@property
-	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def iosRegistry(self) -> dict[str, dict[str, typing.Any]]:
 		return self.entities.iosRegistry
 
 	def visit(self, bdl: Object) -> "Composition":
@@ -136,14 +135,14 @@ class Composition:
 		"""Print a human readable view of this instance."""
 
 		def addContent(
-			content: typing.List[str],
+			content: list[str],
 			title: str,
 			contentList: typing.Iterable[typing.Any],
 		) -> None:
 			content.append(f"==== {title} ====")
 			content += [f"\t- {item}" for item in contentList]
 
-		content: typing.List[str] = []
+		content: list[str] = []
 		addContent(content, "Symbols", str(self.symbols).split("\n"))
 		addContent(content, "Unique Identifiers", [f"{k}: {v}" for k, v in self.uids.items()])
 		addContent(content, "Contexts", self.contexts)

@@ -1,5 +1,4 @@
 import re
-import typing
 
 from .fixed_table import FixedTable
 from .parser import Parser
@@ -23,7 +22,7 @@ class ParserGcc(Parser):
 			if not self._goto(f, re.compile(r"^.*memory map$", re.IGNORECASE)):
 				return False
 
-			table: typing.Optional[FixedTable] = None
+			table: FixedTable | None = None
 			for line in f:
 				table = FixedTable.fromPattern(
 					line,

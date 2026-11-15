@@ -1,13 +1,13 @@
 import pathlib
+import typing
 
+from apps.utils.images.converter import ConversionResult, Converter, OutputFormat
 from PIL import Image, ImageOps
-
-from apps.utils.images.converter import Converter, OutputFormat, ConversionResult
 
 
 class ConverterPillow(Converter):
-	extensions = {".jpg", ".jpeg", ".png", ".bmp", ".gif"}
-	outputFormats = {OutputFormat.JPEG}
+	extensions: typing.ClassVar[set[str]] = {".jpg", ".jpeg", ".png", ".bmp", ".gif"}
+	outputFormats: typing.ClassVar[set[OutputFormat]] = {OutputFormat.JPEG}
 
 	def tryConvert(self, path: pathlib.Path, outputFormat: OutputFormat, output: pathlib.Path) -> ConversionResult:
 		"""Attempt to convert the given file into the given format."""

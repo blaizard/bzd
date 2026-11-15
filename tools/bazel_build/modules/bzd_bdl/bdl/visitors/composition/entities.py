@@ -1,23 +1,23 @@
 import typing
-from functools import cached_property
 from collections import OrderedDict
+from functools import cached_property
 
 from bzd.parser.element import Element
 
-from bdl.visitor import Group
-from bdl.visitors.symbol_map import SymbolMap, Resolver
+from bdl.entities.builder import ExpressionBuilder
 from bdl.entities.impl.entity import Entity
 from bdl.entities.impl.expression import Expression
-from bdl.entities.builder import ExpressionBuilder
 from bdl.entities.impl.types import Category
-from bdl.visitors.composition.connections import Connections
+from bdl.visitor import Group
 from bdl.visitors.composition.components import (
 	Components,
-	ExpressionEntry,
-	EntryType,
-	DependencyGroup,
 	Context,
+	DependencyGroup,
+	EntryType,
+	ExpressionEntry,
 )
+from bdl.visitors.composition.connections import Connections
+from bdl.visitors.symbol_map import Resolver, SymbolMap
 
 
 class Entities:
@@ -32,21 +32,18 @@ class Entities:
 		# Map of all available connections.
 		self.connections = Connections(self.symbols)
 
-	def processFirstStage(
-		self, expression: Expression, fqns: typing.Optional[typing.Set[str]]
-	) -> typing.Optional[Expression]:
+	def processFirstStage(self, expression: Expression, fqns: set[str] | None) -> Expression | None:
 		"""Process first stage expression and return the ones that are not processed."""
 
-		if expression.isSymbol:
-			if expression.symbol.fqn == "bind":
-				assert fqns is not None, "FQNs must be set with bind."
-				expression.contracts.assertOnly({"executor"})
-				for param in expression.parameters:
-					identifiers = set(param.regexpr.match(fqns) if param.isRegexpr else [str(param.symbol)])
-					for fqn in identifiers:
-						entity = self.symbols.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
-						entity.contracts.merge(expression.contracts)
-				return None
+		if expression.isSymbol and expression.symbol.fqn == "bind":
+			assert fqns is not None, "FQNs must be set with bind."
+			expression.contracts.assertOnly({"executor"})
+			for param in expression.parameters:
+				identifiers = set(param.regexpr.match(fqns) if param.isRegexpr else [str(param.symbol)])
+				for fqn in identifiers:
+					entity = self.symbols.getEntityResolved(fqn=fqn).assertValue(element=expression.element)
+					entity.contracts.merge(expression.contracts)
+			return None
 		return expression
 
 	def processMeta(self, expression: Expression) -> None:
@@ -63,22 +60,22 @@ class Entities:
 			expression.error(message="Unsupported meta expression.")
 
 	@property
-	def contexts(self) -> typing.Set[Context]:
+	def contexts(self) -> set[Context]:
 		"""Get the set of available contexts."""
 
 		return self.expressions.contexts
 
 	@property
-	def all(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def all(self) -> dict[Context, list[ExpressionEntry]]:
 		"""Get the expression entries grouped by context."""
 
 		return self.expressions.all
 
 	@cached_property
-	def registry(self) -> typing.Dict[Context, typing.Dict[str, ExpressionEntry]]:
+	def registry(self) -> dict[Context, dict[str, ExpressionEntry]]:
 		"""Get the sorted registry expression entry list for a specific context."""
 
-		result: typing.Dict[Context, typing.Dict[str, ExpressionEntry]] = {}
+		result: dict[Context, dict[str, ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = OrderedDict()
 			for entry in entries:
@@ -87,31 +84,31 @@ class Entities:
 		return result
 
 	@cached_property
-	def registryFQNs(self) -> typing.Set[str]:
+	def registryFQNs(self) -> set[str]:
 		"""Set of all registry FQNs."""
 
-		return {fqn for _, entries in self.registry.items() for fqn in entries.keys()}
+		return {fqn for _, entries in self.registry.items() for fqn in entries}
 
 	@cached_property
-	def workloads(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def workloads(self) -> dict[Context, list[ExpressionEntry]]:
 		"""Get the sorted workloads expression entry list for a specific context."""
 
-		result: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
+		result: dict[Context, list[ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = [entry for entry in entries if entry.isWorkload]
 		return result
 
 	@cached_property
-	def services(self) -> typing.Dict[Context, typing.List[ExpressionEntry]]:
+	def services(self) -> dict[Context, list[ExpressionEntry]]:
 		"""Get the sorted services expression entry list for a specific context."""
 
-		result: typing.Dict[Context, typing.List[ExpressionEntry]] = {}
+		result: dict[Context, list[ExpressionEntry]] = {}
 		for context, entries in self.all.items():
 			result[context] = [entry for entry in entries if entry.isService]
 		return result
 
 	@cached_property
-	def ios(self) -> typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]]:
+	def ios(self) -> dict[Context, list[dict[str, typing.Any]]]:
 		"""Provide a dictionary grouped by contexts of all connections.
 
 		[
@@ -129,12 +126,12 @@ class Entities:
 		]
 		"""
 
-		result: typing.Dict[Context, typing.List[typing.Dict[str, typing.Any]]] = {}
+		result: dict[Context, list[dict[str, typing.Any]]] = {}
 		for context in self.contexts:
 			result[context] = []
 			for identifier, metadata in self.connections.endpoints.items():
 				if metadata.isSource:
-					entry: typing.Dict[str, typing.Any] = {
+					entry: dict[str, typing.Any] = {
 						"symbol": metadata.symbol,
 						"identifier": str(identifier),
 						"sinks": [],
@@ -150,7 +147,7 @@ class Entities:
 		return result
 
 	@cached_property
-	def iosRegistry(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+	def iosRegistry(self) -> dict[str, dict[str, typing.Any]]:
 		"""Provide a registry that contains all available connections.
 
 		{
@@ -167,7 +164,7 @@ class Entities:
 		}
 		"""
 
-		result: typing.Dict[str, typing.Dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registryFQNs}
+		result: dict[str, dict[str, typing.Any]] = {fqn: OrderedDict() for fqn in self.registryFQNs}
 
 		for identifier, metadata in self.connections.endpoints.items():
 			if identifier.this in result:
@@ -181,7 +178,7 @@ class Entities:
 
 		return result
 
-	def getContext(self, expression: Expression, defaultExecutor: typing.Optional[str]) -> Context:
+	def getContext(self, expression: Expression, defaultExecutor: str | None) -> Context:
 		"""Identify the executor and target pair associated with an expression."""
 
 		executor = expression.executor
@@ -230,9 +227,9 @@ class Entities:
 		fqns = {expression.fqn for expression in expressions if expression.isFQN and expression.isName}
 
 		# First stage.
-		executors: typing.List[Expression] = []
-		workloads: typing.List[Expression] = []
-		meta: typing.List[Expression] = []
+		executors: list[Expression] = []
+		workloads: list[Expression] = []
+		meta: list[Expression] = []
 		for expression in expressions:
 			resolver = expression.makeResolver(symbols=self.symbols)
 			expression.resolve(resolver=resolver)
@@ -319,9 +316,9 @@ class Entities:
 		self,
 		element: Element,
 		this: Expression,
-		resolveNamespace: typing.List[str],
+		resolveNamespace: list[str],
 		resolver: Resolver,
-		name: typing.Optional[str] = None,
+		name: str | None = None,
 	) -> Entity:
 		"""Create a new entity for nested compositions.
 
@@ -358,7 +355,7 @@ class Entities:
 		self,
 		expression: Expression,
 		resolver: Resolver,
-	) -> typing.List[Expression]:
+	) -> list[Expression]:
 		"""Register inline component defaults as internal registry entries.
 
 		The expression must be a component instance. A config entry such as
@@ -367,7 +364,7 @@ class Entities:
 		under the parent component and rewrite the config value to point to it.
 		"""
 
-		result: typing.List[Expression] = []
+		result: list[Expression] = []
 
 		for item in expression.parametersResolved:
 			if not item.param.isRValue:
@@ -383,7 +380,7 @@ class Entities:
 			if paramEntity.category != Category.component:
 				continue
 
-			name = "bdlDefault{}".format(item.name[:1].upper() + item.name[1:])
+			name = f"bdlDefault{item.name[:1].upper() + item.name[1:]}"
 			hidden = self.createEntityNestedComposition(
 				element=item.param.deepCopy().element,
 				this=expression,
@@ -455,7 +452,7 @@ class Entities:
 
 			def checkIfInitOrShutdown(
 				interfaceEntity: Entity,
-			) -> typing.Optional[DependencyGroup]:
+			) -> DependencyGroup | None:
 				assert entry is not None
 				if interfaceEntity.contracts.has("init"):
 					return entry.init

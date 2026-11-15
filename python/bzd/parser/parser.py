@@ -1,11 +1,12 @@
 import re
+from collections.abc import Iterator, MutableMapping
 from pathlib import Path
-from typing import Any, Iterator, MutableMapping, Type, Optional
+from typing import Any
 
 from bzd.parser.context import Context
 from bzd.parser.element import SequenceParser
-from bzd.parser.grammar import Grammar, GrammarItem
 from bzd.parser.error import Error
+from bzd.parser.grammar import Grammar, GrammarItem
 
 
 class Parser:
@@ -13,10 +14,14 @@ class Parser:
 		self,
 		content: str,
 		grammar: Grammar,
-		defaultGrammarPre: Grammar = [],
-		defaultGrammarPost: Grammar = [],
+		defaultGrammarPre: Grammar | None = None,
+		defaultGrammarPost: Grammar | None = None,
 	) -> None:
 		self.grammar = grammar
+		if defaultGrammarPre is None:
+			defaultGrammarPre = []
+		if defaultGrammarPost is None:
+			defaultGrammarPost = []
 		self.defaultGrammarPre = defaultGrammarPre
 		self.defaultGrammarPost = defaultGrammarPost
 
@@ -24,7 +29,7 @@ class Parser:
 		self.context = Context(content=content)
 
 	@classmethod
-	def fromPath(cls: Type["Parser"], path: Path, *args: Any, **kwargs: Any) -> "Parser":
+	def fromPath(cls: type["Parser"], path: Path, *args: Any, **kwargs: Any) -> "Parser":
 		"""
 		Make a parser instance from a file path using its text as a content.
 		"""
@@ -48,16 +53,16 @@ class Parser:
 			elif callable(item):
 				yield from self.iterateGrammar(item())
 			else:
-				assert False, "Grammar item must be of type Grammar or GrammarItem, received: {}".format(type(item))
+				assert False, f"Grammar item must be of type Grammar or GrammarItem, received: {type(item)}"
 
-	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Optional[Grammar]:
+	def getGrammar(self, checkpoints: MutableMapping[str, Grammar], item: GrammarItem) -> Grammar | None:
 		"""
 		Get the grammar from a grammar item and update the checkpoint if needed.
 		"""
 		# Grammar link to a checkpoint
 		if isinstance(item.grammar, str):
 			assert item.grammar in checkpoints, (
-				"Unknown checkpoint '{}', ensure the parser discovered it before referencing it.".format(item.grammar)
+				f"Unknown checkpoint '{item.grammar}', ensure the parser discovered it before referencing it."
 			)
 			assert item.checkpoint is None, "A grammar item referencing to a checkpoint cannot set a checkpoint."
 			return checkpoints[item.grammar]
@@ -95,11 +100,11 @@ class Parser:
 						element = fragment.next(element, grammar)
 						break
 				if m is None:
-					raise Exception("Invalid syntax.")
+					raise RuntimeError("Invalid syntax.")
 				assert m is not None
 				index += m.end()
 
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			print("**** debug ****\n", root)
 			for item in self.iterateGrammar(self.defaultGrammarPre + element.getGrammar() + self.defaultGrammarPost):
 				print(item.regexpr)

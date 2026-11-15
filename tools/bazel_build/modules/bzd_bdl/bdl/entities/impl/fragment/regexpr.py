@@ -1,5 +1,5 @@
-import typing
 import re
+import typing
 
 from bzd.parser.element import Element, ElementBuilder
 
@@ -14,13 +14,13 @@ class Regexpr:
 		return self.element.isNestedSequence("regexpr_include") or self.element.isNestedSequence("exclude_include")
 
 	@property
-	def includes(self) -> typing.List[str]:
+	def includes(self) -> list[str]:
 		"""Get the list of includes associated with this regular expression."""
 		sequence = self.element.getNestedSequenceOrEmpty("regexpr_include")
 		return [e.getAttr("regexpr").value for e in sequence]
 
 	@property
-	def excludes(self) -> typing.List[str]:
+	def excludes(self) -> list[str]:
 		"""Get the list of excludes associated with this regular expression."""
 		sequence = self.element.getNestedSequenceOrEmpty("regexpr_exclude")
 		return [e.getAttr("regexpr").value for e in sequence]
@@ -72,7 +72,7 @@ class Regexpr:
 		self,
 		iterable: typing.Iterable[typing.Any],
 		toString: typing.Callable[[typing.Any], str] = str,
-	) -> typing.Set[typing.Any]:
+	) -> set[typing.Any]:
 		"""Match values from an iterable."""
 
 		# Prepare the regular expressions.
@@ -82,7 +82,6 @@ class Regexpr:
 		matches = set()
 		for value in iterable:
 			valueAsStr = toString(value)
-			if regexprInclude.match(valueAsStr):
-				if not regexprExclude or not regexprExclude.match(valueAsStr):
-					matches.add(value)
+			if regexprInclude.match(valueAsStr) and (not regexprExclude or not regexprExclude.match(valueAsStr)):
+				matches.add(value)
 		return matches

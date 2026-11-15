@@ -1,8 +1,9 @@
 import pathlib
 import typing
 
-from bzd_oci.bin import crane
 from bzd.utils.run import ExecuteResult, localCommand
+
+from bzd_oci.bin import crane
 
 
 def ociPush(path: pathlib.Path, repository: str, **kwargs: typing.Any) -> ExecuteResult:

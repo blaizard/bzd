@@ -1,15 +1,15 @@
-import pathlib
 import json
+import pathlib
 import typing
 
 from apps.trader_python.recording.recording import OHLC, Recording
-from apps.trader_python.recording.recording_from_path import RecordingPairFromPath
 from apps.trader_python.recording.recording_from_data import RecordingPairFromData
+from apps.trader_python.recording.recording_from_path import RecordingPairFromPath
 
 
 def _iterateByGroup(
 	iterator: typing.Iterable[OHLC], group: typing.Callable[[typing.Any], str]
-) -> typing.Generator[typing.Tuple[str, typing.Generator[OHLC, None, None]], None, None]:
+) -> typing.Generator[tuple[str, typing.Generator[OHLC, None, None]], None, None]:
 	"""Iterate the recording by consecutive groups."""
 
 	try:

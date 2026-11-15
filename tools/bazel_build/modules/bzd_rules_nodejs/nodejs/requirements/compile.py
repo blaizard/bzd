@@ -1,15 +1,15 @@
 import argparse
-import pathlib
-import typing
 import json
+import pathlib
 import tempfile
+import typing
+from dataclasses import dataclass
 
 from bzd.utils.run import localBazelBinary
 from bzd.utils.semver import Semver, SemverMatcher
-from dataclasses import dataclass
 
-Requirements = typing.Dict[str, typing.Optional[str]]
-Json = typing.Dict[str, typing.Any]
+Requirements = dict[str, str | None]
+Json = dict[str, typing.Any]
 
 
 def parseRequirements(requirements: str) -> Requirements:
@@ -26,7 +26,7 @@ def parseRequirements(requirements: str) -> Requirements:
 			[name, version] = requirementSplit
 			result[name.strip()] = version.strip()
 		else:
-			raise Exception(f"The requirement file is malformed: '{requirement}'")
+			raise RuntimeError(f"The requirement file is malformed: '{requirement}'")
 	return result
 
 
@@ -51,10 +51,10 @@ class Package:
 	name: str
 	version: Semver
 	integrity: str
-	dependencies: typing.Set["Package"]
-	os: typing.Optional[typing.List[str]] = None
-	cpu: typing.Optional[typing.List[str]] = None
-	alias: typing.Optional[str] = None
+	dependencies: set["Package"]
+	os: list[str] | None = None
+	cpu: list[str] | None = None
+	alias: str | None = None
 
 	def makeAlias(self, alias: str) -> "Package":
 		"""Create a clone of this package that is an alias."""
@@ -70,8 +70,8 @@ class Package:
 	@property
 	def package(self) -> str:
 		if self.alias:
-			return f"{self.alias}@npm:{self.name}@{str(self.version)}"
-		return f"{self.name}@{str(self.version)}"
+			return f"{self.alias}@npm:{self.name}@{self.version!s}"
+		return f"{self.name}@{self.version!s}"
 
 	def __str__(self) -> str:
 		return self.package
@@ -90,15 +90,15 @@ class Package:
 		return self != other
 
 	def __repr__(self) -> str:
-		return f"<Package {str(self)}>"
+		return f"<Package {self!s}>"
 
 
 class Packages:
 	"""Data structure to access packages."""
 
 	def __init__(self) -> None:
-		self.packages: typing.Dict[str, Package] = {}
-		self.packagesByName: typing.Dict[str, typing.Dict[Semver, Package]] = {}
+		self.packages: dict[str, Package] = {}
+		self.packagesByName: dict[str, dict[Semver, Package]] = {}
 
 	def add(self, package: Package) -> None:
 		assert package.package not in self.packages, f"Package '{package.package}' is already added to the dictionary."
@@ -129,7 +129,7 @@ class RequirementsFactory:
 	def packagesParserV3(packageLock: Json) -> Packages:
 		"""Parse v3 of packages-lock.json."""
 
-		packagesByName: typing.Dict[str, typing.Dict[Package, typing.List[typing.Dict[str, typing.Any]]]] = {}
+		packagesByName: dict[str, dict[Package, list[dict[str, typing.Any]]]] = {}
 		for path, data in packageLock["packages"].items():
 			name = path.split("node_modules/")[-1]
 			if not name:
@@ -183,14 +183,14 @@ class RequirementsFactory:
 							)
 							continue
 						assert False, f"The dependency '{dependency['name']}' from package '{package}' is not found."
-					versionsPackages = {p.version: p for p in packagesByName[dependency["name"]].keys()}
+					versionsPackages = {p.version: p for p in packagesByName[dependency["name"]]}
 					maybeVersion = dependency["matcher"].matchLatest(versionsPackages.keys())
 					assert maybeVersion is not None, (
 						f"Couldn't find a matching version for '{dependency['name']}' with {dependency['matcher']} and {versionsPackages.keys()}."
 					)
 					resolved = versionsPackages[maybeVersion]
 					# Skip peer dependency edges that would create a cycle (e.g., browserslist <-> update-browserslist-db)
-					visited: typing.Set[Package] = set()
+					visited: set[Package] = set()
 					queue = list(resolved.dependencies)
 					while queue:
 						current = queue.pop()
@@ -213,7 +213,7 @@ class RequirementsFactory:
 		return int(self.packageLock["lockfileVersion"])
 
 	@staticmethod
-	def getDependencies(package: Package) -> typing.Set[Package]:
+	def getDependencies(package: Package) -> set[Package]:
 		"""Get all dependencies of a package (including self)."""
 
 		output = set()
@@ -226,7 +226,7 @@ class RequirementsFactory:
 			queue += current.dependencies
 		return output
 
-	def make(self, requirements: Requirements) -> typing.Dict[str, typing.Any]:
+	def make(self, requirements: Requirements) -> dict[str, typing.Any]:
 		"""Build the content of the requirements file.
 
 		Format is as follows:
@@ -246,8 +246,8 @@ class RequirementsFactory:
 		        },
 		"""
 
-		topLevel: typing.Dict[str, str] = {}
-		allPackages: typing.Dict[str, Package] = {}
+		topLevel: dict[str, str] = {}
+		allPackages: dict[str, Package] = {}
 
 		for name, maybeConstraints in requirements.items():
 			package = self.packages.getMatching(
@@ -259,7 +259,7 @@ class RequirementsFactory:
 				if dependency.package not in allPackages:
 					allPackages[dependency.package] = dependency
 
-		packages: typing.Dict[str, typing.Any] = {}
+		packages: dict[str, typing.Any] = {}
 		for key, pkg in allPackages.items():
 			packages[key] = {
 				"integrity": pkg.integrity,

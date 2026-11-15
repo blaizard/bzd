@@ -2,17 +2,17 @@ import bisect
 import typing
 
 from apps.trader_python.recording.recording import (
+	OHLC,
+	Event,
 	Recording,
 	RecordingPair,
-	Event,
-	OHLC,
 )
 
 
 class RecordingPairFromData(RecordingPair):
 	def __init__(self, *args: typing.Any, **kwargs: typing.Any) -> None:
 		super().__init__(*args, **kwargs)
-		self.prices: typing.List[OHLC] = []
+		self.prices: list[OHLC] = []
 
 	@staticmethod
 	def fromPrices(prices: typing.Iterable[OHLC], *args: typing.Any, **kwargs: typing.Any) -> "RecordingPairFromData":
@@ -54,19 +54,17 @@ class RecordingPairFromData(RecordingPair):
 			self.prices.insert(index, ohlc)
 
 	def __iter__(self) -> typing.Iterator[OHLC]:
-		for ohlc in self.prices:
-			yield ohlc
+		yield from self.prices
 
 
 class RecordingFromData(Recording):
 	def __init__(self) -> None:
 		super().__init__()
-		self.pairs: typing.Dict[str, RecordingPair] = {}
+		self.pairs: dict[str, RecordingPair] = {}
 
 	def addPair(self, recordingPair: RecordingPair) -> None:
 		assert recordingPair.uid not in self.pairs, f"The recording pair '{recordingPair.uid}' is already set."
 		self.pairs[recordingPair.uid] = recordingPair
 
 	def __iter__(self) -> typing.Iterator[RecordingPair]:
-		for pair in self.pairs.values():
-			yield pair
+		yield from self.pairs.values()

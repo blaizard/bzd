@@ -1,16 +1,16 @@
-import typing
-import shlex
 import dataclasses
-import re
 import enum
 import pathlib
+import re
+import shlex
+import typing
 
 
 @dataclasses.dataclass
 class Item:
 	"""Base class for any items."""
 
-	original: typing.List[str]
+	original: list[str]
 	category: enum.Enum
 
 	def filter(self, *args: typing.Any) -> bool:
@@ -44,7 +44,7 @@ class ItemPathOrString(Item):
 	"""Base item that contains a path or a string as value."""
 
 	# The actual path or a name
-	pathOrValue: typing.Union[pathlib.Path, str]
+	pathOrValue: pathlib.Path | str
 
 	@property
 	def hasPath(self) -> bool:
@@ -62,10 +62,10 @@ T = typing.TypeVar("T")
 class ItemFactory:
 	"""Factory to create an item."""
 
-	original: typing.List[str] = dataclasses.field(default_factory=list)
-	args: typing.List[str] = dataclasses.field(default_factory=list)
+	original: list[str] = dataclasses.field(default_factory=list)
+	args: list[str] = dataclasses.field(default_factory=list)
 
-	def make(self, Kind: typing.Type[T], *args: typing.Any, **kwargs: typing.Any) -> T:
+	def make(self, Kind: type[T], *args: typing.Any, **kwargs: typing.Any) -> T:
 		assert issubclass(Kind, Item), f"The type '{Kind}' must be a subclass of 'Item'."
 		return Kind(self.original, *args, **kwargs)
 
@@ -82,11 +82,11 @@ Schema = typing.Mapping[str, Processor]
 
 class CommandExtractor:
 	def __init__(self) -> None:
-		self.result: typing.List[Item] = []
+		self.result: list[Item] = []
 
-	def generateItemString(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
+	def generateItemString(self, kinds: typing.Mapping[str, enum.Enum]) -> dict[str, Processor]:
 		"""Helper to generate batched schema entries for ItemString."""
-		output: typing.Dict[str, Processor] = {}
+		output: dict[str, Processor] = {}
 		for kind, category in kinds.items():
 			output[re.escape(kind)] = Processor(
 				1,
@@ -94,9 +94,9 @@ class CommandExtractor:
 			)
 		return output
 
-	def generateItem(self, kinds: typing.Mapping[str, enum.Enum]) -> typing.Dict[str, Processor]:
+	def generateItem(self, kinds: typing.Mapping[str, enum.Enum]) -> dict[str, Processor]:
 		"""Helper to generate batched schema entries for Item."""
-		output: typing.Dict[str, Processor] = {}
+		output: dict[str, Processor] = {}
 		for kind, category in kinds.items():
 			output[re.escape(kind)] = Processor(
 				0,
@@ -104,10 +104,10 @@ class CommandExtractor:
 			)
 		return output
 
-	def parse(self, cmdString: str, schema: typing.List[Schema], fallback: Fallback) -> None:
-		activeSchema: typing.Optional[Processor] = None
-		factory: typing.Optional[ItemFactory] = None
-		matchArgs: typing.Set[str] = set()
+	def parse(self, cmdString: str, schema: list[Schema], fallback: Fallback) -> None:
+		activeSchema: Processor | None = None
+		factory: ItemFactory | None = None
+		matchArgs: set[str] = set()
 
 		# Process schemas by order of priority.
 		for schemaIndex, schemaDict in enumerate(schema):
@@ -139,7 +139,9 @@ class CommandExtractor:
 						activeSchema.processor(factory, *factory.args)
 						activeSchema = None
 
-	def values(self, exclude: typing.Dict[enum.Enum, typing.Optional[typing.Set[str]]] = {}) -> typing.Iterable[Item]:
+	def values(self, exclude: dict[enum.Enum, set[str] | None] | None = None) -> typing.Iterable[Item]:
+		if exclude is None:
+			exclude = {}
 		for value in self.result:
 			if value.category in exclude:
 				matches = exclude[value.category]

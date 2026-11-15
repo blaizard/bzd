@@ -2,11 +2,11 @@ import argparse
 import pathlib
 import typing
 
-from bzd_sanitizer.worker import worker
 from bzd.utils.run import localBazelBinary
+from bzd_sanitizer.worker import worker
 
 
-def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
+def workload(args: tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
 	workspace, path, check, buildifier = args
 
 	if not check:

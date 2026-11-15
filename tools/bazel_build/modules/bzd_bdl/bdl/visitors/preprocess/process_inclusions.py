@@ -1,7 +1,7 @@
 import typing
 
-from bdl.visitor import Visitor as VisitorBase
 from bdl.entities.all import Preset, Use
+from bdl.visitor import Visitor as VisitorBase
 
 
 class ProcessInclusions(VisitorBase[None]):

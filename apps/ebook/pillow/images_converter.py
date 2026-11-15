@@ -1,10 +1,8 @@
 import pathlib
-import typing
 
-from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
+from apps.ebook.flow import ActionInterface, FlowContext, FlowEnum
 from apps.ebook.providers import ProviderImages
 from apps.ebook.utils import estimatePageDPIs
-
 from PIL import Image
 
 
@@ -14,7 +12,7 @@ class ImagesConverter(ActionInterface):
 	ProviderInput = ProviderImages
 	ProviderOutput = ProviderImages
 
-	def __init__(self, maxDPI: typing.Optional[int] = None, scale: typing.Optional[float] = None) -> None:
+	def __init__(self, maxDPI: int | None = None, scale: float | None = None) -> None:
 		super().__init__()
 		self.maxDPI = maxDPI
 		self.scale = scale
@@ -22,10 +20,10 @@ class ImagesConverter(ActionInterface):
 
 	def process(
 		self, provider: ProviderImages, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderImages, FlowEnum | None]]:
 
 		# Precalculate the DPI of the images if necessary.
-		dimensions: typing.List[typing.Tuple[int, int]] = []
+		dimensions: list[tuple[int, int]] = []
 		for _, currentPath in enumerate(provider.images):
 			with Image.open(currentPath) as currentImage:
 				width, height = currentImage.size
@@ -37,7 +35,7 @@ class ImagesConverter(ActionInterface):
 			with Image.open(path) as image:
 				image = image.convert("RGB")  # type: ignore
 				scale = self.scale or 1.0
-				comments: typing.List[str] = []
+				comments: list[str] = []
 
 				if self.maxDPI is not None:
 					# Get the DPI of this image.

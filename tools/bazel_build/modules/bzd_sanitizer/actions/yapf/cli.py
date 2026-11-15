@@ -3,10 +3,11 @@ import pathlib
 import typing
 
 from bzd_sanitizer.worker import worker
+
 from yapf.yapflib.yapf_api import FormatFile
 
 
-def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
+def workload(args: tuple[pathlib.Path, pathlib.Path, bool, str], stdout: typing.TextIO) -> bool:
 	workspace, path, check, config = args
 
 	_, _, has_change = FormatFile(

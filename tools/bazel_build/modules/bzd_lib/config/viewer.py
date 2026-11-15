@@ -1,23 +1,22 @@
 import argparse
-import pathlib
 import json
+import pathlib
 import typing
-
-from config.reader import internalToKeyData, Data
 
 from bzd.utils.runfiles import pathFromRLocation
 from bzd.utils.secret import decrypt
+from config.reader import Data, internalToKeyData
 
 
 def keyDayaToStr(data: typing.Any) -> str:
 
-	def mergeLinesWithPrefix(prefix: str, lines: typing.List[str], hasNewLine: bool) -> typing.List[str]:
+	def mergeLinesWithPrefix(prefix: str, lines: list[str], hasNewLine: bool) -> list[str]:
 		if not hasNewLine and len(lines) == 1:
 			return [f"{prefix} {lines[0].lstrip()}"]
 		else:
 			return [prefix, *lines]
 
-	def recursive(value: typing.Any, indent: int) -> typing.Tuple[typing.List[str], bool]:
+	def recursive(value: typing.Any, indent: int) -> tuple[list[str], bool]:
 		lines = []
 		pad = "   " * indent
 
@@ -32,9 +31,9 @@ def keyDayaToStr(data: typing.Any) -> str:
 			rawValue = pathFromRLocation(rawValue)
 
 		if isinstance(rawValue, dict):
-			for key, data in rawValue.items():
-				key = data.key if isinstance(data, Data) else key
-				content, hasNewLine = recursive(value=data, indent=indent + 1)
+			for key, valueData in rawValue.items():
+				key = valueData.key if isinstance(valueData, Data) else key
+				content, hasNewLine = recursive(value=valueData, indent=indent + 1)
 				lines.extend(mergeLinesWithPrefix(f"{pad}{key}:", content, hasNewLine))
 			requiresNewLine = True
 
@@ -49,7 +48,7 @@ def keyDayaToStr(data: typing.Any) -> str:
 			lines.append(f"{pad}{json.dumps(rawValue)}")
 
 		else:
-			lines.append(f"{pad} <{type(rawValue).__name__}> {str(rawValue)}")
+			lines.append(f"{pad} <{type(rawValue).__name__}> {rawValue!s}")
 
 		if metadata:
 			lines = mergeLinesWithPrefix(f"{pad}[{', '.join(metadata)}]", lines, requiresNewLine)

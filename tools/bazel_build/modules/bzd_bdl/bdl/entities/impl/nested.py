@@ -3,8 +3,8 @@ import typing
 from bzd.parser.element import Element
 from bzd.parser.error import Error
 
+from bdl.entities.impl.entity import Entity, EntityExpression, Role
 from bdl.entities.impl.fragment.symbol import Symbol
-from bdl.entities.impl.entity import Entity, Role, EntityExpression
 from bdl.entities.impl.types import Category
 
 
@@ -22,7 +22,7 @@ class Nested(Entity):
 	        - [composition]
 	"""
 
-	categoriesAllowed_ = [
+	categoriesAllowed_: typing.ClassVar[list[Category]] = [
 		Category.struct,
 		Category.component,
 		Category.interface,
@@ -46,8 +46,8 @@ class Nested(Entity):
 		return self.element.isNestedSequence("inheritance")
 
 	@property
-	def inheritanceList(self) -> typing.List[Symbol]:
-		inheritanceList: typing.List[Symbol] = []
+	def inheritanceList(self) -> list[Symbol]:
+		inheritanceList: list[Symbol] = []
 		for element in self.element.getNestedSequenceOrEmpty("inheritance"):
 			Error.assertHasAttr(element=element, attr="interface")
 			inheritanceList.append(Symbol(element=element, kind="interface"))
@@ -133,7 +133,7 @@ class Nested(Entity):
 		for category in ["config", "interface", "composition"]:
 			nested = self._getNestedByCategory(category)
 			if nested:
-				content += "\n{}:".format(category)
+				content += f"\n{category}:"
 				content += "\n  ".join([""] + "\n".join([str(entity) for entity in nested]).split("\n"))
 
 		return content

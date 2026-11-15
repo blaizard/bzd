@@ -4,25 +4,27 @@ import tempfile
 import typing
 import unittest
 
-from bdl.grammar import Parser
+from bzd.parser.error import ExceptionParser
+
+from bdl.entities.all import Expression
 from bdl.entities.builder import ElementBuilder
 from bdl.entities.impl.preset import Preset
+from bdl.grammar import Parser
 from bdl.object import Object, ObjectContext
-from bdl.entities.all import Expression
 
 
 class TestRun(unittest.TestCase):
 	maxDiff = 4096
 
-	def _clearSertializedForCompare(self, sequence: typing.List[typing.Any]) -> None:
+	def _clearSertializedForCompare(self, sequence: list[typing.Any]) -> None:
 		for element in sequence:
-			for key in element.keys():
+			for key in element:
 				if key == "@":
 					element["@"] = {key: value["v"] for key, value in element["@"].items()}
 				else:
 					self._clearSertializedForCompare(element[key])
 
-	def assertParserEqual(self, parser: Parser, match: typing.List[typing.Any]) -> None:
+	def assertParserEqual(self, parser: Parser, match: list[typing.Any]) -> None:
 		data = parser.parse()
 		result = data.serialize()
 		self._clearSertializedForCompare(result)
@@ -65,7 +67,7 @@ class TestRun(unittest.TestCase):
 		element.setAttr("name", "test")
 		element.setAttr("value", "path.json")
 		preset = Preset(element)
-		with self.assertRaises(Exception):
+		with self.assertRaises(ExceptionParser):
 			preset.setContent("{bad json")
 
 	def testTopLevelArray(self) -> None:

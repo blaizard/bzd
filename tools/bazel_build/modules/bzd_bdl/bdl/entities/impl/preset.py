@@ -93,8 +93,8 @@ class Preset(EntityExpression):
 	def _resolveTrailingFQN(
 		self,
 		resolver: "Resolver",
-		remaining: typing.List[str],
-	) -> typing.Optional[str]:
+		remaining: list[str],
+	) -> str | None:
 		"""Handle unresolved trailing FQN segments by navigating the JSON structure."""
 		self.assertTrue(
 			condition=bool(remaining),
@@ -103,7 +103,7 @@ class Preset(EntityExpression):
 		self.resolveMemoized(resolver=resolver)
 		return self.getLeaf(".".join(remaining))
 
-	def __getitem__(self, key: typing.Union[str, int]) -> typing.Any:
+	def __getitem__(self, key: str | int) -> typing.Any:
 		return self.json[key]
 
 	def resolve(self, resolver: "Resolver") -> None:

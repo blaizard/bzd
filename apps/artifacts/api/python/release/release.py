@@ -1,14 +1,14 @@
-import typing
 import pathlib
-import struct
-import re
 import platform
+import re
+import struct
 import sys
+import typing
 from datetime import datetime
 
+from apps.artifacts.api.python.common import ArtifactsBase
 from bzd.http.client import HttpClient
 from bzd.logging import Logger
-from apps.artifacts.api.python.common import ArtifactsBase
 
 logger = Logger("release")
 
@@ -18,7 +18,7 @@ class Update:
 		self.response = response
 
 	@property
-	def name(self) -> typing.Optional[str]:
+	def name(self) -> str | None:
 		regexpr = re.compile(r"^.*filename\s*=[\s\"']*(.+?)[\s\"']*$")
 		maybeContent = self.response.getHeader("Content-Disposition")
 		if maybeContent:
@@ -28,7 +28,7 @@ class Update:
 		return None
 
 	@property
-	def lastModified(self) -> typing.Optional[datetime]:
+	def lastModified(self) -> datetime | None:
 		maybeContent = self.response.getHeader("Last-Modified")
 		if maybeContent:
 			try:
@@ -38,7 +38,7 @@ class Update:
 		return None
 
 	@property
-	def lastModifiedAsString(self) -> typing.Optional[str]:
+	def lastModifiedAsString(self) -> str | None:
 		return self.response.getHeader("Last-Modified")  # type: ignore
 
 	def toFile(self, path: pathlib.Path) -> None:
@@ -49,7 +49,7 @@ class Update:
 
 class Release(ArtifactsBase):
 	@staticmethod
-	def getAlIsa() -> typing.Tuple[typing.Optional[str], typing.Optional[str]]:
+	def getAlIsa() -> tuple[str | None, str | None]:
 		"""Get the abstraction layer and the isa."""
 
 		# Identify the bit width.
@@ -77,9 +77,9 @@ class Release(ArtifactsBase):
 	def fetch(
 		self,
 		path: str,
-		uid: typing.Optional[str] = None,
-		ignore: typing.Optional[str] = None,
-	) -> typing.Optional[Update]:
+		uid: str | None = None,
+		ignore: str | None = None,
+	) -> Update | None:
 		"""Check if there is an update available.
 
 		Args:
@@ -102,9 +102,9 @@ class Release(ArtifactsBase):
 
 			try:
 				response = HttpClient.get(fullUrl, query=query)
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				if retry == nbRetries:
-					logger.warning(f"Exception while fetching {fullUrl}?{queryToString()} after {retry} retry: {str(e)}")
+					logger.warning(f"Exception while fetching {fullUrl}?{queryToString()} after {retry} retry: {e!s}")
 				continue
 
 			# No update available

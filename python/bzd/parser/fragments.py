@@ -1,20 +1,19 @@
 import re
+from collections.abc import MutableMapping
+from re import Match
 from typing import (
-	cast,
-	Dict,
-	Match,
-	MutableMapping,
-	Optional,
-	Union,
 	TYPE_CHECKING,
+	ClassVar,
+	Optional,
+	cast,
 )
 
 if TYPE_CHECKING:
 	from bzd.parser.element import ElementParser
 	from bzd.parser.grammar import Grammar
 
-AttributeSerialize = MutableMapping[str, Union[int, str]]
-AttributesSerialize = Dict[str, AttributeSerialize]
+AttributeSerialize = MutableMapping[str, int | str]
+AttributesSerialize = dict[str, AttributeSerialize]
 
 IGNORE_INDEX_VALUE = -1
 
@@ -56,7 +55,7 @@ class AttributeParser(Attribute):
 		super().__init__({"v": value, "i": index, "e": end})
 
 
-Attributes = Dict[str, Attribute]
+Attributes = dict[str, Attribute]
 
 
 class Fragment:
@@ -65,7 +64,7 @@ class Fragment:
 	It describes any entity discovered by the parser.
 	"""
 
-	default: Dict[str, str] = {}
+	default: ClassVar[dict[str, str]] = {}
 
 	def __init__(self, index: int, end: int, match: Match[str]) -> None:
 		self.index = index
@@ -77,12 +76,11 @@ class Fragment:
 	def merge(self, attrs: Attributes) -> None:
 		"""Merge current attributes with existing ones."""
 		for key, value in self.attrs.items():
-			assert key not in attrs, "Attribute '{}' already set".format(key)
+			assert key not in attrs, f"Attribute '{key}' already set"
 			attrs[key] = AttributeParser(index=self.index, end=self.end, value=value)
 
 	def process(self, match: Match[str]) -> None:
 		"""Post process a value discovered."""
-		pass
 
 	def next(self, element: "ElementParser", grammar: Optional["Grammar"]) -> "ElementParser":
 		"""Returns the next element for the next entity.
@@ -97,7 +95,7 @@ class Fragment:
 			self.__class__.__name__,
 			self.index,
 			self.end,
-			" ".join(["{}='{}'".format(key, value) for key, value in self.attrs.items()]),
+			" ".join([f"{key}='{value}'" for key, value in self.attrs.items()]),
 		)
 
 
@@ -121,7 +119,7 @@ class FragmentComment(Fragment):
 				attrs[key] = AttributeParser(
 					index=IGNORE_INDEX_VALUE,
 					end=0,
-					value=attrs[key].value + "\n{}".format(updatedValue),
+					value=attrs[key].value + f"\n{updatedValue}",
 				)
 			else:
 				attrs[key] = AttributeParser(index=IGNORE_INDEX_VALUE, end=0, value=updatedValue)

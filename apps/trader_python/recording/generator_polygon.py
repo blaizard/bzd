@@ -1,14 +1,13 @@
-import datetime
-import typing
 import argparse
+import datetime
 import os
-import time
 import threading
+import time
 
-from bzd.http.client import HttpClient, HttpClientException
-from bzd.logging import Logger
 from apps.artifacts.api.python.node.node import Node
 from apps.trader_python.recording.config_polygon_python import configApiKeys
+from bzd.http.client import HttpClient, HttpClientException
+from bzd.logging import Logger
 
 logger = Logger("polygon.io")
 
@@ -59,20 +58,20 @@ class GeneratorArgs:
 
 	def __init__(
 		self,
-		tickers: typing.List[str],
+		tickers: list[str],
 		dateStart: datetime.datetime,
 		dateEnd: datetime.datetime,
 	) -> None:
 		self.tickers = tickers
 		self.dateStart = dateStart.timestamp()
 		self.dateEnd = dateEnd.timestamp()
-		self.current: typing.Tuple[int, float] = (
+		self.current: tuple[int, float] = (
 			0,
 			self.dateStart,
 		)
 		self.lock = threading.Lock()
 
-	def generate(self) -> typing.Optional[typing.Tuple[str, str]]:
+	def generate(self) -> tuple[str, str] | None:
 
 		with self.lock:
 			index, timestamp = self.current
@@ -80,7 +79,7 @@ class GeneratorArgs:
 				return None
 			result = (
 				self.tickers[index],
-				datetime.datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d"),
+				datetime.datetime.fromtimestamp(timestamp, tz=datetime.UTC).strftime("%Y-%m-%d"),
 			)
 			timestamp += 24 * 60 * 60
 			if timestamp > self.dateEnd:

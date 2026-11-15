@@ -1,6 +1,11 @@
-import typing
 import re
+import typing
 
+from bzd.validation.constraints.boolean import Boolean
+from bzd.validation.constraints.float import Float
+from bzd.validation.constraints.integer import Integer
+from bzd.validation.constraints.mandatory import Mandatory
+from bzd.validation.constraints.string import String
 from bzd.validation.result import Result
 from bzd.validation.schema import (
 	Constraint,
@@ -8,11 +13,6 @@ from bzd.validation.schema import (
 	Values,
 	ValuesDict,
 )
-from bzd.validation.constraints.boolean import Boolean
-from bzd.validation.constraints.integer import Integer
-from bzd.validation.constraints.float import Float
-from bzd.validation.constraints.string import String
-from bzd.validation.constraints.mandatory import Mandatory
 
 PATTERN_CONSTRAINT_ = re.compile(r"([a-zA-Z0-9_-]+)(?:\((.*)\))?")
 
@@ -21,13 +21,13 @@ class ExceptionValidation(Exception):
 	pass
 
 
-SchemaDict = typing.Dict[str, str]
-SchemaList = typing.List[str]
+SchemaDict = dict[str, str]
+SchemaList = list[str]
 Schema = typing.TypeVar("Schema", SchemaList, SchemaDict)
 
 
 class Validation(typing.Generic[Schema]):
-	AVAILABLE_CONSTRAINTS: typing.Dict[str, typing.Type[Constraint]] = {
+	AVAILABLE_CONSTRAINTS: typing.ClassVar[dict[str, type[Constraint]]] = {
 		"boolean": Boolean,
 		"integer": Integer,
 		"float": Float,
@@ -35,7 +35,7 @@ class Validation(typing.Generic[Schema]):
 		"mandatory": Mandatory,
 	}
 
-	memoizedProcessedSchema_: typing.Dict[typing.Tuple[str, int], ProcessedSchema] = {}
+	memoizedProcessedSchema_: typing.ClassVar[dict[tuple[str, int], ProcessedSchema]] = {}
 
 	def __init__(self, schema: Schema, args: typing.Any = None) -> None:
 		"""Initialize the Validation object.
@@ -45,14 +45,14 @@ class Validation(typing.Generic[Schema]):
 		        args: Arguments to be passed to the constraints.
 		"""
 
-		self.processed: typing.Dict[str, ProcessedSchema] = {}
+		self.processed: dict[str, ProcessedSchema] = {}
 		self.isList = isinstance(schema, list)
 		# Arguments to be passed to the check and process functions.
 		# It should not be passed into the install function, otherwise this would
 		# make memoization invalid.
 		self.args = args
 		# This is only used for debug purposes.
-		self.schema: typing.Dict[str, str] = self._inputToInternal(schema)
+		self.schema: dict[str, str] = self._inputToInternal(schema)
 		self._prepocessSchema(self.schema)
 
 	def _inputToInternal(self, schema: Values) -> ValuesDict:
@@ -64,20 +64,20 @@ class Validation(typing.Generic[Schema]):
 		return schema
 
 	@staticmethod
-	def parse(constraints: str) -> typing.Dict[str, typing.List[str]]:
+	def parse(constraints: str) -> dict[str, list[str]]:
 		"""
 		Parse string formatted contract and return the parsed data structure.
 		Note, it is ok to use a dictionary as dicts preserve insertion order in Python 3.7+
 		"""
-		assert isinstance(constraints, str), f"Constraint must be a string, received: {str(constraints)}"
+		assert isinstance(constraints, str), f"Constraint must be a string, received: {constraints!s}"
 		constraintList = [constraint for constraint in constraints.split() if constraint]
 		result = {}
 		for constraint in constraintList:
 			m = PATTERN_CONSTRAINT_.match(constraint)
-			assert m, "Constraint format error: '{}'.".format(constraint)
+			assert m, f"Constraint format error: '{constraint}'."
 			name = m.group(1)
 			args = [arg for arg in (m.group(2) if m.group(2) else "").split(",") if arg]
-			assert name not in result, "Constraint '{}' has been set twice.".format(name)
+			assert name not in result, f"Constraint '{name}' has been set twice."
 			result[name] = args
 
 		return result
@@ -91,7 +91,7 @@ class Validation(typing.Generic[Schema]):
 			# The key must include all variability to generate the processed schema.
 			memoizedKey = (constraints, id(self.AVAILABLE_CONSTRAINTS))
 
-			if memoizedKey in Validation.memoizedProcessedSchema_ and False:
+			if False:
 				self.processed[key] = Validation.memoizedProcessedSchema_[memoizedKey]
 
 			else:
@@ -119,9 +119,9 @@ class Validation(typing.Generic[Schema]):
 		results = Result[Schema](self.isList)
 
 		if self.isList and not isinstance(values, list):
-			results.addGlobalError("Input must be a list, got '{}' instead.".format(type(values)))
+			results.addGlobalError(f"Input must be a list, got '{type(values)}' instead.")
 		elif not self.isList and not isinstance(values, dict):
-			results.addGlobalError("Input must be a dictionary, got '{}' instead.".format(type(values)))
+			results.addGlobalError(f"Input must be a dictionary, got '{type(values)}' instead.")
 
 		# Convert the inputs into internal type
 		internals = self._inputToInternal(values)
@@ -139,9 +139,7 @@ class Validation(typing.Generic[Schema]):
 				else:
 					results.addError(
 						key,
-						[
-							"value not expected, valid choices are: {}.".format(", ".join(["'{}'".format(x) for x in self.processed.keys()]))
-						],
+						["value not expected, valid choices are: {}.".format(", ".join([f"'{x}'" for x in self.processed]))],
 					)
 
 			# Check for mandatory values
@@ -156,7 +154,7 @@ class Validation(typing.Generic[Schema]):
 		elif output == "return":
 			pass
 		else:
-			assert False, "Unsupported output type '{}'.".format(output)
+			assert False, f"Unsupported output type '{output}'."
 
 		return results
 

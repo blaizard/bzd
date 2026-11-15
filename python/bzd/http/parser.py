@@ -1,6 +1,6 @@
-import typing
 import enum
 import re
+import typing
 
 
 class TransferMode(enum.Enum):
@@ -18,8 +18,8 @@ class HttpParser:
 
 		self.reader = reader
 		self.buffer = b""
-		self.transferMode: typing.Optional[TransferMode] = None
-		self.bodyLengthLeft: typing.Optional[int] = None
+		self.transferMode: TransferMode | None = None
+		self.bodyLengthLeft: int | None = None
 
 	@staticmethod
 	def getHeader(data: bytes, name: str, defaultValue: typing.Any = None) -> typing.Any:

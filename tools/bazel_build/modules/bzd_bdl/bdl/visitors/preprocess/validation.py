@@ -1,13 +1,13 @@
-from bdl.visitor import Visitor as VisitorBase
 from bdl.entities.all import (
-	Expression,
-	Nested,
-	Method,
-	Using,
-	Enum,
 	EntityType,
+	Enum,
+	Expression,
+	Method,
+	Nested,
+	Using,
 )
 from bdl.entities.impl.types import Category
+from bdl.visitor import Visitor as VisitorBase
 
 
 class Validation(VisitorBase[None]):
@@ -91,7 +91,7 @@ class Validation(VisitorBase[None]):
 			arg.assertTrue(condition=arg.isName, message="Argument is missing a name.")
 			arg.assertTrue(
 				condition=(arg.name not in argumentNames),
-				message="Argument name '{}' is already defined.".format(arg.name),
+				message=f"Argument name '{arg.name}' is already defined.",
 			)
 			argumentNames.add(arg.name)
 			arg.contracts.validate()

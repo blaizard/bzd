@@ -1,5 +1,5 @@
-import unittest
 import json
+import unittest
 
 from apps.node_manager.private.server.workload import Workload
 from bzd.http.server_mock import makeRESTServerContext

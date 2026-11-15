@@ -1,13 +1,14 @@
+import enum
 import os
+import selectors
+import shlex
+import signal
 import subprocess
 import sys
 import threading
-import signal
-import shlex
-from typing import Any, Callable, List, Dict, Optional, Tuple, TextIO, Union
+from collections.abc import Callable
 from pathlib import Path
-import selectors
-import enum
+from typing import Any, TextIO
 
 
 class StreamCallback:
@@ -35,11 +36,11 @@ class StreamCallback:
 class ExecuteResultStreamWriter:
 	def __init__(
 		self,
-		stdout: Union[bool, TextIO] = False,
-		stderr: Union[bool, TextIO] = False,
+		stdout: bool | TextIO = False,
+		stderr: bool | TextIO = False,
 		maxSize: int = 1000000,
 	) -> None:
-		self.output: List[Tuple[bool, bytes]] = []
+		self.output: list[tuple[bool, bytes]] = []
 		self.stdout = stdout
 		self.stderr = stderr
 		self.size = 0
@@ -127,7 +128,7 @@ class Cancellation:
 		self.reset()
 
 	def reset(
-		self, proc: Optional[subprocess.Popen[bytes]] = None, sig: signal.Signals = signal.SIGTERM, timeoutS: float = 5.0
+		self, proc: subprocess.Popen[bytes] | None = None, sig: signal.Signals = signal.SIGTERM, timeoutS: float = 5.0
 	) -> None:
 		"""Reset the cancellation state."""
 
@@ -145,9 +146,7 @@ class Cancellation:
 			self._cancel(sig=sig, timeoutS=timeoutS)
 
 	@staticmethod
-	def killall(
-		gid: int, sig: signal.Signals, proc: Optional[subprocess.Popen[Any]] = None, timeoutS: float = 5.0
-	) -> bool:
+	def killall(gid: int, sig: signal.Signals, proc: subprocess.Popen[Any] | None = None, timeoutS: float = 5.0) -> bool:
 		"""Try to kill all processes in the given group.
 
 		Args:
@@ -162,7 +161,7 @@ class Cancellation:
 
 		try:
 			os.killpg(gid, sig)
-		except Exception:
+		except Exception:  # noqa: BLE001, S110
 			pass
 		if proc is not None:
 			try:
@@ -185,16 +184,16 @@ class Cancellation:
 
 
 def localCommand(
-	cmds: List[str],
+	cmds: list[str],
 	ignoreFailure: bool = False,
-	cwd: Optional[Path] = None,
-	env: Optional[Dict[str, str]] = None,
-	timeoutS: Optional[float] = 60.0,
+	cwd: Path | None = None,
+	env: dict[str, str] | None = None,
+	timeoutS: float | None = 60.0,
 	stdin: bool = False,
-	stdout: Union[bool, TextIO] = False,
-	stderr: Union[bool, TextIO] = False,
+	stdout: bool | TextIO = False,
+	stderr: bool | TextIO = False,
 	maxOutputSize: int = 1000000,
-	cancellation: Optional[Cancellation] = None,
+	cancellation: Cancellation | None = None,
 ) -> ExecuteResult:
 	"""Run a process locally.
 
@@ -231,7 +230,7 @@ def localCommand(
 		sel.register(proc.stderr, events=selectors.EVENT_READ)  # type: ignore
 
 		returnCode = 1
-		terminationSignal: Optional[signal.Signals] = signal.SIGKILL
+		terminationSignal: signal.Signals | None = signal.SIGKILL
 		try:
 			activeStreams = {proc.stdout, proc.stderr}
 			timer.start()
@@ -277,7 +276,7 @@ def localCommand(
 	return result
 
 
-def localPython(script: str, args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
+def localPython(script: str, args: list[str] | None = None, **kwargs: Any) -> ExecuteResult:
 	"""Execute a python script locally."""
 
 	return localCommand([sys.executable, script] + (args or []), **kwargs)
@@ -285,8 +284,8 @@ def localPython(script: str, args: Optional[List[str]] = None, **kwargs: Any) ->
 
 def localBazelBinary(
 	path: str,
-	args: Optional[List[str]] = None,
-	env: Optional[Dict[str, str]] = None,
+	args: list[str] | None = None,
+	env: dict[str, str] | None = None,
 	**kwargs: Any,
 ) -> ExecuteResult:
 	"""Execute a Bazel-built binary locally; all runfiles must already be available."""
@@ -296,7 +295,7 @@ def localBazelBinary(
 	return localCommand([path] + (args or []), env=env, **kwargs)
 
 
-def localBazel(cmds: List[str], **kwargs: Any) -> ExecuteResult:
+def localBazel(cmds: list[str], **kwargs: Any) -> ExecuteResult:
 	"""Execute a bazel command locally."""
 
 	return localCommand(["bazel"] + cmds, **kwargs)
@@ -304,8 +303,8 @@ def localBazel(cmds: List[str], **kwargs: Any) -> ExecuteResult:
 
 def localBazelTarget(
 	target: str,
-	args: Optional[List[str]] = None,
-	env: Optional[Dict[str, str]] = None,
+	args: list[str] | None = None,
+	env: dict[str, str] | None = None,
 	**kwargs: Any,
 ) -> ExecuteResult:
 	"""Execute a bazel target locally.
@@ -333,7 +332,7 @@ def localBazelTarget(
 	)
 
 
-def localDocker(args: Optional[List[str]] = None, **kwargs: Any) -> ExecuteResult:
+def localDocker(args: list[str] | None = None, **kwargs: Any) -> ExecuteResult:
 	"""Execute a command via docker."""
 
 	return localCommand(["docker"] + (args or []), **kwargs)

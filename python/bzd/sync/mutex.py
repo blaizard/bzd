@@ -1,11 +1,10 @@
 """System wide mutex."""
 
-import pathlib
-import os
 import fcntl
-import time
-import typing
+import os
+import pathlib
 import tempfile
+import time
 
 from bzd.logging import Logger
 
@@ -42,7 +41,7 @@ class Mutex:
 		main thread, therefore this implementation raise the error: 'signal only works in main thread of the main interpreter'
 		"""
 
-		def createLockFileTimestamp() -> typing.Tuple[int, float]:
+		def createLockFileTimestamp() -> tuple[int, float]:
 			lockFile = os.open(self.path, os.O_WRONLY | os.O_CREAT)
 			timestampEnd = time.time() + self.timeoutS
 			return lockFile, timestampEnd
@@ -59,7 +58,7 @@ class Mutex:
 
 		self.lockFile = lockFile
 
-	def __exit__(self, *_: typing.Any) -> None:
+	def __exit__(self, *_: object) -> None:
 
 		lockFile = self.lockFile
 		fcntl.flock(lockFile, fcntl.LOCK_UN)

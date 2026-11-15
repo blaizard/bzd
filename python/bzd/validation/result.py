@@ -8,15 +8,15 @@ T = typing.TypeVar("T")
 class Result(typing.Generic[T]):
 	def __init__(self, isList: bool) -> None:
 		self.isList = isList
-		self.globalErrors: typing.List[str] = []
-		self.errors: typing.Dict[str, typing.List[str]] = {}
+		self.globalErrors: list[str] = []
+		self.errors: dict[str, list[str]] = {}
 		self.values_: Values = [] if self.isList else {}
 
 	def addGlobalError(self, error: str) -> None:
 		self.globalErrors.append(error)
 
-	def addError(self, key: str, errors: typing.List[str]) -> None:
-		assert key not in self.errors, "Key '{}' already assigned.".format(key)
+	def addError(self, key: str, errors: list[str]) -> None:
+		assert key not in self.errors, f"Key '{key}' already assigned."
 		self.errors[key] = errors
 
 	def addResult(self, key: str, result: ProcessedResult) -> None:

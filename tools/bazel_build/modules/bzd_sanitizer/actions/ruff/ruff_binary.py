@@ -1,7 +1,7 @@
 """Thin wrapper to invoke the native ruff binary from its pip wheel."""
 
-import pathlib
 import os
+import pathlib
 import sys
 
 import ruff

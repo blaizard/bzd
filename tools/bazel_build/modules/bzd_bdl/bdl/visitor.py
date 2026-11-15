@@ -1,27 +1,28 @@
-import typing
 import enum
+import types
+import typing
 
-from bzd.parser.visitor import Visitor as VisitorBase
-from bzd.parser.error import Error
 from bzd.parser.element import Element
+from bzd.parser.error import Error
+from bzd.parser.visitor import Visitor as VisitorBase
 
-from bdl.entities.impl.types import Category
 from bdl.entities.all import (
-	Preset,
-	Expression,
-	Nested,
-	Method,
-	Using,
+	EntityType,
 	Enum,
 	EnumValue,
+	Expression,
 	Extern,
+	Method,
 	Namespace,
+	Nested,
+	Preset,
 	Use,
-	EntityType,
+	Using,
 	elementToEntity,
 )
+from bdl.entities.impl.types import Category
 
-NamespaceType = typing.List[str]
+NamespaceType = list[str]
 
 
 class NestedSequence(enum.Enum):
@@ -31,15 +32,15 @@ class NestedSequence(enum.Enum):
 
 
 class Parent:
-	def __init__(self, entity: typing.Optional[typing.Union[EntityType, typing.List[str]]] = None) -> None:
+	def __init__(self, entity: EntityType | list[str] | None = None) -> None:
 		self.entity = entity
 
 	@property
 	def isNested(self) -> bool:
-		return isinstance(self.entity, Nested) or isinstance(self.entity, Enum)
+		return isinstance(self.entity, (Nested, Enum))
 
 	@property
-	def namespace(self) -> typing.List[str]:
+	def namespace(self) -> list[str]:
 		if self.entity and self.isNested:
 			return [self.entity.name] if self.entity.isName else []  # type: ignore
 		if isinstance(self.entity, Namespace):
@@ -61,7 +62,7 @@ class Group(enum.Flag):
 
 
 class GroupScope:
-	def __init__(self, list: typing.List[Group], group: typing.Optional[Group]) -> None:
+	def __init__(self, list: list[Group], group: Group | None) -> None:
 		self.list = list
 		self.group = group
 
@@ -69,16 +70,21 @@ class GroupScope:
 		if self.group is not None:
 			self.list.append(self.group)
 
-	def __exit__(self, exc_type: typing.Any, exc_value: typing.Any, exc_tb: typing.Any) -> None:
+	def __exit__(
+		self,
+		exc_type: type[BaseException] | None,
+		exc_value: BaseException | None,
+		exc_tb: types.TracebackType | None,
+	) -> None:
 		if self.group is not None:
 			self.list.pop()
 
 
 class Groups:
 	def __init__(self) -> None:
-		self.list: typing.List[Group] = []
+		self.list: list[Group] = []
 
-	def scope(self, group: typing.Optional[Group]) -> GroupScope:
+	def scope(self, group: Group | None) -> GroupScope:
 		return GroupScope(list=self.list, group=group)
 
 	@property
@@ -102,8 +108,8 @@ class Visitor(VisitorBase[T, T]):
 
 	def __init__(
 		self,
-		namespace: typing.Optional[typing.List[str]] = None,
-		elementToEntityExtenstion: typing.Optional[typing.Dict[str, typing.Type[EntityType]]] = None,
+		namespace: list[str] | None = None,
+		elementToEntityExtenstion: dict[str, type[EntityType]] | None = None,
 	) -> None:
 		"""Create a visitor for the bdl grammar.
 
@@ -113,7 +119,7 @@ class Visitor(VisitorBase[T, T]):
 		"""
 
 		self.level = 0
-		self.parents: typing.List[Parent] = []
+		self.parents: list[Parent] = []
 		self.elementToEntityExtenstion = elementToEntityExtenstion
 		self.groups = Groups()
 
@@ -122,7 +128,7 @@ class Visitor(VisitorBase[T, T]):
 			self.parents.append(Parent(entity=namespace))
 
 	@property
-	def namespace(self) -> typing.List[str]:
+	def namespace(self) -> list[str]:
 		"""
 		Get the list of names constituting the namespace.
 		"""
@@ -132,7 +138,7 @@ class Visitor(VisitorBase[T, T]):
 	def group(self) -> Group:
 		return self.groups.group
 
-	def entityToGroup(self, entity: EntityType) -> typing.Optional[Group]:
+	def entityToGroup(self, entity: EntityType) -> Group | None:
 		"""Define a group based on an entity."""
 
 		if entity.category == Category.composition:
@@ -145,7 +151,7 @@ class Visitor(VisitorBase[T, T]):
 			return Group.struct
 		return None
 
-	def nestedToGroup(self, entity: EntityType, nested: NestedSequence) -> typing.Optional[Group]:
+	def nestedToGroup(self, entity: EntityType, nested: NestedSequence) -> Group | None:
 		"""Convert a nested sequence type into a group."""
 
 		return {
@@ -230,7 +236,7 @@ class Visitor(VisitorBase[T, T]):
 			else:
 				Error.handleFromElement(
 					element=element,
-					message="Unexpected entity: {}".format(type(entity)),
+					message=f"Unexpected entity: {type(entity)}",
 				)
 
 		return result
@@ -239,58 +245,48 @@ class Visitor(VisitorBase[T, T]):
 		"""
 		Called when discovering a nested entity.
 		"""
-		pass
 
 	def visitExpression(self, entity: Expression, result: T) -> None:
 		"""
 		Called when discovering an expression.
 		"""
-		pass
 
 	def visitMethod(self, entity: Method, result: T) -> None:
 		"""
 		Called when discovering a method.
 		"""
-		pass
 
 	def visitUsing(self, entity: Using, result: T) -> None:
 		"""
 		Called when discovering a using keyword.
 		"""
-		pass
 
 	def visitExtern(self, entity: Extern, result: T) -> None:
 		"""
 		Called when discovering an extern keyword.
 		"""
-		pass
 
 	def visitEnum(self, entity: Enum, result: T) -> None:
 		"""
 		Called when discovering an enum.
 		"""
-		pass
 
 	def visitEnumValue(self, entity: EnumValue, result: T) -> None:
 		"""
 		Called when discovering an enum value.
 		"""
-		pass
 
 	def visitNamespace(self, entity: Namespace, result: T) -> None:
 		"""
 		Called when discovering a namespace.
 		"""
-		pass
 
 	def visitUse(self, entity: Use, result: T) -> None:
 		"""
 		Called when discovering a use statement.
 		"""
-		pass
 
 	def visitPreset(self, entity: Preset, result: T) -> None:
 		"""
 		Called when discovering a preset.
 		"""
-		pass

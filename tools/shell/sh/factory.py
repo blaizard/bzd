@@ -1,6 +1,5 @@
 import os
 import pathlib
-import typing
 import re
 import shutil
 import unittest
@@ -15,7 +14,7 @@ class MyAssertions(unittest.TestCase):
 
 class Sh(Factory):
 	def __init__(self) -> None:
-		self.path: typing.Optional[pathlib.Path] = None
+		self.path: pathlib.Path | None = None
 
 	def getName(self) -> str:
 		"""Give the name of the shell."""

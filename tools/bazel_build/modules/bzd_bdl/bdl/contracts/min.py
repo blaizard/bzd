@@ -1,14 +1,12 @@
-import typing
-
-from bdl.contracts.traits import ContractTraits, Role
 from bdl.contracts.contract import Contract
+from bdl.contracts.traits import ContractTraits, Role
 
 
 class ContractMin(ContractTraits):
 	def __init__(self) -> None:
 		super().__init__(name="min", role=Role.Value | Role.Template | Role.Public)
 
-	def resolveConflictInternals(self, base: Contract, derived: Contract) -> typing.Optional[Contract]:
+	def resolveConflictInternals(self, base: Contract, derived: Contract) -> Contract | None:
 		if base.valueNumber > derived.valueNumber:
-			raise Exception("base contract containing [{}] is defined with a higher minimum.".format(str(base)))
+			raise RuntimeError(f"base contract containing [{base!s}] is defined with a higher minimum.")
 		return derived

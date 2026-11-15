@@ -1,11 +1,10 @@
 import threading
-import typing
 
 from bzd.logging.handler import (
 	Log,
-	LoggerHandlerScope,
 	LoggerHandlerData,
 	LoggerHandlerFlow,
+	LoggerHandlerScope,
 )
 
 
@@ -13,14 +12,14 @@ class LoggerHandlerAsyncBuffered(LoggerHandlerScope):
 	"""Buffers the log entries."""
 
 	def __init__(self, bufferTimeS: float = 1.0, maxBufferSize: int = 10000) -> None:
-		self.data: typing.List[Log] = []
+		self.data: list[Log] = []
 		self.size = 0
-		self.flow: typing.Optional[LoggerHandlerFlow] = None
+		self.flow: LoggerHandlerFlow | None = None
 		self.bufferTimeS = bufferTimeS
 		self.maxBufferSize = maxBufferSize
 		self.stopRequested = False
 		self.timeEvent = threading.Event()
-		self.worker: typing.Optional[threading.Thread] = None
+		self.worker: threading.Thread | None = None
 
 	def handler(self, data: LoggerHandlerData, flow: LoggerHandlerFlow) -> None:
 		self.data += data

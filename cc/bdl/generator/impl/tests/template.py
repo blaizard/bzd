@@ -1,11 +1,9 @@
 import unittest
 from functools import cached_property
 
-from bzd.template.template import Template
-
 from bdl.object import Object, ObjectContext
 from bdl.visitors.composition.visitor import Composition
-
+from bzd.template.template import Template
 from cc.bdl.generator.impl.visitor import Transform
 
 

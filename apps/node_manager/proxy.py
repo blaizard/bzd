@@ -4,11 +4,11 @@ import functools
 import typing
 from contextlib import contextmanager
 
-from bzd.logging import Logger
-from bzd.logging.handler.stderr import LoggerHandlerStderr
-from apps.node_manager.private.common import getHostPort
 from apps.node_manager.client import ARGUMENTS, commandWoLLeasePeriod
 from apps.node_manager.private.client.command.lease import leaseContext
+from apps.node_manager.private.common import getHostPort
+from bzd.logging import Logger
+from bzd.logging.handler.stderr import LoggerHandlerStderr
 
 
 class WolLeaseManager:
@@ -17,7 +17,7 @@ class WolLeaseManager:
 		mac: str,
 		broadcast: str,
 		service: str,
-		wait: typing.List[str],
+		wait: list[str],
 		timeout: int,
 		server: str,
 		name: str,
@@ -73,7 +73,7 @@ class WolLeaseManager:
 								if self.activeClients == 0:
 									break
 
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				self.logger.error(f"Lease error: {e}")
 				await asyncio.sleep(5)
 
@@ -100,7 +100,7 @@ async def pipe(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> No
 				break
 			writer.write(data)
 			await writer.drain()
-	except Exception:
+	except Exception:  # noqa: BLE001, S110
 		pass
 	finally:
 		writer.close()
@@ -118,7 +118,7 @@ async def handleCLient(
 	with wolLeaseManager.lease():
 		try:
 			targetReader, targetWriter = await asyncio.open_connection(targetHost, targetPort)
-		except Exception:
+		except Exception:  # noqa: BLE001
 			clientWriter.close()
 			return
 
@@ -128,7 +128,7 @@ async def handleCLient(
 		await asyncio.gather(pipToTarget, pipToClient)
 
 
-async def main(bind: str, mapping: typing.Dict[int, str], wolLeaseManager: WolLeaseManager, logger: Logger) -> None:
+async def main(bind: str, mapping: dict[int, str], wolLeaseManager: WolLeaseManager, logger: Logger) -> None:
 
 	servers = []
 

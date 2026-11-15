@@ -1,12 +1,10 @@
-import typing
-
-from bzd.validation.schema import Context, Constraint, ProcessedSchema
+from bzd.validation.schema import Constraint, Context, ProcessedSchema
 
 from bdl.contracts.traits import ContractTraits, Role
 
 
 class Convertible_(Constraint):
-	def install(self, processedSchema: ProcessedSchema, args: typing.List[str]) -> None:
+	def install(self, processedSchema: ProcessedSchema, args: list[str]) -> None:
 
 		def _process(base: str, context: Context) -> None:
 			assert "resolver" in context.args

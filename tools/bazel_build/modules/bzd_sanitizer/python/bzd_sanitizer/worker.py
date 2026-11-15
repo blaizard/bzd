@@ -1,11 +1,12 @@
-import pathlib
-import typing
-import sys
-import io
 import dataclasses
+import io
+import pathlib
+import sys
+import typing
+
+from bzd.utils.worker import Worker
 
 from bzd_sanitizer.context import Context
-from bzd.utils.worker import Worker
 
 Ts = typing.TypeVarTuple("Ts")
 
@@ -22,15 +23,15 @@ def chunkWorker(
 	contextPath: pathlib.Path,
 	workload: typing.Callable[
 		[
-			typing.Tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, *Ts],
+			tuple[pathlib.Path, typing.Sequence[pathlib.Path], bool, *Ts],
 			typing.TextIO,
 		],
 		bool,
 	],
-	args: typing.Optional[typing.Tuple[*Ts]] = None,
+	args: tuple[*Ts,] | None = None,
 	timeoutS: int = 60,
 	maxFiles: int = 256,
-	stdoutParser: typing.Optional[typing.Callable[[str, pathlib.Path], typing.Iterator[OutputWithPath]]] = None,
+	stdoutParser: typing.Callable[[str, pathlib.Path], typing.Iterator[OutputWithPath]] | None = None,
 	**filters: typing.Any,
 ) -> bool:
 	"""Execute a single workload at a time with multiple files and report errors if needed."""
@@ -54,7 +55,7 @@ def chunkWorker(
 	# Print the error if any
 	if isFailure:
 		if stdoutParser:
-			outputsByPath: typing.Dict[pathlib.Path, typing.List[str]] = {}
+			outputsByPath: dict[pathlib.Path, list[str]] = {}
 			for output in failureOutputs:
 				for item in [*stdoutParser(output, context.workspace)]:
 					outputsByPath.setdefault(item.path, []).append(item.output)
@@ -63,7 +64,7 @@ def chunkWorker(
 					actualPath = path.resolve(strict=True).relative_to(context.workspace)
 					context.printSection(title=str(actualPath), level=2)
 					print("\n".join(outputs))
-				except Exception:
+				except Exception:  # noqa: BLE001, S110
 					pass
 		else:
 			for output in failureOutputs:
@@ -74,8 +75,8 @@ def chunkWorker(
 
 def worker(
 	contextPath: pathlib.Path,
-	workload: typing.Callable[[typing.Tuple[pathlib.Path, pathlib.Path, bool, *Ts], typing.TextIO], bool],
-	args: typing.Optional[typing.Tuple[*Ts]] = None,
+	workload: typing.Callable[[tuple[pathlib.Path, pathlib.Path, bool, *Ts], typing.TextIO], bool],
+	args: tuple[*Ts,] | None = None,
 	timeoutS: int = 60,
 	**filters: typing.Any,
 ) -> bool:

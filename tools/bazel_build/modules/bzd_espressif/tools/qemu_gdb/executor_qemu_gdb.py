@@ -1,19 +1,18 @@
 import argparse
-import pathlib
-import typing
-import sys
 import os
-import threading
-import time
+import pathlib
 import pty
 import socket
+import sys
+import threading
+import time
 
-from bzd.utils.run import localCommand, localBazel, Cancellation
+from bzd.utils.run import Cancellation, localBazel, localCommand
 
 
 def splitEndOfOptionsMarker(
-	args: typing.List[str],
-) -> typing.Tuple[typing.List[str], typing.List[str]]:
+	args: list[str],
+) -> tuple[list[str], list[str]]:
 	"""Split the given argument list at the end-of-options marker if any."""
 	try:
 		index = args.index("--")
@@ -32,7 +31,7 @@ def checkConnection(host: str, port: int, timeoutS: int) -> bool:
 		sock.settimeout(timeoutS)
 		try:
 			sock.connect((host, port))
-		except Exception:
+		except Exception:  # noqa: BLE001, S112
 			continue
 		else:
 			sock.close()

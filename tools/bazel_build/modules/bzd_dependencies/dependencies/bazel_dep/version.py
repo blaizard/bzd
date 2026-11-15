@@ -12,8 +12,8 @@ class Version:
 	def __init__(
 		self,
 		value: str,
-		numeric: typing.Tuple[int, ...],
-		prerelease: typing.Tuple[typing.Union[int, str], ...],
+		numeric: tuple[int, ...],
+		prerelease: tuple[int | str, ...],
 	) -> None:
 		self.value = value
 		self.numeric_ = numeric
@@ -28,7 +28,7 @@ class Version:
 			return None
 		numeric = tuple(int(component) for component in match.group(1).split("."))
 		prereleaseString = match.group(2)
-		prerelease: typing.Tuple[typing.Union[int, str], ...] = ()
+		prerelease: tuple[int | str, ...] = ()
 		if prereleaseString is not None:
 			prerelease = tuple(
 				int(identifier) if identifier.isdigit() else identifier for identifier in prereleaseString.split(".")
@@ -55,7 +55,7 @@ class Version:
 	def __hash__(self) -> int:
 		return hash(self._comparisonKey())
 
-	def _comparisonKey(self) -> typing.Tuple[typing.Any, ...]:
+	def _comparisonKey(self) -> tuple[typing.Any, ...]:
 		return (
 			self.numeric_,
 			# A release is newer than any of its pre-releases.

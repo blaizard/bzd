@@ -1,18 +1,18 @@
 import typing
-
 from collections import defaultdict
+
 from bdl.entities.impl.types import Category
 
 if typing.TYPE_CHECKING:
 	from bdl.entities.all import (
-		Expression,
-		Nested,
-		Method,
-		Using,
-		Enum,
-		Namespace,
-		Use,
 		EntityType,
+		Enum,
+		Expression,
+		Method,
+		Namespace,
+		Nested,
+		Use,
+		Using,
 	)
 
 
@@ -21,20 +21,19 @@ class EntitySequence:
 	Defines an entity sequence
 	"""
 
-	def __init__(self, sequence: typing.List["EntityType"]) -> None:
+	def __init__(self, sequence: list["EntityType"]) -> None:
 		self.sequence_ = sequence
-		self.processed: typing.Optional[typing.Dict[Category, typing.List["EntityType"]]] = None
+		self.processed: dict[Category, list[EntityType]] | None = None
 
 	@property
-	def sequence(self) -> typing.List["EntityType"]:
+	def sequence(self) -> list["EntityType"]:
 		"""
 		Used for customization.
 		"""
 		return self.sequence_
 
 	def __iter__(self) -> typing.Iterator["EntityType"]:
-		for entity in self.sequence:
-			yield entity
+		yield from self.sequence
 
 	def __len__(self) -> int:
 		return len(self.sequence)
@@ -42,7 +41,7 @@ class EntitySequence:
 	def __repr__(self) -> str:
 		return "\n".join([str(entity.element) for entity in self.sequence])
 
-	def _filteredList(self, *categories: Category) -> typing.List["EntityType"]:
+	def _filteredList(self, *categories: Category) -> list["EntityType"]:
 		if not self.processed:
 			self.processed = defaultdict(list)
 			for entity in self.sequence:
@@ -65,9 +64,9 @@ class EntitySequence:
 		)
 
 	@property
-	def nestedList(self) -> typing.List["Nested"]:
+	def nestedList(self) -> list["Nested"]:
 		return typing.cast(
-			typing.List["Nested"],
+			list["Nested"],
 			self._filteredList(
 				Category.struct,
 				Category.interface,
@@ -81,32 +80,32 @@ class EntitySequence:
 		return self._is(Category.expression)
 
 	@property
-	def expressionList(self) -> typing.List["Expression"]:
-		return typing.cast(typing.List["Expression"], self._filteredList(Category.expression))
+	def expressionList(self) -> list["Expression"]:
+		return typing.cast(list["Expression"], self._filteredList(Category.expression))
 
 	@property
 	def isMethod(self) -> bool:
 		return self._is(Category.method)
 
 	@property
-	def methodList(self) -> typing.List["Method"]:
-		return typing.cast(typing.List["Method"], self._filteredList(Category.method))
+	def methodList(self) -> list["Method"]:
+		return typing.cast(list["Method"], self._filteredList(Category.method))
 
 	@property
 	def isUsing(self) -> bool:
 		return self._is(Category.using)
 
 	@property
-	def usingList(self) -> typing.List["Using"]:
-		return typing.cast(typing.List["Using"], self._filteredList(Category.using))
+	def usingList(self) -> list["Using"]:
+		return typing.cast(list["Using"], self._filteredList(Category.using))
 
 	@property
 	def isEnum(self) -> bool:
 		return self._is(Category.enum)
 
 	@property
-	def enumList(self) -> typing.List["Enum"]:
-		return typing.cast(typing.List["Enum"], self._filteredList(Category.enum))
+	def enumList(self) -> list["Enum"]:
+		return typing.cast(list["Enum"], self._filteredList(Category.enum))
 
 	@property
 	def isNamespace(self) -> bool:
@@ -117,13 +116,13 @@ class EntitySequence:
 		return typing.cast("Namespace", self._filteredList(Category.namespace)[0])
 
 	@property
-	def namespaceList(self) -> typing.List["Namespace"]:
-		return typing.cast(typing.List["Namespace"], self._filteredList(Category.namespace))
+	def namespaceList(self) -> list["Namespace"]:
+		return typing.cast(list["Namespace"], self._filteredList(Category.namespace))
 
 	@property
 	def isUse(self) -> bool:
 		return self._is(Category.use)
 
 	@property
-	def useList(self) -> typing.List["Use"]:
-		return typing.cast(typing.List["Use"], self._filteredList(Category.use))
+	def useList(self) -> list["Use"]:
+		return typing.cast(list["Use"], self._filteredList(Category.use))

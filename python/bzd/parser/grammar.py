@@ -1,20 +1,20 @@
 import re
 import typing
 from functools import cached_property
+from typing import Any
 
-from typing import Any, Optional, Dict, List, Union, Type
 from bzd.parser.fragments import Fragment
 
-Grammar = List[Any]
+Grammar = list[Any]
 
 
 class GrammarItem:
 	def __init__(
 		self,
-		regexpr: Optional[str] = None,
-		fragment: Union[Type[Fragment], Dict[str, str]] = Fragment,
-		grammar: Optional[Union[Grammar, str]] = None,
-		checkpoint: Optional[str] = None,
+		regexpr: str | None = None,
+		fragment: type[Fragment] | dict[str, str] = Fragment,
+		grammar: Grammar | str | None = None,
+		checkpoint: str | None = None,
 	) -> None:
 		self.regexpr_ = regexpr
 
@@ -29,7 +29,7 @@ class GrammarItem:
 			self.fragment = fragment  # type: ignore
 
 		else:
-			raise Exception("Unsupported type for GrammarItem::fragment argument: {}".format(type(fragment)))
+			raise TypeError(f"Unsupported type for GrammarItem::fragment argument: {type(fragment)}")
 
 		self.grammar = grammar
 		self.checkpoint = checkpoint

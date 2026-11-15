@@ -1,17 +1,16 @@
 import argparse
-import typing
-import sys
 import pathlib
+import sys
 
-from bzd.utils.uart import Devices, Device, Uart
-from bzd.utils.run import localPython
 from bzd.logging import Logger
 from bzd.utils.binary_builder import makeBinary
+from bzd.utils.run import localPython
+from bzd.utils.uart import Device, Devices, Uart
 
 logger = Logger("uart")
 
 
-def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device: typing.Optional[Device]) -> Device:
+def getDevice(vidPids: list[tuple[int, int]], device: Device | None) -> Device:
 	"""Search for the most suitable device to program the target."""
 
 	if device is not None:
@@ -24,15 +23,15 @@ def getDevice(vidPids: typing.List[typing.Tuple[int, int]], device: typing.Optio
 			accessibleDevices = filteredDevices.filterByAccess()
 			if accessibleDevices.empty():
 				logger.error(
-					f"The device(s) {str(filteredDevices.get())} is(are) a match, but you don't have the necessary permission for access."
+					f"The device(s) {filteredDevices.get()!s} is(are) a match, but you don't have the necessary permission for access."
 				)
 				logger.error("Use the following command and reboot: sudo usermod -a -G dialout $USER")
 				sys.exit(1)
 			return accessibleDevices.get()[0]
 
 		logger.info("No device compatible, please use one from the following list:")
-		for device, description in devices.getInfo().items():
-			logger.info(f"- {device}: {description}")
+		for deviceName, description in devices.getInfo().items():
+			logger.info(f"- {deviceName}: {description}")
 		sys.exit(1)
 	logger.error("No device found.")
 	sys.exit(1)
@@ -96,7 +95,7 @@ if __name__ == "__main__":
 
 	esptoolArgs = ["--port", device] + esptoolArgs
 	for chunk in binary.chunks:
-		esptoolArgs += ["0x{:x}".format(chunk.address), str(chunk.path)]
+		esptoolArgs += [f"0x{chunk.address:x}", str(chunk.path)]
 
 	result = localPython(
 		script=args.esptool,

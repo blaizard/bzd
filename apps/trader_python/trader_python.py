@@ -1,5 +1,5 @@
-import pathlib
 import argparse
+import pathlib
 
 from apps.trader_python.exchange.virtual.exchange import Virtual
 from apps.trader_python.recording.recording_from_path import RecordingFromPath

@@ -1,23 +1,22 @@
 import json
-import typing
 from pathlib import Path
 
-from bzd.parser.parser import Parser as BaseParser
 from bzd.parser.context import Context
+from bzd.parser.parser import Parser as BaseParser
 
+from bdl.entities.all import EntityType
 from bdl.grammar import Parser
+from bdl.visitors.preprocess.build import Build
+from bdl.visitors.preprocess.process_inclusions import ProcessInclusions
+from bdl.visitors.preprocess.validation import Validation
 from bdl.visitors.symbol_map import SymbolMap
 from bdl.visitors.symbol_tree import SymbolTree
-from bdl.visitors.preprocess.process_inclusions import ProcessInclusions
-from bdl.visitors.preprocess.build import Build
-from bdl.visitors.preprocess.validation import Validation
-from bdl.entities.all import EntityType
 
 
 class ObjectContext:
 	def __init__(
 		self,
-		searchPaths: typing.Optional[typing.List[str]] = None,
+		searchPaths: list[str] | None = None,
 		resolve: bool = False,
 		composition: bool = False,
 	) -> None:
@@ -29,7 +28,7 @@ class ObjectContext:
 		"""
 
 		self.searchPaths = [Path(p) for p in (searchPaths or [])]
-		self.sources: typing.List[Path] = []
+		self.sources: list[Path] = []
 		self.resolve = resolve
 		self.composition = composition
 
@@ -39,7 +38,7 @@ class ObjectContext:
 		path = self.getPathFromSource(source)
 		# Check for circular dependencies
 		if path in self.sources:
-			raise Exception("Circular dependency detected:\n{}".format("\n".join([f.as_posix() for f in self.sources])))
+			raise RuntimeError("Circular dependency detected:\n{}".format("\n".join([f.as_posix() for f in self.sources])))
 		self.sources.append(path)
 
 	def popSource(self) -> None:
@@ -47,7 +46,7 @@ class ObjectContext:
 
 		self.sources.pop()
 
-	def getSource(self) -> typing.Optional[Path]:
+	def getSource(self) -> Path | None:
 		"""Get the current source file path."""
 
 		return self.sources[-1] if len(self.sources) > 0 else None
@@ -64,9 +63,9 @@ class ObjectContext:
 
 		split = source.split("@")
 		assert len(split) <= 2, f"The source '{source}' is malformed."
-		return Path(split[1]) if len(split) > 1 else Path("{}.o".format(source))
+		return Path(split[1]) if len(split) > 1 else Path(f"{source}.o")
 
-	def _findInSearchPaths(self, rel: Path) -> typing.Optional[Path]:
+	def _findInSearchPaths(self, rel: Path) -> Path | None:
 		"""Iterate search paths in order, returning the first match for the given relative path."""
 		for sp in self.searchPaths:
 			candidate = sp / rel
@@ -74,7 +73,7 @@ class ObjectContext:
 				return candidate
 		return None
 
-	def findPreprocess(self, source: str) -> typing.Optional[Path]:
+	def findPreprocess(self, source: str) -> Path | None:
 		"""Search for a preprocessed object file, checking explicit `@<output>` first, then `searchPaths` with the `.bdl.o` suffix."""
 
 		path = self.getPathFromSource(source=source)
@@ -86,7 +85,7 @@ class ObjectContext:
 		# Candidate 2: any search path's preprocessed object file.
 		return self._findInSearchPaths(path.with_suffix(".bdl.o"))
 
-	def findFile(self, source: str) -> typing.Optional[Path]:
+	def findFile(self, source: str) -> Path | None:
 		"""Search for a raw file (e.g. preset JSON), checking the direct path first, then `searchPaths`."""
 
 		path = self.getPathFromSource(source=source)
@@ -100,9 +99,7 @@ class ObjectContext:
 		"""Check if a BDL file has a preprocessed counter-part."""
 
 		preprocessed = self.getPreprocessedPathFromSource(source=source)
-		if preprocessed.is_file():
-			return True
-		return False
+		return bool(preprocessed.is_file())
 
 	def savePreprocess(self, source: str, object: "Object") -> None:
 		"""Save the serialized content of preprocessed object."""
@@ -126,7 +123,7 @@ class ObjectContext:
 			tree=SymbolTree.fromSerialize(payload["tree"], symbols),
 		)
 
-	def preprocess(self, source: str, namespace: typing.Optional[typing.List[str]] = None) -> "Object":
+	def preprocess(self, source: str, namespace: list[str] | None = None) -> "Object":
 		"""Preprocess a bdl file and save its output, or use the preprocessed file if present.
 
 		Args:
@@ -154,7 +151,7 @@ class ObjectContext:
 			saveSource = source
 			if "@" not in source and self.searchPaths:
 				output = self.searchPaths[0] / path.with_suffix(".bdl.o")
-				saveSource = "{}@{}".format(source, output)
+				saveSource = f"{source}@{output}"
 			self.savePreprocess(source=saveSource, object=bdl)
 
 		# Pop dependency
@@ -175,7 +172,7 @@ class Object:
 	def _makeObject(
 		parser: BaseParser,
 		objectContext: ObjectContext,
-		namespace: typing.Optional[typing.List[str]] = None,
+		namespace: list[str] | None = None,
 	) -> "Object":
 		"""Helper to make an object from a parser."""
 
@@ -199,7 +196,7 @@ class Object:
 		)
 
 	@staticmethod
-	def fromContent(content: str, objectContext: typing.Optional[ObjectContext] = None) -> "Object":
+	def fromContent(content: str, objectContext: ObjectContext | None = None) -> "Object":
 		"""Make an object from the content of a bdl file.
 
 		This is mainly used for testing purpose.
@@ -236,8 +233,8 @@ class Object:
 
 		content = ""
 		content += "--- Symbols\n"
-		content += "".join(["\t{}\n".format(line) for line in str(self.symbols).split("\n")])
+		content += "".join([f"\t{line}\n" for line in str(self.symbols).split("\n")])
 		content += "--- Tree\n"
-		content += "".join(["\t{}\n".format(line) for line in str(self.tree).split("\n")])
+		content += "".join([f"\t{line}\n" for line in str(self.tree).split("\n")])
 
 		return content

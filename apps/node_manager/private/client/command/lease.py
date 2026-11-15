@@ -1,12 +1,12 @@
 import os
-import typing
-import threading
-import subprocess
 import shlex
+import subprocess
+import threading
+import typing
 from contextlib import contextmanager
 
-from apps.node_manager.private.common import getHostPort
 from apps.node_manager.private.client.command.lease_period import leasePeriod
+from apps.node_manager.private.common import getHostPort
 from bzd.http.client import HttpClient
 from bzd.logging import Logger
 
@@ -17,7 +17,7 @@ def leaseContext(
 	server: str,
 	ttl: int,
 	logger: Logger,
-	leaseId: typing.Optional[str] = None,
+	leaseId: str | None = None,
 	httpClient: typing.Any = HttpClient,
 ) -> typing.Generator[threading.Event, None, None]:
 	"""Register a workload, run a heartbeat and release the workload when completed."""
@@ -41,7 +41,7 @@ def leaseContext(
 			try:
 				httpClient.post(f"{baseUrl}/workload/heartbeat", json={"id": leaseId, "ttl": ttl})
 				consecutiveFailures = 0
-			except Exception as e:
+			except Exception as e:  # noqa: BLE001
 				consecutiveFailures += 1
 				logger.error(f"Heartbeat failed: {e}")
 				if consecutiveFailures > 2:
@@ -57,7 +57,7 @@ def leaseContext(
 		stop.set()
 		try:
 			httpClient.post(f"{baseUrl}/workload/release", json={"id": leaseId})
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			logger.error(f"Failed to release workload: {e}")
 
 
@@ -65,18 +65,18 @@ def commandLease(
 	server: str,
 	name: str,
 	ttl: int,
-	command: typing.List[str],
+	command: list[str],
 	logger: Logger,
-	leaseId: typing.Optional[str] = None,
-	undefine: typing.Optional[typing.List[str]] = None,
+	leaseId: str | None = None,
+	undefine: list[str] | None = None,
 	httpClient: typing.Any = HttpClient,
 ) -> int:
 	"""Register a workload, run a heartbeat and release the workload when completed."""
 
 	with leaseContext(name=name, server=server, ttl=ttl, leaseId=leaseId, logger=logger, httpClient=httpClient) as stop:
 		env = os.environ.copy()
-		for name in undefine or []:
-			env.pop(name, None)
+		for nameToRemove in undefine or []:
+			env.pop(nameToRemove, None)
 
 		# Run the process in a shell, to mimic what a user would do when calling the script.
 		# This is needed by some programs which need to think they are in an interactive shell.

@@ -1,13 +1,13 @@
 import typing
 
-from bzd.parser.element import Sequence, Element
+from bzd.parser.element import Element, Sequence
 
 T = typing.TypeVar("T")
 U = typing.TypeVar("U")
 
 
 class _VisitorCommon(typing.Generic[T, U]):
-	nestedKind: typing.Optional[str] = "nested"
+	nestedKind: str | None = "nested"
 
 	def visit(self, sequence: Sequence) -> U:
 		result = self._visit(sequence=sequence)  # type: ignore
@@ -33,7 +33,7 @@ class Visitor(_VisitorCommon[T, U]):
 	"""
 
 	def _visit(self, sequence: Sequence, result: typing.Any = None) -> T:
-		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
+		assert isinstance(sequence, Sequence), f"Must be a sequence, instead: {type(sequence)}"
 
 		result = self.visitBegin(result)
 
@@ -62,12 +62,12 @@ class VisitorDepthFirst(_VisitorCommon[T, U]):
 	"""
 
 	def _visit(self, sequence: Sequence) -> T:
-		assert isinstance(sequence, Sequence), "Must be a sequence, instead: {}".format(type(sequence))
+		assert isinstance(sequence, Sequence), f"Must be a sequence, instead: {type(sequence)}"
 
 		result = self.visitBegin()
 
 		for element in sequence:
-			nestedResult: typing.Optional[typing.Any] = None
+			nestedResult: typing.Any | None = None
 			if self.nestedKind is not None:
 				nestedSequence = element.getNestedSequence(kind=self.nestedKind)
 				if nestedSequence is not None:

@@ -4,7 +4,6 @@ import shlex
 import typing
 
 from context.context import Context
-
 from dependencies.interface import Dependencies
 
 _PIN = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)(?:\[[^\]]*\])?\s*==\s*(\S+)")
@@ -47,7 +46,7 @@ class PipRequirements:
 				for path in lock.parent.glob(".__atomic-write*"):
 					path.unlink(missing_ok=True)
 
-	def _targets(self) -> typing.Iterator[typing.Tuple[str, pathlib.Path, pathlib.Path]]:
+	def _targets(self) -> typing.Iterator[tuple[str, pathlib.Path, pathlib.Path]]:
 		"""Discover the update targets of the compile_pip_requirements rules."""
 
 		repos = self.context.getLocalBzlmod()

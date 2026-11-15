@@ -1,7 +1,7 @@
 import argparse
+import json
 import pathlib
 import typing
-import json
 
 from bzd.utils.dict import updateDeep
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
 	args = parser.parse_args()
 
-	output: typing.Dict[str, typing.Any] = {}
+	output: dict[str, typing.Any] = {}
 	for f in args.inputs:
 		data = json.loads(f.read_text())
 		updateDeep(output, data)

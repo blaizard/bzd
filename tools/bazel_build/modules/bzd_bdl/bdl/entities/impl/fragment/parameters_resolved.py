@@ -1,7 +1,7 @@
 import typing
 
 from bzd.parser.element import Element
-from bzd.parser.error import Error, AssertionResult
+from bzd.parser.error import AssertionResult, Error
 
 if typing.TYPE_CHECKING:
 	from bdl.entities.impl.entity import EntityExpression
@@ -35,7 +35,7 @@ class ParametersResolvedItem:
 		return False
 
 	@property
-	def comment(self) -> typing.Optional[str]:
+	def comment(self) -> str | None:
 		return self.expected.comment if self.param.comment is None else self.param.comment
 
 	@property
@@ -46,7 +46,7 @@ class ParametersResolvedItem:
 	def isLValue(self) -> bool:
 		return self.param.isLValue
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
+	def error(self, message: str, element: Element | None = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(
 			element=self.param.element if element is None else element,
 			message=message,
@@ -57,7 +57,7 @@ class ParametersResolvedItem:
 		self,
 		condition: bool,
 		message: str,
-		element: typing.Optional[Element] = None,
+		element: Element | None = None,
 		throw: bool = True,
 	) -> AssertionResult:
 		return Error.assertTrue(
@@ -77,7 +77,7 @@ class ParametersResolved:
 	def __init__(
 		self,
 		element: Element,
-		NestedElementType: typing.Type["EntityExpression"],
+		NestedElementType: type["EntityExpression"],
 		param: str,
 		expected: str,
 	) -> None:
@@ -89,7 +89,7 @@ class ParametersResolved:
 		        expected: The name of the nested sequence containing the expected parameters.
 		"""
 		self.element = element
-		self.list: typing.List[ParametersResolvedItem] = []
+		self.list: list[ParametersResolvedItem] = []
 
 		paramSequence = self.element.getNestedSequenceOrEmpty(param)
 		expectedSequence = self.element.getNestedSequenceOrEmpty(expected)
@@ -97,7 +97,7 @@ class ParametersResolved:
 			self.list.append(ParametersResolvedItem(NestedElementType(paramElement), NestedElementType(expectedElement)))
 
 	@property
-	def dependencies(self) -> typing.Set[str]:
+	def dependencies(self) -> set[str]:
 		"""Output the dependency list for this entity."""
 
 		dependencies = set()
@@ -106,8 +106,7 @@ class ParametersResolved:
 		return dependencies
 
 	def __iter__(self) -> typing.Iterator[ParametersResolvedItem]:
-		for parameter in self.list:
-			yield parameter
+		yield from self.list
 
 	def __getitem__(self, index: int) -> ParametersResolvedItem:
 		return self.list[index]
@@ -124,7 +123,7 @@ class ParametersResolved:
 	def size(self) -> int:
 		return len(self.list)
 
-	def error(self, message: str, element: typing.Optional[Element] = None, throw: bool = True) -> AssertionResult:
+	def error(self, message: str, element: Element | None = None, throw: bool = True) -> AssertionResult:
 		return Error.handleFromElement(
 			element=self.element if element is None else element,
 			message=message,
@@ -135,7 +134,7 @@ class ParametersResolved:
 		self,
 		condition: bool,
 		message: str,
-		element: typing.Optional[Element] = None,
+		element: Element | None = None,
 		throw: bool = True,
 	) -> AssertionResult:
 		return Error.assertTrue(

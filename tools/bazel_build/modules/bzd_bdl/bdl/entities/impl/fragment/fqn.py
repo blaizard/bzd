@@ -1,6 +1,5 @@
-import typing
-import time
 import random
+import time
 
 _staticUid = 0
 
@@ -14,17 +13,17 @@ class FQN:
 		# The '_' is to tell that the visibility of this object is limited to this file,
 		# while the '~' is to ensure no name collision with what the user can define.
 		global _staticUid
-		fqn = "_{:d}~".format(_staticUid)
+		fqn = f"_{_staticUid:d}~"
 		_staticUid += 1
 		return fqn
 
 	@staticmethod
-	def makeUnique(namespace: typing.List[str]) -> str:
+	def makeUnique(namespace: list[str]) -> str:
 		"""
 		Generate a unique FQN for composition for this translation unit.
 		"""
 		global _staticUid
-		name = "{:d}-{:d}-{:d}~".format(time.time_ns(), random.randint(0, 1000000), _staticUid)
+		name = f"{time.time_ns():d}-{random.randint(0, 1000000):d}-{_staticUid:d}~"
 		_staticUid += 1
 		return FQN.fromNamespace(namespace=namespace, name=name)
 
@@ -37,7 +36,7 @@ class FQN:
 		return fqn.endswith("~")
 
 	@staticmethod
-	def fromNamespace(namespace: typing.List[str], name: typing.Optional[str] = None) -> str:
+	def fromNamespace(namespace: list[str], name: str | None = None) -> str:
 		"""
 		Make the fully qualified name from a symbol name
 		"""
@@ -46,7 +45,7 @@ class FQN:
 		return ".".join(namespace + [name])
 
 	@staticmethod
-	def toNamespace(fqn: str) -> typing.List[str]:
+	def toNamespace(fqn: str) -> list[str]:
 		"""
 		Convert a FQN string into a namespace.
 		"""

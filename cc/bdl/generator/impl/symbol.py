@@ -1,13 +1,11 @@
 import typing
 
-
-from bdl.entities.impl.fragment.symbol import Symbol, Visitor
-from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
 from bdl.entities.impl.fragment.fqn import FQN
+from bdl.entities.impl.fragment.parameters_resolved import ParametersResolved
+from bdl.entities.impl.fragment.symbol import Symbol, Visitor
 from bdl.entities.impl.types import Category
-
-from cc.bdl.generator.impl.fqn import fqnToNameStr
 from cc.bdl.generator.impl.builtins import builtins
+from cc.bdl.generator.impl.fqn import fqnToNameStr
 
 
 class _VisitorSymbol(Visitor):
@@ -16,11 +14,11 @@ class _VisitorSymbol(Visitor):
 	def __init__(
 		self,
 		symbol: Symbol,
-		namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]],
+		namespaceToFQN: typing.Callable[[list[str]], str] | None,
 		reference: bool,
 		definition: bool,
 		nonConst: bool,
-		values: typing.Optional[typing.Sequence[str]],
+		values: typing.Sequence[str] | None,
 	) -> None:
 		self.namespaceToFQN = namespaceToFQN
 		self.reference = reference
@@ -35,16 +33,16 @@ class _VisitorSymbol(Visitor):
 		return self.isTopLevel and self.namespaceToFQN is not None
 
 	@property
-	def values(self) -> typing.Optional[typing.Sequence[str]]:
+	def values(self) -> typing.Sequence[str] | None:
 		if self.isTopLevel:
 			return self.values_
 		return None
 
-	def visitValue(self, value: str, comment: typing.Optional[str]) -> str:
+	def visitValue(self, value: str, comment: str | None) -> str:
 		self.symbol.error(message="No values are allowed within a type.")
 		return ""
 
-	def visitSymbol(self, symbol: Symbol, nested: typing.List[str], parameters: ParametersResolved) -> str:
+	def visitSymbol(self, symbol: Symbol, nested: list[str], parameters: ParametersResolved) -> str:
 		"""Called when an element needs to be formatted."""
 
 		# Whether this type should be a reference or not.
@@ -54,7 +52,7 @@ class _VisitorSymbol(Visitor):
 			else (symbol.category == Category.interface or symbol.category == Category.component)
 		)
 
-		outputList: typing.List[str] = []
+		outputList: list[str] = []
 		output: str
 		for index, fqn in enumerate(symbol.kinds):
 			if fqn in builtins:
@@ -83,10 +81,13 @@ class _VisitorSymbol(Visitor):
 		if nested:
 			output += "<{}>".format(", ".join(nested))
 
-		if self.isTopLevel:
-			if self.definition:
-				if symbol.underlyingTypeFQN in builtins and builtins[symbol.underlyingTypeFQN].constexpr:
-					output = "constexpr " + output
+		if (
+			self.isTopLevel
+			and self.definition
+			and symbol.underlyingTypeFQN in builtins
+			and builtins[symbol.underlyingTypeFQN].constexpr
+		):
+			output = "constexpr " + output
 
 		# Apply the reference if any.
 		if useReference:
@@ -100,12 +101,12 @@ class _VisitorSymbol(Visitor):
 
 
 def symbolToStr(
-	symbol: typing.Optional[Symbol],
+	symbol: Symbol | None,
 	adapter: bool = False,
 	reference: bool = False,
 	definition: bool = False,
 	nonConst: bool = False,
-	values: typing.Optional[typing.Sequence[str]] = None,
+	values: typing.Sequence[str] | None = None,
 	registry: bool = False,
 ) -> str:
 	"""
@@ -121,18 +122,18 @@ def symbolToStr(
 	if symbol is None:
 		return "void"
 
-	namespaceToFQN: typing.Optional[typing.Callable[[typing.List[str]], str]] = None
+	namespaceToFQN: typing.Callable[[list[str]], str] | None = None
 	if adapter:
 
-		def namespaceToFQN(namespace: typing.List[str]) -> str:
+		def namespaceToFQN(namespace: list[str]) -> str:
 			return "::".join(namespace[0:-1] + ["adapter"] + namespace[-1:])
 
 	# If the type is part of the registry
 	elif registry and symbol.isThis:
 
-		def namespaceToFQN(namespace: typing.List[str]) -> str:
+		def namespaceToFQN(namespace: list[str]) -> str:
 			fqn = FQN.fromNamespace(namespace=namespace)
-			return "registry.{}_.get()".format(fqnToNameStr(fqn))
+			return f"registry.{fqnToNameStr(fqn)}_.get()"
 
 	# Otherwise it must be a normal type
 	return _VisitorSymbol(

@@ -1,8 +1,8 @@
 import argparse
-import pathlib
 import json
-import yaml
+import pathlib
 
+import yaml
 from config.reader import internalToDictionary
 
 if __name__ == "__main__":
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 		content = json.dumps(data, indent=4)
 
 	else:
-		raise Exception(f"Unsupported format: {args.format}.")
+		raise RuntimeError(f"Unsupported format: {args.format}.")
 
 	if args.output:
 		args.output.write_text(content)

@@ -1,10 +1,10 @@
-import typing
 import pathlib
+import typing
 
-from targets.docker.deployment.base import Docker
 from bdl.generators.json.ast.ast import Ast, Parameters
 from bzd.template.template import Template
 from bzd.utils.secret import maybeDecrypt
+from targets.docker.deployment.base import Docker
 
 
 class DeploymentDockerTraefik(Docker):
@@ -12,8 +12,8 @@ class DeploymentDockerTraefik(Docker):
 		super().__init__(ast=ast, symbol="docker.Traefik")
 		self.common = common
 
-	def makeDockerCompose(self, fqn: str, expression: Parameters) -> typing.Tuple[str, typing.Set[str]]:
+	def makeDockerCompose(self, fqn: str, expression: Parameters) -> tuple[str, set[str]]:
 		dockers = self.getInterfaces(fqn, "add")
 		template = Template.fromPath(pathlib.Path(__file__).parent / "traefik.yml.btl")
 		content = template.render({"dockers": dockers, "maybeDecrypt": maybeDecrypt}, self.common)
-		return content, set([docker.image for docker in dockers])
+		return content, {docker.image for docker in dockers}

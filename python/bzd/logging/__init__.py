@@ -5,9 +5,9 @@ from contextlib import contextmanager
 from bzd.logging.handler import (
 	Log,
 	LoggerHandler,
-	LoggerHandlerScope,
-	LoggerHandlerFlow,
 	LoggerHandlerCallback,
+	LoggerHandlerFlow,
+	LoggerHandlerScope,
 )
 from bzd.logging.handler.stderr import LoggerHandlerStderr
 from bzd.utils.timestamp import timestampUs
@@ -40,7 +40,7 @@ class _CallbackHandler(logging.Handler):
 class Logger:
 	def __init__(self, name: str) -> None:
 		self.logger = logging.getLogger(name)
-		self._handlers: typing.List[typing.List[LoggerHandlerCallback]] = []
+		self._handlers: list[list[LoggerHandlerCallback]] = []
 		self.logger.propagate = False
 		self.logger.addHandler(_CallbackHandler(self._callback))
 
@@ -55,9 +55,7 @@ class Logger:
 		return self
 
 	@contextmanager
-	def handlersScope(
-		self, *handlers: typing.Union[LoggerHandler, LoggerHandlerScope]
-	) -> typing.Generator[None, None, None]:
+	def handlersScope(self, *handlers: LoggerHandler | LoggerHandlerScope) -> typing.Generator[None, None, None]:
 		"""Register scoped handlers."""
 
 		for handler in handlers:

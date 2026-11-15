@@ -1,11 +1,12 @@
 import argparse
+import json
 import pathlib
 import typing
-import json
-from xml.etree.ElementTree import Element, parse as xmlparse
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import parse as xmlparse
 
-Namespace = typing.List[str]
-Json = typing.Dict[str, typing.Any]
+Namespace = list[str]
+Json = dict[str, typing.Any]
 
 
 class Data:
@@ -16,11 +17,11 @@ class Data:
 	def nameToNamespace(name: str) -> Namespace:
 		return name.split("::")
 
-	def add(self, name: str, data: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+	def add(self, name: str, data: dict[str, typing.Any]) -> dict[str, typing.Any]:
 		namespace = Data.nameToNamespace(name)
 		current = self.data
-		for name in namespace:
-			current = current.setdefault(name, {})
+		for segment in namespace:
+			current = current.setdefault(segment, {})
 		current = current.setdefault("_", {})
 		current.update(data)
 		return current  # type: ignore
@@ -48,14 +49,14 @@ class Visitor:
 			"defname": lambda child, attr: {"name": child.text},
 			"defval": lambda child, attr: {"default": child.text},
 		}
-		param: typing.Dict[str, str] = {}
+		param: dict[str, str] = {}
 		for child in element:
 			if child.tag in visitors:
 				param.update(visitors[child.tag](child, child.attrib))
 		return param
 
 	def visitTemplateParamList(self, element: Element, data: Data) -> Json:
-		params: typing.List[typing.Any] = []
+		params: list[typing.Any] = []
 		for child in element:
 			if child.tag == "param":
 				params.append(self.visitParam(child, data))
@@ -127,7 +128,7 @@ class Visitor:
 			"detaileddescription": self.visitDetailedDescription,
 		}
 
-		current: typing.Dict[str, typing.Any] = {"kind": kind}
+		current: dict[str, typing.Any] = {"kind": kind}
 
 		if element.attrib.get("final") == "yes":
 			current["final"] = True

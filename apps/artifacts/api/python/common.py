@@ -1,16 +1,18 @@
-import typing
 import os
 import sys
 import time
+import typing
 
-from bzd.http.client import HttpClient
 from apps.artifacts.api.python.config import (
+	configDefaultNodeVolume,
 	configRemotes,
 	configToken,
-	configDefaultNodeVolume,
 )
+from bzd.http.client import HttpClient
 
-assert len(configRemotes()) > 0, "'remotes' from the API config cannot be empty."
+_defaultRemotes = configRemotes()
+
+assert len(_defaultRemotes) > 0, "'remotes' from the API config cannot be empty."
 
 T = typing.TypeVar("T")
 
@@ -24,10 +26,10 @@ class ArtifactsBase:
 
 	def __init__(
 		self,
-		uid: typing.Optional[str] = None,
-		remotes: typing.List[str] = configRemotes(),
+		uid: str | None = None,
+		remotes: list[str] = _defaultRemotes,
 		volume: str = configDefaultNodeVolume(),
-		token: typing.Optional[str] = os.environ.get("BZD_NODE_TOKEN", configToken()),
+		token: str | None = os.environ.get("BZD_NODE_TOKEN", configToken()),
 		httpClient: typing.Any = HttpClient,
 	) -> None:
 		"""Construct the Artifacts API object.
@@ -44,7 +46,7 @@ class ArtifactsBase:
 		self.remoteSources = remotes
 		self.volume = volume
 		self.token = token
-		self.remote: typing.Optional[str] = None
+		self.remote: str | None = None
 		self.httpClient = httpClient
 
 	def logError(self, message: str) -> None:
@@ -57,7 +59,7 @@ class ArtifactsBase:
 		print(message, file=sys.stderr)
 
 	@property
-	def remotes(self) -> typing.Generator[typing.Tuple[str, int, int], None, None]:
+	def remotes(self) -> typing.Generator[tuple[str, int, int], None, None]:
 		"""Generator for the remotes.
 
 		The usage pattern expects the user to exit the generator at the first valid remote.
@@ -80,7 +82,7 @@ class ArtifactsBase:
 		self,
 		callback: typing.Callable[[str], T],
 		errorMessage: str,
-		retryForS: typing.Optional[float] = None,
+		retryForS: float | None = None,
 	) -> T:
 		"""Run the callback against each remote until one succeeds.
 
@@ -99,8 +101,8 @@ class ArtifactsBase:
 			for remote, retry, nbRetries in self.remotes:
 				try:
 					return callback(remote)
-				except Exception as e:
-					self.logError(f"Remote '{remote}' failed (attempt {retry + 1}/{nbRetries + 1}): {str(e)}")
+				except Exception as e:  # noqa: BLE001
+					self.logError(f"Remote '{remote}' failed (attempt {retry + 1}/{nbRetries + 1}): {e!s}")
 			if retryForS is None:
 				break
 			timestampElapsed = time.time() - timestampStart
@@ -110,7 +112,7 @@ class ArtifactsBase:
 		raise NodePublishNoRemote(errorMessage)
 
 	@staticmethod
-	def pathToKey(path: str) -> typing.List[str]:
+	def pathToKey(path: str) -> list[str]:
 		"""Convert a path into a normalized sequence of keys.
 
 		For example: /a/b//../c -> [a,c]
@@ -118,7 +120,7 @@ class ArtifactsBase:
 		normalizedPath = os.path.normpath(path)
 		return [element for element in normalizedPath.split("/") if len(element)]
 
-	def _repr(self) -> typing.List[str]:
+	def _repr(self) -> list[str]:
 		content = []
 		if self.uid is not None:
 			content.append(f"uid={self.uid}")

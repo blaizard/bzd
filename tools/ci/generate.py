@@ -1,17 +1,17 @@
 import argparse
-import sys
 import pathlib
+import sys
 import typing
 
+from bzd_sanitizer.context import Context
 from tools.ci.factory import Factory
+from tools.ci.gitea.factory import Gitea
+from tools.ci.github.factory import GitHub
 from tools.ci.jenkins.factory import Jenkins
 from tools.ci.quality_gate.factory import QualityGate
 from tools.ci.travis.factory import Travis
-from tools.ci.github.factory import GitHub
-from tools.ci.gitea.factory import Gitea
-from bzd_sanitizer.context import Context
 
-factories: typing.Final[typing.Iterable[typing.Type[Factory]]] = (
+factories: typing.Final[typing.Iterable[type[Factory]]] = (
 	Jenkins,
 	QualityGate,
 	Travis,

@@ -3,11 +3,12 @@ import pathlib
 import typing
 
 from bzd_sanitizer.worker import worker
-from bdl.object import ObjectContext
+
 from bdl.generators.bdl.visitor import formatBdl
+from bdl.object import ObjectContext
 
 
-def workload(args: typing.Tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
+def workload(args: tuple[pathlib.Path, pathlib.Path, bool], stdout: typing.TextIO) -> bool:
 	workspace, path, check = args
 
 	original = (workspace / path).read_text()

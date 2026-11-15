@@ -7,13 +7,13 @@ from bzd.parser.visitor import Visitor as VisitorBase
 from bdl.entities.impl.entity import Entity, Role
 
 
-class _Visitor(VisitorBase[str, typing.List[str]]):
+class _Visitor(VisitorBase[str, list[str]]):
 	nestedKind = None
 
-	def visitBegin(self, result: typing.Any) -> typing.List[str]:
+	def visitBegin(self, result: typing.Any) -> list[str]:
 		return []
 
-	def visitElement(self, element: Element, result: typing.List[str]) -> typing.List[str]:
+	def visitElement(self, element: Element, result: list[str]) -> list[str]:
 		Error.assertHasAttr(element=element, attr="name")
 		result.append(element.getAttr("name").value)
 		return result
@@ -31,7 +31,7 @@ class Namespace(Entity):
 		Error.assertHasSequence(element=element, sequence="name")
 
 	@property
-	def nameList(self) -> typing.List[str]:
+	def nameList(self) -> list[str]:
 		sequence = self.element.getNestedSequence("name")
 		assert sequence is not None
 		return _Visitor().visit(sequence=sequence)

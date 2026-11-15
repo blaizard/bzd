@@ -1,12 +1,12 @@
 import argparse
+import json
 import pathlib
 import typing
-import json
 
 from config.reader import internalToKeyData
 
 
-def toTypeScript(data: typing.Any) -> typing.Tuple[str, str]:
+def toTypeScript(data: typing.Any) -> tuple[str, str]:
 	"""Convert data to TypeScript format."""
 
 	if isinstance(data, bool):

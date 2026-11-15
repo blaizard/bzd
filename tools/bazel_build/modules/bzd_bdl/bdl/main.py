@@ -2,8 +2,9 @@ import argparse
 from pathlib import Path
 
 import bzd.parser.error
-from bdl.object import ObjectContext
+
 from bdl.lib import preprocess
+from bdl.object import ObjectContext
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="BZD language parser and generator.")

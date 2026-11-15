@@ -1,14 +1,14 @@
-import re
 import os
 import pathlib
-import typing
+import re
 import sys
+import typing
 
-SectionType = typing.Dict[str, typing.Dict[str, int]]
-AggregatedSectionType = typing.Dict[str, SectionType]
-UnitsType = typing.Dict[str, typing.Dict[str, int]]
-AggregatedUnitsType = typing.Dict[str, typing.Dict[str, int]]
-Fragment = typing.Sequence[typing.Dict[str, typing.Any]]
+SectionType = dict[str, dict[str, int]]
+AggregatedSectionType = dict[str, SectionType]
+UnitsType = dict[str, dict[str, int]]
+AggregatedUnitsType = dict[str, dict[str, int]]
+Fragment = typing.Sequence[dict[str, typing.Any]]
 
 
 class Parser:
@@ -20,13 +20,13 @@ class Parser:
 
 	def __init__(self, path: pathlib.Path) -> None:
 		self.path = path
-		self.mapping: typing.Dict[str, str] = {}
+		self.mapping: dict[str, str] = {}
 		self.setParsedData()
 
 	def setParsedData(
 		self,
-		sections: typing.Optional[Fragment] = None,
-		units: typing.Optional[Fragment] = None,
+		sections: Fragment | None = None,
+		units: Fragment | None = None,
 		areUnitsPath: bool = False,
 	) -> None:
 		"""
@@ -228,6 +228,5 @@ class Parser:
 
 		regexprList = [self._patternToRegexpr(pattern) for pattern in patternList]
 		for section, aggregate in self.mapping.items():
-			if aggregate == Parser.unsetAggregrate:
-				if any(regexpr.fullmatch(section) for regexpr in regexprList):
-					self.mapping[section] = name
+			if aggregate == Parser.unsetAggregrate and any(regexpr.fullmatch(section) for regexpr in regexprList):
+				self.mapping[section] = name

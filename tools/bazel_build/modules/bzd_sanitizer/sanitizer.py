@@ -1,22 +1,23 @@
 import argparse
-import pathlib
 import os
+import pathlib
 import sys
-import typing
 import time
+import typing
 
-from bzd.utils.run import localCommand, localBazelTarget
+from bzd.utils.run import localBazelTarget, localCommand
+
 from bzd_sanitizer.context import Context
 
 
-def getFileListFromResult(result: typing.Any, workspace: pathlib.Path) -> typing.List[str]:
+def getFileListFromResult(result: typing.Any, workspace: pathlib.Path) -> list[str]:
 	"""Get a result and returns a list of existing files."""
 
 	return list({f for f in result.getStdout().split("\n") if (workspace / f).is_file()})
 
 
 def getFileListFromRecursiveGit(
-	workspace: pathlib.Path, path: pathlib.Path, command: typing.List[str]
+	workspace: pathlib.Path, path: pathlib.Path, command: list[str]
 ) -> typing.Sequence[str]:
 	"""Execute a git command to get a list of files and searching within submodules as well."""
 
@@ -81,7 +82,7 @@ def getFileList(workspace: pathlib.Path, path: pathlib.Path, all: bool) -> typin
 	return fileList
 
 
-def getTargetFromTag(workspace: pathlib.Path, tag: str) -> typing.List[str]:
+def getTargetFromTag(workspace: pathlib.Path, tag: str) -> list[str]:
 	result = localCommand(
 		["bazel", "query", 'attr("tags", "' + tag + '", //...)', "--output=label"],
 		cwd=workspace,

@@ -1,11 +1,9 @@
 import pathlib
-import typing
-
-from apps.ebook.flow import ActionInterface, FlowEnum, FlowContext
-from apps.ebook.providers import ProviderEbook, ProviderImages
-from apps.ebook.utils import sizeToString, percentToString, estimatePageDPIs
 
 import pymupdf
+from apps.ebook.flow import ActionInterface, FlowContext, FlowEnum
+from apps.ebook.providers import ProviderEbook, ProviderImages
+from apps.ebook.utils import estimatePageDPIs, percentToString, sizeToString
 
 
 class PdfToImages(ActionInterface):
@@ -16,8 +14,8 @@ class PdfToImages(ActionInterface):
 
 	def __init__(
 		self,
-		maxDPI: typing.Optional[int] = None,
-		maxImages: typing.Optional[int] = None,
+		maxDPI: int | None = None,
+		maxImages: int | None = None,
 	) -> None:
 		super().__init__()
 		self.maxDPI = maxDPI
@@ -25,12 +23,12 @@ class PdfToImages(ActionInterface):
 
 	def process(
 		self, provider: ProviderEbook, directory: pathlib.Path, context: FlowContext
-	) -> typing.List[typing.Tuple[ProviderImages, typing.Optional[FlowEnum]]]:
+	) -> list[tuple[ProviderImages, FlowEnum | None]]:
 
 		allImages = []
 		with pymupdf.open(provider.ebook) as doc:  # type: ignore
 			# Estimate the DPI of the pages, as the dpi attribute from get_pixmap is not reliable.
-			dimensions: typing.List[typing.Tuple[int, int]] = []
+			dimensions: list[tuple[int, int]] = []
 			for page in doc:
 				rect = page.bound()
 				dimensions.append(

@@ -1,9 +1,7 @@
-import typing
-
 from bdl.entities.impl.fragment.parameters_resolved import ParametersResolvedItem
 
 
-def commentBlockToStr(comment: typing.Optional[str]) -> str:
+def commentBlockToStr(comment: str | None) -> str:
 	"""
 	Normal block comments.
 	"""
@@ -13,7 +11,7 @@ def commentBlockToStr(comment: typing.Optional[str]) -> str:
 	return "".join([f"// {c}\n" for c in comment.split("\n")])
 
 
-def commentEmbeddedToStr(comment: typing.Optional[str]) -> str:
+def commentEmbeddedToStr(comment: str | None) -> str:
 	"""
 	Inline and embedded comments.
 	"""

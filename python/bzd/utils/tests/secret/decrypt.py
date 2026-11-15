@@ -1,5 +1,5 @@
-import unittest
 import pathlib
+import unittest
 
 from bzd.utils.secret import decrypt, maybeDecrypt
 
