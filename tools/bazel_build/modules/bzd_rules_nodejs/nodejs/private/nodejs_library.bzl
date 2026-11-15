@@ -111,7 +111,7 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
         content = json.encode_indent(package_json_content),
     )
 
-    # The package files are extracted into individual tree artifacts, while all the links are
+    # The package files are copied into individual tree artifacts, while all the links are
     # created as declared symlinks. This prevents Bazel from expanding the pnpm store symlinks.
     direct_infos = [package[BzdNodeJsPackageInfo] for package in packages]
     all_infos = depset(direct_infos, transitive = [info.transitive_infos for info in direct_infos]).to_list()
@@ -127,12 +127,12 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
     if all_infos:
         args = ctx.actions.args()
         for info in all_infos:
-            args.add("--extract")
-            args.add(info.store)
+            args.add("--copy")
+            args.add(info.srcs.path)
             args.add(contents[info.canonical_name].path)
 
         ctx.actions.run(
-            inputs = depset([info.store for info in all_infos]),
+            inputs = depset(transitive = [info.srcs.transitive_files for info in all_infos]),
             outputs = contents.values(),
             arguments = [args],
             progress_message = "Preparing node_modules for {}...".format(ctx.label),
