@@ -12,7 +12,7 @@ BzdNodeJsInstallInfo = provider(
         "file_mapping": "A mapping between the original file and the transpiled file.",
         "files": "All the nodejs related files for the installation.",
         "modules": "Top level module names, will be used for deduplicating.",
-        "node_modules": "The node_modules directory.",
+        "node_modules_files": "The node_modules files.",
         "package_json": "The package.json file located at the root.",
         "runfiles": "The runfiles to be added to the runfiles of the target.",
     },
@@ -32,13 +32,14 @@ def _bzd_nodejs_install_impl(ctx):
         apis = provider.apis,
         imports = provider.imports,
         base_dir_name = base_dir_name,
+        copy_files = True,
     )
 
     # --- Fill in the metadata
 
     metadata = ctx.actions.declare_file("{}.nodejs_install/metadata.json".format(ctx.label.name))
     ctx.actions.run(
-        inputs = [setup.package_json, setup.api, setup.node_modules],
+        inputs = [setup.package_json, setup.api],
         outputs = [metadata],
         progress_message = "Generating manifest for {}".format(ctx.label),
         mnemonic = "NodejsMetadata",
@@ -54,10 +55,13 @@ def _bzd_nodejs_install_impl(ctx):
     return [
         BzdNodeJsInstallInfo(
             api = setup.api,
-            files = depset([setup.package_json, setup.api, setup.node_modules] + setup.file_mapping.values()),
+            files = depset(
+                [setup.package_json, setup.api] + setup.file_mapping.values(),
+                transitive = [setup.node_modules_files],
+            ),
             runfiles = provider.runfiles,
             package_json = setup.package_json,
-            node_modules = setup.node_modules,
+            node_modules_files = setup.node_modules_files,
             file_mapping = setup.file_mapping,
             modules = [package[BzdNodeJsPackageInfo].module_name for package in packages],
         ),

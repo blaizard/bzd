@@ -43,6 +43,39 @@ def _bzd_nodejs_merge(*providers):
 
     return provider
 
+def _relative_link_target(link_path, target_path):
+    """Compute the relative path from the parent directory of link_path to target_path."""
+
+    link_segments = link_path.split("/")[:-1]
+    target_segments = target_path.split("/")
+    common = 0
+    for index in range(min(len(link_segments), len(target_segments))):
+        if link_segments[index] != target_segments[index]:
+            break
+        common = index + 1
+    return "/".join([".."] * (len(link_segments) - common) + target_segments[common:])
+
+def _declare_directory_symlink(ctx, link_path, target_path):
+    """Declare a symlink pointing to a directory."""
+
+    symlink = ctx.actions.declare_symlink(link_path)
+    ctx.actions.symlink(
+        output = symlink,
+        target_path = _relative_link_target(link_path, target_path),
+        target_type = "directory",
+    )
+    return symlink
+
+def _add_link(ctx, files, links, link_path, target_path):
+    """Register a directory symlink, ensuring paths are not declared twice."""
+
+    if link_path in links:
+        if links[link_path] != target_path:
+            fail("Conflicting symlink for '{}': '{}' and '{}'.".format(link_path, links[link_path], target_path))
+        return
+    links[link_path] = target_path
+    files.append(_declare_directory_symlink(ctx, link_path, target_path))
+
 def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
     """Generate a node_modules and a package.json file at the root of `base_dir_name`.
 
@@ -53,12 +86,13 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
         base_dir_name: The name of the directory where the node_modules should be located.
 
     Returns:
-        A tuple containing the package.json file and the node_modules directory populated.
+        A struct containing the package.json file, the node_modules files and its runfiles path.
     """
 
     # Outputs of this rule.
     package_json = ctx.actions.declare_file("{}/package.json".format(base_dir_name))
-    node_modules = ctx.actions.declare_directory("{}/node_modules".format(base_dir_name))
+    node_modules = "{}/node_modules".format(base_dir_name)
+    node_modules_short_path = "/".join(package_json.short_path.split("/")[:-1] + ["node_modules"])
 
     package_json_content = {
         "imports": {"#bzd/*": "./*"} | {
@@ -77,33 +111,76 @@ def bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name):
         content = json.encode_indent(package_json_content),
     )
 
-    transitive_stores = depset(transitive = [package[BzdNodeJsPackageInfo].transitive_stores for package in packages])
+    # The package files are extracted into individual tree artifacts, while all the links are
+    # created as declared symlinks. This prevents Bazel from expanding the pnpm store symlinks.
+    direct_infos = [package[BzdNodeJsPackageInfo] for package in packages]
+    all_infos = depset(direct_infos, transitive = [info.transitive_infos for info in direct_infos]).to_list()
 
-    args = ctx.actions.args()
-    args.add("--output", node_modules.path)
-    args.add_all(transitive_stores, before_each = "--store")
-    for package in packages:
-        info = package[BzdNodeJsPackageInfo]
-        args.add_all("--top-level", [info.module_name, info.canonical_name])
+    contents = {}
+    for info in all_infos:
+        if info.canonical_name in contents:
+            fail("Duplicate package canonical name '{}'.".format(info.canonical_name))
+        contents[info.canonical_name] = ctx.actions.declare_directory(
+            "{}/.store/{}/pkg".format(node_modules, info.canonical_name),
+        )
 
-    ctx.actions.run(
-        inputs = transitive_stores,
-        outputs = [node_modules],
-        arguments = [args],
-        progress_message = "Preparing node_modules for {}...".format(ctx.label),
-        mnemonic = "NodejsNodeModulesInstall",
-        executable = ctx.executable._node_modules,
+    if all_infos:
+        args = ctx.actions.args()
+        for info in all_infos:
+            args.add("--extract")
+            args.add(info.store)
+            args.add(contents[info.canonical_name].path)
+
+        ctx.actions.run(
+            inputs = depset([info.store for info in all_infos]),
+            outputs = contents.values(),
+            arguments = [args],
+            progress_message = "Preparing node_modules for {}...".format(ctx.label),
+            mnemonic = "NodejsNodeModulesInstall",
+            executable = ctx.executable._node_modules,
+        )
+
+    # Links within the package store, so each package only sees its own dependencies.
+    files = []
+    links = {}
+    for info in all_infos:
+        for alias, dep_canonical_name in info.deps.items():
+            if dep_canonical_name not in contents:
+                fail("Package '{}' depends on '{}' which is not part of the transitive closure.".format(info.canonical_name, dep_canonical_name))
+            _add_link(
+                ctx,
+                files,
+                links,
+                "{}/.store/{}/node_modules/{}".format(node_modules, info.canonical_name, alias),
+                "{}/.store/{}/pkg".format(node_modules, dep_canonical_name),
+            )
+
+    # Top-level links.
+    for info in direct_infos:
+        _add_link(
+            ctx,
+            files,
+            links,
+            "{}/{}".format(node_modules, info.module_name),
+            "{}/.store/{}/pkg".format(node_modules, info.canonical_name),
+        )
+
+    return struct(
+        node_modules_files = depset(files + contents.values()),
+        node_modules_short_path = node_modules_short_path,
+        package_json = package_json,
     )
 
-    return [package_json, node_modules]
-
-def bzd_nodejs_layout_files(ctx, file_locations, base_dir_name):
+def bzd_nodejs_layout_files(ctx, file_locations, base_dir_name, copy = False):
     """Layout the sources files at the given root directory.
 
     Args:
         ctx: The context of the rule.
         file_locations: The files to be laid out.
         base_dir_name: The name of the directory where the node_modules should be located.
+        copy: Whether to copy the files instead of symlinking them. Copies are required when Node
+            resolves modules by their canonical path (without --preserve-symlinks), so that
+            resolution stays rooted in this directory.
 
     Returns:
         The file mapping: a dictionary which key is the original file and the value is the new file.
@@ -111,14 +188,39 @@ def bzd_nodejs_layout_files(ctx, file_locations, base_dir_name):
 
     # Map all the sources to the generated files directory.
     file_mapping = {}
-    for original_file, transpiled_file, mapping in file_locations.to_list():
-        # This makes all file live at the same level.
-        symlink = ctx.actions.declare_file("{}/{}".format(base_dir_name, mapping))
-        ctx.actions.symlink(
-            output = symlink,
-            target_file = transpiled_file,
-        )
-        file_mapping[original_file] = symlink
+    if copy:
+        # The files must be real (not symlinks), otherwise Node resolves them to their canonical
+        # location and loses the package.json and node_modules of this directory.
+        args = ctx.actions.args()
+        inputs = []
+        outputs = []
+        for original_file, transpiled_file, mapping in file_locations.to_list():
+            output = ctx.actions.declare_file("{}/{}".format(base_dir_name, mapping))
+            args.add(transpiled_file)
+            args.add(output)
+            inputs.append(transpiled_file)
+            outputs.append(output)
+            file_mapping[original_file] = output
+
+        if outputs:
+            ctx.actions.run_shell(
+                inputs = inputs,
+                outputs = outputs,
+                arguments = [args],
+                command = "while [ $# -ge 2 ]; do cp -p -- \"$1\" \"$2\"; shift 2; done",
+                mnemonic = "NodejsLayoutFiles",
+                progress_message = "Laying out the files of {}...".format(ctx.label),
+            )
+    else:
+        for original_file, transpiled_file, mapping in file_locations.to_list():
+            # This makes all file live at the same level.
+            symlink = ctx.actions.declare_file("{}/{}".format(base_dir_name, mapping))
+            ctx.actions.symlink(
+                output = symlink,
+                target_file = transpiled_file,
+            )
+            file_mapping[original_file] = symlink
+
     return file_mapping
 
 def bzd_nodejs_create_apis(ctx, apis, base_dir_name):
@@ -146,7 +248,7 @@ def bzd_nodejs_create_apis(ctx, apis, base_dir_name):
     )
     return api
 
-def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name):
+def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name, copy_files = False):
     """Setup a nodejs environment.
 
     Args:
@@ -156,18 +258,19 @@ def bzd_nodejs_setup(ctx, file_locations, packages, imports, apis, base_dir_name
         imports: Dictionary of imports to be added(name to path).
         apis: All the APIs to be merged.
         base_dir_name: The name of the directory where the node_modules should be located.
+        copy_files: Whether to copy the files instead of symlinking them.
 
     Returns:
         A result containing all the files created and some additional accessors.
     """
 
-    package_json, node_modules = bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name)
+    node_modules = bzd_nodejs_make_node_modules(ctx, packages, imports, base_dir_name)
     api = bzd_nodejs_create_apis(ctx, apis, base_dir_name)
-    file_mapping = bzd_nodejs_layout_files(ctx, file_locations, base_dir_name)
+    file_mapping = bzd_nodejs_layout_files(ctx, file_locations, base_dir_name, copy = copy_files)
 
     return struct(
-        package_json = package_json,
-        node_modules = node_modules,
+        package_json = node_modules.package_json,
+        node_modules_files = node_modules.node_modules_files,
         api = api,
         file_mapping = file_mapping,
         convert_path = lambda path: "{}/{}".format(base_dir_name, path),
@@ -280,7 +383,10 @@ def _bzd_nodejs_library_impl(ctx):
         )
 
         ctx.actions.run(
-            inputs = setup.file_mapping.values() + [setup.package_json, setup.node_modules, tsconfig],
+            inputs = depset(
+                setup.file_mapping.values() + [setup.package_json, tsconfig],
+                transitive = [setup.node_modules_files],
+            ),
             outputs = [f for files in typescript.values() for f in files],
             progress_message = "Processing TypeScript for {}...".format(ctx.label),
             arguments = [

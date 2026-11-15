@@ -1,17 +1,30 @@
 """Generate a bundle for executables."""
 
 def _gather_files_and_symlinks(ctx, targets):
-    """Gather all files/directories and symlinks for the give target set."""
+    """Gather all files/directories and symlinks for the give target set.
+
+    Declared symlinks (`declare_symlink`) are separated from regular files so they can be emitted
+    as links rather than walked as directories. This is generic: any target that provides declared
+    symlinks in its `DefaultInfo.files` relies on it.
+
+    Returns a tuple with the files to be included in the manifest, the symlinks to be created and
+    the inputs required to execute the action.
+    """
 
     files = []
-    transitive_files = []
+    inputs = []
     symlinks = {}
 
     for src in targets:
         info = src[DefaultInfo]
+        inputs.append(info.files)
 
-        # Include the files associated with the target.
-        transitive_files.append(info.files)
+        # Declared symlinks are artifacts of their own, they are not walked as directories.
+        for file in info.files.to_list():
+            if file.is_symlink:
+                symlinks[file.path] = {"target": file.path, "type": "symlink"}
+            else:
+                files.append(file)
 
         # If runfiles are requested and this is an executable.
         if ctx.attr.include_runfiles and info.files_to_run and info.files_to_run.executable:
@@ -24,13 +37,14 @@ def _gather_files_and_symlinks(ctx, targets):
             # Add associated runfiles.
             runfiles = info.default_runfiles
             if runfiles:
-                for f in runfiles.files.to_list():
-                    if f.is_symlink:
+                for file in runfiles.files.to_list():
+                    if file.is_symlink:
                         # declare_symlink() files are dangling in the output tree, their
                         # target can only be resolved at execution time.
-                        symlinks["{}/{}".format(base_path, f.short_path)] = {"target": f.path, "type": "symlink"}
+                        symlinks["{}/{}".format(base_path, file.short_path)] = {"target": file.path, "type": "symlink"}
                     else:
-                        symlinks["{}/{}".format(base_path, f.short_path)] = {"target": f.path, "type": "absolute"}
+                        files.append(file)
+                        symlinks["{}/{}".format(base_path, file.short_path)] = {"target": file.path, "type": "absolute"}
                 for symlink in runfiles.symlinks.to_list():
                     if symlink.target_file:
                         symlinks["{}/{}".format(base_path, symlink.path)] = {"target": symlink.target_file.path, "type": "absolute"}
@@ -41,9 +55,9 @@ def _gather_files_and_symlinks(ctx, targets):
                         symlinks["{}/{}".format(base_path, symlink.path)] = {"target": symlink.target_file.path, "type": "absolute"}
                     else:
                         symlinks["{}/{}".format(base_path, symlink.path)] = {"target": symlink.target_path, "type": "relative"}
-                transitive_files.append(runfiles.files)
+                inputs.append(runfiles.files)
 
-    return depset(files, transitive = transitive_files), symlinks
+    return depset(files), symlinks, depset(transitive = inputs)
 
 def _gather_root_symlinks(ctx):
     """Gather all root symlinks."""
@@ -93,7 +107,7 @@ def _bzd_tar_impl(ctx):
     outputs = []
 
     for layer in ctx.attr.layers:
-        files, symlinks = _gather_files_and_symlinks(ctx, [layer])
+        files, symlinks, inputs = _gather_files_and_symlinks(ctx, [layer])
         output = _get_output(ctx, layer_id)
         layers.append({
             "files": sorted([f.path for f in files.to_list()]),
@@ -101,10 +115,10 @@ def _bzd_tar_impl(ctx):
             "symlinks": symlinks,
         })
         outputs.append(output)
-        transitive_files.append(files)
+        transitive_files.append(inputs)
         layer_id += 1
 
-    files, symlinks = _gather_files_and_symlinks(ctx, ctx.attr.srcs)
+    files, symlinks, inputs = _gather_files_and_symlinks(ctx, ctx.attr.srcs)
     root_symlinks_files, root_symlinks = _gather_root_symlinks(ctx)
     output = _get_output(ctx, layer_id)
     layers.append({
@@ -113,7 +127,7 @@ def _bzd_tar_impl(ctx):
         "symlinks": symlinks | root_symlinks,
     })
     outputs.append(output)
-    transitive_files.extend([files, root_symlinks_files])
+    transitive_files.extend([inputs, root_symlinks_files])
 
     manifest_file = ctx.actions.declare_file("{}.manifest.json".format(ctx.label.name))
     ctx.actions.write(

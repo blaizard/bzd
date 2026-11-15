@@ -47,7 +47,7 @@ def vite_run(ctx, install, inputs, output, substitutions):
         inputs = depset([vite_config] + inputs, transitive = [install.files]),
         outputs = [output],
         arguments = [
-            "{}/vite/bin/vite".format(install.node_modules.path),
+            "{}/node_modules/vite/bin/vite".format(install.package_json.dirname),
             "build",
             "--logLevel",
             "warn",

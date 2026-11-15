@@ -1,21 +1,8 @@
 """NodeJs package rule.
 
-The target is to recreate such structure:
-
-node_modules
-├── foo -> ./.store/foo@1.0.0
-└── .store
-    ├── bar@1.0.0
-    │   ├── <src>
-    │   └── node_modules
-    │       └── qar -> ../../qar@2.0.0
-    ├── foo@1.0.0
-    │   ├── <src>
-    │   └── node_modules
-    │       ├── bar -> ../../bar@1.0.0
-    │       └── qar -> ../../qar@2.0.0
-    └── qar@2.0.0
-        └── <src>
+Each package is repackaged into a deterministic archive of its files. The install rule extracts
+each archive into a tree artifact and recreates the dependency links as declared symlinks (see
+`bzd_nodejs_make_node_modules`), so that no tree artifact contains a symlink.
 """
 
 load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
@@ -26,8 +13,10 @@ BzdNodeJsPackageInfo = provider(
     "Provider for a single package",
     fields = {
         "canonical_name": "The canonical name of the package, ex: foo@1.0.0",
+        "deps": "Dictionary of dependency alias to canonical name.",
         "module_name": "The module name of the package, ex: foo",
-        "transitive_stores": "All stores archive related to this package (including itself).",
+        "store": "The archive containing the package files.",
+        "transitive_infos": "All transitive package infos (excluding itself).",
     },
 )
 
@@ -35,19 +24,10 @@ BzdNodeJsPackageInfo = provider(
 
 def _bzd_nodejs_package_impl(ctx):
     store = ctx.actions.declare_file("store.tar")
+    srcs = ctx.attr.srcs[DirectoryInfo]
+
     args = ctx.actions.args()
     args.add("--output", store)
-    args.add("--root", ctx.attr.canonical_name)
-
-    # Compute the symlinks and their relative paths.
-    node_modules = "{}/node_modules".format(ctx.attr.canonical_name)
-    for module_name, dep in ctx.attr.deps.items():
-        symlink = "{}/{}".format(node_modules, module_name)
-        path_up = [".."] * (len(symlink.split("/")) - 1)
-        relative_path = "/".join(path_up + [dep[BzdNodeJsPackageInfo].canonical_name])
-        args.add_all("--symlink", [module_name, relative_path])
-
-    srcs = ctx.attr.srcs[DirectoryInfo]
     args.add(srcs.path)
 
     ctx.actions.run(
@@ -59,10 +39,20 @@ def _bzd_nodejs_package_impl(ctx):
         executable = ctx.executable._repackage,
     )
 
+    # Direct dependencies with their link alias, which may differ from the dependency module name
+    # (npm aliases). This cannot be derived from `transitive_infos`, which only carries the closure.
+    deps = {
+        module_name: dep[BzdNodeJsPackageInfo].canonical_name
+        for module_name, dep in ctx.attr.deps.items()
+    }
+    dep_infos = [dep[BzdNodeJsPackageInfo] for dep in ctx.attr.deps.values()]
+
     return [DefaultInfo(files = depset([store])), BzdNodeJsPackageInfo(
         canonical_name = ctx.attr.canonical_name,
+        deps = deps,
         module_name = ctx.attr.module_name,
-        transitive_stores = depset([store], transitive = [dep[BzdNodeJsPackageInfo].transitive_stores for dep in ctx.attr.deps.values()]),
+        store = store,
+        transitive_infos = depset(dep_infos, transitive = [info.transitive_infos for info in dep_infos]),
     )]
 
 bzd_nodejs_package = rule(
@@ -88,7 +78,7 @@ bzd_nodejs_package = rule(
         ),
         "_repackage": attr.label(
             default = "//nodejs/private/python:repackage",
-            doc = "Repackage npm packages to include relative symlinks.",
+            doc = "Repackage npm packages into a deterministic archive.",
             cfg = "exec",
             executable = True,
         ),
