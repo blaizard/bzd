@@ -1,6 +1,7 @@
 use "rust/components/embassy/executor/interface.bdl"
 use "rust/components/generic/logger/backend/interface.bdl"
 use "rust/components/generic/logger/sink/ostream/interface.bdl"
+use "rust/components/std/camera/mock/interface.bdl"
 use "rust/components/std/stream/out/interface.bdl"
 use "rust/components/embassy/timer/interface.bdl"
 
@@ -12,6 +13,7 @@ composition {
 	logger_backend = bzd.components.generic.LoggerBackend(sink = ostream_logger, min_level = bzd.logger.Level.Info);
 	executor = bzd.components.embassy.Executor(logger_backend = logger_backend) [executor];
 	timer = bzd.components.embassy.Timer();
+	camera = bzd.components.std.camera.Mock();
 	
 }
 

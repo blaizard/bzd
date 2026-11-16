@@ -1,0 +1,15 @@
+load("@bzd_bdl//:defs.bzl", "bdl_target")
+
+bdl_target(
+    name = "xiao_sense",
+    composition = [
+        "composition.bdl",
+    ],
+    parent = "//rust/targets/esp:auto",
+    platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//rust/components/embassy/camera/ov3660",
+        "//rust/components/esp/memory/psram",
+    ],
+)

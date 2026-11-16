@@ -1,0 +1,12 @@
+use "rust/components/embassy/camera/ov3660/interface.bdl"
+use "rust/components/esp/memory/psram/interface.bdl"
+
+
+
+composition {
+	psram = bzd.components.esp.memory.Psram(size = 8 * 1024 * 1024);
+	camera = bzd.components.embassy.camera.Ov3660(memory = psram, width = 2048, height = 1536, timeout_ms = 5000);
+	
+}
+
+

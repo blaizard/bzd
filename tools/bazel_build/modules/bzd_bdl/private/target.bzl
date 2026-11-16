@@ -90,11 +90,13 @@ def _bdl_target_macro_impl(name, visibility, parent, platform, **kwargs):
         if platform != None:
             fail("bdl_target which names end with 'auto' cannot have platform defined.")
 
+    # Reference the `<name>.platform` alias for the transition, the same label used by
+    # `bdl_system`, so that both resolve to a single configuration.
     _bdl_target(
         name = name,
         visibility = visibility,
         parent = parent,
-        platform = platform,
+        platform = ":{}.platform".format(name) if platform != None else None,
         **kwargs
     )
 
