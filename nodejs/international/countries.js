@@ -1296,15 +1296,7 @@ export default {
 	lk: {
 		name: "Sri Lanka",
 		timezone: ["+05:30"],
-		search: [
-			"democratic socialist republic of sri lanka",
-			"ශ්‍රී ලංකාව",
-			"இலங்கை",
-			"lk",
-			"ilaṅkai",
-			"lka",
-			"sri lanka",
-		],
+		search: ["democratic socialist republic of sri lanka", "ශ්‍රී ලංකාව", "இலங்கை", "lk", "ilaṅkai", "lka", "sri lanka"],
 		call: ["94"],
 		currency: ["lkr"],
 		lang: ["sin", "tam"],

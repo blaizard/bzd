@@ -56,7 +56,7 @@ function synchronizeCssStyles(src, destination, recursive) {
 	if (recursive) {
 		const vSrcElements = src.childNodes;
 		const vDstElements = destination.childNodes;
-		for (let i = vSrcElements.length; i--; ) {
+		for (let i = vSrcElements.length; i--;) {
 			const vSrcElement = vSrcElements[i];
 			let vDstElement = vDstElements[i];
 			if (vSrcElement instanceof HTMLElement) {

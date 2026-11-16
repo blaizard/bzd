@@ -15,7 +15,7 @@ import LoggerMemory from "#bzd/nodejs/vue/components/logger/backend/memory/memor
 import { Node } from "#bzd/apps/artifacts/api/nodejs/node/node.js";
 import ProviderProcess from "#bzd/nodejs/core/statistics/provider_process.js";
 
-import { Command } from "commander/esm.mjs";
+import { Command } from "commander";
 
 const Exception = ExceptionFactory("backend");
 const Log = LogFactory("backend");

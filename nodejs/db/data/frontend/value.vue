@@ -4,8 +4,7 @@
 		<a v-else-if="enableViewOriginal" class="action" @click="setViewOriginal" v-tooltip="tooltipActionLess">-</a>
 		<div class="value-grid" @click.stop="onClick">
 			<div v-for="([t, v], index) in valueDisplay" :class="classItem(!isExpired(t))">
-				<span class="timestamp">{{ timestampToString(t) }}</span
-				><span class="value">
+				<span class="timestamp">{{ timestampToString(t) }}</span><span class="value">
 					<code class="json">{{ JSON.stringify(v) }}</code>
 				</span>
 				<span class="metadata">

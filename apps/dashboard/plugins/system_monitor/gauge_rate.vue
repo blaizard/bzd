@@ -3,8 +3,7 @@
 		<template v-if="nbObjects <= max">
 			<div class="gauge" v-for="(data, inputName) in input">
 				<div class="name">
-					<span class="small">{{ name.substring(0, 3) }}</span
-					>.{{ inputName.toUpperCase() }}
+					<span class="small">{{ name.substring(0, 3) }}</span>.{{ inputName.toUpperCase() }}
 				</div>
 				<div class="values">
 					<div class="value">

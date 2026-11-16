@@ -53,20 +53,24 @@ describe("Records", () => {
 		});
 		const records = new Records({ path: "records", fs: fs });
 
-		it("init", async () => {
-			await records.init();
+		it(
+			"init",
+			async () => {
+				await records.init();
 
-			const files = await fs.readdir("records/main");
-			Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec.gz", "8.rec", "3.rec"]);
-			Exception.assertEqual(records.storages["main"].records, [
-				{ tick: 1, path: "records/main/1.rec", size: 39 },
-				{ tick: 2, path: "records/main/2.rec", size: 41 },
-				{ tick: 3, path: "records/main/3.rec", size: 42 },
-				{ tick: 4, path: "records/main/4.rec", size: 43 },
-				{ tick: 5, path: "records/main/5.rec.gz", size: 64 },
-				{ tick: 8, path: "records/main/8.rec", size: 43 },
-			]);
-		}, /*timeout*/ 10000);
+				const files = await fs.readdir("records/main");
+				Exception.assertEqual(files, ["2.rec", "1.rec", "4.rec", "5.rec.gz", "8.rec", "3.rec"]);
+				Exception.assertEqual(records.storages["main"].records, [
+					{ tick: 1, path: "records/main/1.rec", size: 39 },
+					{ tick: 2, path: "records/main/2.rec", size: 41 },
+					{ tick: 3, path: "records/main/3.rec", size: 42 },
+					{ tick: 4, path: "records/main/4.rec", size: 43 },
+					{ tick: 5, path: "records/main/5.rec.gz", size: 64 },
+					{ tick: 8, path: "records/main/8.rec", size: 43 },
+				]);
+			},
+			/*timeout*/ 10000,
+		);
 
 		it("read", async () => {
 			Exception.assertEqual((await records.read().next()).value, [1, "a", 3, null]);
