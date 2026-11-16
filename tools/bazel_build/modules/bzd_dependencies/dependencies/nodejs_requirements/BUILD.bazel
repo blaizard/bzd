@@ -1,0 +1,14 @@
+load("@rules_python//python:defs.bzl", "py_library")
+
+py_library(
+    name = "nodejs_requirements",
+    srcs = [
+        "__init__.py",
+        "nodejs_requirements.py",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//context",
+        "//dependencies:interface",
+    ],
+)

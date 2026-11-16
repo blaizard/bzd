@@ -12,6 +12,7 @@ py_binary(
         "//context",
         "//dependencies:interface",
         "//dependencies/bazel_dep",
+        "//dependencies/nodejs_requirements",
         "//dependencies/pip_requirements",
     ],
 )

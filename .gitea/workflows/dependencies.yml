@@ -11,6 +11,7 @@ on:
                 options:
                     - all
                     - bazel_dep
+                    - nodejs_requirements
                     - pip_requirements
                 default: all
 
@@ -33,6 +34,7 @@ jobs:
             matrix:
                 dependency:
                     - bazel_dep
+                    - nodejs_requirements
                     - pip_requirements
         steps:
             - if: ${{ !inputs.dependency || inputs.dependency == 'all' || inputs.dependency == matrix.dependency }}

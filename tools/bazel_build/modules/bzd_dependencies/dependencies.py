@@ -7,10 +7,12 @@ import time
 from context.context import Context
 from dependencies.bazel_dep.bazel_dep import BazelDep
 from dependencies.interface import DependencyInterface
+from dependencies.nodejs_requirements.nodejs_requirements import NodejsRequirements
 from dependencies.pip_requirements.pip_requirements import PipRequirements
 
 AllDependencies: dict[str, type[DependencyInterface]] = {
 	"bazel_dep": BazelDep,
+	"nodejs_requirements": NodejsRequirements,
 	"pip_requirements": PipRequirements,
 }
 
