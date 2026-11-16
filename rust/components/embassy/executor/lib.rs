@@ -9,6 +9,7 @@ pub use rust_components_embassy_executor_interface::{
     BzdComponentsEmbassyExecutorContextConstraintTypes, BzdComponentsEmbassyExecutorInterface,
 };
 use rust_interfaces_executor::BzdExecutorInterface;
+use rust_interfaces_power::BzdPowerInterface;
 
 pub struct BzdComponentsEmbassyExecutor<
     C: BzdComponentsEmbassyExecutorContextConstraint,
@@ -96,6 +97,8 @@ where
         }
     }
     async fn join(self) -> i32 {
+        let power = { self.context.power.lock().await.accessor() };
+        let mut deep_sleep = core::pin::pin!(power.wait_deep_sleep());
         let mut workloads = core::pin::pin!(self.workloads.join());
         let mut services = core::pin::pin!(self.services.join());
 
@@ -103,6 +106,12 @@ where
         // workloads are done.
         let mut services_completed = false;
         core::future::poll_fn(|cx| {
+            // Stop as soon as the target requests deep sleep. Returning drops all
+            // workload and service futures, releasing their resources.
+            if deep_sleep.as_mut().poll(cx).is_ready() {
+                return core::task::Poll::Ready(0);
+            }
+
             // Let the services make progress while the workloads are running.
             if !services_completed && services.as_mut().poll(cx).is_ready() {
                 services_completed = true;
@@ -191,12 +200,17 @@ mod tests {
         }
     }
 
-    static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
+    use rust_components_generic_power::BzdComponentsGenericPower;
 
-    fn executor(
-    ) -> BzdComponentsEmbassyExecutor<BzdComponentsEmbassyExecutorContextConstraintTypes<NullBackend>>
-    {
-        BzdComponentsEmbassyExecutor::new(BzdComponentsEmbassyExecutorContext::new(&BACKEND))
+    static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
+    static POWER: Mutex<BzdComponentsGenericPower> = Mutex::new(BzdComponentsGenericPower);
+
+    fn executor() -> BzdComponentsEmbassyExecutor<
+        BzdComponentsEmbassyExecutorContextConstraintTypes<NullBackend, BzdComponentsGenericPower>,
+    > {
+        BzdComponentsEmbassyExecutor::new(BzdComponentsEmbassyExecutorContext::new(
+            &BACKEND, &POWER,
+        ))
     }
 
     #[test]

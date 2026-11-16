@@ -1,5 +1,6 @@
 use "rust/interfaces/executor.bdl"
 use "rust/interfaces/logger.bdl"
+use "rust/interfaces/power.bdl"
 
 namespace bzd.components.embassy;
 
@@ -7,6 +8,7 @@ namespace bzd.components.embassy;
 component Executor : bzd.Executor {
 config:
 	logger_backend = bzd.logger.Backend;
+	power = bzd.Power;
 	
 interface:
 	

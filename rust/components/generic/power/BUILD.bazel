@@ -1,0 +1,26 @@
+load("@bzd_bdl//:defs.bzl", "bdl_library")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+bdl_library(
+    name = "interface",
+    srcs = [
+        "interface.bdl",
+    ],
+    deps = [
+        "//rust/interfaces:power",
+    ],
+)
+
+rust_library(
+    name = "power",
+    srcs = [
+        "power.rs",
+    ],
+    crate_name = "rust_components_generic_power",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":interface",
+        "//rust/interfaces:power",
+        "//rust/libs/power",
+    ],
+)

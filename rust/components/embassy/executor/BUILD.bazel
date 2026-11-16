@@ -10,6 +10,7 @@ bdl_library(
     deps = [
         "//rust/interfaces:executor",
         "//rust/interfaces:logger",
+        "//rust/interfaces:power",
     ],
 )
 
@@ -25,11 +26,16 @@ rust_library(
         "//rust/bzd",
         "//rust/interfaces:executor",
         "//rust/interfaces:logger",
+        "//rust/interfaces:power",
         "//rust/libs/embassy",
+        "//rust/libs/power",
     ],
 )
 
 rust_test(
     name = "executor_test",
     crate = ":executor",
+    deps = [
+        "//rust/components/generic/power",
+    ],
 )

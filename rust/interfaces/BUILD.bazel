@@ -78,6 +78,17 @@ bdl_library(
 )
 
 bdl_library(
+    name = "power",
+    srcs = [
+        "power.bdl",
+    ],
+    visibility = ["//visibility:public"],
+    implementation = {
+        "rust": "//rust/interfaces/impl:power",
+    },
+)
+
+bdl_library(
     name = "tls",
     srcs = [
         "tls.bdl",

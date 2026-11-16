@@ -87,6 +87,18 @@ rust_library(
 )
 
 rust_library(
+    name = "power",
+    srcs = [
+        "power.rs",
+    ],
+    crate_name = "rust_interfaces_power_impl",
+    visibility = ["//rust/interfaces:__pkg__"],
+    deps = [
+        "//rust/libs/power",
+    ],
+)
+
+rust_library(
     name = "tls",
     srcs = [
         "tls.rs",

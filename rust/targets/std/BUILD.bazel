@@ -21,6 +21,7 @@ bdl_target(
     data = {
         "deps": [
             "//rust/libs/embassy",
+            "//rust/libs/power",
         ],
         "main": [
             "embassy.rs",
@@ -36,6 +37,7 @@ bdl_target(
         "//rust/components/embassy/timer",
         "//rust/components/generic/logger/backend:logger_backend",
         "//rust/components/generic/logger/sink/ostream",
+        "//rust/components/generic/power",
         "//rust/components/std/camera/mock",
         "//rust/components/std/network/embedded_nal",
         "//rust/components/std/network/tls",

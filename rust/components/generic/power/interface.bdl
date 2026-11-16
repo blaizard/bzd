@@ -1,0 +1,11 @@
+use "rust/interfaces/power.bdl"
+
+namespace bzd.components.generic;
+
+
+component Power : bzd.Power {
+interface:
+	
+}
+
+
