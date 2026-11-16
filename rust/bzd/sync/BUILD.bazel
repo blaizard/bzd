@@ -9,5 +9,6 @@ rust_library(
     deps = [
         "//rust/bzd/sync/mutex",
         "//rust/bzd/sync/signal",
+        "//rust/bzd/sync/watcher",
     ],
 )
