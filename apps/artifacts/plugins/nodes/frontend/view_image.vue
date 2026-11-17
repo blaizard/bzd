@@ -52,8 +52,14 @@
 				loaded: false,
 				error: null,
 				fetching: false,
+				fetchPending: false,
 				liveTimer: null,
 			};
+		},
+		watch: {
+			hoverTimestamp() {
+				this.fetchImage();
+			},
 		},
 		computed: {
 			/// The file endpoint is the node endpoint with the UID replaced by @file.
@@ -69,7 +75,11 @@
 		},
 		async mounted() {
 			await this.handleSubmit(() => this.fetchImage());
-			this.liveTimer = setInterval(() => this.fetchImage(), livePeriodMs);
+			this.liveTimer = setInterval(() => {
+				if (this.hoverTimestamp == null) {
+					this.fetchImage();
+				}
+			}, livePeriodMs);
 		},
 		beforeUnmount() {
 			clearInterval(this.liveTimer);
@@ -88,9 +98,13 @@
 					return null;
 				}
 			},
-			/// Fetch the newest image from all the dashboard inputs.
+			/// Fetch the newest image from all the dashboard inputs, or the one at the cursor timestamp.
 			async fetchImage() {
-				if (this.fetching || !this.options.inputs) {
+				if (this.fetching) {
+					this.fetchPending = true;
+					return;
+				}
+				if (!this.options.inputs) {
 					return;
 				}
 				const inputs = Object.keys(this.options.inputs);
@@ -101,13 +115,17 @@
 				this.fetching = true;
 				try {
 					this.$emit("fetch", livePeriodMs);
-					const result = await this.requestBackend(this.endpoint, {
-						method: "get",
-						query: {
+					const query = Object.fromEntries(
+						Object.entries({
 							include: inputs.join(","),
 							metadata: 1,
 							count: 1,
-						},
+							before: this.hoverTimestamp,
+						}).filter(([_, value]) => value !== null && value !== undefined),
+					);
+					const result = await this.requestBackend(this.endpoint, {
+						method: "get",
+						query: query,
 						expect: "json",
 					});
 					let newest = null;
@@ -128,6 +146,10 @@
 					this.updateImage(newest);
 				} finally {
 					this.fetching = false;
+					if (this.fetchPending) {
+						this.fetchPending = false;
+						this.fetchImage();
+					}
 				}
 			},
 			updateImage(image) {
@@ -135,7 +157,9 @@
 					this.image = null;
 					return;
 				}
-				this.$emit("timestamp", image.timestamp);
+				if (this.hoverTimestamp == null) {
+					this.$emit("timestamp", image.timestamp);
+				}
 				if (this.image && this.image.value["$file"] === image.value["$file"]) {
 					return;
 				}

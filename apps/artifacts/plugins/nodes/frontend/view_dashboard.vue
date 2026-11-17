@@ -13,6 +13,18 @@
 			</button>
 		</div>
 		<Form :description="formDescription" v-model="options"></Form>
+		<div class="timeline" v-if="ready">
+			<input
+				class="timeline-slider"
+				type="range"
+				min="0"
+				:max="timelineMax"
+				step="1"
+				:value="timelinePosition"
+				@input="onTimelineInput"
+				aria-label="Current timestamp"
+			/>
+		</div>
 		<div class="components" v-loading="loading" ref="componentContainer">
 			<div
 				:class="dashboardClass(dashboard)"
@@ -59,6 +71,9 @@
 	import Lock from "#bzd/nodejs/core/lock.js";
 
 	const optionsStorageKey = "bzd-artifacts-plugin-nodes-view-dashboard-options";
+
+	/// The number of positions available on the timeline slider.
+	const timelineSteps = 1000;
 
 	export default {
 		mixins: [Base, Component],
@@ -206,6 +221,21 @@
 			ready() {
 				return this.timeRange[0] !== null && this.timeRange[1] !== null;
 			},
+			timelineMax() {
+				return timelineSteps;
+			},
+			timelinePosition() {
+				if (!this.ready) {
+					return timelineSteps;
+				}
+				const [timestampOldest, timestampNewest] = this.timeRange;
+				const timestamp = Math.min(Math.max(this.hoverTimestamp ?? timestampNewest, timestampOldest), timestampNewest);
+				const period = timestampNewest - timestampOldest;
+				if (period <= 0) {
+					return timelineSteps;
+				}
+				return Math.round(((timestamp - timestampOldest) / period) * timelineSteps);
+			},
 			timeRangeString() {
 				const [timestampOldest, timestampNewest] = this.timeRange;
 				if (timestampOldest === null && timestampNewest === null) {
@@ -233,6 +263,18 @@
 			},
 		},
 		methods: {
+			/// Update the cursor timestamp from the timeline slider position.
+			onTimelineInput(event) {
+				const position = Number(event.target.value);
+				if (position >= timelineSteps) {
+					this.hoverTimestamp = null;
+					return;
+				}
+				const [timestampOldest, timestampNewest] = this.timeRange;
+				this.hoverTimestamp = Math.round(
+					timestampOldest + (position / timelineSteps) * (timestampNewest - timestampOldest),
+				);
+			},
 			/// Anchor the timestamp extrapolation on the newest timestamp fetched by a dashboard.
 			onTimestamp(timestamp) {
 				if (timestamp === null || timestamp === undefined) {
@@ -453,6 +495,20 @@
 				color: $fieldSpecialTextColor;
 				background-color: $fieldSpecialBgColor;
 			}
+		}
+	}
+
+	.timeline {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 4px 0;
+
+		.timeline-slider {
+			flex: 1;
+			min-width: 0;
+			cursor: pointer;
+			accent-color: $bzdGraphColorGray;
 		}
 	}
 
