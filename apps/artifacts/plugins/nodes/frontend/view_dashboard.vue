@@ -509,6 +509,13 @@
 			min-width: 0;
 			cursor: pointer;
 			accent-color: $bzdGraphColorGray;
+			opacity: 0.4;
+			transition: opacity 0.2s;
+
+			&:hover,
+			&:focus {
+				opacity: 1;
+			}
 		}
 	}
 
