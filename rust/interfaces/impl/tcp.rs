@@ -14,5 +14,5 @@ pub trait BzdNetworkTcpClientInterface {
     type Stream: IStream + OStream + 'static;
 
     /// Connect to `address` and return the resulting stream.
-    async fn connect(&self, address: SocketAddr) -> Result<Self::Stream, Error>;
+    async fn connect(&mut self, address: SocketAddr) -> Result<Self::Stream, Error>;
 }

@@ -31,7 +31,7 @@ where
 {
     type Stream = TcpStream<TcpConnectionType>;
 
-    async fn connect(&self, address: SocketAddr) -> Result<Self::Stream, Error> {
+    async fn connect(&mut self, address: SocketAddr) -> Result<Self::Stream, Error> {
         let network = state::get().ok_or_else(|| {
             bzd::base::error::failure!("TCP connect to {address}: network is not initialized")
         })?;

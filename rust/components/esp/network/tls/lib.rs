@@ -231,7 +231,7 @@ where
         TlsStream<Session<'static, Transport<<C::Tcp as BzdNetworkTcpClientInterface>::Stream>>>;
 
     async fn connect(&self, address: SocketAddr, server_name: &str) -> Result<Self::Stream, Error> {
-        let transport = self.context.tcp.read().await.connect(address).await?;
+        let transport = self.context.tcp.write().await.connect(address).await?;
         let tls = tls()?;
         connect(tls, transport, server_name, self.context.ca_certificate).await
     }

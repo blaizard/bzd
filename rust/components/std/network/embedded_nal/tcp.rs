@@ -27,7 +27,7 @@ impl Default for BzdComponentsStdNetworkNalTcp {
 impl BzdNetworkTcpClientInterface for BzdComponentsStdNetworkNalTcp {
     type Stream = TcpStream<<Stack as TcpConnect>::Connection<'static>>;
 
-    async fn connect(&self, address: SocketAddr) -> Result<Self::Stream, Error> {
+    async fn connect(&mut self, address: SocketAddr) -> Result<Self::Stream, Error> {
         let connection = self
             .stack
             .connect(address)

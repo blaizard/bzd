@@ -58,7 +58,7 @@ where
 
         match url.scheme() {
             Scheme::Http => {
-                let mut stream = self.context.tcp.read().await.connect(address).await?;
+                let mut stream = self.context.tcp.write().await.connect(address).await?;
                 request.send(&mut stream, buffer).await
             }
             Scheme::Https => match host {
