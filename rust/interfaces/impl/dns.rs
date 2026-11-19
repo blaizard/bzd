@@ -7,5 +7,5 @@ use core::net::IpAddr;
 /// Resolves hostnames to IP addresses.
 pub trait BzdNetworkDnsInterface {
     /// Resolve `hostname` into an address.
-    async fn resolve(&self, hostname: &str) -> Result<IpAddr, Error>;
+    async fn resolve(&mut self, hostname: &str) -> Result<IpAddr, Error>;
 }

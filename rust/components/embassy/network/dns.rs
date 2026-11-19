@@ -28,7 +28,7 @@ impl<C> BzdNetworkDnsInterface for BzdComponentsEmbassyNetworkDns<C>
 where
     C: BzdComponentsEmbassyNetworkDnsContextConstraint,
 {
-    async fn resolve(&self, hostname: &str) -> Result<IpAddr, Error> {
+    async fn resolve(&mut self, hostname: &str) -> Result<IpAddr, Error> {
         let network = state::get().ok_or_else(|| {
             bzd::base::error::failure!("DNS resolve '{hostname}': network is not initialized")
         })?;

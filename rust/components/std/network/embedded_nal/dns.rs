@@ -22,7 +22,7 @@ impl Default for BzdComponentsStdNetworkNalDns {
 }
 
 impl BzdNetworkDnsInterface for BzdComponentsStdNetworkNalDns {
-    async fn resolve(&self, hostname: &str) -> Result<IpAddr, bzd::base::error::Error> {
+    async fn resolve(&mut self, hostname: &str) -> Result<IpAddr, bzd::base::error::Error> {
         self.stack
             .get_host_by_name(hostname, AddrType::Either)
             .await

@@ -51,7 +51,7 @@ where
         let address = SocketAddr::new(
             match host {
                 Host::Ip(ip) => ip,
-                Host::Domain(domain) => self.context.dns.read().await.resolve(domain).await?,
+                Host::Domain(domain) => self.context.dns.write().await.resolve(domain).await?,
             },
             url.port(),
         );
