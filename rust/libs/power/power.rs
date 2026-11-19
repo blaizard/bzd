@@ -62,19 +62,6 @@ impl Power {
     pub fn deep_sleep_requested(&self) -> Option<DeepSleepRequest> {
         decode_request(self.request.load(Ordering::Acquire))
     }
-
-    /// Wait until a deep-sleep request is made.
-    pub(crate) async fn wait_deep_sleep(&self) -> DeepSleepRequest {
-        let mut receiver = DEEP_SLEEP_WATCHER
-            .receiver()
-            .expect("power: too many executors waiting for deep sleep");
-        loop {
-            if let Some(request) = self.deep_sleep_requested() {
-                return request;
-            }
-            receiver.changed().await;
-        }
-    }
 }
 
 impl Default for Power {
@@ -125,9 +112,9 @@ pub trait BzdPowerInterface {
         BzdPowerInterface::request_sleep(self.power_handle()).await;
     }
 
-    /// Wait until deep sleep is requested.
-    fn wait_deep_sleep(&self) -> impl Future<Output = ()> + 'static {
-        self.power_handle().wait_deep_sleep()
+    /// Wait until deep sleep is requested and no prevention is active.
+    async fn wait_deep_sleep(&self) {
+        self.power_handle().wait_deep_sleep().await;
     }
 }
 
@@ -194,10 +181,17 @@ impl<L: LightSleep> BzdPowerInterface for PowerHandle<L> {
         self.light_sleep.request_sleep().await;
     }
 
-    fn wait_deep_sleep(&self) -> impl Future<Output = ()> + 'static {
-        let power = self.power;
-        async move {
-            power.wait_deep_sleep().await;
+    async fn wait_deep_sleep(&self) {
+        let mut receiver = DEEP_SLEEP_WATCHER
+            .receiver()
+            .expect("power: too many executors waiting for deep sleep");
+        loop {
+            if self.power.deep_sleep_requested().is_some()
+                && self.preventing.load(Ordering::Acquire) == 0
+            {
+                return;
+            }
+            receiver.changed().await;
         }
     }
 }
@@ -209,6 +203,7 @@ struct PreventDeepSleepGuard<'a> {
 impl Drop for PreventDeepSleepGuard<'_> {
     fn drop(&mut self) {
         self.counter.fetch_sub(1, Ordering::AcqRel);
+        DEEP_SLEEP_WATCHER.send(());
     }
 }
 
@@ -314,14 +309,6 @@ mod tests {
             power.deep_sleep_requested().unwrap().duration(),
             Some(Duration::from_millis(u64::from(MAX_DURATION_MILLIS)))
         )?;
-        Ok(())
-    }
-
-    #[test]
-    async fn existing_request_returns_immediately() -> TestResult {
-        let power = Power::new();
-        power.request_deep_sleep(None);
-        assert_eq!(power.wait_deep_sleep().await.duration(), None)?;
         Ok(())
     }
 

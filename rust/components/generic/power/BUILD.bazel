@@ -21,6 +21,7 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = [
         ":interface",
+        "//rust/bzd",
         "//rust/interfaces:power",
         "//rust/libs/embassy",
         "//rust/libs/power",

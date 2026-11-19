@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use bzd::sync::mutex::Mutex;
+use bzd::sync::rwlock::RwLock;
 use core::future::Future;
 use rust_interfaces_logger::BzdLoggerBackendInterface;
 
@@ -10,7 +10,7 @@ pub trait BzdExecutorInterface: Sized {
     type LoggerBackend: BzdLoggerBackendInterface + 'static;
 
     /// The logger backend associated with this executor.
-    fn logger_backend(&self) -> &'static Mutex<Self::LoggerBackend>;
+    fn logger_backend(&self) -> &'static RwLock<Self::LoggerBackend>;
 
     /// Register a workload.
     fn push_workload<F>(

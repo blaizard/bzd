@@ -28,7 +28,7 @@ impl<C: BzdComponentsGenericLoggerBackendContextConstraint> BzdComponentsGeneric
 
     /// Drain all queued records through the sink.
     pub async fn flush(&mut self) -> Result<(), Error> {
-        let mut sink = self.context.sink.lock().await;
+        let mut sink = self.context.sink.write().await;
         logger_state().flush(&mut *sink).await
     }
 }
@@ -55,7 +55,7 @@ impl<C: BzdComponentsGenericLoggerBackendContextConstraint>
     async fn run(&mut self) -> Result<(), Error> {
         loop {
             {
-                let mut sink = self.context.sink.lock().await;
+                let mut sink = self.context.sink.write().await;
                 logger_state().flush(&mut *sink).await?;
             }
             logger_state().wait().await;

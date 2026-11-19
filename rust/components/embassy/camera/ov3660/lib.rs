@@ -110,7 +110,7 @@ where
     async fn allocate_frame(&mut self) -> Result<&'static mut [u8], Error> {
         let width = self.context.width as usize;
         let height = self.context.height as usize;
-        let mut memory = self.context.memory.lock().await;
+        let mut memory = self.context.memory.write().await;
         // Leave 2 bytes per pixel for large JPEGs, capped by the memory size.
         let size = (width * height * 2).min(memory.capacity());
         memory.alloc(size)

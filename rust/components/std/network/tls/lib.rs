@@ -423,7 +423,7 @@ where
         TlsStream<OwnedConnection<Transport<<C::Tcp as BzdNetworkTcpClientInterface>::Stream>>>;
 
     async fn connect(&self, address: SocketAddr, server_name: &str) -> Result<Self::Stream, Error> {
-        let transport = self.context.tcp.lock().await.connect(address).await?;
+        let transport = self.context.tcp.read().await.connect(address).await?;
         connect(transport, server_name, self.context.ca_certificate).await
     }
 }

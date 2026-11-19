@@ -51,14 +51,14 @@ where
         let address = SocketAddr::new(
             match host {
                 Host::Ip(ip) => ip,
-                Host::Domain(domain) => self.context.dns.lock().await.resolve(domain).await?,
+                Host::Domain(domain) => self.context.dns.read().await.resolve(domain).await?,
             },
             url.port(),
         );
 
         match url.scheme() {
             Scheme::Http => {
-                let mut stream = self.context.tcp.lock().await.connect(address).await?;
+                let mut stream = self.context.tcp.read().await.connect(address).await?;
                 request.send(&mut stream, buffer).await
             }
             Scheme::Https => match host {
@@ -66,7 +66,7 @@ where
                     let mut stream = self
                         .context
                         .tls
-                        .lock()
+                        .read()
                         .await
                         .connect(address, domain)
                         .await?;

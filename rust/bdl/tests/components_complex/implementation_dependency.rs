@@ -27,7 +27,7 @@ struct Manager {
 
 impl BzdTestManagerInterface for Manager {
     async fn run(&mut self) -> Result<(), bzd::base::error::Error> {
-        let mut user = self.context.user.lock().await;
+        let mut user = self.context.user.write().await;
         let _ = user.greet().await?;
         Ok(())
     }
@@ -37,14 +37,14 @@ impl BzdTestManagerInterface for Manager {
 #[bzd_test::test]
 mod tests {
     use super::*;
-    use bzd::sync::mutex::Mutex;
+    use bzd::sync::rwlock::RwLock;
     use component::StaticComponent;
 
     #[test]
     fn test_component() -> TestResult {
-        static USER: StaticComponent<Mutex<User>> = StaticComponent::new();
+        static USER: StaticComponent<RwLock<User>> = StaticComponent::new();
         let user = USER.get_or_init(|| {
-            Mutex::new(User {
+            RwLock::new(User {
                 context: BzdTestUserContext { username: "Alex" },
             })
         });

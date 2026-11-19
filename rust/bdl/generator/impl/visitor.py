@@ -291,7 +291,7 @@ class Transform:
 		symbol = expression.symbol
 		assert symbol.this, f"The lifecycle '{expression}' must target a component instance."
 		receiver = (
-			"component" if symbol.this == fqn else f"{self.entryStructNameToStr(symbol.this)}::get().component.lock().await"
+			"component" if symbol.this == fqn else f"{self.entryStructNameToStr(symbol.this)}::get().component.write().await"
 		)
 		parameters = ", ".join(self.configParamValueToStr(item) for item in expression.parametersResolved)
 		return f"{receiver}.{symbol.propertyName}({parameters})"
@@ -302,7 +302,7 @@ class Transform:
 		symbol = entry.expression.symbol
 		assert symbol.this, f"The workload '{entry.expression}' must be a method call on a component instance."
 		parameters = ", ".join(self.configParamValueToStr(item) for item in entry.expression.parametersResolved)
-		return f"{self.entryStructNameToStr(symbol.this)}::get().component.lock().await.{symbol.propertyName}({parameters})"
+		return f"{self.entryStructNameToStr(symbol.this)}::get().component.write().await.{symbol.propertyName}({parameters})"
 
 
 def formatRust(bdl: Object, data: dict[str, typing.Any] | None = None) -> str:

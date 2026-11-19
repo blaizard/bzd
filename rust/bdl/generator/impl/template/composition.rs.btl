@@ -93,7 +93,7 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 
 	let executor = {{ context | executorConstructorToStr }};
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger("{{ context.executor }}");
+	let mut logger = logger_backend.read().await.logger("{{ context.executor }}");
 
 	log_info!(logger, "Initialization completed.")?;
 
@@ -134,13 +134,13 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "Workload failure: {}", error)?;
 	}
-	logger_backend.lock().await.flush().await?;
+	logger_backend.write().await.flush().await?;
 
 	// Shutdown all registry entries.
 {% for fqn, entry in registry[context] %}
 	{{ fqn | entryStructNameToStr }}::get().shutdown().await?;
 {% end %}
-	let _ = logger_backend.lock().await.flush().await;
+	let _ = logger_backend.write().await.flush().await;
 
 	error.map_or(Ok(()), Err)
 }

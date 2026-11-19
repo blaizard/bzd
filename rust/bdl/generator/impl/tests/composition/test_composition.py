@@ -46,7 +46,7 @@ composition {
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
 		self.assertIn(
-			'let mut logger = logger_backend.lock().await.logger("default.executor");',
+			'let mut logger = logger_backend.read().await.logger("default.executor");',
 			actual,
 		)
 		self.assertNotIn("install", actual)
@@ -459,7 +459,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 
 	let executor = DefaultExecutor::new();
 	let logger_backend = executor.logger_backend();
-	let mut logger = logger_backend.lock().await.logger("default.executor");
+	let mut logger = logger_backend.read().await.logger("default.executor");
 
 	log_info!(logger, "Initialization completed.")?;
 
@@ -468,7 +468,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	let failure: core::cell::RefCell<Option<bzd::base::error::Error>> = core::cell::RefCell::new(None);
 	let executor = executor
 		.push_workload(async {
-			match DefaultPersonChildEntry::get().component.lock().await.print_info().await {
+			match DefaultPersonChildEntry::get().component.write().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -477,7 +477,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 			}
 		})
 		.push_workload(async {
-			match DefaultPersonParentEntry::get().component.lock().await.print_info().await {
+			match DefaultPersonParentEntry::get().component.write().await.print_info().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -486,7 +486,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 			}
 		})
 		.push_workload(async {
-			match DefaultPrinterEntry::get().component.lock().await.run().await {
+			match DefaultPrinterEntry::get().component.write().await.run().await {
 				Ok(()) => 0,
 				Err(e) => {
 					*failure.borrow_mut() = Some(e);
@@ -505,7 +505,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "Workload failure: {}", error)?;
 	}
-	logger_backend.lock().await.flush().await?;
+	logger_backend.write().await.flush().await?;
 
 	// Shutdown all registry entries.
 	DefaultExecutorEntry::get().shutdown().await?;
@@ -513,7 +513,7 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	DefaultPersonChildEntry::get().shutdown().await?;
 	DefaultPersonParentEntry::get().shutdown().await?;
 	DefaultPrinterEntry::get().shutdown().await?;
-	let _ = logger_backend.lock().await.flush().await;
+	let _ = logger_backend.write().await.flush().await;
 
 	error.map_or(Ok(()), Err)
 }

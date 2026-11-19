@@ -120,9 +120,9 @@ fn main() -> Result<(), bzd::base::error::Error> {
     block_on(person_child.init())?;
     block_on(person_parent.init())?;
 
-    block_on(async { person_child.component.lock().await.print_info().await })?;
-    block_on(async { person_child.component.lock().await.print_info().await })?;
-    block_on(async { person_parent.component.lock().await.print_info().await })?;
+    block_on(async { person_child.component.write().await.print_info().await })?;
+    block_on(async { person_child.component.write().await.print_info().await })?;
+    block_on(async { person_parent.component.write().await.print_info().await })?;
 
     block_on(person_child.shutdown())?;
     block_on(person_parent.shutdown())?;

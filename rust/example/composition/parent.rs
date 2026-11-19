@@ -33,7 +33,7 @@ where
             self.context.children.len()
         );
         for child in self.context.children {
-            let mut child = child.lock().await;
+            let mut child = child.write().await;
             child.print_info().await?;
         }
         Ok(())

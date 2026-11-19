@@ -3,7 +3,7 @@
 use core::cell::UnsafeCell;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use bzd::sync::mutex::{Mutex, MutexGuard};
+use bzd::sync::rwlock::{RwLock, RwLockWriteGuard};
 
 #[allow(async_fn_in_trait)] // Components are initialized locally and do not require Send bounds.
 pub trait Lifecycle {
@@ -13,7 +13,7 @@ pub trait Lifecycle {
     async fn shutdown(&self) -> Result<(), bzd::base::error::Error>;
 }
 
-pub type ComponentHandle<T> = &'static Mutex<T>;
+pub type ComponentHandle<T> = &'static RwLock<T>;
 
 pub struct StaticComponent<T>(UnsafeCell<Option<T>>);
 
@@ -37,31 +37,15 @@ impl<T> Default for StaticComponent<T> {
     }
 }
 
-pub struct Component<T> {
-    inner: Mutex<T>,
-}
-
-impl<T> Component<T> {
-    pub const fn new(inner: T) -> Self {
-        Self {
-            inner: Mutex::new(inner),
-        }
-    }
-
-    pub async fn lock(&self) -> MutexGuard<'_, T> {
-        self.inner.lock().await
-    }
-}
-
 pub struct CompositionComponent<T> {
-    component: Component<T>,
+    component: RwLock<T>,
     ref_count: AtomicUsize,
 }
 
 impl<T> CompositionComponent<T> {
     pub const fn new(inner: T) -> Self {
         Self {
-            component: Component::new(inner),
+            component: RwLock::new(inner),
             ref_count: AtomicUsize::new(0),
         }
     }
@@ -70,7 +54,7 @@ impl<T> CompositionComponent<T> {
     where
         F: AsyncFnOnce(&mut T) -> Result<(), bzd::base::error::Error>,
     {
-        let mut component = self.lock().await;
+        let mut component = self.component.write().await;
         let is_first = self.ref_count.fetch_add(1, Ordering::Relaxed) == 0;
 
         if is_first {
@@ -84,7 +68,7 @@ impl<T> CompositionComponent<T> {
     where
         F: AsyncFnOnce(&mut T) -> Result<(), bzd::base::error::Error>,
     {
-        let mut component = self.lock().await;
+        let mut component = self.component.write().await;
         let is_last = self.ref_count.fetch_sub(1, Ordering::Relaxed) == 1;
 
         if is_last {
@@ -94,11 +78,11 @@ impl<T> CompositionComponent<T> {
         Ok(is_last)
     }
 
-    pub async fn lock(&self) -> MutexGuard<'_, T> {
-        self.component.lock().await
+    pub async fn write(&self) -> RwLockWriteGuard<'_, T> {
+        self.component.write().await
     }
 
-    pub fn handle(&self) -> &Mutex<T> {
-        &self.component.inner
+    pub fn handle(&self) -> &RwLock<T> {
+        &self.component
     }
 }

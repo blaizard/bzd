@@ -44,11 +44,22 @@ impl BzdPowerInterface for BzdComponentsGenericPower {
 #[bzd_test::test]
 mod tests {
     use super::*;
+    use bzd::sync::rwlock::RwLock;
 
     #[test]
     fn component_forwards_power_interface() -> TestResult {
         let power = BzdComponentsGenericPower::new();
         assert_eq!(power.is_deep_sleep(), false)?;
+        Ok(())
+    }
+
+    #[test]
+    async fn multiple_readers_can_prevent_deep_sleep() -> TestResult {
+        let power = RwLock::new(BzdComponentsGenericPower::new());
+        let first = power.read().await;
+        let second = power.read().await;
+        assert_eq!(first.prevent_deep_sleep(async { 1 }).await, 1)?;
+        assert_eq!(second.prevent_deep_sleep(async { 2 }).await, 2)?;
         Ok(())
     }
 }

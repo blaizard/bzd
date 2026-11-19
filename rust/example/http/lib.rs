@@ -35,8 +35,8 @@ where
     C::Http: BzdNetworkHttpClientInterface,
 {
     async fn run(&mut self) -> Result<(), Error> {
-        let http = self.context.http.lock().await;
-        let mut out = self.context.out.lock().await;
+        let http = self.context.http.read().await;
+        let mut out = self.context.out.write().await;
         let mut buffer = [0u8; BUFFER_SIZE];
 
         let request = Request::get("http://example.com/")?;

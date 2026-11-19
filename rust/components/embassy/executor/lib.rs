@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
 
-use bzd::sync::mutex::Mutex;
+use bzd::sync::rwlock::RwLock;
 use core::future::Future;
 use embassy_futures::join::join;
 pub use rust_components_embassy_executor_interface::{
@@ -65,7 +65,7 @@ where
 {
     type LoggerBackend = C::LoggerBackend;
 
-    fn logger_backend(&self) -> &'static Mutex<Self::LoggerBackend> {
+    fn logger_backend(&self) -> &'static RwLock<Self::LoggerBackend> {
         self.context.logger_backend
     }
 
@@ -97,11 +97,8 @@ where
         }
     }
     async fn join(self) -> i32 {
-        let deep_sleep = {
-            let power = self.context.power.lock().await;
-            power.wait_deep_sleep()
-        };
-        let mut deep_sleep = core::pin::pin!(deep_sleep);
+        let power = self.context.power.read().await;
+        let mut deep_sleep = core::pin::pin!(power.wait_deep_sleep());
         let mut workloads = core::pin::pin!(self.workloads.join());
         let mut services = core::pin::pin!(self.services.join());
 
@@ -205,8 +202,8 @@ mod tests {
 
     use rust_components_generic_power::BzdComponentsGenericPower;
 
-    static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
-    static POWER: Mutex<BzdComponentsGenericPower> = Mutex::new(BzdComponentsGenericPower::new());
+    static BACKEND: RwLock<NullBackend> = RwLock::new(NullBackend);
+    static POWER: RwLock<BzdComponentsGenericPower> = RwLock::new(BzdComponentsGenericPower::new());
 
     fn executor() -> BzdComponentsEmbassyExecutor<
         BzdComponentsEmbassyExecutorContextConstraintTypes<NullBackend, BzdComponentsGenericPower>,

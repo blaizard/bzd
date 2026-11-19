@@ -30,11 +30,11 @@ impl<C: BzdComponentsGenericOStreamLoggerSinkContextConstraint> BzdLoggerSinkInt
     for BzdComponentsGenericOStreamLoggerSink<C>
 {
     async fn write(&mut self, data: &[u8]) -> Result<(), Error> {
-        self.context.out.lock().await.write_all(data).await
+        self.context.out.write().await.write_all(data).await
     }
 
     async fn flush(&mut self) -> Result<(), Error> {
-        self.context.out.lock().await.flush().await
+        self.context.out.write().await.flush().await
     }
 }
 
