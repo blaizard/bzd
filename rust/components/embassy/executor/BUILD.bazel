@@ -28,7 +28,6 @@ rust_library(
         "//rust/interfaces:logger",
         "//rust/interfaces:power",
         "//rust/libs/embassy",
-        "//rust/libs/power",
     ],
 )
 

@@ -97,8 +97,11 @@ where
         }
     }
     async fn join(self) -> i32 {
-        let power = { self.context.power.lock().await.accessor() };
-        let mut deep_sleep = core::pin::pin!(power.wait_deep_sleep());
+        let deep_sleep = {
+            let power = self.context.power.lock().await;
+            power.wait_deep_sleep()
+        };
+        let mut deep_sleep = core::pin::pin!(deep_sleep);
         let mut workloads = core::pin::pin!(self.workloads.join());
         let mut services = core::pin::pin!(self.services.join());
 
@@ -203,7 +206,7 @@ mod tests {
     use rust_components_generic_power::BzdComponentsGenericPower;
 
     static BACKEND: Mutex<NullBackend> = Mutex::new(NullBackend);
-    static POWER: Mutex<BzdComponentsGenericPower> = Mutex::new(BzdComponentsGenericPower);
+    static POWER: Mutex<BzdComponentsGenericPower> = Mutex::new(BzdComponentsGenericPower::new());
 
     fn executor() -> BzdComponentsEmbassyExecutor<
         BzdComponentsEmbassyExecutorContextConstraintTypes<NullBackend, BzdComponentsGenericPower>,

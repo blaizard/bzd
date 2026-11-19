@@ -44,7 +44,7 @@ async fn main(_spawner: Spawner) -> ! {
 
     match runExecutor().await {
         Ok(()) => {
-            if let Some(request) = rust_libs_power::power().deep_sleep_requested().await {
+            if let Some(request) = rust_libs_power::power().deep_sleep_requested() {
                 let mut low_power = LowPower::new(peripherals.LPWR.reborrow());
                 if let Some(duration) = request.duration() {
                     let micros = u64::try_from(duration.as_micros()).unwrap_or(u64::MAX);
