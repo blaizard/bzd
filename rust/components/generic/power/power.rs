@@ -3,19 +3,9 @@
 
 pub use rust_components_generic_power_interface::BzdComponentsGenericPowerInterface;
 
-use rust_libs_power::{BzdPowerInterface, LightSleep, PowerHandle};
+use rust_libs_power::{BzdPowerInterface, PowerHandle};
 
-pub struct YieldLightSleep;
-
-impl LightSleep for YieldLightSleep {
-    const DEFAULT: Self = Self;
-
-    async fn request_sleep(&self) {
-        embassy_futures::yield_now().await;
-    }
-}
-
-pub struct BzdComponentsGenericPower(PowerHandle<YieldLightSleep>);
+pub struct BzdComponentsGenericPower(PowerHandle);
 
 impl BzdComponentsGenericPower {
     #[must_use]
@@ -33,9 +23,7 @@ impl Default for BzdComponentsGenericPower {
 impl BzdComponentsGenericPowerInterface for BzdComponentsGenericPower {}
 
 impl BzdPowerInterface for BzdComponentsGenericPower {
-    type LightSleepImpl = YieldLightSleep;
-
-    fn power_handle(&self) -> &PowerHandle<YieldLightSleep> {
+    fn power_handle(&self) -> &PowerHandle {
         &self.0
     }
 }

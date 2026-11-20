@@ -450,9 +450,8 @@ impl Lifecycle for DefaultPrinterEntry {
 #[allow(non_snake_case)]
 pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 {
-	// Initialize all registry entries.
+	// Initialize the registry entries that are used.
 	DefaultExecutorEntry::get().init().await?;
-	DefaultOutEntry::get().init().await?;
 	DefaultPersonChildEntry::get().init().await?;
 	DefaultPersonParentEntry::get().init().await?;
 	DefaultPrinterEntry::get().init().await?;
@@ -505,15 +504,12 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "Workload failure: {}", error)?;
 	}
-	logger_backend.write().await.flush().await?;
 
-	// Shutdown all registry entries.
-	DefaultExecutorEntry::get().shutdown().await?;
-	DefaultOutEntry::get().shutdown().await?;
-	DefaultPersonChildEntry::get().shutdown().await?;
-	DefaultPersonParentEntry::get().shutdown().await?;
+	// Shutdown the registry entries that are used.
 	DefaultPrinterEntry::get().shutdown().await?;
-	let _ = logger_backend.write().await.flush().await;
+	DefaultPersonParentEntry::get().shutdown().await?;
+	DefaultPersonChildEntry::get().shutdown().await?;
+	DefaultExecutorEntry::get().shutdown().await?;
 
 	error.map_or(Ok(()), Err)
 }
@@ -521,6 +517,65 @@ pub async fn runExecutor() -> Result<(), bzd::base::error::Error>
 """
 		actual = self._generate(content=content, imports=["child", "parent"])
 		self.assertEqual(actual.rstrip("\n"), expectedContent.rstrip("\n"))
+
+	def testCompositionUsedEntries(self) -> None:
+		content = """
+namespace default;
+component Out {
+}
+component Worker {
+config:
+	out = Out;
+interface:
+	method run();
+}
+component Executor {
+}
+composition {
+	executor = Executor() [executor];
+	out = Out();
+	worker = Worker(out = out);
+	worker.run();
+}
+"""
+		actual = self._generate(content=content, imports=[])
+		initBlock = actual.split("// Initialize the registry entries that are used.")[1].split("let executor =")[0]
+		self.assertIn("DefaultExecutorEntry", initBlock)
+		self.assertIn("DefaultWorkerEntry", initBlock)
+		self.assertNotIn("DefaultOutEntry", initBlock)
+
+		shutdownBlock = actual.split("// Shutdown the registry entries that are used.")[1]
+		self.assertNotIn("DefaultOutEntry", shutdownBlock)
+		# Dependencies are still shutdown through their dependent's lifecycle.
+		self.assertIn("DefaultOutEntry::get().shutdown().await?;", actual)
+
+	def testCompositionShutdownOrder(self) -> None:
+		content = """
+namespace default;
+component Out {
+}
+component Worker {
+config:
+	out = Out;
+interface:
+	method close() [shutdown];
+	method run();
+}
+component Executor {
+}
+composition {
+	executor = Executor() [executor];
+	out = Out();
+	worker = Worker(out = out);
+	worker.run();
+}
+"""
+		actual = self._generate(content=content, imports=[])
+		shutdown = actual.split("impl Lifecycle for DefaultWorkerEntry")[1].split("async fn shutdown")[1]
+		self.assertLess(
+			shutdown.index("component.close().await?;"),
+			shutdown.index("DefaultOutEntry::get().shutdown().await?;"),
+		)
 
 
 if __name__ == "__main__":

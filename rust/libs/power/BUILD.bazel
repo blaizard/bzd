@@ -1,3 +1,4 @@
+load("@bzd_rules_doc//doc:defs.bzl", "doc_binary")
 load("@rules_rust//rust:defs.bzl", "rust_library")
 load("//rust:defs.bzl", "rust_test")
 
@@ -16,4 +17,12 @@ rust_library(
 rust_test(
     name = "power_test",
     crate = ":power",
+)
+
+doc_binary(
+    name = "documentation",
+    srcs = [
+        ("Power", "README.md"),
+    ],
+    visibility = ["//visibility:public"],
 )

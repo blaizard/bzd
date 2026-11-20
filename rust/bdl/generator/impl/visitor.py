@@ -304,6 +304,33 @@ class Transform:
 		parameters = ", ".join(self.configParamValueToStr(item) for item in entry.expression.parametersResolved)
 		return f"{self.entryStructNameToStr(symbol.this)}::get().component.write().await.{symbol.propertyName}({parameters})"
 
+	def usedEntries(self, context: Context) -> list[str]:
+		"""Get the registry entries used by the composition roots, in registry order.
+
+		Dependencies are initialized and shutdown by their dependent's lifecycle.
+		"""
+
+		assert self.composition is not None
+		used: set[str] = {context.executor}
+		for entry in self.composition.services.get(context, []):
+			used.update(dep.fqn for dep in entry.deps)
+		for entry in self.composition.workloads.get(context, []):
+			used.update(dep.fqn for dep in entry.deps)
+		return [fqn for fqn in self.composition.registry.get(context, {}) if fqn in used]
+
+	def initEntries(self, context: Context) -> list[str]:
+		"""Get the registry entries in initialization order, executor first."""
+
+		executor = context.executor
+		return [executor] + [fqn for fqn in self.usedEntries(context) if fqn != executor]
+
+	def shutdownEntries(self, context: Context) -> list[str]:
+		"""Get the registry entries in shutdown order, executor last."""
+
+		executor = context.executor
+		entries = [fqn for fqn in self.usedEntries(context) if fqn != executor]
+		return list(reversed(entries)) + [executor]
+
 
 def formatRust(bdl: Object, data: dict[str, typing.Any] | None = None) -> str:
 	template = Template.fromPath(pathlib.Path(__file__).parent / "template/file.rs.btl", indent=True)

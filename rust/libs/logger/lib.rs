@@ -8,7 +8,7 @@ use rust_interfaces_logger::BzdLoggerSinkInterface;
 
 pub use rust_interfaces_logger::{BzdLoggerBackendInterface, BzdLoggerLevel, Logger};
 
-const RING_SIZE: usize = 1024;
+const RING_SIZE: usize = 4096;
 const MAX_RECORDS_PER_BATCH: usize = 32;
 
 /// Persistent state of a logger backend.

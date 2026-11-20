@@ -23,7 +23,6 @@ rust_library(
         ":interface",
         "//rust/bzd",
         "//rust/interfaces:power",
-        "//rust/libs/embassy",
         "//rust/libs/power",
     ],
 )

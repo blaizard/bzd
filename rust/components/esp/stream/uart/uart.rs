@@ -2,7 +2,7 @@
 
 use bzd::base::stream::OStream;
 use esp_hal::gpio::AnyPin;
-use esp_hal::uart::{Config, Uart};
+use esp_hal::uart::{Config, UartTx};
 use rust_components_esp_hal::init as esp_hal_init;
 pub use rust_components_esp_stream_uart_interface::{
     BzdComponentsEspUartDevice, BzdComponentsEspUartOutContext, BzdComponentsEspUartOutInterface,
@@ -10,7 +10,7 @@ pub use rust_components_esp_stream_uart_interface::{
 
 pub struct BzdComponentsEspUartOut {
     context: BzdComponentsEspUartOutContext,
-    uart: Option<Uart<'static, esp_hal::Async>>,
+    uart: Option<UartTx<'static, esp_hal::Async>>,
 }
 
 impl BzdComponentsEspUartOut {
@@ -35,8 +35,8 @@ impl BzdComponentsEspUartOutInterface for BzdComponentsEspUartOut {
         let config = Config::default().with_baudrate(self.context.baudrate as u32);
 
         let uart = match self.context.device {
-            BzdComponentsEspUartDevice::Uart0 => Uart::new(peripheral.UART0.reborrow(), config),
-            BzdComponentsEspUartDevice::Uart1 => Uart::new(peripheral.UART1.reborrow(), config),
+            BzdComponentsEspUartDevice::Uart0 => UartTx::new(peripheral.UART0.reborrow(), config),
+            BzdComponentsEspUartDevice::Uart1 => UartTx::new(peripheral.UART1.reborrow(), config),
         }
         .map_err(|_| bzd::base::error::failure!("failed to initialize UART"))?
         .with_tx(pin)

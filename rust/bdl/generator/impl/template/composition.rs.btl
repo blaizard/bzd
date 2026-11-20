@@ -30,11 +30,11 @@ use {{ import }}::*;
 
 {#- Generate calls for all shutdown members associated with an expression. -#}
 {%- macro callShutdownMembers(entry, fqn) -%}
-	{% for dep in entry.deps %}
-		{{ dep.fqn | entryStructNameToStr }}::get().shutdown().await?;
-	{% end %}
 	{% for shutdown in entry.shutdown %}
 		{{ lifecycleMethodToStr(shutdown, fqn) }}.await?;
+	{% end %}
+	{% for dep in entry.deps %}
+		{{ dep.fqn | entryStructNameToStr }}::get().shutdown().await?;
 	{% end %}
 {% end %}
 
@@ -86,8 +86,8 @@ impl Lifecycle for {{ fqn | entryStructNameToStr }} {
 #[allow(non_snake_case)]
 pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::error::Error>
 {
-	// Initialize all registry entries.
-{% for fqn, entry in registry[context] %}
+	// Initialize the registry entries that are used.
+{% for fqn in initEntries(context) %}
 	{{ fqn | entryStructNameToStr }}::get().init().await?;
 {% end %}
 
@@ -134,13 +134,11 @@ pub async fn {{ context | runFunctionNameToStr }}() -> Result<(), bzd::base::err
 	if let Some(error) = error.as_ref() {
 		log_error!(logger, "Workload failure: {}", error)?;
 	}
-	logger_backend.write().await.flush().await?;
 
-	// Shutdown all registry entries.
-{% for fqn, entry in registry[context] %}
+	// Shutdown the registry entries that are used.
+{% for fqn in shutdownEntries(context) %}
 	{{ fqn | entryStructNameToStr }}::get().shutdown().await?;
 {% end %}
-	let _ = logger_backend.write().await.flush().await;
 
 	error.map_or(Ok(()), Err)
 }

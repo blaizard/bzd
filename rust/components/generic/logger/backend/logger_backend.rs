@@ -61,4 +61,9 @@ impl<C: BzdComponentsGenericLoggerBackendContextConstraint>
             logger_state().wait().await;
         }
     }
+
+    async fn shutdown(&mut self) -> Result<(), Error> {
+        let _ = self.flush().await;
+        Ok(())
+    }
 }

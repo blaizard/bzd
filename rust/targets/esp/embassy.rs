@@ -5,6 +5,7 @@ use bzd::base::panic::PanicPrint;
 use embassy_executor::Spawner;
 // Forces the global allocator from esp-alloc to be linked.
 use esp_alloc as _;
+use esp_hal::peripherals::LPWR;
 use esp_hal::rtc_cntl::sleep::{LowPower, RtcSleepConfig};
 use esp_hal::system::software_reset;
 use esp_hal::timer::timg::TimerGroup;
@@ -40,7 +41,14 @@ pub fn exit(code: i32) -> ! {
 async fn main(_spawner: Spawner) -> ! {
     let peripherals = esp_hal_init();
     let timer_group = TimerGroup::new(peripherals.TIMG0.reborrow());
-    esp_rtos::start(timer_group.timer0, peripherals.FROM_CPU_INTR0.reborrow());
+    // SAFETY: `LPWR` is a singleton. The stolen handle only builds the idle hook
+    // and is dropped before the handle owned by `peripherals` is used.
+    let light_sleep_hook = esp_rtos::sleep::configure(unsafe { LPWR::steal() }).light_sleep_hook;
+    esp_rtos::start_with_idle_hook(
+        timer_group.timer0,
+        peripherals.FROM_CPU_INTR0.reborrow(),
+        light_sleep_hook,
+    );
 
     match runExecutor().await {
         Ok(()) => {

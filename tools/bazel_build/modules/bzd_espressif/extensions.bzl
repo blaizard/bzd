@@ -74,9 +74,9 @@ def _load_tools(_module_ctx):
             ],
             "http": [
                 bzd_http_archive(
-                    integrity = "sha256-K54VdHDtuLAxZ5llUCksbfjMZxYCXrrYkn25UNeTFBc=",
-                    strip_prefix = "esp-emu-0.51.0-x86_64-unknown-linux-gnu",
-                    url = "https://github.com/espressif/esp-emulator/releases/download/v0.51.0/esp-emu-0.51.0-x86_64-unknown-linux-gnu.tar.gz",
+                    integrity = "sha256-vLlA3PSKpqG2Lb3Eq8N/BUMXEPQEDZ4lBHI6XqT9Xek=",
+                    strip_prefix = "esp-emu-1.1.0-x86_64-unknown-linux-gnu",
+                    url = "https://github.com/espressif/esp-emulator/releases/download/v1.1.0/esp-emu-1.1.0-x86_64-unknown-linux-gnu.tar.gz",
                 ),
             ],
         }],

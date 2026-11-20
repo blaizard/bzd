@@ -4,6 +4,7 @@ doc_binary(
     name = "documentation",
     srcs = [
         ("**", "//rust/bdl:documentation"),
+        ("**", "//rust/libs/power:documentation"),
     ],
     visibility = ["//docs:__pkg__"],
 )

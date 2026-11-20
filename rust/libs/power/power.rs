@@ -2,9 +2,9 @@
 #![no_main]
 
 /// Design:
-/// Provide 2 sleep modes:
-/// 1. Light sleep: The CPU is stopped, but the RAM and peripherals are still powered. This is the default sleep mode.
-/// 2. Deep sleep: The CPU, RAM, and peripherals are powered down. The memory is lost, and the system must be re-initialized on wakeup. This is the most power-efficient sleep mode.
+/// Coordinate deep sleep for the current target.
+/// Light sleep is handled by the platform executor runtime: on ESP it is
+/// triggered by the esp-rtos idle hook when no task is runnable.
 use bzd::sync::watcher::Watcher;
 use core::future::Future;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
@@ -35,6 +35,7 @@ impl DeepSleepRequest {
 /// Shared power state for the current target.
 pub struct Power {
     request: AtomicU32,
+    watcher: Watcher<(), MAX_WAITERS>,
 }
 
 impl Power {
@@ -42,6 +43,7 @@ impl Power {
     pub const fn new() -> Self {
         Self {
             request: AtomicU32::new(NO_REQUEST),
+            watcher: Watcher::new(),
         }
     }
 
@@ -53,7 +55,7 @@ impl Power {
             .compare_exchange(NO_REQUEST, encoded, Ordering::AcqRel, Ordering::Acquire)
             .is_ok()
         {
-            DEEP_SLEEP_WATCHER.send(());
+            self.watcher.send(());
         }
     }
 
@@ -70,24 +72,11 @@ impl Default for Power {
     }
 }
 
-/// Platform-specific light-sleep implementation.
-#[allow(async_fn_in_trait)] // Sleep futures are polled locally and do not require Send bounds.
-pub trait LightSleep {
-    /// Value used to construct the default implementation.
-    const DEFAULT: Self;
-
-    /// Request light sleep.
-    async fn request_sleep(&self);
-}
-
 /// Power interface exposed to the executor and components.
 #[allow(async_fn_in_trait)] // Power handles are polled locally and do not require Send bounds.
 pub trait BzdPowerInterface {
-    /// Light-sleep implementation used by this power interface.
-    type LightSleepImpl: LightSleep;
-
     /// Access the underlying power handle.
-    fn power_handle(&self) -> &PowerHandle<Self::LightSleepImpl>;
+    fn power_handle(&self) -> &PowerHandle;
 
     /// Request deep sleep.
     async fn request_deep_sleep(&self, duration: Option<Duration>) {
@@ -107,11 +96,6 @@ pub trait BzdPowerInterface {
         BzdPowerInterface::is_deep_sleep(self.power_handle())
     }
 
-    /// Request light sleep.
-    async fn request_sleep(&self) {
-        BzdPowerInterface::request_sleep(self.power_handle()).await;
-    }
-
     /// Wait until deep sleep is requested and no prevention is active.
     async fn wait_deep_sleep(&self) {
         self.power_handle().wait_deep_sleep().await;
@@ -119,42 +103,36 @@ pub trait BzdPowerInterface {
 }
 
 /// Per-consumer power handle.
-pub struct PowerHandle<L> {
+pub struct PowerHandle {
     power: &'static Power,
     preventing: AtomicUsize,
-    light_sleep: L,
 }
 
-impl<L> PowerHandle<L> {
-    /// Create a handle for a specific power state and light-sleep implementation.
+impl PowerHandle {
+    /// Create a handle for a specific power state.
     #[must_use]
-    pub const fn with_power(power: &'static Power, light_sleep: L) -> Self {
+    pub const fn with_power(power: &'static Power) -> Self {
         Self {
             power,
             preventing: AtomicUsize::new(0),
-            light_sleep,
         }
     }
-}
 
-impl<L: LightSleep> PowerHandle<L> {
     /// Create a handle bound to the target-wide power state.
     #[must_use]
     pub const fn new() -> Self {
-        Self::with_power(power(), L::DEFAULT)
+        Self::with_power(power())
     }
 }
 
-impl<L: LightSleep> Default for PowerHandle<L> {
+impl Default for PowerHandle {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<L: LightSleep> BzdPowerInterface for PowerHandle<L> {
-    type LightSleepImpl = L;
-
-    fn power_handle(&self) -> &PowerHandle<L> {
+impl BzdPowerInterface for PowerHandle {
+    fn power_handle(&self) -> &PowerHandle {
         self
     }
 
@@ -169,6 +147,7 @@ impl<L: LightSleep> BzdPowerInterface for PowerHandle<L> {
         self.preventing.fetch_add(1, Ordering::AcqRel);
         let _guard = PreventDeepSleepGuard {
             counter: &self.preventing,
+            power: self.power,
         };
         work.await
     }
@@ -177,12 +156,10 @@ impl<L: LightSleep> BzdPowerInterface for PowerHandle<L> {
         self.preventing.load(Ordering::Acquire) == 0 && self.power.deep_sleep_requested().is_some()
     }
 
-    async fn request_sleep(&self) {
-        self.light_sleep.request_sleep().await;
-    }
-
     async fn wait_deep_sleep(&self) {
-        let mut receiver = DEEP_SLEEP_WATCHER
+        let mut receiver = self
+            .power
+            .watcher
             .receiver()
             .expect("power: too many executors waiting for deep sleep");
         loop {
@@ -198,12 +175,13 @@ impl<L: LightSleep> BzdPowerInterface for PowerHandle<L> {
 
 struct PreventDeepSleepGuard<'a> {
     counter: &'a AtomicUsize,
+    power: &'static Power,
 }
 
 impl Drop for PreventDeepSleepGuard<'_> {
     fn drop(&mut self) {
         self.counter.fetch_sub(1, Ordering::AcqRel);
-        DEEP_SLEEP_WATCHER.send(());
+        self.power.watcher.send(());
     }
 }
 
@@ -228,7 +206,6 @@ fn decode_request(encoded: u32) -> Option<DeepSleepRequest> {
 }
 
 static POWER: Power = Power::new();
-static DEEP_SLEEP_WATCHER: Watcher<(), MAX_WAITERS> = Watcher::new();
 
 /// Access the shared power state.
 ///
@@ -247,20 +224,10 @@ mod tests {
     use core::pin::pin;
     use core::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
 
-    struct TestLightSleep;
-
-    impl LightSleep for TestLightSleep {
-        const DEFAULT: Self = Self;
-
-        async fn request_sleep(&self) {}
-    }
-
-    struct TestWrapper(PowerHandle<TestLightSleep>);
+    struct TestWrapper(PowerHandle);
 
     impl BzdPowerInterface for TestWrapper {
-        type LightSleepImpl = TestLightSleep;
-
-        fn power_handle(&self) -> &PowerHandle<TestLightSleep> {
+        fn power_handle(&self) -> &PowerHandle {
             &self.0
         }
     }
@@ -316,7 +283,7 @@ mod tests {
     async fn handle_wait_deep_sleep_returns_existing_request() -> TestResult {
         static POWER: Power = Power::new();
         POWER.request_deep_sleep(None);
-        let handle = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let handle = PowerHandle::with_power(&POWER);
         handle.wait_deep_sleep().await;
         Ok(())
     }
@@ -324,7 +291,7 @@ mod tests {
     #[test]
     async fn handle_requests_deep_sleep() -> TestResult {
         static POWER: Power = Power::new();
-        let handle = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let handle = PowerHandle::with_power(&POWER);
         handle
             .request_deep_sleep(Some(Duration::from_secs(2)))
             .await;
@@ -339,7 +306,7 @@ mod tests {
     async fn prevention_hides_deep_sleep() -> TestResult {
         static POWER: Power = Power::new();
         POWER.request_deep_sleep(None);
-        let handle = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let handle = PowerHandle::with_power(&POWER);
         handle
             .prevent_deep_sleep(async { assert_eq!(handle.is_deep_sleep(), false) })
             .await?;
@@ -351,7 +318,7 @@ mod tests {
     async fn prevention_can_be_nested() -> TestResult {
         static POWER: Power = Power::new();
         POWER.request_deep_sleep(None);
-        let handle = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let handle = PowerHandle::with_power(&POWER);
         handle
             .prevent_deep_sleep(async {
                 handle
@@ -368,8 +335,8 @@ mod tests {
     async fn prevention_is_local_to_handle() -> TestResult {
         static POWER: Power = Power::new();
         POWER.request_deep_sleep(None);
-        let preventing = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
-        let other = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let preventing = PowerHandle::with_power(&POWER);
+        let other = PowerHandle::with_power(&POWER);
         preventing
             .prevent_deep_sleep(async {
                 assert_eq!(preventing.is_deep_sleep(), false)?;
@@ -383,7 +350,7 @@ mod tests {
     fn prevention_is_released_when_dropped() -> TestResult {
         static POWER: Power = Power::new();
         POWER.request_deep_sleep(None);
-        let handle = PowerHandle::<TestLightSleep>::with_power(&POWER, TestLightSleep);
+        let handle = PowerHandle::with_power(&POWER);
         let waker = noop_waker();
         let mut context = Context::from_waker(&waker);
         {
@@ -398,7 +365,7 @@ mod tests {
     #[test]
     async fn defaults_delegate_to_power_handle() -> TestResult {
         static POWER: Power = Power::new();
-        let wrapper = TestWrapper(PowerHandle::with_power(&POWER, TestLightSleep));
+        let wrapper = TestWrapper(PowerHandle::with_power(&POWER));
         wrapper
             .request_deep_sleep(Some(Duration::from_secs(4)))
             .await;
@@ -409,32 +376,10 @@ mod tests {
         wrapper
             .prevent_deep_sleep(async {
                 assert_eq!(wrapper.is_deep_sleep(), false)?;
-                wrapper.request_sleep().await;
                 Ok(())
             })
             .await?;
         assert_eq!(wrapper.is_deep_sleep(), true)?;
-        Ok(())
-    }
-
-    #[test]
-    async fn request_sleep_uses_light_sleep_implementation() -> TestResult {
-        static POWER: Power = Power::new();
-        static CALLS: AtomicUsize = AtomicUsize::new(0);
-
-        struct CountingLightSleep;
-
-        impl LightSleep for CountingLightSleep {
-            const DEFAULT: Self = Self;
-
-            async fn request_sleep(&self) {
-                CALLS.fetch_add(1, Ordering::Relaxed);
-            }
-        }
-
-        let handle = PowerHandle::<CountingLightSleep>::with_power(&POWER, CountingLightSleep);
-        handle.request_sleep().await;
-        assert_eq!(CALLS.load(Ordering::Relaxed), 1)?;
         Ok(())
     }
 }
