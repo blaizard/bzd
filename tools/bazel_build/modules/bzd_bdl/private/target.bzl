@@ -1,5 +1,6 @@
 """BDL target rules."""
 
+load("@bzd_lib//:defs.bzl", "BzdRunnerOptionsInfo")
 load("//private:common.bzl", "aspect_bdl_providers", "library_extensions", "transition_platform")
 load("//private:providers.bzl", "BdlTargetInfo")
 
@@ -32,14 +33,23 @@ def _bdl_target_impl(ctx):
     if not composition:
         fail("The target {} is missing composition files".format(ctx.label))
 
-    return BdlTargetInfo(
-        composition = composition,
-        deps = deps,
-        data = data,
-        language = language,
-        binary = binary,
-        presets = presets,
-    )
+    runner_options = ctx.attr.runner_options or ctx.attr.parent
+    if runner_options != None:
+        runner_options = runner_options[BzdRunnerOptionsInfo]
+    else:
+        runner_options = BzdRunnerOptionsInfo(files = {}, values = {})
+
+    return [
+        BdlTargetInfo(
+            composition = composition,
+            deps = deps,
+            data = data,
+            language = language,
+            binary = binary,
+            presets = presets,
+        ),
+        runner_options,
+    ]
 
 _bdl_target = rule(
     implementation = _bdl_target_impl,
@@ -76,6 +86,10 @@ _bdl_target = rule(
         "presets": attr.label_list(
             allow_files = [".json"],
             doc = "JSON preset files referenced by `preset NAME from \"PATH\";` statements in the composition files.",
+        ),
+        "runner_options": attr.label(
+            providers = [BzdRunnerOptionsInfo],
+            doc = "Options passed to the runner of the binary, inherited from the parent if not set.",
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
