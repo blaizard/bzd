@@ -1,0 +1,16 @@
+# Documentation for partition_table_4mb_ota_2x1984kib.bin. The binary is checked
+# in; regenerate it with Espressif's gen_esp32part.py (see README.md) after
+# changing this file.
+#
+# Two OTA application slots of 0x1F0000 (1984 KiB) each:
+#   0x10000 + 0x1F0000 = 0x200000, and 0x200000 + 0x1F0000 = 0x3F0000.
+# There is no factory partition: with an empty otadata, the bootloader boots the
+# first OTA slot (ota_0), which is where the runner flashes the initial image.
+# The remaining 64 KiB at the end of the 4 MB flash are left unused.
+#
+# Name,     Type, SubType, Offset,   Size
+nvs,        data, nvs,     0x9000,   0x4000
+otadata,    data, ota,     0xD000,   0x2000
+phy_init,   data, phy,     0xF000,   0x1000
+ota_0,      app,  ota_0,   0x10000,  0x1F0000
+ota_1,      app,  ota_1,   0x200000, 0x1F0000

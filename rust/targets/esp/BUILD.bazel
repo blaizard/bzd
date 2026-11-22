@@ -89,7 +89,7 @@ bdl_target(
         ":network_config.json",
         "//rust/targets:tls_config.json",
     ],
-    runner_options = "@bzd_espressif//partition_table:4mb_ota_3x1344kib",
+    runner_options = "@bzd_espressif//partition_table:4mb_ota_2x1984kib",
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/executor",
