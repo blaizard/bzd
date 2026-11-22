@@ -106,7 +106,7 @@ def bzd_runner_factory(is_test, providers = None):
             ),
             "runner_options": attr.label(
                 providers = [BzdRunnerOptionsInfo],
-                doc = "Options passed to the runner, they override the toolchain options.",
+                doc = "Options passed to the runner.",
             ),
         },
         executable = True,

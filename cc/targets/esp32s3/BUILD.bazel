@@ -37,6 +37,7 @@ bdl_target(
         "composition.bdl",
     ],
     language = "cc",
+    runner_options = "@bzd_espressif//partition_table:4mb_ota_3x1344kib",
     visibility = [
         "//visibility:public",
     ],

@@ -1,13 +1,13 @@
 """Rust rule wrapper."""
 
-load("@bzd_lib//:defs.bzl", "bzd_runner_factory")
+load("@bzd_lib//:defs.bzl", "BzdRunnerOptionsInfo", "bzd_runner_factory")
 load("@rules_rust//rust:defs.bzl", "rust_common", rust_binary_original = "rust_binary", rust_test_original = "rust_test")
 load("//rust/private/config:config.bzl", _bzd_rust_config = "bzd_rust_config")
 
 _bzd_runner_rust_binary = bzd_runner_factory(is_test = False, providers = [rust_common.crate_info, rust_common.test_crate_info])
 _bzd_runner_rust_test = bzd_runner_factory(is_test = True, providers = [rust_common.crate_info, rust_common.test_crate_info])
 
-def _rust_binary_impl(name, visibility, crate_name, tags, testonly, **kwargs):
+def _rust_binary_impl(name, visibility, crate_name, tags, testonly, runner_options, **kwargs):
     rust_binary_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
@@ -18,6 +18,7 @@ def _rust_binary_impl(name, visibility, crate_name, tags, testonly, **kwargs):
     _bzd_runner_rust_binary(
         name = name,
         binary = ":{}.original".format(name),
+        runner_options = runner_options,
         visibility = visibility,
         testonly = testonly,
         tags = (tags or []) + ["rust"],
@@ -25,10 +26,17 @@ def _rust_binary_impl(name, visibility, crate_name, tags, testonly, **kwargs):
 
 rust_binary = macro(
     inherit_attrs = rust_binary_original,
+    attrs = {
+        "runner_options": attr.label(
+            providers = [BzdRunnerOptionsInfo],
+            default = Label("//rust/targets:auto"),
+            doc = "Options passed to the runner of this binary.",
+        ),
+    },
     implementation = _rust_binary_impl,
 )
 
-def _rust_test_impl(name, visibility, crate_name, deps, tags, target, testonly, **kwargs):
+def _rust_test_impl(name, visibility, crate_name, deps, tags, target, testonly, runner_options, **kwargs):
     rust_test_original(
         name = "{}.original".format(name),
         crate_name = crate_name or name,
@@ -43,6 +51,7 @@ def _rust_test_impl(name, visibility, crate_name, deps, tags, target, testonly, 
     _bzd_runner_rust_test(
         name = name,
         binary = ":{}.original".format(name),
+        runner_options = runner_options,
         visibility = visibility,
         testonly = testonly,
         tags = (tags or []) + ["rust"],
@@ -51,6 +60,11 @@ def _rust_test_impl(name, visibility, crate_name, deps, tags, target, testonly, 
 rust_test = macro(
     inherit_attrs = rust_test_original,
     attrs = {
+        "runner_options": attr.label(
+            providers = [BzdRunnerOptionsInfo],
+            default = Label("//rust/targets:auto"),
+            doc = "Options passed to the runner of this test.",
+        ),
         "target": attr.label_list(default = ["//rust/targets:main"]),
         "use_libtest_harness": None,
     },

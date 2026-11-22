@@ -43,6 +43,7 @@ def _bzd_cc_binary_impl(name, visibility, target, tags, bdls, hdrs, srcs, deps, 
     bzd_runner_binary(
         name = name,
         binary = "{}.system.default".format(name),
+        runner_options = target,
         testonly = testonly,
         visibility = visibility,
         tags = tags + ["cc"],
@@ -130,6 +131,7 @@ def bzd_cc_test(name, target = "//cc/targets:auto", tags = [], bdls = [], hdrs =
     bzd_runner_test(
         name = name,
         binary = "{}.system.default".format(name),
+        runner_options = target,
         testonly = testonly,
         tags = tags + ["cc"],
         **kwargs

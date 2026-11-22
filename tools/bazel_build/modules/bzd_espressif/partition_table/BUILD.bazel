@@ -1,4 +1,14 @@
-exports_files(
-    ["partition_table_4mb_ota_3x1344kib.bin"],
+load("@bzd_lib//:defs.bzl", "bzd_runner_options")
+
+bzd_runner_options(
+    name = "4mb_ota_3x1344kib",
+    files = {
+        "PARTITION_TABLE": "partition_table_4mb_ota_3x1344kib.bin",
+    },
+    values = {
+        "APP_MAX_SIZE": "0x150000",
+        "APP_OFFSET": "0x10000",
+        "FLASH_SIZE": "4MB",
+    },
     visibility = ["//visibility:public"],
 )

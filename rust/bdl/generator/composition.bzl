@@ -138,6 +138,7 @@ def _generator_rust_composition_impl(name, visibility, target_name, target, comp
             "{}.library".format(name),
             "{}.main".format(name),
         ],
+        runner_options = target,
         visibility = visibility,
         testonly = testonly,
         **kwargs

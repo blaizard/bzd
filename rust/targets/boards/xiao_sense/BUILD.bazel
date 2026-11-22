@@ -7,6 +7,7 @@ bdl_target(
     ],
     parent = "//rust/targets/esp:auto",
     platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
+    runner_options = "@bzd_espressif//partition_table:4mb_ota_3x1344kib",
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/camera/ov3660",
