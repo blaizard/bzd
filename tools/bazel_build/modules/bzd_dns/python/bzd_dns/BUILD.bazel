@@ -43,6 +43,25 @@ py_library(
 )
 
 py_binary(
+    name = "sync",
+    srcs = [
+        "__init__.py",
+        "sync.py",
+    ],
+    tags = [
+        "mypy-ignore",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bzd_python//bzd/utils:secret",
+        requirement("octodns"),
+        requirement("octodns_bind"),
+        requirement("octodns_digitalocean"),
+        requirement("pyyaml"),
+    ],
+)
+
+py_binary(
     name = "aggregator",
     srcs = [
         "__init__.py",

@@ -77,11 +77,11 @@ def _bzd_dns_binary_impl(ctx):
     return sh_binary_wrapper_impl(
         ctx = ctx,
         locations = {
-            ctx.attr._octodns: "octodns",
+            ctx.attr._sync: "sync",
             output: "output",
         },
         output = ctx.outputs.executable,
-        command = "{octodns} --config={output}/config.yaml --quiet --doit",
+        command = "{sync} --config={output}/config.yaml --quiet --doit \"$@\"",
     )
 
 bzd_dns_binary = rule(
@@ -103,8 +103,8 @@ bzd_dns_binary = rule(
             cfg = "exec",
             executable = True,
         ),
-        "_octodns": attr.label(
-            default = Label("//python/bzd_dns:octodns-sync"),
+        "_sync": attr.label(
+            default = Label("//python/bzd_dns:sync"),
             cfg = "exec",
             executable = True,
         ),
