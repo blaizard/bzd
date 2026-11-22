@@ -12,3 +12,16 @@ bzd_runner_options(
     },
     visibility = ["//visibility:public"],
 )
+
+bzd_runner_options(
+    name = "8mb_ota_2x4032kib",
+    files = {
+        "PARTITION_TABLE": "partition_table_8mb_ota_2x4032kib.bin",
+    },
+    values = {
+        "APP_MAX_SIZE": "0x3F0000",
+        "APP_OFFSET": "0x10000",
+        "FLASH_SIZE": "8MB",
+    },
+    visibility = ["//visibility:public"],
+)

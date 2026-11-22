@@ -1,13 +1,13 @@
 load("@bzd_bdl//:defs.bzl", "bdl_target")
 
 bdl_target(
-    name = "xiao_sense",
+    name = "xiao_esp32s3_sense",
     composition = [
         "composition.bdl",
     ],
     parent = "//rust/targets/esp:auto",
     platform = "@esp32s3//:platform-esp32s3-xtensa_lx7",
-    runner_options = "@bzd_espressif//partition_table:4mb_ota_3x1344kib",
+    runner_options = "@bzd_espressif//partition_table:8mb_ota_2x4032kib",
     visibility = ["//visibility:public"],
     deps = [
         "//rust/components/embassy/camera/ov3660",
