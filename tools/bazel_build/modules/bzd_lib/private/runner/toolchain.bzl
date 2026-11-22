@@ -3,12 +3,16 @@
 def _bzd_runner_toolchain_impl(ctx):
     toolchain_info = platform_common.ToolchainInfo(
         runner = ctx.attr.runner,
+        required_options = ctx.attr.required_options,
     )
     return [toolchain_info]
 
 bzd_runner_toolchain = rule(
     implementation = _bzd_runner_toolchain_impl,
     attrs = {
+        "required_options": attr.string_list(
+            doc = "Options this runner expects, an empty list means none are expected.",
+        ),
         "runner": attr.label(
             executable = True,
             cfg = "exec",
@@ -18,10 +22,11 @@ bzd_runner_toolchain = rule(
     provides = [platform_common.ToolchainInfo],
 )
 
-def _bzd_make_runner_toolchain_impl(name, visibility, runner, **kwargs):
+def _bzd_make_runner_toolchain_impl(name, visibility, runner, required_options, **kwargs):
     bzd_runner_toolchain(
         name = "{}.toolchain".format(name),
         runner = runner,
+        required_options = required_options,
     )
     native.toolchain(
         name = name,
@@ -35,6 +40,9 @@ bzd_make_runner_toolchain = macro(
     inherit_attrs = native.toolchain,
     implementation = _bzd_make_runner_toolchain_impl,
     attrs = {
+        "required_options": attr.string_list(
+            doc = "Options this runner expects, an empty list means none are expected.",
+        ),
         "runner": attr.label(
             executable = True,
             cfg = "exec",
