@@ -102,6 +102,19 @@ bzd_config_default(
 )
 ```
 
+## Workspace status
+
+Values from the workspace status can be embedded in a configuration with `include_workspace_status`:
+
+```py
+bzd_config(
+    name = "config",
+    include_workspace_status = ["STABLE_VERSION"],
+)
+```
+
+Stamping is opt-in.
+
 ## Visualization
 
 The configuration can be visualized running the target appended with '.view'.

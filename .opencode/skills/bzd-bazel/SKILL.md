@@ -121,6 +121,7 @@ g++ main.cc
 | ------------ | ----------------------------------------------------- |
 | `debug`      | Debug symbols, debug environment (assertions enabled) |
 | `prod`       | Optimized production build                            |
+| `stamp`      | Embed workspace status (version) in release artifacts |
 | `remote`     | Build on remote execution servers                     |
 | `docker`     | Run toolchains locally inside a Docker sandbox        |
 | `asan`       | Address Sanitizer (memory errors, use-after-free)     |

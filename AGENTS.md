@@ -24,6 +24,7 @@ The project uses Bazel for building and testing. Use the provided `./tools/bazel
 
 - `--config=debug`: Enable debug symbols and environment.
 - `--config=prod`: Optimized production builds.
+- `--config=stamp`: Embed the workspace status (version) into release artifacts.
 - `--config=remote`: Build on remote execution servers.
 - `--config=docker`: Run toolchains locally in a docker sandbox.
 - `--config=asan|lsan|tsan|ubsan`: Enable various sanitizers.

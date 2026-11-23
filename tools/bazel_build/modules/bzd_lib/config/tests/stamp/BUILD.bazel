@@ -1,0 +1,14 @@
+load("//:defs.bzl", "bzd_diff_test")
+load("//config:defs.bzl", "bzd_config")
+
+bzd_config(
+    name = "config_stamp",
+    include_workspace_status = ["STABLE_VERSION"],
+)
+
+bzd_diff_test(
+    name = "config_stamp_test",
+    file1 = ":config_stamp.json",
+    file2 = "expected_config_stamp.json",
+    format = "json",
+)

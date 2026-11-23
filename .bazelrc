@@ -121,6 +121,7 @@ build:prod --@rules_rust//rust/settings:extra_rustc_flag=-Copt-level=z
 
 # Add stamping
 build --workspace_status_command tools/bazel_build/buildstamp/stamp.sh
+build:stamp --@bzd_lib//settings/stamp=True
 
 # Enforce strict checks.
 build --strict_filesets

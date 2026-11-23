@@ -75,13 +75,19 @@ def _bzd_config_impl(ctx):
         args.add("--value", json.encode([key, ctx.expand_location(value, targets = ctx.attr.data), metadata]))
 
     if ctx.attr.include_workspace_status:
-        workspace_status_files = [
-            ctx.info_file,
-            ctx.version_file,
-        ]
-        args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
-        args.add_all(workspace_status_files, before_each = "--workspace-status-file")
-        input_files += workspace_status_files
+        if ctx.attr._stamp[BuildSettingInfo].value:
+            workspace_status_files = [
+                ctx.info_file,
+                ctx.version_file,
+            ]
+            args.add_all(ctx.attr.include_workspace_status, before_each = "--workspace-status-key")
+            args.add_all(workspace_status_files, before_each = "--workspace-status-file")
+            input_files += workspace_status_files
+        else:
+            # Keep the keys present for their consumers, with a stable value so that
+            # unstamped builds remain cacheable.
+            for key in ctx.attr.include_workspace_status:
+                args.add("--value", json.encode([key, "dev", []]))
 
     # Build the default configuration.
     internal = ctx.actions.declare_file("{}.internal".format(ctx.label))
@@ -115,7 +121,8 @@ _bzd_config = rule(
             allow_files = [".json", ".yaml", ".yml"],
         ),
         "include_workspace_status": attr.string_list(
-            doc = "Include the key/value pairs from the status information about the workspace, see --workspace_status_command.",
+            doc = """Include the key/value pairs from the status information about the workspace, see --workspace_status_command.
+            This is gated by the //settings/stamp build setting, enable it with --@bzd_lib//settings/stamp=True for release builds.""",
         ),
         "srcs": attr.label_list(
             allow_files = [".json", ".yaml", ".yml"],
@@ -132,6 +139,11 @@ _bzd_config = rule(
             default = Label("//config:merge"),
             cfg = "exec",
             executable = True,
+        ),
+        "_stamp": attr.label(
+            doc = "Build setting controlling whether the workspace status is stamped into the configuration.",
+            default = Label("//settings/stamp"),
+            providers = [BuildSettingInfo],
         ),
     },
     provides = [DefaultInfo, ConfigInfo],
