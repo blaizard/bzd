@@ -111,7 +111,7 @@ def runFlow(provider: ProviderEbook, flowRegistry: FlowRegistry, directory: path
 			for path in output.outputs:
 				destination = createSiblingOutput(provider.ebook.parent / path.name)
 				# Note, we use this instead of shutil.copy/move to avoid copying metadata.
-				# This is important for some filesystem that do not support copying metadata.
+				# This is important for some filesystems that do not support copying metadata.
 				shutil.copyfile(path, destination)
 				sizeStr = sizeToString(destination.stat().st_size)
 				print(f"Output {destination} ({sizeStr}).")

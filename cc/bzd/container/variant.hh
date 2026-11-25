@@ -32,7 +32,7 @@ class VariantBase
 {
 protected:
 	using Self = VariantBase<Ts...>;
-	// Type use to define the index of the variant type.
+	// Type used to define the index of the variant type.
 	using IndexType = bzd::Int16;
 	// Metaprogramming list type
 	using TypeList = bzd::meta::TypeList<Ts...>;

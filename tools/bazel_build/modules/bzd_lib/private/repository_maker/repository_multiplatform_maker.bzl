@@ -58,7 +58,7 @@ def bzd_repository_multiplatform_maker(name, repositories, expose):
     """Multi-platform repository.
 
     Creates a repository that exposes several target which point to target specific underlying repositories.
-    This function can be used as follow in a module context:
+    This function can be used as follows in a module context:
     ```
     repository_multiplatform_maker(
         name = "my_repo",

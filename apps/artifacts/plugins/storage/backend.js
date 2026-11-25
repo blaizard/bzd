@@ -5,7 +5,7 @@ import extensionUpload from "#bzd/apps/artifacts/plugins/extension/upload/upload
 import extensionWebdav from "#bzd/apps/artifacts/plugins/extension/webdav/webdav.js";
 import extensionCachingProxy from "#bzd/apps/artifacts/plugins/extension/caching_proxy/caching_proxy.js";
 
-/// The storage plugin support the following features:
+/// The storage plugin supports the following features:
 ///
 /// - upload:
 ///   Allow certain directory to be uploadable, this also comes with several options.

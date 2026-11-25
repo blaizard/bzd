@@ -86,9 +86,9 @@ def _mypy_aspect_impl(target, ctx):
 
     py_rule = ctx.rule
 
-    # Instead of reading the 'srcs' attribute to identify which file need to be mypy-ed, we read the PyInfo and get all the
+    # Instead of reading the 'srcs' attribute to identify which files need to be mypy-ed, we read the PyInfo and get all the
     # srcs from this rule, inputs, transitives and generated.
-    # We only check the subset that has need been checked before, this is done with MyPyInfo.
+    # We only check the subset that has not been checked before, this is done with MyPyInfo.
     # This has the advantage to mypy also the generated python files from custom rules.
     # The only requirement is that the dependencies come from the 'deps' attribute.
     all_srcs = target[PyInfo].transitive_sources

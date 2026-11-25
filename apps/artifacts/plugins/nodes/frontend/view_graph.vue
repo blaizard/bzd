@@ -107,7 +107,7 @@
 								},
 							},
 							legend: {
-								maxHeight: 30, // Hides if the legend takes 2 lines, this avoid shrinking the actual graph
+								maxHeight: 30, // Hides if the legend takes 2 lines, this avoids shrinking the actual graph
 								labels: {
 									// Creates small round labels
 									boxWidth: 12,

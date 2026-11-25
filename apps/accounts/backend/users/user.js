@@ -209,7 +209,7 @@ export default class User {
 
 	/// Register a payment reference processed by this user.
 	///
-	/// Those are payment already done, that do not need further processing.
+	/// Those are payments already done, that do not need further processing.
 	registerPayment(uid) {
 		Exception.assert(!this.hasPayment(uid), "The payment '{}' was already registered.", uid);
 		if (!("payments" in this.value)) {

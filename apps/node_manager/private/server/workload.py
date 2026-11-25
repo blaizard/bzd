@@ -49,7 +49,7 @@ class Workload:
 	def terminate(self) -> None:
 		"""Terminate and handle wake up to a fresh state."""
 
-		# This disable all APIs.
+		# This disables all APIs.
 		self.shutingDown_ = True
 
 		self.terminateFn_()

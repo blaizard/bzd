@@ -47,7 +47,7 @@ export default class SessionAuthenticationServer extends AuthenticationServer {
 			maxSessionsPerUser: 5,
 			// Time in seconds after which the access token will expire.
 			tokenAccessExpiresIn: 5 * 60,
-			// Reuse token that have x seconds left.
+			// Reuse a token that has x seconds left.
 			tokenAccessExpiresInReuse: 60,
 			// Time in seconds after which the SSO refresh token will expire.
 			tokenRefreshSSOExpiresIn: 2 * 60,

@@ -187,7 +187,7 @@ class TreeBuilder:
 	def generate(self, mtree: Mtree) -> bytes:
 		"""Generate the mtree content, this is a deterministic representation of the file system structure."""
 
-		# Set the directory entries, this ensure that parent directories are created before their content.
+		# Set the directory entries, this ensures that parent directories are created before their content.
 		for path in self.directories:
 			if mtree.addDirectory(path):
 				for directoryPaths, filePaths, linkPaths in self._listDirectory(path):

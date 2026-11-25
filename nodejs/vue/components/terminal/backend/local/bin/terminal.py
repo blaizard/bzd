@@ -60,7 +60,7 @@ def main(cwd: pathlib.Path, env: dict[str, str], args: list[str]) -> None:
 			cwd=cwd,
 			env=env,
 			bufsize=0,
-			# use os.setsid() make it run in a new process group, or bash job control will not be enabled
+			# use os.setsid() to make it run in a new process group, or bash job control will not be enabled
 			start_new_session=True,
 			# Working with bytes
 			text=False,

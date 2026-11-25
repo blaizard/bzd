@@ -28,7 +28,7 @@ def main(cwd: pathlib.Path, env: dict[str, str], args: list[str]) -> None:
 	resize(master, 30, 1024)
 
 	try:
-		# use os.setsid() make it run in a new process group, or bash job control will not be enabled
+		# use os.setsid() to make it run in a new process group, or bash job control will not be enabled
 		p = subprocess.Popen(
 			["/bin/bash"] + args,
 			cwd=cwd,

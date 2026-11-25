@@ -6,7 +6,7 @@ import Provider from "#bzd/nodejs/core/services/provider.js";
 const Exception = ExceptionFactory("services");
 const Log = LogFactory("services");
 
-/// This class is a manager of service, that start, stop and schedule them.
+/// This class is a manager of services, that starts, stops and schedules them.
 ///
 /// A service is an entity that has a start, stop and one or more time triggered methods.
 export default class Services {
