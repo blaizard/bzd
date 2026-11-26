@@ -1,0 +1,9667 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "23d79a66-175b-59b3-8e15-4302691ce746")
+	(paper "A3")
+	(title_block
+		(title "Jardinier2000 - RS-485 HUB")
+		(date "2026-11-26")
+		(rev "v0.5")
+		(company "")
+		(comment 1 "4x independent RS-485 ports, combined receive, per-port DE")
+	)
+	(lib_symbols
+		(symbol "Device:C"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0.254)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "C"
+				(at 0.635 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "C"
+				(at 0.635 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0.9652 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Unpolarized capacitor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "cap capacitor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "C_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "C_0_1"
+				(polyline
+					(pts
+						(xy -2.032 0.762) (xy 2.032 0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.032 -0.762) (xy 2.032 -0.762)
+					)
+					(stroke
+						(width 0.508)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "C_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 2.794)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:Polyfuse"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "F"
+				(at -2.54 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Polyfuse"
+				(at 2.54 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 1.27 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Resettable fuse, polymeric positive temperature coefficient"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "resettable fuse PTC PPTC polyfuse polyswitch"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "*polyfuse* *PTC*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Polyfuse_0_1"
+				(polyline
+					(pts
+						(xy -1.524 2.54) (xy -1.524 1.524) (xy 1.524 -1.524) (xy 1.524 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -0.762 2.54)
+					(end 0.762 -2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Polyfuse_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:D_Schottky"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D_Schottky"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Schottky diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "diode Schottky"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "D_Schottky_0_1"
+				(polyline
+					(pts
+						(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_Schottky_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:D_TVS"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D_TVS"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Bidirectional transient-voltage-suppression diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "diode TVS thyrector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "D_TVS_0_1"
+				(polyline
+					(pts
+						(xy -2.54 1.27) (xy -2.54 -1.27) (xy 2.54 1.27) (xy 2.54 -1.27) (xy -2.54 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.508 1.27) (xy 0 1.27) (xy 0 -1.27) (xy -0.508 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_TVS_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "A1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Connector_Generic:Conn_01x04"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x04"
+				(at 0 -7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x04_1_1"
+				(rectangle
+					(start -1.27 3.81)
+					(end 1.27 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(rectangle
+					(start -1.27 2.667)
+					(end 0 2.413)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 0.127)
+					(end 0 -0.127)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -2.413)
+					(end 0 -2.667)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(rectangle
+					(start -1.27 -4.953)
+					(end 0 -5.207)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "jardinier2000:THVD1450DR"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "U"
+				(at -7.62 17.78 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "THVD1450DR"
+				(at 2.54 17.78 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+				(at 0 -17.78 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "https://www.ti.com/lit/ds/symlink/thvd1450.pdf"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "3.3-V to 5-V RS-485 transceiver with +/-18-kV IEC ESD protection, SOIC-8"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "RS-485 RS-422 transceiver"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "SOIC*3.9x4.9mm*P1.27mm*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "THVD1450DR_0_1"
+				(rectangle
+					(start -7.62 12.7)
+					(end 7.62 -12.7)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "THVD1450DR_1_1"
+				(pin output line
+					(at -10.16 7.62 0)
+					(length 2.54)
+					(name "RO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 2.54 0)
+					(length 2.54)
+					(name "~{RE}"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 -2.54 0)
+					(length 2.54)
+					(name "DE"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -10.16 -7.62 0)
+					(length 2.54)
+					(name "DI"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 -15.24 90)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 10.16 5.08 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 0 15.24 270)
+					(length 2.54)
+					(name "VCC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:+3V3"
+			(power global)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "+3V3"
+				(at 0 3.556 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+3V3\""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "+3V3_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+3V3_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:GND"
+			(power global)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 -6.35 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "GND"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "GND_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "GND_1_1"
+				(pin power_in line
+					(at 0 0 270)
+					(length 0)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:VBUS"
+			(power global)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "VBUS"
+				(at 0 3.556 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"VBUS\""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "VBUS_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "VBUS_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(wire
+		(pts
+			(xy 39.37 72.39) (xy 34.29 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66d4b333-949b-5b90-8903-191de85a4be0")
+	)
+	(hierarchical_label "RS485_DE1"
+		(shape input)
+		(at 34.29 72.39 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a1c03f68-3dab-5e31-aae6-360f894cc5cc")
+	)
+	(wire
+		(pts
+			(xy 39.37 77.47) (xy 34.29 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd682639-f4ff-56d5-a7b6-adfd6a8be72e")
+	)
+	(hierarchical_label "RS485_DE1"
+		(shape input)
+		(at 34.29 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "28cccf5d-851a-5a96-b753-eb32ca69730e")
+	)
+	(wire
+		(pts
+			(xy 33.02 101.6) (xy 33.02 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "704b939b-5779-56fb-b372-351795bdbaa9")
+	)
+	(hierarchical_label "RS485_DE1"
+		(shape input)
+		(at 33.02 96.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4e6c8c64-b51b-5f45-8043-e8dfc5559bbf")
+	)
+	(wire
+		(pts
+			(xy 33.02 109.22) (xy 33.02 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a43599e7-770a-5129-a980-df2075c4877b")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 114.3 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "7ad11120-477d-5b46-a391-c4ffd8293d8a")
+	(property "Reference" "#PWR_RS01"
+		(at 33.02 115.57 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 33.02 118.11 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 33.02 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 33.02 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 33.02 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "7de00d79-361f-5dcf-8b31-770581c3333e")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS01")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 39.37 67.31) (xy 34.29 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "762efc5a-876e-5eb7-ba40-5c8394dedb4b")
+	)
+	(label "RS485_RO1"
+		(at 34.29 67.31 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1193ba57-d348-5674-ab39-859fe0792195")
+	)
+	(wire
+		(pts
+			(xy 39.37 82.55) (xy 34.29 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2c7fa9fa-e940-5387-8e3e-a626e5ad9cbb")
+	)
+	(hierarchical_label "RS485_TX"
+		(shape input)
+		(at 34.29 82.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "69c2fc30-00f1-5176-95b6-aed1518919db")
+	)
+	(wire
+		(pts
+			(xy 49.53 59.69) (xy 49.53 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f7b65864-9800-5c3c-8d31-3a7f74716bc5")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 49.53 54.61 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "79d25c30-3b44-5e65-a8a1-a8a454f43f44")
+	(property "Reference" "#PWR_RS02"
+		(at 49.53 55.88 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 49.53 50.8 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 49.53 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 49.53 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 49.53 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "e8354ca7-fbf7-5a03-946c-f7d923403337")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS02")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 49.53 90.17) (xy 49.53 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a18f9ad3-e767-5082-90e3-aac4ee6c378f")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 49.53 95.25 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "48e7e895-d02b-5f5d-9c66-b043db7776c2")
+	(property "Reference" "#PWR_RS03"
+		(at 49.53 96.52 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 49.53 99.06 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 49.53 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 49.53 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 49.53 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "387e769a-1513-5d0d-bc36-14797ce13691")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 64.77 45.72) (xy 64.77 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a9fe2fe8-0374-511d-a334-301428214cdf")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 64.77 40.64 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "fd84828f-610e-56a0-9c50-ff5c72edd049")
+	(property "Reference" "#PWR_RS04"
+		(at 64.77 41.91 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 64.77 36.83 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 64.77 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "785d6188-ad2f-58af-8194-548fbbc2f393")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS04")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 64.77 53.34) (xy 64.77 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "db1019a0-e0a4-52f2-bd92-0d95730492ea")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 64.77 58.42 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a8d13750-85cb-5c56-b4cd-6f89ff41f9fe")
+	(property "Reference" "#PWR_RS05"
+		(at 64.77 59.69 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 64.77 62.23 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 64.77 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "0d84c114-e566-5ff3-ae95-cab6550fdcc3")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 59.69 69.85) (xy 72.39 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d8c2afd9-5a60-53b4-a421-880a1ed69ad4")
+	)
+	(wire
+		(pts
+			(xy 72.39 69.85) (xy 72.39 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9c6cb785-d64e-50b1-8819-d9fb0386242e")
+	)
+	(wire
+		(pts
+			(xy 72.39 69.85) (xy 80.01 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "570cbecb-6d6a-5393-bb2a-a868e1e42b63")
+	)
+	(wire
+		(pts
+			(xy 80.01 69.85) (xy 80.01 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "07095f8f-aac5-5fa7-a499-6fa47213e159")
+	)
+	(wire
+		(pts
+			(xy 80.01 82.55) (xy 190.5 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5de4605-c30e-5977-98a8-a180ebee4bd9")
+	)
+	(wire
+		(pts
+			(xy 59.69 74.93) (xy 72.39 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2fddb82e-febd-54ca-87cb-a832065ff83d")
+	)
+	(wire
+		(pts
+			(xy 72.39 74.93) (xy 72.39 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6ef5271b-4436-57a0-9bee-58c481542851")
+	)
+	(wire
+		(pts
+			(xy 72.39 74.93) (xy 85.09 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bc524c56-9bce-5540-bf55-3488d9adcb40")
+	)
+	(wire
+		(pts
+			(xy 85.09 74.93) (xy 85.09 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5496494e-4340-5a1f-8a3a-9b5a0ecfa73a")
+	)
+	(wire
+		(pts
+			(xy 85.09 85.09) (xy 190.5 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e07727c-cb1f-5e48-9939-e04ba446f7f8")
+	)
+	(wire
+		(pts
+			(xy 105.41 35.56) (xy 105.41 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4efe01f0-7374-5ab8-b630-7e522bbfcdaa")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 105.41 30.480000000000004 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "78eafe05-3c72-51f0-aa0e-394eadb00e71")
+	(property "Reference" "#PWR_RS06"
+		(at 105.41 31.75 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 105.41 26.67 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 105.41 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "8f407692-326d-53d2-93a6-8ab2eacf26db")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 105.41 43.18) (xy 105.41 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8c024636-08bf-52b9-9112-6c0eed155333")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 105.41 48.26 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "195592ee-be2b-5b61-89d2-aded879f953f")
+	(property "Reference" "#PWR_RS07"
+		(at 105.41 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 105.41 52.07 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 105.41 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "e570b36f-ee17-56ad-b0cb-4ff6c815e342")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 115.57 49.53) (xy 110.49 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "17977101-9524-5dd9-bdac-6489d73cbf5d")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 110.49 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3ab028b8-17be-574a-b66c-6962891d798e")
+	(property "Reference" "#PWR_RS08"
+		(at 111.76 49.53 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 104.14 49.53 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 110.49 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 110.49 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 110.49 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "88649f52-c767-5376-b336-74b9c04d5eb7")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 123.19 49.53) (xy 135.89 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2fe055f2-f683-5c4f-893e-a1bace81a797")
+	)
+	(wire
+		(pts
+			(xy 135.89 49.53) (xy 135.89 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1346d424-1561-53a1-89e1-2b1d4afdb681")
+	)
+	(wire
+		(pts
+			(xy 135.89 77.47) (xy 190.5 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "06da6891-a13d-54f5-ba12-1484b7c0eeb3")
+	)
+	(wire
+		(pts
+			(xy 143.51 49.53) (xy 148.59 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "133d4312-307d-5ea9-bc6b-33db68e46806")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 148.59 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1f803b5c-c202-59f3-be05-161bad455fd8")
+	(property "Reference" "#PWR_RS09"
+		(at 149.86 49.53 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 154.94 49.53 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 148.59 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 148.59 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 148.59 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "f4110ee3-dff7-50b7-94ed-5318cfddc994")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 190.5 80.01) (xy 185.42 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1913d55c-a19b-5ff8-b962-560c1d4d678b")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 185.42 80.01 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "75e3cf7e-a959-5618-baf0-51072dd7ff74")
+	(property "Reference" "#PWR_RS10"
+		(at 184.15 80.01 90)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 179.07 80.01 90)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 185.42 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 185.42 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 185.42 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "c6a0fcf6-1fde-5c40-a914-9a086e637a91")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "PORT1_5V"
+		(at 154.94 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8e8e1c53-d9ea-57e2-b9e1-47333f5406f2")
+	)
+	(label "RS485_A1"
+		(at 154.94 82.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0bcbbf93-981e-5889-ba37-105b6929d748")
+	)
+	(label "RS485_B1"
+		(at 154.94 85.09 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "447ac2d6-0c0b-5d4d-b3b1-2c1a7443342e")
+	)
+	(text "1=5V  2=GND  3=A  4=B"
+		(at 149.86 115.57 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "0d9c2369-8c01-5041-9f15-51be4b6ea76e")
+	)
+	(wire
+		(pts
+			(xy 240.03 72.39) (xy 234.95 72.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f1670ae4-46ae-5d48-85d3-4ec76a5407bc")
+	)
+	(hierarchical_label "RS485_DE2"
+		(shape input)
+		(at 234.95 72.39 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "19bb1447-7fe3-5e16-b613-1d7224b94279")
+	)
+	(wire
+		(pts
+			(xy 240.03 77.47) (xy 234.95 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "60ed950b-5a71-5765-86ca-a5348c213f0e")
+	)
+	(hierarchical_label "RS485_DE2"
+		(shape input)
+		(at 234.95 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4795bc7d-ff8a-5dc2-a06d-afc0db781b1a")
+	)
+	(wire
+		(pts
+			(xy 232.41 101.6) (xy 232.41 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5abf0c1b-10e4-5831-9bfa-09fddce00b4a")
+	)
+	(hierarchical_label "RS485_DE2"
+		(shape input)
+		(at 232.41 96.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "51fbd0c6-579e-591a-96c1-27f7ec58619c")
+	)
+	(wire
+		(pts
+			(xy 232.41 109.22) (xy 232.41 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "10bcad04-a325-595d-9963-d6640ef6eddd")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 232.41 114.3 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6698743b-9c10-5ba5-9af0-4776f8073800")
+	(property "Reference" "#PWR_RS11"
+		(at 232.41 115.57 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 232.41 118.11 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 232.41 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 232.41 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 232.41 114.3 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "2aab25bf-5646-5d5c-a6f1-80b5d5a2b6ff")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 240.03 67.31) (xy 234.95 67.31)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "689c5fab-ced1-509a-93a8-0f3544264baa")
+	)
+	(label "RS485_RO2"
+		(at 234.95 67.31 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "139d8fcf-3836-5529-99b9-93edee205fa8")
+	)
+	(wire
+		(pts
+			(xy 240.03 82.55) (xy 234.95 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f4ffa0f0-1386-512f-8941-62a35fb67793")
+	)
+	(hierarchical_label "RS485_TX"
+		(shape input)
+		(at 234.95 82.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "509d0f7d-c2ef-5c21-835b-92acc75167f4")
+	)
+	(wire
+		(pts
+			(xy 250.19 59.69) (xy 250.19 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d6bbc6d-b0cb-5aea-9855-768dbbce69ea")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 250.19 54.61 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "911a354f-6131-5f52-8a40-a7908e500f9c")
+	(property "Reference" "#PWR_RS12"
+		(at 250.19 55.88 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 250.19 50.8 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 250.19 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 250.19 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 250.19 54.61 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "fc2183ff-cce0-59d3-a23f-5da06ee8c108")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 250.19 90.17) (xy 250.19 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c4217af8-bd52-58ec-8a1f-68434ce5384d")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 250.19 95.25 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d53fee8b-9a30-54f0-867d-aa8a39e94490")
+	(property "Reference" "#PWR_RS13"
+		(at 250.19 96.52 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 250.19 99.06 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 250.19 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 250.19 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 250.19 95.25 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "28891efe-7f48-53e6-9085-3cbe194357ea")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 265.43 45.72) (xy 265.43 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "893e6983-4b27-54f5-bbfa-9bef9f03d0ea")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 265.43 40.64 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f02d8319-5acd-5b25-a6c4-0f79fec184ee")
+	(property "Reference" "#PWR_RS14"
+		(at 265.43 41.91 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 265.43 36.83 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 265.43 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 40.64 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "dcc75ea8-580c-5f62-aa80-fcf94cbe7b60")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 265.43 53.34) (xy 265.43 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d41c5848-2fcf-593b-91d7-db447a767997")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 265.43 58.42 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b5f29bbc-0333-583d-bb11-034a0cde7859")
+	(property "Reference" "#PWR_RS15"
+		(at 265.43 59.69 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 265.43 62.23 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 265.43 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 58.42 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "8928d669-b685-5698-bd2f-d7155c39d90d")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 260.35 69.85) (xy 271.78 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "04b605d8-faf6-5f0f-877e-7134585d05ea")
+	)
+	(wire
+		(pts
+			(xy 271.78 69.85) (xy 271.78 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dda4bfa5-6f79-5962-9b68-6dbf7dcced1a")
+	)
+	(wire
+		(pts
+			(xy 271.78 69.85) (xy 279.4 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ed333552-0804-5251-a961-397fd9548024")
+	)
+	(wire
+		(pts
+			(xy 279.4 69.85) (xy 279.4 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "86965370-334e-5013-8ad6-19b2aa4e4abb")
+	)
+	(wire
+		(pts
+			(xy 279.4 82.55) (xy 389.89 82.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f73b220c-9a25-5359-80b1-74ca08c3d6a8")
+	)
+	(wire
+		(pts
+			(xy 260.35 74.93) (xy 271.78 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ba882872-1e71-5d4d-9707-522478d15d41")
+	)
+	(wire
+		(pts
+			(xy 271.78 74.93) (xy 271.78 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7436de0b-ef9b-57d7-af7c-3650eaf493d3")
+	)
+	(wire
+		(pts
+			(xy 271.78 74.93) (xy 284.48 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a3173097-799e-5e66-a686-42bed4bf6adb")
+	)
+	(wire
+		(pts
+			(xy 284.48 74.93) (xy 284.48 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2623bb1f-9371-5df3-8aa3-50d299e754d7")
+	)
+	(wire
+		(pts
+			(xy 284.48 85.09) (xy 389.89 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8bdcd768-a48a-5bd1-8490-5c86155744de")
+	)
+	(wire
+		(pts
+			(xy 304.8 35.56) (xy 304.8 30.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "85743050-7eb0-50b6-8e3d-dd3237399765")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 304.8 30.480000000000004 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4e6d6922-82bc-552a-9efa-b27f7ab4f736")
+	(property "Reference" "#PWR_RS16"
+		(at 304.8 31.75 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 304.8 26.67 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 304.8 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 30.480000000000004 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "728ef192-1c9f-534f-9689-6163feb12bcd")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS16")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 304.8 43.18) (xy 304.8 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5f3f5a09-bc58-565b-8e6d-4f22e8836f28")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 304.8 48.26 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "271c5362-04d4-5823-a50f-191700c4c063")
+	(property "Reference" "#PWR_RS17"
+		(at 304.8 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 304.8 52.07 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 304.8 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 48.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "ce02a6c2-56ea-5b01-9bc4-84c7f06d9379")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 316.23 49.53) (xy 311.15 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e4e1fb0e-3ee0-5a73-b3d7-55bf1f376eb2")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 311.15000000000003 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3adf0c84-66c0-54f3-8ad8-9d559d372455")
+	(property "Reference" "#PWR_RS18"
+		(at 312.42 49.53 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 304.8 49.53 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 311.15000000000003 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 311.15000000000003 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 311.15000000000003 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "260ab8fb-fbec-578c-bb5c-3f61ea587b7a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 323.85 49.53) (xy 336.55 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3dd2f507-6119-596d-9bbb-679cdc6f3384")
+	)
+	(wire
+		(pts
+			(xy 336.55 49.53) (xy 336.55 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "90eedd42-8341-5836-bd5a-5aa03f35823f")
+	)
+	(wire
+		(pts
+			(xy 336.55 77.47) (xy 389.89 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78874dce-3486-5644-a17e-f2bfcc9c2cb5")
+	)
+	(wire
+		(pts
+			(xy 344.17 49.53) (xy 349.25 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7ebe0e6a-c8fc-588c-b439-f0fcf3bdd40b")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 349.25 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "301fbb4a-a95b-579e-875a-ea6f197aedf5")
+	(property "Reference" "#PWR_RS19"
+		(at 350.52 49.53 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 355.6 49.53 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 349.25 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 349.25 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 349.25 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "7b188241-5254-5e3c-a2c8-8a916b7098eb")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 389.89 80.01) (xy 384.81 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9df59876-bf18-50aa-844b-c05c3f47ddfa")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 384.81 80.01 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a0da07dc-6680-5905-a486-352b73701ace")
+	(property "Reference" "#PWR_RS20"
+		(at 383.54 80.01 90)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 378.46 80.01 90)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 384.81 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 384.81 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 384.81 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "90a92cf3-231c-57f0-b009-fc67dab5fa27")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "PORT2_5V"
+		(at 355.6 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "85b68ab2-9a7d-5221-a340-d8bacdf8460a")
+	)
+	(label "RS485_A2"
+		(at 355.6 82.55 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9e868a72-be21-5c2d-b9a4-0194c1571abf")
+	)
+	(label "RS485_B2"
+		(at 355.6 85.09 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1c064318-5644-512b-baa2-67584e77a656")
+	)
+	(text "1=5V  2=GND  3=A  4=B"
+		(at 350.52 115.57 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "8fe0c752-281f-5c35-a3e6-4f2a5f2694c4")
+	)
+	(wire
+		(pts
+			(xy 39.37 193.04) (xy 34.29 193.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "38099606-0676-5568-8b7a-3723f93e0d7b")
+	)
+	(hierarchical_label "RS485_DE3"
+		(shape input)
+		(at 34.29 193.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2c10c6e3-3775-55ec-a8b2-df29b73101c6")
+	)
+	(wire
+		(pts
+			(xy 39.37 198.12) (xy 34.29 198.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c8d1096d-5425-5132-8ad5-af3b27cc4003")
+	)
+	(hierarchical_label "RS485_DE3"
+		(shape input)
+		(at 34.29 198.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bc75ea37-cfdd-5016-8fc6-d99ec931c968")
+	)
+	(wire
+		(pts
+			(xy 33.02 220.98) (xy 33.02 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eaf99050-a2e8-58dd-b6d5-3d77ef9d72f4")
+	)
+	(hierarchical_label "RS485_DE3"
+		(shape input)
+		(at 33.02 215.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f76266fe-a4f6-5b80-ad43-463ac97cf00a")
+	)
+	(wire
+		(pts
+			(xy 33.02 228.6) (xy 33.02 233.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d766c385-f030-5abe-a2ea-f1104599224c")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 233.68 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "181c9923-aaa9-5a94-8e43-84ee27ca0e44")
+	(property "Reference" "#PWR_RS21"
+		(at 33.02 234.95 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 33.02 237.49 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 33.02 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 33.02 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 33.02 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "18afb50a-d6b0-5810-bd64-30eff702c0d6")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS21")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 39.37 187.96) (xy 34.29 187.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e1c35d43-ceb1-5cb1-b2de-35842349295e")
+	)
+	(label "RS485_RO3"
+		(at 34.29 187.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a31fa461-3c1b-5575-a2d3-d7f49c3a7147")
+	)
+	(wire
+		(pts
+			(xy 39.37 203.2) (xy 34.29 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "902ad49d-6206-5f3d-8c5c-79919b64fb53")
+	)
+	(hierarchical_label "RS485_TX"
+		(shape input)
+		(at 34.29 203.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "99c12ef6-516d-5378-8411-2bbed1a17ddb")
+	)
+	(wire
+		(pts
+			(xy 49.53 180.34) (xy 49.53 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e9c44ba3-c1d2-5632-8608-568f891a0e77")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 49.53 175.26 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "49aea2ce-2ddd-5e06-9a89-00c2a2c10911")
+	(property "Reference" "#PWR_RS22"
+		(at 49.53 176.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 49.53 171.45 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 49.53 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 49.53 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 49.53 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "26e4ae88-522e-570a-b8f7-e96c06532c40")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 49.53 210.82) (xy 49.53 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea044c41-0692-50ac-b51d-02719da12707")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 49.53 215.9 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4de0b682-c1e2-5ac0-8f1b-a299291a1d74")
+	(property "Reference" "#PWR_RS23"
+		(at 49.53 217.17 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 49.53 219.71 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 49.53 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 49.53 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 49.53 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "61811f2a-6441-53cf-b486-be9aa503728d")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS23")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 64.77 166.37) (xy 64.77 161.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "59b68328-f7b8-54ab-afc4-233f877f10c7")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 64.77 161.29 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "28d84cbb-fa86-57f2-a7ec-a59b0982684a")
+	(property "Reference" "#PWR_RS24"
+		(at 64.77 162.56 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 64.77 157.48 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 64.77 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "34820b7c-249f-5b36-a41a-4c8f99f6ba3e")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS24")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 64.77 173.99) (xy 64.77 179.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b2d16108-5089-5c1e-b430-08e47049c1f2")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 64.77 179.07000000000002 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "bc697a43-ea8b-594c-9abc-51642850f968")
+	(property "Reference" "#PWR_RS25"
+		(at 64.77 180.34 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 64.77 182.88 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 64.77 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "652674e4-80c0-59e3-b3f0-d7b643e3634f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS25")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 59.69 190.5) (xy 72.39 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b3facf91-d45b-5217-88a6-93b780f98fd1")
+	)
+	(wire
+		(pts
+			(xy 72.39 190.5) (xy 72.39 191.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e321832-f42b-5506-9934-a45d007555a9")
+	)
+	(wire
+		(pts
+			(xy 72.39 190.5) (xy 80.01 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e89acf90-3b2d-51bf-be1c-1b47462a4191")
+	)
+	(wire
+		(pts
+			(xy 80.01 190.5) (xy 80.01 201.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "688190b0-7666-511f-b81f-a6fb3315ed8a")
+	)
+	(wire
+		(pts
+			(xy 80.01 201.93) (xy 190.5 201.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "33a168a0-16e0-5618-a87e-c298208d9b32")
+	)
+	(wire
+		(pts
+			(xy 59.69 195.58) (xy 72.39 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d772e850-9930-57fc-9c8a-4d9fa635b5f5")
+	)
+	(wire
+		(pts
+			(xy 72.39 195.58) (xy 72.39 199.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d7e3164-b65f-56b4-850d-05f28f11c27d")
+	)
+	(wire
+		(pts
+			(xy 72.39 195.58) (xy 85.09 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "709c8647-68e1-59aa-b855-051dc62ab9eb")
+	)
+	(wire
+		(pts
+			(xy 85.09 195.58) (xy 85.09 204.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0a624e51-31f2-59d5-9dc4-c60aa3253655")
+	)
+	(wire
+		(pts
+			(xy 85.09 204.47) (xy 190.5 204.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "acfaa8ca-ad78-54dd-891d-cb6db8994491")
+	)
+	(wire
+		(pts
+			(xy 105.41 156.21) (xy 105.41 151.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "468388d0-81d1-5d94-bbeb-b44b5a123036")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 105.41 151.13 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "8a1e2d97-c258-58aa-82f3-9e73ff584874")
+	(property "Reference" "#PWR_RS26"
+		(at 105.41 152.4 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 105.41 147.32 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 105.41 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "1eaa0b46-d044-5214-bc57-59ba6408dc4f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS26")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 105.41 163.83) (xy 105.41 168.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "02f1f01b-3397-54ff-bd8c-7987bdfdd4e8")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 105.41 168.91000000000003 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1bdaeffb-c9b4-5a43-a003-d766c88e9a8d")
+	(property "Reference" "#PWR_RS27"
+		(at 105.41 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 105.41 172.72 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 105.41 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "96d243ec-045d-50f5-86f2-0a90624108f0")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS27")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 115.57 170.18) (xy 110.49 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3bdd79a2-d2ba-568c-af66-2c3fd47863e9")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 110.49 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1c3ee3b1-1580-5efc-ab60-830e77f94c82")
+	(property "Reference" "#PWR_RS28"
+		(at 111.76 170.18 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 104.14 170.18 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 110.49 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 110.49 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 110.49 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "4c280d8f-e256-5818-bca4-8952249346c9")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS28")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 123.19 170.18) (xy 135.89 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "17011ad6-5cec-535f-b1f7-2ec9093ea23a")
+	)
+	(wire
+		(pts
+			(xy 135.89 170.18) (xy 135.89 196.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "477e70ed-8743-54dc-9717-f1a21e17aa85")
+	)
+	(wire
+		(pts
+			(xy 135.89 196.85) (xy 190.5 196.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "07f4bbf6-c06b-5742-8fe3-9a31b9581beb")
+	)
+	(wire
+		(pts
+			(xy 143.51 170.18) (xy 148.59 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b993b3f1-261c-5f95-a82d-7a2eb89a57f0")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 148.59 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0c70a2f0-3334-504b-98dd-f8d330fcb3a1")
+	(property "Reference" "#PWR_RS29"
+		(at 149.86 170.18 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 154.94 170.18 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 148.59 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 148.59 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 148.59 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "1b9fc0df-591b-5b4a-b5d7-67842d0f4180")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS29")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 190.5 199.39) (xy 185.42 199.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c4224311-5ca9-5a92-9d7b-7f92b65d5bdf")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 185.42 199.39 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a930e850-e9f9-56f7-920a-a3c6e87f9d2c")
+	(property "Reference" "#PWR_RS30"
+		(at 184.15 199.39 90)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 179.07 199.39 90)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 185.42 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 185.42 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 185.42 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "a76e257b-3748-5ad2-b9d8-5355542dd02f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS30")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "PORT3_5V"
+		(at 154.94 196.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d8fd8e07-3f8a-5600-9022-5d75c73816ef")
+	)
+	(label "RS485_A3"
+		(at 154.94 201.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c867aa8a-adcd-5042-8629-9c74d058d205")
+	)
+	(label "RS485_B3"
+		(at 154.94 204.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fb10e6b7-5a9c-53e4-939a-5b1064a28767")
+	)
+	(text "1=5V  2=GND  3=A  4=B"
+		(at 149.86 234.95 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "9975e232-ae44-57cb-be12-01cb0f3ca56a")
+	)
+	(wire
+		(pts
+			(xy 240.03 193.04) (xy 234.95 193.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b487edb-6f12-558a-b162-2c8ba9384f51")
+	)
+	(hierarchical_label "RS485_DE4"
+		(shape input)
+		(at 234.95 193.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "70a934ac-e46b-5f21-89e6-40a7b5857f1a")
+	)
+	(wire
+		(pts
+			(xy 240.03 198.12) (xy 234.95 198.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "669918d5-30c1-5a16-bd88-c9321fa79d9e")
+	)
+	(hierarchical_label "RS485_DE4"
+		(shape input)
+		(at 234.95 198.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "7759b127-0ddc-5b5d-a7a2-8414e193a942")
+	)
+	(wire
+		(pts
+			(xy 232.41 220.98) (xy 232.41 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f02d642a-40fe-5e1b-a2fe-9cdf9d052a3b")
+	)
+	(hierarchical_label "RS485_DE4"
+		(shape input)
+		(at 232.41 215.9 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d04d32ac-4004-59fa-b8cb-af1bda75a053")
+	)
+	(wire
+		(pts
+			(xy 232.41 228.6) (xy 232.41 233.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4dd7cf89-0615-5078-885b-79a30c9064db")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 232.41 233.68 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "fe6587f8-7390-5827-a053-e92cefb9ecf5")
+	(property "Reference" "#PWR_RS31"
+		(at 232.41 234.95 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 232.41 237.49 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 232.41 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 232.41 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 232.41 233.68 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "27d07c92-f78a-583e-9a3d-7a510348adfa")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS31")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 240.03 187.96) (xy 234.95 187.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "34b80117-4432-5da0-984f-8acc82565ee2")
+	)
+	(label "RS485_RO4"
+		(at 234.95 187.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "42acfbc4-4db8-58f1-84fe-93cce22b4fd3")
+	)
+	(wire
+		(pts
+			(xy 240.03 203.2) (xy 234.95 203.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "33c54033-9c71-5d55-bb86-5e4a29cfb704")
+	)
+	(hierarchical_label "RS485_TX"
+		(shape input)
+		(at 234.95 203.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "85089a1b-4c8c-5e0a-be3d-0849afc71685")
+	)
+	(wire
+		(pts
+			(xy 250.19 180.34) (xy 250.19 175.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b37e4d88-d97c-5277-9422-a06f4752d95a")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 250.19 175.26 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "56456bb2-793c-55e3-8196-efd5f056a0ba")
+	(property "Reference" "#PWR_RS32"
+		(at 250.19 176.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 250.19 171.45 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 250.19 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 250.19 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 250.19 175.26 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "e39690a1-82c7-5415-bd80-59652324bb49")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS32")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 250.19 210.82) (xy 250.19 215.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "19ec4675-c71e-5a22-a04c-2336dc029a53")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 250.19 215.9 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4bd0fa0d-4652-5e56-bb94-a0ffcaea5188")
+	(property "Reference" "#PWR_RS33"
+		(at 250.19 217.17 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 250.19 219.71 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 250.19 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 250.19 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 250.19 215.9 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "7730d07e-72a8-5d62-839c-5538f6d68b9c")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS33")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 265.43 166.37) (xy 265.43 161.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b3615035-e30c-573e-89c1-d60cd91f5755")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 265.43 161.29 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "7c545424-5465-54dc-99d3-5bb9c11a9710")
+	(property "Reference" "#PWR_RS34"
+		(at 265.43 162.56 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 265.43 157.48 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 265.43 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 161.29 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "a6519826-91ae-537f-b513-e827544eaf12")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS34")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 265.43 173.99) (xy 265.43 179.07)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a79d57bc-64c2-504d-b850-b0d098dc2018")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 265.43 179.07000000000002 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3aba376b-6a76-58a9-b86d-42832c5a4f24")
+	(property "Reference" "#PWR_RS35"
+		(at 265.43 180.34 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 265.43 182.88 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 265.43 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 179.07000000000002 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "39e9bd7d-cccb-58b6-afe4-bd7a54596f01")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS35")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 260.35 190.5) (xy 271.78 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "22776b5a-a2d6-52bb-985e-d24e6f05c7c1")
+	)
+	(wire
+		(pts
+			(xy 271.78 190.5) (xy 271.78 191.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ce67d560-c197-5be4-9377-0df31437b2e4")
+	)
+	(wire
+		(pts
+			(xy 271.78 190.5) (xy 279.4 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6da35117-d223-5e77-8b0f-4d7fdcbf1ec5")
+	)
+	(wire
+		(pts
+			(xy 279.4 190.5) (xy 279.4 201.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf17daec-c7da-5183-bc2d-53e7bc639448")
+	)
+	(wire
+		(pts
+			(xy 279.4 201.93) (xy 389.89 201.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "18e3853b-f9a1-5a54-83f7-7379ca4f0dc4")
+	)
+	(wire
+		(pts
+			(xy 260.35 195.58) (xy 271.78 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e67ac462-934c-5391-9d48-9727dccea988")
+	)
+	(wire
+		(pts
+			(xy 271.78 195.58) (xy 271.78 199.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f18c8fcf-a51d-5ac1-9ec5-c1b444c73be8")
+	)
+	(wire
+		(pts
+			(xy 271.78 195.58) (xy 284.48 195.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54f79662-5f5d-5798-aa5f-e73511ae3750")
+	)
+	(wire
+		(pts
+			(xy 284.48 195.58) (xy 284.48 204.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f824fdc8-66e3-5ae4-86fb-7e040ac1bdb1")
+	)
+	(wire
+		(pts
+			(xy 284.48 204.47) (xy 389.89 204.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "49a4ef00-1a09-5744-8fef-9768bee177f4")
+	)
+	(wire
+		(pts
+			(xy 304.8 156.21) (xy 304.8 151.13)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5c16371a-28ae-5822-a0c7-a1e8c8a440fb")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 304.8 151.13 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e49af4bf-038e-5dc2-8b75-7b92f11710c2")
+	(property "Reference" "#PWR_RS36"
+		(at 304.8 152.4 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 304.8 147.32 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 304.8 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 151.13 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "86a9b278-0f32-5707-999e-6af632fc01f5")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS36")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 304.8 163.83) (xy 304.8 168.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6026f9c5-bb87-5ec2-8607-8ec8b469ddd5")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 304.8 168.91000000000003 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "ef83ae17-982b-5d8b-894d-fffe20ac619a")
+	(property "Reference" "#PWR_RS37"
+		(at 304.8 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 304.8 172.72 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 304.8 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 168.91000000000003 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "73abab30-24b1-5ff5-8706-13f1633a245a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS37")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 316.23 170.18) (xy 311.15 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66c433b9-960e-5162-b876-72a4636d0ae9")
+	)
+	(symbol
+		(lib_id "power:VBUS")
+		(at 311.15000000000003 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "55ef86e3-4af4-50b5-9b8d-62623dac6b31")
+	(property "Reference" "#PWR_RS38"
+		(at 312.42 170.18 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "VBUS"
+		(at 304.8 170.18 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 311.15000000000003 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 311.15000000000003 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 311.15000000000003 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "5d89e990-513a-5a20-b57e-27b8ab44522a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS38")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 323.85 170.18) (xy 336.55 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a4bb10e6-10ee-526b-85f9-b77aa7251ec4")
+	)
+	(wire
+		(pts
+			(xy 336.55 170.18) (xy 336.55 196.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "648f40a7-ece8-5595-9d18-7345d0a43176")
+	)
+	(wire
+		(pts
+			(xy 336.55 196.85) (xy 389.89 196.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "609ddac2-0782-5fe8-ac1f-5309afb7dc4a")
+	)
+	(wire
+		(pts
+			(xy 344.17 170.18) (xy 349.25 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f705fd6a-5694-5aa8-a420-c3de8d08d647")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 349.25 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0645d08a-f872-5f32-8e92-d4fcfb0fdba0")
+	(property "Reference" "#PWR_RS39"
+		(at 350.52 170.18 270)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 355.6 170.18 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 349.25 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 349.25 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 349.25 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "97d2f84e-53ab-5dc6-af12-b9f47b0cda0a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS39")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 389.89 199.39) (xy 384.81 199.39)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a21b8959-b8e7-589b-bfa1-fda62d3095b8")
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 384.81 199.39 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2184c786-40d6-5bfd-b0c9-0d8dd5ab9de4")
+	(property "Reference" "#PWR_RS40"
+		(at 383.54 199.39 90)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "GND"
+		(at 378.46 199.39 90)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 384.81 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 384.81 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 384.81 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "b96daaee-ad40-55f1-9b1e-525905b41b24")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS40")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(label "PORT4_5V"
+		(at 355.6 196.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3a55dddd-67a4-59fd-881a-5cb97325b6ae")
+	)
+	(label "RS485_A4"
+		(at 355.6 201.93 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "31d2c8cc-d5ca-52b9-a945-0ca2c2f8183a")
+	)
+	(label "RS485_B4"
+		(at 355.6 204.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a2a7694a-9ab0-5cb4-a992-273b82b28775")
+	)
+	(text "1=5V  2=GND  3=A  4=B"
+		(at 350.52 234.95 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "2e4276ac-1b5e-524f-b367-31215d8725ef")
+	)
+	(wire
+		(pts
+			(xy 49.53 271.78) (xy 49.53 266.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6bc73a90-d060-53cc-b6f7-11e5d017d081")
+	)
+	(label "RS485_RO1"
+		(at 49.53 266.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "368b11cf-5d95-5d9a-ae79-7689969c6185")
+	)
+	(wire
+		(pts
+			(xy 110.49 271.78) (xy 110.49 266.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "888e4e3c-de9f-56d9-894d-0aa68ffcece2")
+	)
+	(label "RS485_RO2"
+		(at 110.49 266.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9490621a-b187-5211-b4d1-be9339f630a3")
+	)
+	(junction
+		(at 110.49 279.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7f492039-48e8-5663-8327-b4a1f44bf473")
+	)
+	(wire
+		(pts
+			(xy 170.18 271.78) (xy 170.18 266.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "de99aea2-e601-5d29-a8c8-17ab9f886769")
+	)
+	(label "RS485_RO3"
+		(at 170.18 266.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3f03755d-efe1-52a8-892d-027fd9be379c")
+	)
+	(junction
+		(at 170.18 279.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d06f33c4-84f2-56ce-8464-bc31327a451b")
+	)
+	(wire
+		(pts
+			(xy 229.87 271.78) (xy 229.87 266.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "58f7aa5e-1a88-55c8-93ac-faae98941962")
+	)
+	(label "RS485_RO4"
+		(at 229.87 266.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "49d12c89-d2bf-5220-95bc-77602cf86bb0")
+	)
+	(junction
+		(at 229.87 279.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d8bcf215-7bfe-5573-a572-111a809cef7e")
+	)
+	(wire
+		(pts
+			(xy 49.53 279.4) (xy 255.27 279.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e4493ba-0b9e-50bc-b5b9-10e9234564a1")
+	)
+	(wire
+		(pts
+			(xy 255.27 271.78) (xy 255.27 266.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d75a20b-0dde-5537-ba2d-b0ab3bd99799")
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 255.27 266.7 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "801041b3-873f-5020-812c-af457cc5653b")
+	(property "Reference" "#PWR_RS41"
+		(at 255.27 267.97 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "+3V3"
+		(at 255.27 262.89 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" ""
+		(at 255.27 266.7 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 255.27 266.7 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 255.27 266.7 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "341fd83e-2699-5e1e-b8ff-7ac76d681e39")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "#PWR_RS41")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(wire
+		(pts
+			(xy 245.11 279.4) (xy 245.11 284.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dbc2eec2-f87b-57b9-8f13-4b5850633a1a")
+	)
+	(junction
+		(at 245.11 279.4)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7c70bce2-4675-5ff7-ad4d-e1959298f66a")
+	)
+	(hierarchical_label "RS485_RX"
+		(shape output)
+		(at 245.11 284.48 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6b0ac62a-9bbf-5e25-b7a8-1cbd20314c4e")
+	)
+	(symbol
+		(lib_id "jardinier2000:THVD1450DR")
+		(at 49.53 74.93 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d4903660-c6f4-5b5a-9181-14d8812621e1")
+	(property "Reference" "U4"
+		(at 41.910000000000004 59.690000000000005 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "THVD1450DR"
+		(at 52.07 59.690000000000005 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(at 49.53 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.ti.com/lit/ds/symlink/thvd1450.pdf"
+		(at 49.53 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "3.3-V to 5-V RS-485 transceiver"
+		(at 49.53 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "93dd60ce-460c-5b07-ab6b-d471371d1cfe")
+		)
+		(pin "2"
+			(uuid "6a8cdcd5-310d-5dc7-a93d-b7f3c0619288")
+		)
+		(pin "3"
+			(uuid "9d72e75f-d04d-5001-bc8b-c914f0c8e62a")
+		)
+		(pin "4"
+			(uuid "9ca4ba56-f70b-5223-816e-1fca52d89940")
+		)
+		(pin "5"
+			(uuid "17eb3f84-7242-59e2-99c5-f86263918232")
+		)
+		(pin "6"
+			(uuid "fde9f9d4-8d57-5553-bb13-d8376a805634")
+		)
+		(pin "7"
+			(uuid "56fee5f2-9281-593c-aaaa-66231270022b")
+		)
+		(pin "8"
+			(uuid "45df9d6a-f145-5c93-9b0b-5f04126ac86f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 64.77 49.53 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e9e74854-af93-5a01-9768-fdbb4af3668b")
+	(property "Reference" "C21"
+		(at 67.31 48.26 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100nF"
+		(at 67.31 50.800000000000004 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(at 64.77 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "63fb4d7a-95d3-5fa7-a478-1feecc7cfce4")
+		)
+		(pin "2"
+			(uuid "97795089-bac3-51a0-b1e8-010cbb677f8a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C21")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 72.39 74.93 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b1b81fc2-35af-5c99-862c-5ab609506de7")
+	(property "Reference" "R14"
+		(at 74.93 73.66000000000001 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "120R"
+		(at 74.93 76.2 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 72.39 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 72.39 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 72.39 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "735f3cd9-8c7b-5636-8eee-a41f849629e0")
+		)
+		(pin "2"
+			(uuid "52cf83c2-ceb6-5bf5-b948-e642925c33e4")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R14")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 33.02 105.41 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d7edb270-3573-51fb-9195-0cff6ffb606a")
+	(property "Reference" "R18"
+		(at 35.56 104.14 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "10k"
+		(at 35.56 106.67999999999999 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 33.02 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 33.02 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 33.02 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "217a82d0-14ff-5d9a-93b9-025b7aa4737a")
+		)
+		(pin "2"
+			(uuid "767154db-deb3-594e-be49-e4a598e5aaa6")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 119.38 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4d0648bf-3312-5cc2-b581-163756deda6b")
+	(property "Reference" "F3"
+		(at 119.38 46.99 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "PTC 1.5A/16V"
+		(at 119.38 52.07 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" "Fuse:Fuse_1812_4532Metric"
+		(at 119.38 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 119.38 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 119.38 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "268d1a33-8da7-5791-af66-4a2369dd9795")
+		)
+		(pin "2"
+			(uuid "4a902fe3-fda8-547f-907e-6ae52127cd61")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "F3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 105.41 39.37 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "dc663120-803d-5620-9096-15a8ecd9c115")
+	(property "Reference" "C17"
+		(at 107.95 38.099999999999994 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100uF"
+		(at 107.95 40.64 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_1210_3225Metric"
+		(at 105.41 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "38e280e5-0b3b-5993-8aed-3130f53a95f5")
+		)
+		(pin "2"
+			(uuid "2cd3e3ec-0b49-54df-9dca-efbfb9d685d2")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 139.7 49.53 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "95536d70-59ae-5ba4-9447-92bff55e2194")
+	(property "Reference" "D1"
+		(at 142.23999999999998 46.99 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "SMF5.0CA"
+		(at 142.23999999999998 52.07 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SMF"
+		(at 139.7 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 139.7 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 139.7 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "92623586-684a-58fc-b336-1b6d97a18d4e")
+		)
+		(pin "2"
+			(uuid "35da2bb0-a6e1-592b-b292-cb36aa77f3b6")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 195.58 80.01 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "449b923c-3f06-5c98-9e0c-4973ffba6e73")
+	(property "Reference" "J2"
+		(at 203.20000000000002 74.93 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "WIRE PADS"
+		(at 203.20000000000002 77.47 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(at 195.58 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 195.58 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "Solder wire pads: 5V, GND, A, B"
+		(at 195.58 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "681e0809-a340-5207-b182-c400820339f6")
+		)
+		(pin "2"
+			(uuid "1197433d-02f3-539e-ad91-3618df0e0249")
+		)
+		(pin "3"
+			(uuid "728c724e-82ed-5631-a8d2-500bad49ce66")
+		)
+		(pin "4"
+			(uuid "7c32a2a9-8864-5205-bf78-a80fe018b71d")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "jardinier2000:THVD1450DR")
+		(at 250.19 74.93 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1b86f0c5-b3ba-5eb9-8547-bfe5168919fc")
+	(property "Reference" "U5"
+		(at 242.57 59.690000000000005 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "THVD1450DR"
+		(at 252.73 59.690000000000005 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(at 250.19 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.ti.com/lit/ds/symlink/thvd1450.pdf"
+		(at 250.19 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "3.3-V to 5-V RS-485 transceiver"
+		(at 250.19 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "8a8b5d15-29e2-5138-8695-316cfb0934f9")
+		)
+		(pin "2"
+			(uuid "5a49b000-4c99-59b0-9a12-05881d2609bd")
+		)
+		(pin "3"
+			(uuid "f74045d6-70c7-5ff5-a649-5f19007e5789")
+		)
+		(pin "4"
+			(uuid "1fb24287-93eb-58b0-8b87-3361b9bf54c5")
+		)
+		(pin "5"
+			(uuid "aca2e12e-0650-52f8-ba87-8a783640369a")
+		)
+		(pin "6"
+			(uuid "f17fc024-4301-52d4-84b0-a419e5623197")
+		)
+		(pin "7"
+			(uuid "52820e0a-46a5-5c52-b736-2eb6c5a77c49")
+		)
+		(pin "8"
+			(uuid "f4149d2a-dc04-5c69-9d27-2813b1b41c1f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "U5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 265.43 49.53 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d118c93e-29b2-5a8f-8d22-aa55f0d452ae")
+	(property "Reference" "C22"
+		(at 267.97 48.26 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100nF"
+		(at 267.97 50.800000000000004 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(at 265.43 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "e0a08c74-8549-525b-b9b5-98cdfcc325c3")
+		)
+		(pin "2"
+			(uuid "00728e35-bea6-5931-ad14-3b2c1dd51941")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 271.78 74.93 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "355014b1-b7de-5fef-b266-bfed0a70f960")
+	(property "Reference" "R15"
+		(at 274.32 73.66000000000001 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "120R"
+		(at 274.32 76.2 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 271.78 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 271.78 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 271.78 74.93 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "61f7cf31-9cfd-58e6-af01-8a2ab97fdef2")
+		)
+		(pin "2"
+			(uuid "74d71980-cb1f-5c86-ab1b-7367e0f526bf")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R15")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 232.41 105.41 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b81738b4-e270-5eed-8102-deea04a7a469")
+	(property "Reference" "R19"
+		(at 234.95 104.14 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "10k"
+		(at 234.95 106.67999999999999 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 232.41 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 232.41 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 232.41 105.41 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "2a00ee12-9120-5f57-9f0d-cbd14a5a7832")
+		)
+		(pin "2"
+			(uuid "2c9d966c-f27d-5fe3-bc96-4aa7f3d25e93")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 320.04 49.53 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "191081bf-376e-5ac3-b089-2f87e90d69fe")
+	(property "Reference" "F4"
+		(at 320.04 46.99 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "PTC 1.5A/16V"
+		(at 320.04 52.07 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" "Fuse:Fuse_1812_4532Metric"
+		(at 320.04 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 320.04 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 320.04 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "5d7506b6-6838-5833-8320-f331463b31b7")
+		)
+		(pin "2"
+			(uuid "91bd345f-8686-5333-a0f1-6fdba0bf7629")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "F4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 304.8 39.37 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0a5825b9-feaf-58ea-9bac-1127591f103e")
+	(property "Reference" "C18"
+		(at 307.34000000000003 38.099999999999994 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100uF"
+		(at 307.34000000000003 40.64 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_1210_3225Metric"
+		(at 304.8 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 39.37 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "bff2f9b1-be33-53c1-aaa0-c6e3ec84b3b2")
+		)
+		(pin "2"
+			(uuid "ba03830b-2481-5323-b449-272279d883e7")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 340.36 49.53 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "547a4585-dc8c-5661-909d-49ec2b0ca8cc")
+	(property "Reference" "D2"
+		(at 342.90000000000003 46.99 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "SMF5.0CA"
+		(at 342.90000000000003 52.07 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SMF"
+		(at 340.36 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 340.36 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 340.36 49.53 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "697b2306-fde4-5ebe-ad0e-364629ead004")
+		)
+		(pin "2"
+			(uuid "e86d7f6a-8f0e-5560-b449-5af1faf0535f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 394.97 80.01 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c92b4957-1f22-5bbf-aaff-c56535af1649")
+	(property "Reference" "J3"
+		(at 402.59000000000003 74.93 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "WIRE PADS"
+		(at 402.59000000000003 77.47 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(at 394.97 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 394.97 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "Solder wire pads: 5V, GND, A, B"
+		(at 394.97 80.01 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "b775339c-4008-554d-9226-702dca27c2b2")
+		)
+		(pin "2"
+			(uuid "7c70289b-cbd7-5c0a-91fa-f285115c0914")
+		)
+		(pin "3"
+			(uuid "aec33891-62ad-53bd-83c2-df8116d4f87b")
+		)
+		(pin "4"
+			(uuid "108dce13-cde1-50fb-80b6-587df51b929c")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "jardinier2000:THVD1450DR")
+		(at 49.53 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e52068fc-9351-5505-b9bd-fd332b757f87")
+	(property "Reference" "U6"
+		(at 41.910000000000004 180.34 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "THVD1450DR"
+		(at 52.07 180.34 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(at 49.53 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.ti.com/lit/ds/symlink/thvd1450.pdf"
+		(at 49.53 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "3.3-V to 5-V RS-485 transceiver"
+		(at 49.53 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "ab7799c4-d1cc-5e80-abf6-a1b866dbf939")
+		)
+		(pin "2"
+			(uuid "752d1a8f-6e46-554a-979e-acf07369e954")
+		)
+		(pin "3"
+			(uuid "088f8c7a-1ab0-57c3-adbb-03b38d18fe4a")
+		)
+		(pin "4"
+			(uuid "11bd55d3-4026-5413-a997-33bc851c4aac")
+		)
+		(pin "5"
+			(uuid "53b069c4-4dda-5dc0-a57b-ede0c3bee997")
+		)
+		(pin "6"
+			(uuid "dbd14f4b-a4e3-57db-aaad-43906ca91b35")
+		)
+		(pin "7"
+			(uuid "6f43368a-2c62-5890-b256-ffac4f98e9ac")
+		)
+		(pin "8"
+			(uuid "9587b7ab-130d-57d4-a1ec-0f177e336498")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "U6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 64.77 170.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "85ef4938-70ba-532f-a17a-6e8ba4ede03e")
+	(property "Reference" "C23"
+		(at 67.31 168.91 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100nF"
+		(at 67.31 171.45000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(at 64.77 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 64.77 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 64.77 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "76a47718-51bd-5586-acab-8e752869e073")
+		)
+		(pin "2"
+			(uuid "d947bc2d-417a-593e-aa8f-b31dc9886912")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C23")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 72.39 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c0c58505-60ca-5322-aded-1193f8a2f1ec")
+	(property "Reference" "R16"
+		(at 74.93 194.31 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "120R"
+		(at 74.93 196.85000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 72.39 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 72.39 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 72.39 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "453e7a74-7b9b-59f5-8a9c-81b824241570")
+		)
+		(pin "2"
+			(uuid "cf17ecb0-3f55-5b87-bed9-36f1e6bd4513")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R16")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 33.02 224.79 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "4dff2b1a-bf36-56e4-9abc-dae2588fd2d7")
+	(property "Reference" "R20"
+		(at 35.56 223.51999999999998 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "10k"
+		(at 35.56 226.06 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 33.02 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 33.02 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 33.02 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "d6e045a7-1960-578f-9c41-49cf2f411e44")
+		)
+		(pin "2"
+			(uuid "f3cf69a7-f096-530c-ac1f-570cde7029dd")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 119.38 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "917c90e7-f11f-5f59-b6b2-f8e702448d61")
+	(property "Reference" "F5"
+		(at 119.38 167.64000000000001 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "PTC 1.5A/16V"
+		(at 119.38 172.72 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" "Fuse:Fuse_1812_4532Metric"
+		(at 119.38 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 119.38 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 119.38 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "72183dff-2a16-55b9-a5de-e6445c49419f")
+		)
+		(pin "2"
+			(uuid "b486ccec-2e94-5a7c-a21c-9a457970c88d")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "F5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 105.41 160.02 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0d680aa6-558b-5a5b-89ce-ee33e6a1163c")
+	(property "Reference" "C19"
+		(at 107.95 158.75 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100uF"
+		(at 107.95 161.29000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_1210_3225Metric"
+		(at 105.41 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 105.41 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 105.41 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "5ad5a7c1-5997-52db-a10f-943260aa412a")
+		)
+		(pin "2"
+			(uuid "1b046328-3687-587a-b257-607e6ac3a5b8")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 139.7 170.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "eab573c5-0ada-574b-b77b-76a9b5a75f40")
+	(property "Reference" "D3"
+		(at 142.23999999999998 167.64000000000001 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "SMF5.0CA"
+		(at 142.23999999999998 172.72 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SMF"
+		(at 139.7 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 139.7 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 139.7 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "1d9bf38a-0a69-5bd1-a3c2-317dc7546c24")
+		)
+		(pin "2"
+			(uuid "168f1fed-0f08-5ade-ba23-993526600c10")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 195.58 199.39 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6b54a517-837d-5167-9706-0019dd310805")
+	(property "Reference" "J4"
+		(at 203.20000000000002 194.30999999999997 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "WIRE PADS"
+		(at 203.20000000000002 196.85 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(at 195.58 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 195.58 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "Solder wire pads: 5V, GND, A, B"
+		(at 195.58 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "1b36fca9-59a0-5445-b42d-9e45b2e0bcf6")
+		)
+		(pin "2"
+			(uuid "a9713def-dc15-5f68-87e8-30c53a34d8fc")
+		)
+		(pin "3"
+			(uuid "a021d498-1fea-54a7-8073-41d2d54788d5")
+		)
+		(pin "4"
+			(uuid "954065e0-11f8-58fb-b620-8610d04c90c1")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "jardinier2000:THVD1450DR")
+		(at 250.19 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b11f12d8-fefd-5acc-a8d8-622ecb963c33")
+	(property "Reference" "U7"
+		(at 242.57 180.34 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "THVD1450DR"
+		(at 252.73 180.34 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(at 250.19 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.ti.com/lit/ds/symlink/thvd1450.pdf"
+		(at 250.19 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "3.3-V to 5-V RS-485 transceiver"
+		(at 250.19 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "f429abef-b5c7-5b9d-b7b0-31f396a615eb")
+		)
+		(pin "2"
+			(uuid "918325e0-ea2b-5190-9f65-429521c5af8f")
+		)
+		(pin "3"
+			(uuid "f112bac0-e752-599a-a3b8-a5b8c333c636")
+		)
+		(pin "4"
+			(uuid "47d8bbcb-21d4-56a5-9e43-654e64a3dcf2")
+		)
+		(pin "5"
+			(uuid "a30cff6a-5f05-50af-8539-c0fc66a79a1d")
+		)
+		(pin "6"
+			(uuid "02e585b1-d4ff-5aa9-9c18-2d86e0884c05")
+		)
+		(pin "7"
+			(uuid "a082ad9f-a847-5dd1-9f38-618c010586e2")
+		)
+		(pin "8"
+			(uuid "6a9f6995-ea43-5670-8211-907e108fcdbc")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "U7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 265.43 170.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "40bfd47a-fa80-5fef-bf74-95fc7ce312db")
+	(property "Reference" "C24"
+		(at 267.97 168.91 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100nF"
+		(at 267.97 171.45000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(at 265.43 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 265.43 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 265.43 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "b05d1dec-0e90-5df2-809f-045061c8cac0")
+		)
+		(pin "2"
+			(uuid "8e3dea50-b288-55ee-bb80-063ec99ff70a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C24")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 271.78 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "80188fa7-8bee-5184-a5c6-5860b42ac532")
+	(property "Reference" "R17"
+		(at 274.32 194.31 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "120R"
+		(at 274.32 196.85000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 271.78 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 271.78 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 271.78 195.58 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "9d7f0a50-6375-56f6-a9f2-4bce3fd55b72")
+		)
+		(pin "2"
+			(uuid "488ade76-01c9-5bdd-91f4-9b3a0860cc9a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 232.41 224.79 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f046ed24-7f2d-5579-963f-f001493c9b0f")
+	(property "Reference" "R21"
+		(at 234.95 223.51999999999998 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "10k"
+		(at 234.95 226.06 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 232.41 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 232.41 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 232.41 224.79 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "0e4bb0ef-1b7f-5b3f-98b2-b298e82102ce")
+		)
+		(pin "2"
+			(uuid "c940992a-77ea-586c-9d09-e747b70033ee")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R21")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:Polyfuse")
+		(at 320.04 170.18 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "29726884-6b31-5998-830a-bdd9cae97114")
+	(property "Reference" "F6"
+		(at 320.04 167.64000000000001 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Value" "PTC 1.5A/16V"
+		(at 320.04 172.72 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Footprint" "Fuse:Fuse_1812_4532Metric"
+		(at 320.04 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 320.04 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 320.04 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "37d5283e-5e39-52a7-8e7d-ffc8d4101b53")
+		)
+		(pin "2"
+			(uuid "bf52b4d2-f1d7-5947-95bd-309343a91ee0")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "F6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 304.8 160.02 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d868e8f8-9aa1-5048-b8f3-0509062c49b2")
+	(property "Reference" "C20"
+		(at 307.34000000000003 158.75 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "100uF"
+		(at 307.34000000000003 161.29000000000002 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Capacitor_SMD:C_1210_3225Metric"
+		(at 304.8 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 304.8 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 304.8 160.02 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "36695a33-8927-5260-b631-b4ebe1a9c2b8")
+		)
+		(pin "2"
+			(uuid "14830baa-061f-5798-811f-ad9d5a0ff517")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "C20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 340.36 170.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "bc8142e4-a4fe-56ed-9708-0e78ae24f085")
+	(property "Reference" "D4"
+		(at 342.90000000000003 167.64000000000001 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "SMF5.0CA"
+		(at 342.90000000000003 172.72 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SMF"
+		(at 340.36 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 340.36 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 340.36 170.18 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "235bd3f6-7b36-508b-ab39-bf2683c8671b")
+		)
+		(pin "2"
+			(uuid "ee68c0e7-08f6-525d-a673-aaf33fb25758")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector_Generic:Conn_01x04")
+		(at 394.97 199.39 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "73e83d2c-5407-5bf1-b74a-0ebf48ab1501")
+	(property "Reference" "J5"
+		(at 402.59000000000003 194.30999999999997 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "WIRE PADS"
+		(at 402.59000000000003 196.85 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+		(at 394.97 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 394.97 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" "Solder wire pads: 5V, GND, A, B"
+		(at 394.97 199.39 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "30f34227-d493-5414-8ed8-a855d7a3d86c")
+		)
+		(pin "2"
+			(uuid "9185c70b-5558-5d2a-85ce-4d6b0f771fe1")
+		)
+		(pin "3"
+			(uuid "e88da0eb-ec93-5e5c-8444-ddd9cdf65011")
+		)
+		(pin "4"
+			(uuid "832076ca-93cd-5c45-9f75-a065a4195181")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "J5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 49.53 275.59 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "74fb6baf-1976-5cf7-bb47-659f25148b62")
+	(property "Reference" "D5"
+		(at 52.07 271.78 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "BAT54"
+		(at 52.07 273.04999999999995 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SOD-323"
+		(at 49.53 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 49.53 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 49.53 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "906447eb-b8c7-5050-bb07-2e12ff283588")
+		)
+		(pin "2"
+			(uuid "6173cb8f-8ca7-50ee-b23d-03af2527d28a")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 110.49 275.59 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "32110398-ad39-5633-b00c-45378838e436")
+	(property "Reference" "D6"
+		(at 113.03 271.78 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "BAT54"
+		(at 113.03 273.04999999999995 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SOD-323"
+		(at 110.49 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 110.49 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 110.49 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "6d0b169b-bbdb-5aaa-84e8-66cf73fc80ab")
+		)
+		(pin "2"
+			(uuid "a7f3de15-4264-5542-a449-7a879a679771")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 170.18 275.59 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e7892830-53af-54f4-a29e-f4985d1e5b34")
+	(property "Reference" "D7"
+		(at 172.72 271.78 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "BAT54"
+		(at 172.72 273.04999999999995 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SOD-323"
+		(at 170.18 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 170.18 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 170.18 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "c30471d4-babb-5ed6-9658-0c5e0d9b8047")
+		)
+		(pin "2"
+			(uuid "6adfa7e8-9e1d-5a71-a7b5-c085e8a0318f")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 229.87 275.59 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2184ec4d-9bb2-5160-8ea2-e3a070242333")
+	(property "Reference" "D8"
+		(at 232.41 271.78 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "BAT54"
+		(at 232.41 273.04999999999995 270)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Diode_SMD:D_SOD-323"
+		(at 229.87 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 229.87 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 229.87 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "5f0730d2-5209-575a-8e54-33139899c90f")
+		)
+		(pin "2"
+			(uuid "e731f6c6-d3bc-5982-8e45-fc9323514513")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "D8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 255.27 275.59 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c740beab-edc0-5354-9bad-3acdc5ea17ed")
+	(property "Reference" "R22"
+		(at 257.81 274.32 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Value" "10k"
+		(at 257.81 276.85999999999996 0)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+	)
+	(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+		(at 255.27 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 255.27 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 255.27 275.59 0)
+		(hide yes)
+		(show_name no)
+		(do_not_autoplace no)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+		(pin "1"
+			(uuid "7afd6b04-3666-541e-a099-85db2235794a")
+		)
+		(pin "2"
+			(uuid "f45e1128-a416-5b01-8fa4-59b1e8d59cc7")
+		)
+		(instances
+			(project "jardinier2000"
+				(path "/7dbe90ae-c149-5247-adce-9c1a581a51de/a8b5f214-c9a6-5f06-a88f-6a4413aaf909"
+					(reference "R22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(rectangle
+		(start 10.16 20.32)
+		(end 209.55 139.7)
+		(stroke
+			(width 0.1524)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "d35c7739-1b5d-5c76-8792-a7d4d997faf5")
+	)
+	(rectangle
+		(start 209.55 20.32)
+		(end 410.21 139.7)
+		(stroke
+			(width 0.1524)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "a3e2f21f-a169-5782-9c1a-d6aee49d576d")
+	)
+	(rectangle
+		(start 10.16 139.7)
+		(end 209.55 260.35)
+		(stroke
+			(width 0.1524)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "6f1e3c7b-7b52-5a2a-b14d-4bc0ce4de227")
+	)
+	(rectangle
+		(start 209.55 139.7)
+		(end 410.21 260.35)
+		(stroke
+			(width 0.1524)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "bbdbe4fe-7cd3-5cc1-adb6-bf234d098a24")
+	)
+	(rectangle
+		(start 10.16 260.35)
+		(end 289.56 289.56)
+		(stroke
+			(width 0.1524)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid "24be23ef-e97a-503f-860f-c35d90fd019b")
+	)
+	(text "PORT 1"
+		(at 15.24 30.48 0)
+		(effects
+			(font
+				(size 2.0 2.0)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "41e48fa7-7454-5f40-a210-4368f4b166e0")
+	)
+	(text "PORT 2"
+		(at 214.63 30.48 0)
+		(effects
+			(font
+				(size 2.0 2.0)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "2c92d66b-6b8c-579c-b342-98a430e3bacc")
+	)
+	(text "PORT 3"
+		(at 15.24 149.86 0)
+		(effects
+			(font
+				(size 2.0 2.0)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "e8756825-54d4-5035-b009-afe667dee28e")
+	)
+	(text "PORT 4"
+		(at 214.63 149.86 0)
+		(effects
+			(font
+				(size 2.0 2.0)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "23fd0a88-9a45-5de5-a643-eb4f7648bc13")
+	)
+	(text "RX COMBINER"
+		(at 15.24 270.51 0)
+		(effects
+			(font
+				(size 1.5 1.5)
+				(thickness 0.3)
+			)
+			(justify left bottom)
+		)
+		(uuid "a1dcdef0-0698-5450-bfec-73ec35bcbcb3")
+	)
+	(embedded_fonts no)
+)
