@@ -149,71 +149,6 @@ class FeatureDevcontainerCLI(Feature):
 		]
 
 
-class FeatureOpenCode(Feature):
-	"""Feature: Add opencode CLI to the container."""
-
-	@staticmethod
-	def cli() -> dict[str, dict[str, typing.Any]]:
-		return {
-			"opencode": {
-				"action": "append",
-				"default": [],
-				"choices": ["playwright", "host-config"],
-				"help": "Options for the opencode feature.",
-			}
-		}
-
-	def process(self, context: "SandboxContainer") -> None:
-		# Add Linux essential tools
-		llmEssentials = [
-			"jq",
-			"ripgrep",
-			"coreutils",
-			"diffutils",
-			"lsof",
-			"net-tools",
-			"netcat-openbsd",
-			"iproute2",
-			"tree",
-			"coreutils",
-			"findutils",
-		]
-		self.dockerFile += [
-			f"RUN sudo apt install -y nodejs npm {' '.join(llmEssentials)}",
-			"RUN sudo npm install -g @opencode/cli",
-		]
-
-		if "host-config" in self.args.opencode:
-			self.dockerFile += [
-				# Important! If not set, docker will create synthetic directory and write access will not be permitted.
-				f"RUN mkdir -p {context.home}/.config {context.home}/.local/share {context.home}/.local/state",
-			]
-			hostHome = pathlib.Path.home()
-			self.volumes += [
-				f"{hostHome / path}:{context.home / path}"
-				for path in [
-					".config/opencode",
-					".local/share/opencode",
-					".local/state/opencode",
-				]
-				if (hostHome / path).exists()
-			]
-		else:
-			# Add generic agents/commands/skills.
-			self.includes(".opencode/agents", f"{context.home}/.config/opencode/agents", context)
-			self.includes(".opencode/commands", f"{context.home}/.config/opencode/commands", context)
-			for skill in ["cc", "debug", "documentation", "sanitize", "software-architecture", "write-tests"]:
-				self.includes(f".opencode/skills/{skill}", f"{context.home}/.config/opencode/skills/{skill}", context)
-
-		if "playwright" in self.args.opencode:
-			self.includes(".opencode/skills/playwright-cli", f"{context.home}/.config/opencode/skills/playwright-cli", context)
-			self.dockerFile += [
-				# Newer version require node v20+ (which conflicts with ubuntu stock node version).
-				"RUN sudo npm install -g @playwright/cli@v0.1.15",
-				"RUN playwright-cli install-browser chrome --with-deps",
-			]
-
-
 class FeatureDocker(Feature):
 	"""Feature: Docker outside the container."""
 
@@ -722,7 +657,6 @@ services:
 			"volume": FeatureVolume,
 			"isolation": FeatureIsolation,
 			"devcontainer": FeatureDevcontainerCLI,
-			"opencode": FeatureOpenCode,
 			"session": FeatureSession,
 		}
 
@@ -829,7 +763,7 @@ services:
 			help="Additional arguments to pass to the container.",
 		)
 
-		for FeatureClass in allFeatures.values():
+		for FeatureClass in [*allFeatures.values(), *additionalFeatures]:
 			for name, kwargs in FeatureClass.cli().items():
 				parser.add_argument(f"--{name}", **kwargs)
 
