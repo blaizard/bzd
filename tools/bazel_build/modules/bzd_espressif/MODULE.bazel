@@ -22,4 +22,4 @@ pip.parse(
 use_repo(pip, pip = "bzd_espressif_pip")
 
 # Default runners are QEMU.
-register_toolchains("//runner/esp32:qemu_toolchain", "//runner/esp32s3:esp_emu_toolchain", "//runner/esp32:qemu_gdb_toolchain", "//runner/esp32s3:qemu_toolchain")
+register_toolchains("//runner/esp32:esp_emu_toolchain", "//runner/esp32s3:esp_emu_toolchain", "//runner/esp32:qemu_gdb_toolchain", "//runner/esp32:qemu_toolchain", "//runner/esp32s3:qemu_toolchain")

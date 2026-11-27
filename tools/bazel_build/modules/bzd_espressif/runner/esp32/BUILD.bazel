@@ -32,6 +32,36 @@ bzd_make_runner_toolchain(
 )
 
 sh_binary_wrapper(
+    name = "esp_emu",
+    command = """
+        {esptool} --chip esp32 elf2image -o "./image" "$1"
+        {builder} --size "$FLASH_SIZE" --chunk {bootloader},0x1000 --chunk "$PARTITION_TABLE",0x8000 --chunk ./image,"$APP_OFFSET","$APP_MAX_SIZE" ./qemu_flash.bin
+        {esp_emu} --binary "$1" -- --chip esp32 --firmware ./qemu_flash.bin
+    """,
+    locations = {
+        "//tools/esp_emu": "esp_emu",
+        "@bzd_python//bzd/utils:binary_builder": "builder",
+        "@esp32_xtensa_lx6_sdk//:bin/bootloader.bin": "bootloader",
+        "@esptool//:esptool": "esptool",
+    },
+)
+
+bzd_make_runner_toolchain(
+    name = "esp_emu_toolchain",
+    required_options = [
+        "APP_MAX_SIZE",
+        "APP_OFFSET",
+        "FLASH_SIZE",
+        "PARTITION_TABLE",
+    ],
+    runner = ":esp_emu",
+    target_compatible_with = [
+        "@bzd_platforms//al:esp32",
+        "@bzd_platforms//isa:xtensa_lx6",
+    ],
+)
+
+sh_binary_wrapper(
     name = "qemu_gdb",
     command = """
         {esptool} --chip esp32 elf2image -o "./image" "$1"
