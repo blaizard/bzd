@@ -8,6 +8,7 @@ py_binary(
         "generate_dockerfile.py",
     ],
     deps = [
+        "//:opencode",
         "//:sandbox",
     ],
 )

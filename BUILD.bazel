@@ -60,3 +60,12 @@ py_binary(
     srcs = ["sandbox.py"],
     visibility = ["//visibility:public"],
 )
+
+py_binary(
+    name = "opencode",
+    srcs = ["opencode.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":sandbox",
+    ],
+)

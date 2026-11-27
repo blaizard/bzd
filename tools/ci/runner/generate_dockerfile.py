@@ -1,6 +1,7 @@
 import argparse
 import pathlib
 
+from opencode import FeatureKiCad, FeatureOpenCode, FeaturePlaywright
 from sandbox import Feature, SandboxContainer
 
 
@@ -56,12 +57,8 @@ if __name__ == "__main__":
 
 	elif args.image == "opencode":
 		sandbox = SandboxContainer.fromCLI(
-			commonArgs
-			+ [
-				"--enable=opencode",
-				"--opencode=playwright",
-			],
-			additionalFeatures=[FeatureLinux],
+			commonArgs,
+			additionalFeatures=[FeatureLinux, FeatureOpenCode, FeatureKiCad, FeaturePlaywright],
 		)
 
 	else:
