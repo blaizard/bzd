@@ -398,8 +398,23 @@ describe("MCPServer", () => {
 			});
 			Exception.assertEqual(response.status, 200);
 			const body = JSON.parse(response.data);
+			Exception.assertEqual(body.error.code, -32601);
 			Exception.assertEqual(body.error.message, "Unsupported MCP method: foo/bar");
 			Exception.assert(!("result" in body));
+		});
+
+		it("should return a valid JSON-RPC error for the server/discover probe", async () => {
+			const mockChannel = new MockHttpServer();
+			const mcpServer = new MCPServer({ channel: mockChannel });
+			mcpServer.addRoute("/mcp", async () => {}, {});
+			await mockChannel.start();
+			const response = await mockChannel.send("post", "/mcp", {
+				data: { jsonrpc: "2.0", id: 6, method: "server/discover", params: {} },
+			});
+			Exception.assertEqual(response.status, 200);
+			const body = JSON.parse(response.data);
+			Exception.assertEqual(body.error.code, -32601);
+			Exception.assertEqual(body.error.message, "Unsupported MCP method: server/discover");
 		});
 	});
 });
