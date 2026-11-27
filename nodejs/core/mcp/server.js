@@ -114,9 +114,21 @@ export default class MCPServer {
 				context.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
 				context.setHeader(
 					"Access-Control-Allow-Headers",
-					"Origin, Content-Type, Accept, Authorization, mcp-protocol-version",
+					"Origin, Content-Type, Accept, Authorization, mcp-protocol-version, Mcp-Session-Id",
 				);
 				context.sendStatus(200, "OK");
+			},
+			routeOptions,
+		);
+
+		// Server-initiated messages (SSE) are not supported.
+		this.options.channel.addRoute(
+			"GET",
+			endpoint,
+			(context) => {
+				context.setHeader("Access-Control-Allow-Origin", "*");
+				context.setHeader("Allow", "POST, OPTIONS");
+				context.sendStatus(405);
 			},
 			routeOptions,
 		);
@@ -126,6 +138,12 @@ export default class MCPServer {
 			endpoint,
 			async (context) => {
 				const body = context.getBody();
+				// Notifications do not expect a response.
+				if (isObject(body) && !("id" in body) && typeof body.method === "string") {
+					context.setHeader("Access-Control-Allow-Origin", "*");
+					context.sendStatus(202);
+					return;
+				}
 				const method = body.method;
 				let response = {
 					jsonrpc: "2.0",

@@ -416,5 +416,36 @@ describe("MCPServer", () => {
 			Exception.assertEqual(body.error.code, -32601);
 			Exception.assertEqual(body.error.message, "Unsupported MCP method: server/discover");
 		});
+
+		it("should respond 202 to notifications", async () => {
+			const mockChannel = new MockHttpServer();
+			const mcpServer = new MCPServer({ channel: mockChannel });
+			mcpServer.addRoute("/mcp", async () => {}, {});
+			await mockChannel.start();
+			const response = await mockChannel.send("post", "/mcp", {
+				data: { jsonrpc: "2.0", method: "notifications/initialized" },
+			});
+			Exception.assertEqual(response.status, 202);
+			Exception.assertEqual(response.data, null);
+		});
+
+		it("should respond 405 to GET requests", async () => {
+			const mockChannel = new MockHttpServer();
+			const mcpServer = new MCPServer({ channel: mockChannel });
+			mcpServer.addRoute("/mcp", async () => {}, {});
+			await mockChannel.start();
+			const response = await mockChannel.send("get", "/mcp");
+			Exception.assertEqual(response.status, 405);
+			Exception.assertEqual(response.headers["Allow"], "POST, OPTIONS");
+		});
+
+		it("should allow the Mcp-Session-Id header in CORS preflight", async () => {
+			const mockChannel = new MockHttpServer();
+			const mcpServer = new MCPServer({ channel: mockChannel });
+			mcpServer.addRoute("/mcp", async () => {}, {});
+			await mockChannel.start();
+			const response = await mockChannel.send("options", "/mcp");
+			Exception.assert(response.headers["Access-Control-Allow-Headers"].includes("Mcp-Session-Id"));
+		});
 	});
 });
