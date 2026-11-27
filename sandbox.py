@@ -764,7 +764,7 @@ services:
 		)
 
 		for FeatureClass in [*allFeatures.values(), *additionalFeatures]:
-			for name, kwargs in FeatureClass.cli().items():
+			for name, kwargs in FeatureClass.cli().items():  # type: ignore
 				parser.add_argument(f"--{name}", **kwargs)
 
 		# Read the arguments.
