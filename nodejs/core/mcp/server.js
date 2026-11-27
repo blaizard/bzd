@@ -194,7 +194,7 @@ export default class MCPServer {
 					}
 				} else {
 					response.error = {
-						code: -32601,
+						code: -32601, // Method not found.
 						message: "Unsupported MCP method: " + method,
 					};
 				}
