@@ -1,0 +1,26 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bzd_rules_nodejs//nodejs:defs.bzl", "bzd_nodejs_requirements_compile")
+
+exports_files([
+    "defs.bzl",
+])
+
+bzl_library(
+    name = "defs",
+    srcs = [
+        "defs.bzl",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//private:defs",
+    ],
+)
+
+# Update: bazel run @bzd_tscircuit//:requirements
+bzd_nodejs_requirements_compile(
+    name = "requirements",
+    srcs = [
+        "requirements.in",
+    ],
+    output = "requirements.json",
+)

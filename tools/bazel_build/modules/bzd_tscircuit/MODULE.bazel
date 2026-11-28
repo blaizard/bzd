@@ -1,0 +1,19 @@
+module(
+    name = "bzd_tscircuit",
+    version = "1.0",
+)
+
+bazel_dep(name = "bazel_skylib", version = "1.9.2")
+bazel_dep(name = "rules_python", version = "2.5.1")
+bazel_dep(name = "bzd_lib", version = "1.0")
+bazel_dep(name = "bzd_python", version = "1.0")
+bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
+
+# Nodejs
+
+requirements_nodejs = use_extension("@bzd_rules_nodejs//:requirements.bzl", "requirements_nodejs")
+requirements_nodejs.parse(
+    name = "bzd_tscircuit_deps",
+    requirements = "//:requirements.json",
+)
+use_repo(requirements_nodejs, "bzd_tscircuit_deps")

@@ -1,0 +1,19 @@
+load("//:defs.bzl", "bzd_tscircuit_binary", "bzd_tscircuit_library")
+
+bzd_tscircuit_library(
+    name = "components",
+    srcs = [
+        "components/blinker_led.tsx",
+    ],
+)
+
+bzd_tscircuit_binary(
+    name = "example",
+    srcs = [
+        "example.circuit.tsx",
+    ],
+    main = "example.circuit.tsx",
+    deps = [
+        ":components",
+    ],
+)

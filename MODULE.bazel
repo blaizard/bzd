@@ -10,6 +10,7 @@ bazel_dep(name = "bzd_rules_doc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_cc", version = "1.0")
 bazel_dep(name = "bzd_toolchain_rust", version = "1.0")
 bazel_dep(name = "bzd_rules_nodejs", version = "1.0")
+bazel_dep(name = "bzd_tscircuit", version = "1.0")
 bazel_dep(name = "bzd_platforms", version = "1.0")
 bazel_dep(name = "bzd_dns", version = "1.0")
 bazel_dep(name = "bzd_sanitizer", version = "1.0")
@@ -38,6 +39,7 @@ bazel_dep(name = "rules_pkg", version = "1.3.0")
     "bzd_toolchain_cc",
     "bzd_toolchain_rust",
     "bzd_rules_nodejs",
+    "bzd_tscircuit",
     "bzd_rules_oci",
     "bzd_bundle",
     "bzd_platforms",
