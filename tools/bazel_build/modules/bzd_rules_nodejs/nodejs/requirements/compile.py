@@ -185,9 +185,18 @@ class RequirementsFactory:
 						assert False, f"The dependency '{dependency['name']}' from package '{package}' is not found."
 					versionsPackages = {p.version: p for p in packagesByName[dependency["name"]]}
 					maybeVersion = dependency["matcher"].matchLatest(versionsPackages.keys())
-					assert maybeVersion is not None, (
-						f"Couldn't find a matching version for '{dependency['name']}' with {dependency['matcher']} and {versionsPackages.keys()}."
-					)
+					if maybeVersion is None:
+						# A peer dependency may be overridden by the package manager, in which case the
+						# lockfile contains a version that does not satisfy it. This edge is only an
+						# optimization, the dependency can still be resolved at runtime.
+						if dependency.get("isPeer"):
+							print(
+								f"WARNING: Peer dependency '{dependency['name']}' from package '{package}' cannot be satisfied with {versionsPackages.keys()}. Skipping."
+							)
+							continue
+						assert False, (
+							f"Couldn't find a matching version for '{dependency['name']}' with {dependency['matcher']} and {versionsPackages.keys()}."
+						)
 					resolved = versionsPackages[maybeVersion]
 					# Skip peer dependency edges that would create a cycle (e.g., browserslist <-> update-browserslist-db)
 					visited: set[Package] = set()
