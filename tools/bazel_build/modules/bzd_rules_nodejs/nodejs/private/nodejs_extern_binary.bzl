@@ -11,7 +11,7 @@ def _bzd_nodejs_extern_binary_impl(ctx):
     toolchain_executable = ctx.toolchains["//nodejs:toolchain_type"].executable
 
     # Build the command
-    command = "NODE_ENV=production {{node}} {{node_modules}}/{binary} {params} \"$@\"".format(
+    command = "{{node}} {{node_modules}}/{binary} {params} \"$@\"".format(
         binary = ctx.attr.binary,
         params = " ".join(ctx.attr.params),
     )
